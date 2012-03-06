@@ -643,6 +643,16 @@ case ${target} in
       ;;
   esac
   ;;
+*-*-nacl*)
+  gas=yes
+  gnu_ld=yes
+  default_use_cxa_atexit=yes
+  default_gnu_indirect_function=yes
+  use_gcc_tgmath=no
+  use_gcc_stdint=wrap
+#  native_system_header_dir=/include
+#  extra_options="$extra_options nacl.opt"
+  ;;
 *-*-netbsd*)
   tmake_file="t-slibgcc"
   gas=yes
@@ -827,6 +837,17 @@ arm-wrs-vxworks)
 arm*-*-freebsd*)
 	tm_file="dbxelf.h elfos.h ${fbsd_tm_file} arm/elf.h arm/aout.h arm/freebsd.h arm/arm.h"
 	tmake_file="${tmake_file} arm/t-arm arm/t-strongarm-elf"
+	;;
+arm*-*-nacl*)
+	tm_file="dbxelf.h elfos.h gnu-user.h nacl.h glibc-stdint.h arm/elf.h arm/linux-elf.h arm/bpabi.h arm/linux-eabi.h arm/aout.h arm/nacl.h arm/arm.h"
+	case $target in
+	arm*b-*-nacl*)
+		tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
+		;;
+	esac
+	tmake_file="${tmake_file} arm/t-arm"
+	need_64bit_hwint=yes
+	with_tls=${with_tls:-gnu}
 	;;
 arm*-*-netbsdelf*)
 	tm_file="dbxelf.h elfos.h netbsd.h netbsd-elf.h arm/elf.h arm/aout.h arm/arm.h arm/netbsd-elf.h"

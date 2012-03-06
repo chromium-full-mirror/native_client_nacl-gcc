@@ -1862,7 +1862,7 @@ arm_option_override (void)
   /* Use the cp15 method if it is available.  */
   if (target_thread_pointer == TP_AUTO)
     {
-      if (arm_arch6k && !TARGET_THUMB1)
+      if (arm_arch6k && !TARGET_THUMB1 && !TARGET_SFI_NACL1)
 	target_thread_pointer = TP_CP15;
       else
 	target_thread_pointer = TP_SOFT;
@@ -1870,6 +1870,9 @@ arm_option_override (void)
 
   if (TARGET_HARD_TP && TARGET_THUMB1)
     error ("can not use -mtp=cp15 with 16-bit Thumb");
+
+  if (TARGET_HARD_TP && TARGET_SFI_NACL1)
+    error ("can not use -mtp=cp15 with Native Client SFI");
 
   /* Override the default structure alignment for AAPCS ABI.  */
   if (!global_options_set.x_arm_structure_size_boundary)
@@ -7631,7 +7634,7 @@ arm_rtx_costs_1 (rtx x, enum rtx_code outer, int* total, bool speed)
 
     case SET:
       return false;
-      
+
     case UNSPEC:
       /* We cost this as high as our memory costs to allow this to
 	 be hoisted from loops.  */
@@ -10956,7 +10959,7 @@ gen_const_stm_seq (rtx *operands, int nops)
    unaligned copies on processors which support unaligned semantics for those
    instructions.  INTERLEAVE_FACTOR can be used to attempt to hide load latency
    (using more registers) by doing e.g. load/load/store/store for a factor of 2.
-   An interleave factor of 1 (the minimum) will perform no interleaving. 
+   An interleave factor of 1 (the minimum) will perform no interleaving.
    Load/store multiple are used for aligned addresses where possible.  */
 
 static void
@@ -10976,9 +10979,9 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
   HOST_WIDE_INT srcoffset, dstoffset;
   HOST_WIDE_INT src_autoinc, dst_autoinc;
   rtx mem, addr;
-  
+
   gcc_assert (1 <= interleave_factor && interleave_factor <= 4);
-  
+
   /* Use hard registers if we have aligned source or destination so we can use
      load/store multiple with contiguous registers.  */
   if (dst_aligned || src_aligned)
@@ -10992,7 +10995,7 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
   src = copy_addr_to_reg (XEXP (srcbase, 0));
 
   srcoffset = dstoffset = 0;
-  
+
   /* Calls to arm_gen_load_multiple and arm_gen_store_multiple update SRC/DST.
      For copying the last bytes we want to subtract this offset again.  */
   src_autoinc = dst_autoinc = 0;
@@ -11046,14 +11049,14 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
 
       remaining -= block_size_bytes;
     }
-  
+
   /* Copy any whole words left (note these aren't interleaved with any
      subsequent halfword/byte load/stores in the interests of simplicity).  */
-  
+
   words = remaining / UNITS_PER_WORD;
 
   gcc_assert (words < interleave_factor);
-  
+
   if (src_aligned && words > 1)
     {
       emit_insn (arm_gen_load_multiple (regnos, words, src, TRUE, srcbase,
@@ -11093,11 +11096,11 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
     }
 
   remaining -= words * UNITS_PER_WORD;
-  
+
   gcc_assert (remaining < 4);
-  
+
   /* Copy a halfword if necessary.  */
-  
+
   if (remaining >= 2)
     {
       halfword_tmp = gen_reg_rtx (SImode);
@@ -11121,11 +11124,11 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       remaining -= 2;
       srcoffset += 2;
     }
-  
+
   gcc_assert (remaining < 2);
-  
+
   /* Copy last byte.  */
-  
+
   if ((remaining & 1) != 0)
     {
       byte_tmp = gen_reg_rtx (SImode);
@@ -11146,9 +11149,9 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       remaining--;
       srcoffset++;
     }
-  
+
   /* Store last halfword if we haven't done so already.  */
-  
+
   if (halfword_tmp)
     {
       addr = plus_constant (dst, dstoffset - dst_autoinc);
@@ -11167,7 +11170,7 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       emit_move_insn (mem, gen_lowpart (QImode, byte_tmp));
       dstoffset++;
     }
-  
+
   gcc_assert (remaining == 0 && srcoffset == dstoffset);
 }
 
@@ -11186,7 +11189,7 @@ arm_adjust_block_mem (rtx mem, HOST_WIDE_INT length, rtx *loop_reg,
 		      rtx *loop_mem)
 {
   *loop_reg = copy_addr_to_reg (XEXP (mem, 0));
-  
+
   /* Although the new mem does not refer to a known location,
      it does keep up to LENGTH bytes of alignment.  */
   *loop_mem = change_address (mem, BLKmode, *loop_reg);
@@ -11206,14 +11209,14 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
 {
   rtx label, src_reg, dest_reg, final_src, test;
   HOST_WIDE_INT leftover;
-  
+
   leftover = length % bytes_per_iter;
   length -= leftover;
-  
+
   /* Create registers and memory references for use within the loop.  */
   arm_adjust_block_mem (src, bytes_per_iter, &src_reg, &src);
   arm_adjust_block_mem (dest, bytes_per_iter, &dest_reg, &dest);
-  
+
   /* Calculate the value that SRC_REG should have after the last iteration of
      the loop.  */
   final_src = expand_simple_binop (Pmode, PLUS, src_reg, GEN_INT (length),
@@ -11222,7 +11225,7 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
   /* Emit the start of the loop.  */
   label = gen_label_rtx ();
   emit_label (label);
-  
+
   /* Emit the loop body.  */
   arm_block_move_unaligned_straight (dest, src, bytes_per_iter,
 				     interleave_factor);
@@ -11230,11 +11233,11 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
   /* Move on to the next block.  */
   emit_move_insn (src_reg, plus_constant (src_reg, bytes_per_iter));
   emit_move_insn (dest_reg, plus_constant (dest_reg, bytes_per_iter));
-  
+
   /* Emit the loop condition.  */
   test = gen_rtx_NE (VOIDmode, src_reg, final_src);
   emit_jump_insn (gen_cbranchsi4 (test, src_reg, final_src, label));
-  
+
   /* Mop up any left-over bytes.  */
   if (leftover)
     arm_block_move_unaligned_straight (dest, src, leftover, interleave_factor);
@@ -11248,7 +11251,7 @@ static int
 arm_movmemqi_unaligned (rtx *operands)
 {
   HOST_WIDE_INT length = INTVAL (operands[2]);
-  
+
   if (optimize_size)
     {
       bool src_aligned = MEM_ALIGN (operands[1]) >= BITS_PER_WORD;
@@ -11259,7 +11262,7 @@ arm_movmemqi_unaligned (rtx *operands)
 	 resulting code can be smaller.  */
       unsigned int interleave_factor = (src_aligned || dst_aligned) ? 2 : 1;
       HOST_WIDE_INT bytes_per_iter = (src_aligned || dst_aligned) ? 8 : 4;
-      
+
       if (length > 12)
 	arm_block_move_unaligned_loop (operands[0], operands[1], length,
 				       interleave_factor, bytes_per_iter);
@@ -11277,7 +11280,7 @@ arm_movmemqi_unaligned (rtx *operands)
       else
 	arm_block_move_unaligned_straight (operands[0], operands[1], length, 4);
     }
-  
+
   return 1;
 }
 
@@ -19983,7 +19986,7 @@ struct builtin_description
   const enum rtx_code      comparison;
   const unsigned int       flag;
 };
-  
+
 static const struct builtin_description bdesc_2arg[] =
 {
 #define IWMMXT_BUILTIN(code, string, builtin) \
@@ -21901,7 +21904,7 @@ thumb_unexpanded_epilogue (void)
   if (extra_pop > 0)
     {
       unsigned long extra_mask = (1 << extra_pop) - 1;
-      live_regs_mask |= extra_mask << ((size + UNITS_PER_WORD - 1) 
+      live_regs_mask |= extra_mask << ((size + UNITS_PER_WORD - 1)
 				       / UNITS_PER_WORD);
     }
 
@@ -24722,10 +24725,10 @@ int
 vfp3_const_double_for_fract_bits (rtx operand)
 {
   REAL_VALUE_TYPE r0;
-  
+
   if (GET_CODE (operand) != CONST_DOUBLE)
     return 0;
-  
+
   REAL_VALUE_FROM_CONST_DOUBLE (r0, operand);
   if (exact_real_inverse (DFmode, &r0))
     {

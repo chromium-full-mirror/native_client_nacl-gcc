@@ -1,0 +1,79 @@
+/* Definitions for ARM running Native Client
+   Copyright (C) 2012 Free Software Foundation, Inc.
+
+   This file is part of GCC.
+
+   GCC is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published
+   by the Free Software Foundation; either version 3, or (at your
+   option) any later version.
+
+   GCC is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+   License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with GCC; see the file COPYING3.  If not see
+   <http://www.gnu.org/licenses/>.  */
+
+/* linux-elf.h and linux-eabi.h should have already been included.  Now
+   just override any conflicting definitions and add any extras.  */
+
+#undef  TARGET_OS_CPP_BUILTINS
+#define TARGET_OS_CPP_BUILTINS()                \
+  do                                            \
+    {                                           \
+      TARGET_BPABI_CPP_BUILTINS();              \
+      GNU_USER_TARGET_OS_CPP_BUILTINS();        \
+    }                                           \
+  while (0)
+
+#undef  TARGET_DEFAULT_FLOAT_ABI
+#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_HARD
+
+/* For NaCl we use DWARF2 unwind information, not ARM's flavor.  */
+#undef  ARM_UNWIND_INFO
+#define ARM_UNWIND_INFO 0
+
+#undef  TARGET_DEFAULT
+#define TARGET_DEFAULT (TARGET_ENDIAN_DEFAULT | MASK_SFI_NACL1)
+
+#undef  SUBTARGET_CPU_DEFAULT
+#define SUBTARGET_CPU_DEFAULT TARGET_CPU_genericv7a
+
+/* r9 is reserved for the thread pointer.  */
+#undef  SUBTARGET_CONDITIONAL_REGISTER_USAGE
+#define SUBTARGET_CONDITIONAL_REGISTER_USAGE \
+  fixed_regs[9] = 1; \
+  call_used_regs[9] = 1;
+
+/* TARGET_BIG_ENDIAN_DEFAULT is set in
+   config.gcc for big endian configurations.  */
+#undef TARGET_LINKER_EMULATION
+#if TARGET_BIG_ENDIAN_DEFAULT
+#define TARGET_LINKER_EMULATION  "armelfb_nacl"
+#else
+#define TARGET_LINKER_EMULATION  "armelf_nacl"
+#endif
+
+/* TODO: thumb */
+#undef  GNU_USER_DYNAMIC_LINKER
+#define GNU_USER_DYNAMIC_LINKER "/lib/ld-nacl-arm.so.1"
+
+#undef  LINK_SPEC
+#define LINK_SPEC BE8_LINK_SPEC LINUX_TARGET_LINK_SPEC
+
+#undef  CC1_SPEC
+#define CC1_SPEC GNU_USER_TARGET_CC1_SPEC
+
+#undef  CC1PLUS_SPEC
+
+#undef  LIB_SPEC
+#define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
+
+#undef  STARTFILE_SPEC
+#define STARTFILE_SPEC GNU_USER_TARGET_STARTFILE_SPEC
+
+#undef  ENDFILE_SPEC
+#define ENDFILE_SPEC GNU_USER_TARGET_ENDFILE_SPEC
