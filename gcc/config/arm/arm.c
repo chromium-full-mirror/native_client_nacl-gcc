@@ -15400,9 +15400,10 @@ output_return_instruction (rtx operand, int really_return, int reverse)
       const char * return_reg;
 
       /* If we do not have any special requirements for function exit
-	 (e.g. interworking) then we can load the return address
+	 (e.g. interworking, nacl) then we can load the return address
 	 directly into the PC.  Otherwise we must load it into LR.  */
       if (really_return
+	  && !TARGET_SFI_NACL1
 	  && (IS_INTERRUPT (func_type) || !TARGET_INTERWORK))
 	return_reg = reg_names[PC_REGNUM];
       else
@@ -15517,7 +15518,10 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 
       /* See if we need to generate an extra instruction to
 	 perform the actual function return.  */
+      /* TODO(sehr): surely there's a better way than repeating this condition
+         here and above. */
       if (really_return
+	  && !TARGET_SFI_NACL1
 	  && func_type != ARM_FT_INTERWORKED
 	  && (live_regs_mask & (1 << LR_REGNUM)) != 0)
 	{
