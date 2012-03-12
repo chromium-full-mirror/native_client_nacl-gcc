@@ -5844,12 +5844,11 @@ arm_legitimate_index_p (enum machine_mode mode, rtx index, RTX_CODE outer,
   HOST_WIDE_INT range;
   enum rtx_code code = GET_CODE (index);
 
-#ifdef TARGET_SFI_NACL1
   /* This may be overly drastic, since it also disables post-increment by
      register addressing.  */
-  if (code != CONST_INT)
+  if (TARGET_SFI_NACL1 && code != CONST_INT)
     return 0;
-#endif
+
   /* Standard coprocessor addressing modes.  */
   if (TARGET_HARD_FLOAT
       && (TARGET_VFP || TARGET_FPA || TARGET_MAVERICK)
