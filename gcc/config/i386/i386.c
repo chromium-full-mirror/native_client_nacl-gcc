@@ -11436,11 +11436,11 @@ ix86_decompose_address (rtx addr, struct ix86_address *out)
 	  addr = XEXP (addr, 0);
 
 	  /* Adjust SUBREGs.  */
-	  if (GET_MODE (addr) == DImode)
-	    addr = gen_rtx_SUBREG (SImode, addr, 0);
-	  else if (GET_CODE (addr) == SUBREG
-		   && GET_MODE (SUBREG_REG (addr)) == SImode)
+	  if (GET_CODE (addr) == SUBREG
+	      && GET_MODE (SUBREG_REG (addr)) == SImode)
 	    addr = SUBREG_REG (addr);
+	  else if (GET_MODE (addr) == DImode)
+	    addr = gen_rtx_SUBREG (SImode, addr, 0);
 	  else
 	    return 0;
 	}
@@ -23121,7 +23121,7 @@ ix86_split_call_vzeroupper (rtx insn, rtx vzeroupper)
 const char *
 ix86_output_call_insn (rtx insn, rtx call_op)
 {
-  bool direct_p = constant_call_address_operand (call_op, Pmode);
+  bool direct_p = constant_call_address_operand (call_op, VOIDmode);
   bool seh_nop_p = false;
   const char *xasm;
 
