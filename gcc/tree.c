@@ -10197,32 +10197,26 @@ widest_int_cst_value (const_tree x)
   return val;
 }
 
-/* If TYPE is an integral type, return an equivalent type which is
-    unsigned iff UNSIGNEDP is true.  If TYPE is not an integral type,
-    return TYPE itself.  */
+/* If TYPE is an integral or pointer type, return an integer type with
+   the same precision which is unsigned iff UNSIGNEDP is true, or itself
+   if TYPE is already an integer type of signedness UNSIGNEDP.  */
 
 tree
 signed_or_unsigned_type_for (int unsignedp, tree type)
 {
-  tree t = type;
-  if (POINTER_TYPE_P (type))
-    {
-      /* If the pointer points to the normal address space, use the
-	 size_type_node.  Otherwise use an appropriate size for the pointer
-	 based on the named address space it points to.  */
-      if (!TYPE_ADDR_SPACE (TREE_TYPE (t)))
-	t = size_type_node;
-      else
-	return lang_hooks.types.type_for_size (TYPE_PRECISION (t), unsignedp);
-    }
+  if (TREE_CODE (type) == INTEGER_TYPE && TYPE_UNSIGNED (type) == unsignedp)
+    return type;
 
-  if (!INTEGRAL_TYPE_P (t) || TYPE_UNSIGNED (t) == unsignedp)
-    return t;
+  if (!INTEGRAL_TYPE_P (type)
+      && !POINTER_TYPE_P (type))
+    return NULL_TREE;
 
-  return lang_hooks.types.type_for_size (TYPE_PRECISION (t), unsignedp);
+  return build_nonstandard_integer_type (TYPE_PRECISION (type), unsignedp);
 }
 
-/* Returns unsigned variant of TYPE.  */
+/* If TYPE is an integral or pointer type, return an integer type with
+   the same precision which is unsigned, or itself if TYPE is already an
+   unsigned integer type.  */
 
 tree
 unsigned_type_for (tree type)
@@ -10230,7 +10224,9 @@ unsigned_type_for (tree type)
   return signed_or_unsigned_type_for (1, type);
 }
 
-/* Returns signed variant of TYPE.  */
+/* If TYPE is an integral or pointer type, return an integer type with
+   the same precision which is signed, or itself if TYPE is already a
+   signed integer type.  */
 
 tree
 signed_type_for (tree type)
@@ -11211,6 +11207,52 @@ tree_strip_sign_nop_conversions (tree exp)
   while (tree_sign_nop_conversion (exp))
     exp = TREE_OPERAND (exp, 0);
   return exp;
+}
+
+/* Avoid any floating point extensions from EXP.  */
+tree
+strip_float_extensions (tree exp)
+{
+  tree sub, expt, subt;
+
+  /*  For floating point constant look up the narrowest type that can hold
+      it properly and handle it like (type)(narrowest_type)constant.
+      This way we can optimize for instance a=a*2.0 where "a" is float
+      but 2.0 is double constant.  */
+  if (TREE_CODE (exp) == REAL_CST && !DECIMAL_FLOAT_TYPE_P (TREE_TYPE (exp)))
+    {
+      REAL_VALUE_TYPE orig;
+      tree type = NULL;
+
+      orig = TREE_REAL_CST (exp);
+      if (TYPE_PRECISION (TREE_TYPE (exp)) > TYPE_PRECISION (float_type_node)
+	  && exact_real_truncate (TYPE_MODE (float_type_node), &orig))
+	type = float_type_node;
+      else if (TYPE_PRECISION (TREE_TYPE (exp))
+	       > TYPE_PRECISION (double_type_node)
+	       && exact_real_truncate (TYPE_MODE (double_type_node), &orig))
+	type = double_type_node;
+      if (type)
+	return build_real (type, real_value_truncate (TYPE_MODE (type), orig));
+    }
+
+  if (!CONVERT_EXPR_P (exp))
+    return exp;
+
+  sub = TREE_OPERAND (exp, 0);
+  subt = TREE_TYPE (sub);
+  expt = TREE_TYPE (exp);
+
+  if (!FLOAT_TYPE_P (subt))
+    return exp;
+
+  if (DECIMAL_FLOAT_TYPE_P (expt) != DECIMAL_FLOAT_TYPE_P (subt))
+    return exp;
+
+  if (TYPE_PRECISION (subt) > TYPE_PRECISION (expt))
+    return exp;
+
+  return strip_float_extensions (sub);
 }
 
 /* Strip out all handled components that produce invariant

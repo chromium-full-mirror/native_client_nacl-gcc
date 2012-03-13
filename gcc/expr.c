@@ -4593,10 +4593,12 @@ expand_assignment (tree to, tree from, bool nontemporal)
   if ((TREE_CODE (to) == MEM_REF
        || TREE_CODE (to) == TARGET_MEM_REF)
       && mode != BLKmode
+      && !mem_ref_refers_to_non_mem_p (to)
       && ((align = get_object_or_type_alignment (to))
 	  < GET_MODE_ALIGNMENT (mode))
-      && ((icode = optab_handler (movmisalign_optab, mode))
-	  != CODE_FOR_nothing))
+      && (((icode = optab_handler (movmisalign_optab, mode))
+	   != CODE_FOR_nothing)
+	  || SLOW_UNALIGNED_ACCESS (mode, align)))
     {
       addr_space_t as
 	= TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (TREE_OPERAND (to, 0))));
@@ -4639,11 +4641,17 @@ expand_assignment (tree to, tree from, bool nontemporal)
       if (TREE_THIS_VOLATILE (to))
 	MEM_VOLATILE_P (mem) = 1;
 
-      create_fixed_operand (&ops[0], mem);
-      create_input_operand (&ops[1], reg, mode);
-      /* The movmisalign<mode> pattern cannot fail, else the assignment would
-	 silently be omitted.  */
-      expand_insn (icode, 2, ops);
+      if (icode != CODE_FOR_nothing)
+	{
+	  create_fixed_operand (&ops[0], mem);
+	  create_input_operand (&ops[1], reg, mode);
+	  /* The movmisalign<mode> pattern cannot fail, else the assignment
+	     would silently be omitted.  */
+	  expand_insn (icode, 2, ops);
+	}
+      else
+	store_bit_field (mem, GET_MODE_BITSIZE (mode),
+			 0, 0, 0, mode, reg);
       return;
     }
 
@@ -5893,8 +5901,8 @@ store_constructor (tree exp, rtx target, int cleared, HOST_WIDE_INT size)
 
 		if (TYPE_PRECISION (type) < BITS_PER_WORD)
 		  {
-		    type = lang_hooks.types.type_for_size
-		      (BITS_PER_WORD, TYPE_UNSIGNED (type));
+		    type = lang_hooks.types.type_for_mode
+		      (word_mode, TYPE_UNSIGNED (type));
 		    value = fold_convert (type, value);
 		  }
 
@@ -10726,7 +10734,6 @@ try_casesi (tree index_type, tree index_expr, tree minval, tree range,
 {
   struct expand_operand ops[5];
   enum machine_mode index_mode = SImode;
-  int index_bits = GET_MODE_BITSIZE (index_mode);
   rtx op1, op2, index;
 
   if (! HAVE_casesi)
@@ -10753,7 +10760,7 @@ try_casesi (tree index_type, tree index_expr, tree minval, tree range,
     {
       if (TYPE_MODE (index_type) != index_mode)
 	{
-	  index_type = lang_hooks.types.type_for_size (index_bits, 0);
+	  index_type = lang_hooks.types.type_for_mode (index_mode, 0);
 	  index_expr = fold_convert (index_type, index_expr);
 	}
 
