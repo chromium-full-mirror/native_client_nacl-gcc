@@ -17844,6 +17844,53 @@ arm_print_operand (FILE *stream, rtx x, int code)
       }
       return;
 
+    case 'j':
+      /* Used to prefix a "bx", repeating the (register) operand.
+	 Normally, produces no output.  Under -msfi-nacl1, produces the
+	 "sfi_" prefix unless the register is LR.  */
+      if (GET_CODE (x) != REG)
+	{
+	  output_operand_lossage ("invalid operand for code '%c'", code);
+	  return;
+	}
+
+      if (TARGET_SFI_NACL1
+	  && REGNO (x) != LR_REGNUM)
+	fprintf (stream, "sfi_");
+      return;
+
+    case '*':
+      /* Used to prefix a "bl" or "blx".  */
+      if (TARGET_SFI_NACL1)
+	fprintf (stream, "sfi_");
+      return;
+
+    case 'b':
+      /* Used to prefix a load or store instruction, repeating the memory
+	 operand.  Normally, produces no output.  Under -msfi-nacl1,
+	 produces "sfi_breg REG, " unless REG is SP or LR.  */
+      if (GET_CODE (x) != MEM)
+	{
+	  output_operand_lossage ("invalid operand for code '%c'", code);
+	  return;
+	}
+
+      if (TARGET_SFI_NACL1)
+	{
+	  rtx addr = XEXP (x, 0);
+	  int regno;
+	  if (GET_CODE (addr) != REG)
+	    {
+	      /* It might be (plus (reg...) ...) or suchlike.  */
+	      addr = XEXP (addr, 0);
+	      gcc_assert (GET_CODE (addr) == REG);
+	    }
+	  regno = REGNO (addr);
+	  if (regno != LR_REGNUM && regno != SP_REGNUM)
+	    fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
+	}
+      return;
+
     default:
       if (x == 0)
 	{
@@ -18017,7 +18064,7 @@ static bool
 arm_print_operand_punct_valid_p (unsigned char code)
 {
   return (code == '@' || code == '|' || code == '.'
-	  || code == '(' || code == ')' || code == '#'
+	  || code == '(' || code == ')' || code == '#' || code == '*'
 	  || (TARGET_32BIT && (code == '?'))
 	  || (TARGET_THUMB2 && (code == '!'))
 	  || (TARGET_THUMB && (code == '_')));
