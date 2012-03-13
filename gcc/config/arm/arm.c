@@ -2076,6 +2076,9 @@ arm_isr_value (tree argument)
   const isr_attribute_arg * ptr;
   const char *              arg;
 
+  if (TARGET_SFI_NACL1)
+    return ARM_FT_UNKNOWN;
+
   if (!arm_arch_notm)
     return ARM_FT_NORMAL | ARM_FT_STACKALIGN;
 
@@ -15841,6 +15844,7 @@ arm_output_epilogue (rtx sibling)
 	 special function exit sequence, or we are not really returning.  */
       if (really_return
 	  && ARM_FUNC_TYPE (func_type) == ARM_FT_NORMAL
+          && !TARGET_SFI_NACL1
 	  && !crtl->calls_eh_return)
 	/* Delete the LR from the register mask, so that the LR on
 	   the stack is loaded into the PC in the register mask.  */
@@ -16026,6 +16030,7 @@ arm_output_epilogue (rtx sibling)
       /* If we can, restore the LR into the PC.  */
       if (ARM_FUNC_TYPE (func_type) != ARM_FT_INTERWORKED
 	  && (TARGET_ARM || ARM_FUNC_TYPE (func_type) == ARM_FT_NORMAL)
+          && !TARGET_SFI_NACL1
 	  && !IS_STACKALIGN (func_type)
 	  && really_return
 	  && crtl->args.pretend_args_size == 0
