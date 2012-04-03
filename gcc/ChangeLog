@@ -1,3 +1,54 @@
+2012-04-03  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.ac: Use GCC_AC_FUNC_MMAP_BLACKLIST instead
+	of gcc_AC_FUNC_MMAP_BLACKLIST.
+	* acinclude.m4 (gcc_AC_FUNC_MMAP_BLACKLIST): Remove.
+	* Makefile.in (aclocal_deps): Add mmap.m4.
+	* configure: Regenerate.
+	* aclocal.m4: Regenerate.
+
+2012-04-03  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/52808
+	* tracer.c (tail_duplicate): Return whether we have duplicated
+	any block.
+	(tracer): If we have duplicated any block, cleanup the CFG.
+	* cfghooks.c (duplicate_block): If we duplicated a loop
+	header but not its loop, destroy the loop because it now has
+	multiple entries.
+	* tree-ssa-threadupdate.c (thread_through_loop_header): Tell
+	the cfg manipulation routines we are not creating a multiple
+	entry loop.
+
+2012-04-03  Tristan Gingold  <gingold@adacore.com>
+
+	* config/vms/vms-c.c (vms_pragma_nomember_alignment): Handle
+	'byte' alignment.
+	(vms_c_common_override_options): Allow parameterless variadic
+	functions.
+
+2012-04-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/52835
+	* tree-data-ref.c (build_rdg): Return NULL if
+	compute_data_dependences_for_loop failed.
+
+2012-04-03  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* varasm.c (initializer_constant_valid_for_bitfield_p): Return true
+	for REAL_CST as well.
+	(output_constructor): Use RECORD_OR_UNION_TYPE_P predicate.
+	In the bitfield case, if the value is a REAL_CST, convert it first to
+	an INTEGER_CST.
+
+2012-04-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config.gcc: Use i386/biarchx32.h instead of i386/biarch64.h
+	for --with-abi={x32|mx32} or --with-multilib-list=mx32.
+	(supported_defaults): Add abi for i[34567]86-*-* and x86_64-*-*.
+
+	* config/i386/biarchx32.h: New.
+
 2012-04-02  Anatoly Sokolov  <aesok@post.ru>
 
 	* config/arm/arm.h (PREFERRED_RELOAD_CLASS): Remove.
