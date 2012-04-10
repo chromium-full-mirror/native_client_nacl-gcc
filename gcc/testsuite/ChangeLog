@@ -1,3 +1,72 @@
+2010-04-10  Michael Matz  <matz@suse.de>
+
+	* gcc.dg/vect/vect-outer-1-big-array.c: Adjust.
+	* gcc.dg/vect/vect-outer-1.c: Adjust.
+	* gcc.dg/vect/vect-outer-1a-big-array.c: Adjust.
+	* gcc.dg/vect/vect-outer-1a.c: Adjust.
+	* gcc.dg/vect/vect-outer-1b-big-array.c: Adjust.
+	* gcc.dg/vect/vect-outer-1b.c: Adjust.
+	* gcc.dg/vect/vect-outer-2b.c: Adjust.
+	* gcc.dg/vect/vect-outer-3b.c: Adjust.
+
+2012-04-10  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	PR tree-optimization/52870
+	* gcc.dg/vect/pr52870.c: New test.
+
+2012-04-09  Mike Stump  <mikestump@comcast.net>
+
+	* g++.dg/cpp0x/udlit-raw-op.C: Don't use CRLF endings.
+	* gcc.dg/tree-ssa/vrp59.c: Likewise.
+	* gcc.dg/tree-ssa/vrp60.c: Likewise.
+	* gnat.dg/aggr11.adb: Likewise.
+	* gnat.dg/aggr11_pkg.ads: Likewise.
+	* gnat.dg/aggr15.adb: Likewise.
+	* gnat.dg/aggr15.ads: Likewise.
+	* gnat.dg/aggr17.adb: Likewise.
+	* gnat.dg/aggr18.adb: Likewise.
+	* gnat.dg/array14.adb: Likewise.
+	* gnat.dg/array14.ads: Likewise.
+	* gnat.dg/array14_pkg.ads: Likewise.
+	* gnat.dg/array19.adb: Likewise.
+	* gnat.dg/array19.ads: Likewise.
+	* gnat.dg/discr27.adb: Likewise.
+	* gnat.dg/discr27.ads: Likewise.
+	* gnat.dg/discr35.adb: Likewise.
+	* gnat.dg/discr35.ads: Likewise.
+	* gnat.dg/discr6.adb: Likewise.
+	* gnat.dg/discr6_pkg.ads: Likewise.
+	* gnat.dg/import1.adb: Likewise.
+	* gnat.dg/import1.ads: Likewise.
+	* gnat.dg/loop_address2.adb: Likewise.
+	* gnat.dg/opt7.adb: Likewise.
+	* gnat.dg/opt7.ads: Likewise.
+	* gnat.dg/pointer_variable_bounds.adb: Likewise.
+	* gnat.dg/pointer_variable_bounds.ads: Likewise.
+	* gnat.dg/rep_clause2.adb: Likewise.
+	* gnat.dg/rep_clause2.ads: Likewise.
+	* gnat.dg/slice2.adb: Likewise.
+	* gnat.dg/slice2.ads: Likewise.
+	* gnat.dg/slice6.adb: Likewise.
+	* gnat.dg/slice6_pkg.ads: Likewise.
+	* gnat.dg/specs/unchecked_union2.ads: Likewise.
+	* gnat.dg/taft_type2.adb: Likewise.
+	* gnat.dg/taft_type2.ads: Likewise.
+	* gnat.dg/taft_type2_pkg.ads: Likewise.
+	* gnat.dg/volatile10.adb: Likewise.
+	* gnat.dg/volatile10_pkg.ads: Likewise.
+
+	* gcc.dg/dll-8.c: Remove execute permissions.
+	* g++.dg/ext/dllexport5.C: Likewise.
+
+2012-04-09  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/52722
+	PR lto/51765
+	PR lto/52634	
+	* gcc.dg/lto/pr52634_1.c: New testcase.
+	* gcc.dg/lto/pr52634_0.c: New testcase.
+
 2012-04-09  Uros Bizjak  <ubizjak@gmail.com>
 
 	PR target/52883

@@ -1,3 +1,124 @@
+2012-04-10  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	* tree.h (warn_if_unused_value): Move declaration from here.
+	* stmt.c (warn_if_unused_value): Move definition from here.
+
+2010-04-10  Michael Matz  <matz@suse.de>
+
+	* tree-vectorizer.h (_loop_vec_info.strided_stores): Rename to
+	grouped_stores.
+	(LOOP_VINFO_STRIDED_STORES): Rename to LOOP_VINFO_GROUPED_STORES.
+	(struce _bb_vec_info.strided_stores): Rename to grouped_stores.
+	(BB_VINFO_STRIDED_STORES): Rename to BB_VINFO_GROUPED_STORES.
+	(STMT_VINFO_STRIDED_ACCESS): Rename to STMT_VINFO_GROUPED_ACCESS.
+	(vect_strided_store_supported): Rename to vect_grouped_store_supported.
+	(vect_strided_load_supported): Rename to vect_grouped_load_supported.
+	(vect_transform_strided_load): Rename to vect_transform_grouped_load.
+	(vect_record_strided_load_vectors): Rename to
+	vect_record_grouped_load_vectors.
+	* tree-vect-data-refs.c (vect_update_misalignment_for_peel):
+	Rename use of above macros.
+	(vect_verify_datarefs_alignment): Ditto.
+	(vector_alignment_reachable_p): Ditto.
+	(vect_peeling_hash_get_lowest_cost): Ditto.
+	(vect_enhance_data_refs_alignment): Ditto.
+	(vect_analyze_group_access): Ditto and rename stride to groupsize.
+	(vect_analyze_data_ref_access): Rename "strided" to "grouped".
+	(vect_strided_store_supported): Rename to vect_grouped_store_supported.
+	(vect_strided_load_supported): Rename to vect_grouped_load_supported.
+	(vect_transform_strided_load): Rename to vect_transform_grouped_load.
+	(vect_record_strided_load_vectors): Rename to
+	vect_record_grouped_load_vectors.
+	* tree-vect-loop.c (new_loop_vec_info): Rename use of above macros.
+	(destroy_loop_vec_info): Ditto.
+	(vect_transform_loop): Ditto and rename strided_store to grouped_store.
+	* tree-vect-slp.c (vect_build_slp_tree): Rename use of above macros.
+	(vect_analyze_slp): Ditto.
+	(new_bb_vec_info): Ditto.
+	(destroy_bb_vec_info): Ditto.
+	(vect_schedule_slp_instance): Ditto and rename strided_store to
+	grouped_store.
+	* tree-vect-stmts.c (vect_cost_strided_group_size): Rename to
+	vect_cost_group_size.
+	(vect_model_store_cost): Rename use of above macros and call
+	to vect_cost_strided_group_size.
+	(vect_model_load_cost): Ditto.
+	(vectorizable_store): Ditto, rename strided_store to grouped_store
+	and calls to renamed tree-vectorizer.h functions.
+	(vectorizable_load): Ditto.
+	(vect_transform_stmt): Rename use of above macros and strided_store
+	to grouped_store.
+
+2012-04-10  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.h: Remove misledaing comment on ipa-ref.h.
+	(symtab_type): New enum.
+	(symtab_node): New structure.
+	(cgraph_node, varpool_node): Add symbol base type.
+	(cgraph, varpool): New accestor functions.
+	* cgraph.c (cgraph_create_node_1): Set symbol type.
+	* varpool.c (varpool_node): Set symbol type.
+
+2012-04-10  Ulrich Weigand  <ulrich.weigand@linaro.org>
+	    Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* fwprop.c (propagate_rtx): Also set PR_CAN_APPEAR for subregs.
+
+2012-04-10  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/52888
+	* gimple-low.c (gimple_check_call_args): Properly account for
+	compatible aggregate types.
+
+2012-04-10  Richard Guenther  <rguenther@suse.de>
+
+	* toplev.h (tree_rest_of_compilation): Remove.
+	* tree-optimize.c (tree_rest_of_compilation): Likewise.
+	* cgraph.h (tree_rest_of_compilation): Declare.
+	* tree-optimize.c (tree_rest_of_compilation): Move ...
+	* cgraphunit.c (tree_rest_of_compilation): ... here.
+	* cgraph.c (cgraph_add_new_function): Adjust.
+	* Makefile.in (tree-optimize.o): Adjust.
+	(cgraphunit.o): Likewise.
+
+2012-04-10  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	PR tree-optimization/52870
+	* tree-vect-patterns.c (vect_recog_widen_mult_pattern): Verify that
+	presumed pattern statement is within the same loop or basic block.
+
+2012-04-10  Tristan Gingold  <gingold@adacore.com>
+
+	* gengtype.c (main): Make uintptr_t a known type.
+
+2012-04-10  Richard Guenther  <rguenther@suse.de>
+
+	* tree-pass.h (tree_lowering_passes): Remove.
+	* tree-optimize.c (tree_lowering_passes): Remove.
+	* cgraph.c (cgraph_add_new_function): Inline relevant parts
+	of tree_lowering_passes, avoid redundant call of early local
+	passes.
+	* cgraphunit.c (cgraph_lower_function): Fold into ...
+	(cgraph_analyze_function): ... its single caller.  Inline
+	relevant parts of tree_lowering_passes.
+
+2012-04-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR other/52777
+	* config/pa/pa.opt: Remove SIO and GNU_LD.
+
+2012-04-09  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/52722
+	PR lto/51765
+	PR lto/52634	
+	* lto-cgraph.c (compute_ltrans_boundary): When alias is in the boundary,
+	add its target too.
+	* lto.c (add_references_to_partition): Add also aliased nodes.
+	(add_cgraph_node_to_partition,
+	add_varpool_node_to_partition): Work on nodes, not functions/variables;
+	when adding alias, add also the aliased object.
+
 2012-04-09  Uros Bizjak  <ubizjak@gmail.com>
 
 	PR target/52883
