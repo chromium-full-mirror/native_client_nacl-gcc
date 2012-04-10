@@ -32,3 +32,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
         builtin_assert ("system=nacl");                         \
         builtin_assert ("system=posix");                        \
     } while (0)
+
+/* Since non-instructions can never go into code sections,
+   this is always false for Native Client targets.  */
+#define JUMP_TABLES_IN_TEXT_SECTION     0
