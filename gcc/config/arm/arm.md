@@ -3400,8 +3400,8 @@
   output_asm_insn (\"cmp\\t%1, %2\", operands);
   if (TARGET_THUMB2)
     output_asm_insn (\"ite\t%d3\", operands);
-  output_asm_insn (\"str%d3\\t%1, %0\", operands);
-  output_asm_insn (\"str%D3\\t%2, %0\", operands);
+  output_asm_insn (\"%b0str%d3\\t%1, %0\", operands);
+  output_asm_insn (\"%b0str%D3\\t%2, %0\", operands);
   return \"\";
   "
   [(set_attr "conds" "clob")
@@ -3996,7 +3996,7 @@
 	(unspec:SI [(match_operand:SI 1 "memory_operand" "Uw,m")]
 		   UNSPEC_UNALIGNED_LOAD))]
   "unaligned_access && TARGET_32BIT"
-  "ldr%?\t%0, %1\t@ unaligned"
+  "%b1ldr%?\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
    (set_attr "length" "2,4")
    (set_attr "predicable" "yes")
@@ -4008,7 +4008,7 @@
 	  (unspec:HI [(match_operand:HI 1 "memory_operand" "Uw,m")]
 		     UNSPEC_UNALIGNED_LOAD)))]
   "unaligned_access && TARGET_32BIT"
-  "ldr%(sh%)\t%0, %1\t@ unaligned"
+  "%b1ldr%(sh%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
    (set_attr "length" "2,4")
    (set_attr "predicable" "yes")
@@ -4020,7 +4020,7 @@
 	  (unspec:HI [(match_operand:HI 1 "memory_operand" "Uw,m")]
 		     UNSPEC_UNALIGNED_LOAD)))]
   "unaligned_access && TARGET_32BIT"
-  "ldr%(h%)\t%0, %1\t@ unaligned"
+  "%b1ldr%(h%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
    (set_attr "length" "2,4")
    (set_attr "predicable" "yes")
@@ -4031,7 +4031,7 @@
 	(unspec:SI [(match_operand:SI 1 "s_register_operand" "l,r")]
 		   UNSPEC_UNALIGNED_STORE))]
   "unaligned_access && TARGET_32BIT"
-  "str%?\t%1, %0\t@ unaligned"
+  "%b0str%?\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
    (set_attr "length" "2,4")
    (set_attr "predicable" "yes")
@@ -4042,7 +4042,7 @@
 	(unspec:HI [(match_operand:HI 1 "s_register_operand" "l,r")]
 		   UNSPEC_UNALIGNED_STORE))]
   "unaligned_access && TARGET_32BIT"
-  "str%(h%)\t%1, %0\t@ unaligned"
+  "%b0str%(h%)\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
    (set_attr "length" "2,4")
    (set_attr "predicable" "yes")
@@ -4624,7 +4624,7 @@
   "TARGET_ARM && arm_arch4 && !arm_arch6"
   "@
    #
-   ldr%(h%)\\t%0, %1"
+   %b1ldr%(h%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
 )
@@ -4635,7 +4635,7 @@
   "TARGET_ARM && arm_arch6"
   "@
    uxth%?\\t%0, %1
-   ldr%(h%)\\t%0, %1"
+   %b1ldr%(h%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
 )
@@ -4716,7 +4716,7 @@
   "TARGET_ARM && !arm_arch6"
   "@
    #
-   ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
+   %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
   [(set_attr "length" "8,4")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
@@ -4728,7 +4728,7 @@
   "TARGET_ARM && arm_arch6"
   "@
    uxtb%(%)\\t%0, %1
-   ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
+   %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
   [(set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
 )
@@ -4959,7 +4959,7 @@
   "TARGET_ARM && arm_arch4 && !arm_arch6"
   "@
    #
-   ldr%(sh%)\\t%0, %1"
+   %b1ldr%(sh%)\\t%0, %1"
   [(set_attr "length" "8,4")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
@@ -4974,7 +4974,7 @@
   "TARGET_32BIT && arm_arch6"
   "@
    sxth%?\\t%0, %1
-   ldr%(sh%)\\t%0, %1"
+   %b1ldr%(sh%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -5018,7 +5018,7 @@
   [(set (match_operand:HI 0 "s_register_operand" "=r")
 	(sign_extend:HI (match_operand:QI 1 "arm_extendqisi_mem_op" "Uq")))]
   "TARGET_ARM && arm_arch4"
-  "ldr%(sb%)\\t%0, %1"
+  "%b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "256")
@@ -5059,7 +5059,7 @@
   "TARGET_ARM && arm_arch4 && !arm_arch6"
   "@
    #
-   ldr%(sb%)\\t%0, %1"
+   %b1ldr%(sb%)\\t%0, %1"
   [(set_attr "length" "8,4")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
@@ -5074,7 +5074,7 @@
   "TARGET_ARM && arm_arch6"
   "@
    sxtb%?\\t%0, %1
-   ldr%(sb%)\\t%0, %1"
+   %b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -5569,8 +5569,8 @@
    mov%?\\t%0, %1
    mvn%?\\t%0, #%B1
    movw%?\\t%0, %1
-   ldr%?\\t%0, %1
-   str%?\\t%1, %0"
+   %b1ldr%?\\t%0, %1
+   %b0str%?\\t%1, %0"
   [(set_attr "type" "*,*,*,*,load1,store1")
    (set_attr "insn" "mov,mov,mvn,mov,*,*")
    (set_attr "predicable" "yes")
@@ -5605,8 +5605,8 @@
    #
    ldmia\\t%1, {%0}
    stmia\\t%0, {%1}
-   ldr\\t%0, %1
-   str\\t%1, %0
+   %b1ldr\\t%0, %1
+   %b0str\\t%1, %0
    mov\\t%0, %1"
   [(set_attr "length" "2,2,4,4,2,2,2,2,2")
    (set_attr "type" "*,*,*,*,load1,store1,load1,store1,*")
@@ -5717,7 +5717,7 @@
   [(set (match_operand:SI 0 "s_register_operand" "=r")
 	(unspec:SI [(match_operand:SI 1 "" "mX")] UNSPEC_PIC_SYM))]
   "TARGET_32BIT && flag_pic"
-  "ldr%?\\t%0, %1"
+  "%b1ldr%?\\t%0, %1"
   [(set_attr "type" "load1")
    (set_attr "pool_range" "4096")
    (set (attr "neg_pool_range")
@@ -6248,8 +6248,8 @@
   "@
    mov%?\\t%0, %1\\t%@ movhi
    mvn%?\\t%0, #%B1\\t%@ movhi
-   str%(h%)\\t%1, %0\\t%@ movhi
-   ldr%(h%)\\t%0, %1\\t%@ movhi"
+   %b0str%(h%)\\t%1, %0\\t%@ movhi
+   %b1ldr%(h%)\\t%0, %1\\t%@ movhi"
   [(set_attr "type" "*,*,store1,load1")
    (set_attr "predicable" "yes")
    (set_attr "insn" "mov,mvn,*,*")
@@ -6398,10 +6398,10 @@
   "@
    mov%?\\t%0, %1
    mvn%?\\t%0, #%B1
-   ldr%(b%)\\t%0, %1
-   str%(b%)\\t%1, %0
-   ldr%(b%)\\t%0, %1
-   str%(b%)\\t%1, %0"
+   %b1ldr%(b%)\\t%0, %1
+   %b0str%(b%)\\t%1, %0
+   %b1ldr%(b%)\\t%0, %1
+   %b0str%(b%)\\t%1, %0"
   [(set_attr "type" "*,*,load1,store1,load1,store1")
    (set_attr "insn" "mov,mvn,*,*,*,*")
    (set_attr "predicable" "yes")
@@ -6417,8 +6417,8 @@
        || register_operand (operands[1], QImode))"
   "@
    add\\t%0, %1, #0
-   ldrb\\t%0, %1
-   strb\\t%1, %0
+   %b1ldrb\\t%0, %1
+   %b0strb\\t%1, %0
    mov\\t%0, %1
    mov\\t%0, %1
    mov\\t%0, %1"
@@ -6460,9 +6460,9 @@
   switch (which_alternative)
     {
     case 0:	/* ARM register from memory */
-      return \"ldr%(h%)\\t%0, %1\\t%@ __fp16\";
+      return \"%b1ldr%(h%)\\t%0, %1\\t%@ __fp16\";
     case 1:	/* memory from ARM register */
-      return \"str%(h%)\\t%1, %0\\t%@ __fp16\";
+      return \"%b0str%(h%)\\t%1, %0\\t%@ __fp16\";
     case 2:	/* ARM register from ARM register */
       return \"mov%?\\t%0, %1\\t%@ __fp16\";
     case 3:	/* ARM register from constant */
@@ -6577,8 +6577,8 @@
        || register_operand (operands[1], SFmode))"
   "@
    mov%?\\t%0, %1
-   ldr%?\\t%0, %1\\t%@ float
-   str%?\\t%1, %0\\t%@ float"
+   %b1ldr%?\\t%0, %1\\t%@ float
+   %b0str%?\\t%1, %0\\t%@ float"
   [(set_attr "predicable" "yes")
    (set_attr "type" "*,load1,store1")
    (set_attr "insn" "mov,*,*")
@@ -8304,7 +8304,7 @@
    (use (match_operand 2 "" ""))
    (clobber (reg:SI LR_REGNUM))]
   "TARGET_ARM && arm_arch5"
-  "blx%?\\t%0"
+  "%*blx%?\\t%0"
   [(set_attr "type" "call")]
 )
 
@@ -8416,7 +8416,7 @@
    (use (match_operand 3 "" ""))
    (clobber (reg:SI LR_REGNUM))]
   "TARGET_ARM && arm_arch5"
-  "blx%?\\t%1"
+  "%*blx%?\\t%1"
   [(set_attr "type" "call")]
 )
 
@@ -8496,7 +8496,7 @@
    && !arm_is_long_call_p (SYMBOL_REF_DECL (operands[0]))"
   "*
   {
-    return NEED_PLT_RELOC ? \"bl%?\\t%a0(PLT)\" : \"bl%?\\t%a0\";
+    return NEED_PLT_RELOC ? \"%*bl%?\\t%a0(PLT)\" : \"%*bl%?\\t%a0\";
   }"
   [(set_attr "type" "call")]
 )
@@ -8512,7 +8512,7 @@
    && !arm_is_long_call_p (SYMBOL_REF_DECL (operands[1]))"
   "*
   {
-    return NEED_PLT_RELOC ? \"bl%?\\t%a1(PLT)\" : \"bl%?\\t%a1\";
+    return NEED_PLT_RELOC ? \"%*bl%?\\t%a1(PLT)\" : \"%*bl%?\\t%a1\";
   }"
   [(set_attr "type" "call")]
 )
@@ -8928,19 +8928,22 @@
   "
 )
 
-;; NB Never uses BX.
 (define_insn "*arm_indirect_jump"
   [(set (pc)
 	(match_operand:SI 0 "s_register_operand" "r"))]
   "TARGET_ARM"
-  "mov%?\\t%|pc, %0\\t%@ indirect register jump"
+  "*
+  if (arm_arch5 || arm_arch4t)
+    return \"%j0bx%?\\t%0\\t%@ indirect register jump\";
+  return \"mov%?\\t%|pc, %0\\t%@ indirect register jump\";
+  "
   [(set_attr "predicable" "yes")]
 )
 
 (define_insn "*load_indirect_jump"
   [(set (pc)
 	(match_operand:SI 0 "memory_operand" "m"))]
-  "TARGET_ARM"
+  "TARGET_ARM && !TARGET_SFI_NACL1"
   "ldr%?\\t%|pc, %0\\t%@ indirect memory jump"
   [(set_attr "type" "load1")
    (set_attr "pool_range" "4096")
@@ -10527,7 +10530,7 @@
 	if (val1 == 4 || val2 == 4)
 	  /* Other val must be 8, since we know they are adjacent and neither
 	     is zero.  */
-	  output_asm_insn (\"ldm%(ib%)\\t%0, {%1, %2}\", ldm);
+	  output_asm_insn (\"%b0ldm%(ib%)\\t%0, {%1, %2}\", ldm);
 	else if (const_ok_for_arm (val1) || const_ok_for_arm (-val1))
 	  {
 	    ldm[0] = ops[0] = operands[4];
@@ -10535,9 +10538,9 @@
 	    ops[2] = GEN_INT (val1);
 	    output_add_immediate (ops);
 	    if (val1 < val2)
-	      output_asm_insn (\"ldm%(ia%)\\t%0, {%1, %2}\", ldm);
+	      output_asm_insn (\"%b0ldm%(ia%)\\t%0, {%1, %2}\", ldm);
 	    else
-	      output_asm_insn (\"ldm%(da%)\\t%0, {%1, %2}\", ldm);
+	      output_asm_insn (\"%b0ldm%(da%)\\t%0, {%1, %2}\", ldm);
 	  }
 	else
 	  {
@@ -10545,25 +10548,25 @@
 	    ops[0] = ldm[1];
 	    ops[1] = base_reg;
 	    ops[2] = GEN_INT (val1);
-	    output_asm_insn (\"ldr%?\\t%0, [%1, %2]\", ops);
+	    output_asm_insn (\"%b1ldr%?\\t%0, [%1, %2]\", ops);
 	    ops[0] = ldm[2];
 	    ops[2] = GEN_INT (val2);
-	    output_asm_insn (\"ldr%?\\t%0, [%1, %2]\", ops);
+	    output_asm_insn (\"%b1ldr%?\\t%0, [%1, %2]\", ops);
 	  }
       }
     else if (val1 != 0)
       {
 	if (val1 < val2)
-	  output_asm_insn (\"ldm%(da%)\\t%0, {%1, %2}\", ldm);
+	  output_asm_insn (\"%b0ldm%(da%)\\t%0, {%1, %2}\", ldm);
 	else
-	  output_asm_insn (\"ldm%(ia%)\\t%0, {%1, %2}\", ldm);
+	  output_asm_insn (\"%b0ldm%(ia%)\\t%0, {%1, %2}\", ldm);
       }
     else
       {
 	if (val1 < val2)
-	  output_asm_insn (\"ldm%(ia%)\\t%0, {%1, %2}\", ldm);
+	  output_asm_insn (\"%b0ldm%(ia%)\\t%0, {%1, %2}\", ldm);
 	else
-	  output_asm_insn (\"ldm%(da%)\\t%0, {%1, %2}\", ldm);
+	  output_asm_insn (\"%b0ldm%(da%)\\t%0, {%1, %2}\", ldm);
       }
     output_asm_insn (\"%I3%?\\t%0, %1, %2\", arith);
     return \"\";
@@ -11265,7 +11268,7 @@
    (clobber (reg:SI IP_REGNUM))
    (clobber (reg:CC CC_REGNUM))]
   "TARGET_SOFT_TP"
-  "bl\\t__aeabi_read_tp\\t@ load_tp_soft"
+  "%*bl\\t__aeabi_read_tp\\t@ load_tp_soft"
   [(set_attr "conds" "clob")]
 )
 
@@ -11282,7 +11285,7 @@
   {
     targetm.asm_out.internal_label (asm_out_file, "LPIC",
 				    INTVAL (operands[1]));
-    return "bl\\t%c0(tlscall)";
+    return "%*bl\\t%c0(tlscall)";
   }
   [(set_attr "conds" "clob")
    (set_attr "length" "4")]

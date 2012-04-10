@@ -13379,7 +13379,7 @@ thumb2_reorg (void)
 		      break;
 
 		    case MINUS:
-		      /* RSBS <Rd>,<Rn>,#0  
+		      /* RSBS <Rd>,<Rn>,#0
 			 Not handled here: see NEG below.  */
 		      /* SUBS <Rd>,<Rn>,#<imm3>
 			 SUBS <Rdn>,#<imm8>
@@ -14145,25 +14145,25 @@ output_move_double (rtx *operands, bool emit, int *count)
 	    {
 	      if (TARGET_LDRD
 		  && !(fix_cm3_ldrd && reg0 == REGNO(XEXP (operands[1], 0))))
-		output_asm_insn ("ldr%(d%)\t%0, [%m1]", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1]", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%m1, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%m1, %M0", operands);
 	    }
 	  break;
 
 	case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("ldr%(d%)\t%0, [%m1, #8]!", operands);
+	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1, #8]!", operands);
 	  break;
 
 	case PRE_DEC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%m1, #-8]!", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1, #-8]!", operands);
 	      else
-		output_asm_insn ("ldm%(db%)\t%m1!, %M0", operands);
+		output_asm_insn ("%b1ldm%(db%)\t%m1!, %M0", operands);
 	    }
 	  break;
 
@@ -14171,16 +14171,16 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%m1], #8", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1], #8", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%m1!, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%m1!, %M0", operands);
 	    }
 	  break;
 
 	case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("ldr%(d%)\t%0, [%m1], #-8", operands);
+	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1], #-8", operands);
 	  break;
 
 	case PRE_MODIFY:
@@ -14201,7 +14201,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		  if (emit)
 		    {
 		      output_asm_insn ("add%?\t%1, %1, %2", otherops);
-		      output_asm_insn ("ldr%(d%)\t%0, [%1] @split", otherops);
+		      output_asm_insn ("%b1ldr%(d%)\t%0, [%1] @split",
+                                       otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14217,14 +14218,16 @@ output_move_double (rtx *operands, bool emit, int *count)
 			  && INTVAL (otherops[2]) < 256))
 		    {
 		      if (emit)
-			output_asm_insn ("ldr%(d%)\t%0, [%1, %2]!", otherops);
+			output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]!",
+                                         otherops);
 		    }
 		  else
 		    {
 		      if (emit)
 			{
-			  output_asm_insn ("ldr%?\t%0, [%1, %2]!", otherops);
-			  output_asm_insn ("ldr%?\t%H0, [%1, #4]", otherops);
+			  output_asm_insn ("%b1ldr%?\t%0, [%1, %2]!",
+                                           otherops);
+			  output_asm_insn ("%b1ldr%?\t%H0, [%1, #4]", otherops);
 			}
 		      if (count)
 			*count = 2;
@@ -14243,14 +14246,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      && INTVAL (otherops[2]) < 256))
 		{
 		  if (emit)
-		    output_asm_insn ("ldr%(d%)\t%0, [%1], %2", otherops);
+		    output_asm_insn ("%b1ldr%(d%)\t%0, [%1], %2", otherops);
 		}
 	      else
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%H0, [%1, #4]", otherops);
-		      output_asm_insn ("ldr%?\t%0, [%1], %2", otherops);
+		      output_asm_insn ("%b1ldr%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, [%1], %2", otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14272,9 +14275,9 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%1]", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%1]", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%1, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%1, %M0", operands);
 	    }
 
 	  if (count)
@@ -14341,7 +14344,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 			  if (emit)
 			    {
 			      output_asm_insn ("add%?\t%0, %1, %2", otherops);
-			      output_asm_insn ("ldr%(d%)\t%0, [%1]", operands);
+			      output_asm_insn ("%b1ldr%(d%)\t%0, [%1]",
+                                               operands);
 			    }
 			  if (count)
 			    *count = 2;
@@ -14350,7 +14354,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 			{
 			  otherops[0] = operands[0];
 			  if (emit)
-			    output_asm_insn ("ldr%(d%)\t%0, [%1, %2]", otherops);
+			    output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]",
+                                             otherops);
 			}
 		      return "";
 		    }
@@ -14381,9 +14386,9 @@ output_move_double (rtx *operands, bool emit, int *count)
 		*count = 2;
 
 	      if (TARGET_LDRD)
-		return "ldr%(d%)\t%0, [%1]";
+		return "%b1ldr%(d%)\t%0, [%1]";
 
-	      return "ldm%(ia%)\t%1, %M0";
+	      return "%b1ldm%(ia%)\t%1, %M0";
 	    }
 	  else
 	    {
@@ -14393,8 +14398,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%0, %1", otherops);
-		      output_asm_insn ("ldr%?\t%0, %1", operands);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", operands);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14404,8 +14409,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%0, %1", operands);
-		      output_asm_insn ("ldr%?\t%0, %1", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", operands);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14425,25 +14430,25 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0]", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0]", operands);
 	      else
-		output_asm_insn ("stm%(ia%)\t%m0, %M1", operands);
+		output_asm_insn ("%b0stm%(ia%)\t%m0, %M1", operands);
 	    }
 	  break;
 
         case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("str%(d%)\t%1, [%m0, #8]!", operands);
+	    output_asm_insn ("%b0str%(d%)\t%1, [%m0, #8]!", operands);
 	  break;
 
         case PRE_DEC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0, #-8]!", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0, #-8]!", operands);
 	      else
-		output_asm_insn ("stm%(db%)\t%m0!, %M1", operands);
+		output_asm_insn ("%b0stm%(db%)\t%m0!, %M1", operands);
 	    }
 	  break;
 
@@ -14451,16 +14456,16 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0], #8", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0], #8", operands);
 	      else
-		output_asm_insn ("stm%(ia%)\t%m0!, %M1", operands);
+		output_asm_insn ("%b0stm%(ia%)\t%m0!, %M1", operands);
 	    }
 	  break;
 
         case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("str%(d%)\t%1, [%m0], #-8", operands);
+	    output_asm_insn ("%b0str%(d%)\t%1, [%m0], #-8", operands);
 	  break;
 
 	case PRE_MODIFY:
@@ -14480,8 +14485,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("str%?\t%0, [%1, %2]!", otherops);
-		      output_asm_insn ("str%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1str%?\t%0, [%1, %2]!", otherops);
+		      output_asm_insn ("%b1str%?\t%H0, [%1, #4]", otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14490,8 +14495,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("str%?\t%H0, [%1, #4]", otherops);
-		      output_asm_insn ("str%?\t%0, [%1], %2", otherops);
+		      output_asm_insn ("%b1str%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1str%?\t%0, [%1], %2", otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14500,12 +14505,12 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  else if (GET_CODE (XEXP (operands[0], 0)) == PRE_MODIFY)
 	    {
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1, %2]!", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]!", otherops);
 	    }
 	  else
 	    {
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1], %2", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1], %2", otherops);
 	    }
 	  break;
 
@@ -14517,21 +14522,21 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		case -8:
 		  if (emit)
-		    output_asm_insn ("stm%(db%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(db%)\t%m0, %M1", operands);
 		  return "";
 
 		case -4:
 		  if (TARGET_THUMB2)
 		    break;
 		  if (emit)
-		    output_asm_insn ("stm%(da%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(da%)\t%m0, %M1", operands);
 		  return "";
 
 		case 4:
 		  if (TARGET_THUMB2)
 		    break;
 		  if (emit)
-		    output_asm_insn ("stm%(ib%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(ib%)\t%m0, %M1", operands);
 		  return "";
 		}
 	    }
@@ -14545,7 +14550,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      otherops[0] = operands[1];
 	      otherops[1] = XEXP (XEXP (operands[0], 0), 0);
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1, %2]", otherops);
+		output_asm_insn ("%b0str%(d%)\t%0, [%1, %2]", otherops);
 	      return "";
 	    }
 	  /* Fall through */
@@ -14555,8 +14560,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  otherops[1] = operands[1];
 	  if (emit)
 	    {
-	      output_asm_insn ("str%?\t%1, %0", operands);
-	      output_asm_insn ("str%?\t%H1, %0", otherops);
+	      output_asm_insn ("%b0str%?\t%1, %0", operands);
+	      output_asm_insn ("%b0str%?\t%H1, %0", otherops);
 	    }
 	  if (count)
 	    *count = 2;
@@ -14581,13 +14586,13 @@ output_move_quad (rtx *operands)
           switch (GET_CODE (XEXP (operands[1], 0)))
             {
             case REG:
-              output_asm_insn ("ldm%(ia%)\t%m1, %M0", operands);
+              output_asm_insn ("%b0ldm%(ia%)\t%m1, %M0", operands);
               break;
 
             case LABEL_REF:
             case CONST:
               output_asm_insn ("adr%?\t%0, %1", operands);
-              output_asm_insn ("ldm%(ia%)\t%0, %M0", operands);
+              output_asm_insn ("%b0ldm%(ia%)\t%0, %M0", operands);
               break;
 
             default:
@@ -14631,7 +14636,7 @@ output_move_quad (rtx *operands)
       switch (GET_CODE (XEXP (operands[0], 0)))
         {
         case REG:
-          output_asm_insn ("stm%(ia%)\t%m0, %M1", operands);
+          output_asm_insn ("%b0stm%(ia%)\t%m0, %M1", operands);
           break;
 
         default:
@@ -15511,7 +15516,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	  ops[1] = gen_rtx_SYMBOL_REF (Pmode, NEED_PLT_RELOC ? "abort(PLT)"
 				       : "abort");
 	  assemble_external_libcall (ops[1]);
-	  output_asm_insn (reverse ? "bl%D0\t%a1" : "bl%d0\t%a1", ops);
+	  output_asm_insn (reverse ? "%*bl%D0\t%a1" : "%*bl%d0\t%a1", ops);
 	}
 
       return "";
@@ -15835,7 +15840,7 @@ arm_output_epilogue (rtx sibling)
       /* A volatile function should never return.  Call abort.  */
       op = gen_rtx_SYMBOL_REF (Pmode, NEED_PLT_RELOC ? "abort(PLT)" : "abort");
       assemble_external_libcall (op);
-      output_asm_insn ("bl\t%a0", &op);
+      output_asm_insn ("%*bl\t%a0", &op);
 
       return "";
     }
@@ -18002,7 +18007,7 @@ arm_print_operand (FILE *stream, rtx x, int code)
     case 'b':
       /* Used to prefix a load or store instruction, repeating the memory
 	 operand.  Normally, produces no output.  Under -msfi-nacl1,
-	 produces "sfi_breg REG, " unless REG is SP or LR.  */
+	 produces "sfi_breg REG, " unless REG is SP or PC.  */
       if (GET_CODE (x) != MEM)
 	{
 	  output_operand_lossage ("invalid operand for code '%c'", code);
@@ -18013,14 +18018,22 @@ arm_print_operand (FILE *stream, rtx x, int code)
 	{
 	  rtx addr = XEXP (x, 0);
 	  int regno;
-	  if (GET_CODE (addr) != REG)
-	    {
+          switch (GET_CODE (addr))
+            {
+            case LABEL_REF:
+            case SYMBOL_REF:
+              regno = PC_REGNUM;
+              break;
+            default:
 	      /* It might be (plus (reg...) ...) or suchlike.  */
 	      addr = XEXP (addr, 0);
 	      gcc_assert (GET_CODE (addr) == REG);
-	    }
-	  regno = REGNO (addr);
-	  if (regno != LR_REGNUM && regno != SP_REGNUM)
+              /* Fall through.  */
+            case REG:
+              regno = REGNO (addr);
+              break;
+            }
+	  if (regno != SP_REGNUM && regno != PC_REGNUM)
 	    fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
 	}
       return;
