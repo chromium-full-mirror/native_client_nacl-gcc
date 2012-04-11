@@ -11381,9 +11381,6 @@ rs6000_expand_builtin (tree exp, rtx target, rtx subtarget ATTRIBUTE_UNUSED,
     case RS6000_BUILTIN_RSQRT:
       return rs6000_expand_unop_builtin (CODE_FOR_rsqrtdf2, exp, target);
 
-    case RS6000_BUILTIN_BSWAP_HI:
-      return rs6000_expand_unop_builtin (CODE_FOR_bswaphi2, exp, target);
-
     case POWER7_BUILTIN_BPERMD:
       return rs6000_expand_binop_builtin (((TARGET_64BIT)
 					   ? CODE_FOR_bpermd_di
@@ -11672,12 +11669,6 @@ rs6000_init_builtins (void)
   ftype = builtin_function_type (mode, mode, mode, VOIDmode,
 				 POWER7_BUILTIN_BPERMD, "__builtin_bpermd");
   def_builtin ("__builtin_bpermd", ftype, POWER7_BUILTIN_BPERMD);
-
-      /* Don't use builtin_function_type here, as it maps HI/QI to SI.  */
-  ftype = build_function_type_list (unsigned_intHI_type_node,
-				    unsigned_intHI_type_node,
-				    NULL_TREE);
-  def_builtin ("__builtin_bswap16", ftype, RS6000_BUILTIN_BSWAP_HI);
 
 #if TARGET_XCOFF
   /* AIX libm provides clog as __clog.  */
@@ -15570,14 +15561,11 @@ rs6000_generate_compare (rtx cmp, enum machine_mode mode)
 	   || code == GEU || code == LEU)
     comp_mode = CCUNSmode;
   else if ((code == EQ || code == NE)
-	   && GET_CODE (op0) == SUBREG
-	   && GET_CODE (op1) == SUBREG
-	   && SUBREG_PROMOTED_UNSIGNED_P (op0)
-	   && SUBREG_PROMOTED_UNSIGNED_P (op1))
+	   && unsigned_reg_p (op0)
+	   && (unsigned_reg_p (op1)
+	       || (CONST_INT_P (op1) && INTVAL (op1) != 0)))
     /* These are unsigned values, perhaps there will be a later
-       ordering compare that can be shared with this one.
-       Unfortunately we cannot detect the signedness of the operands
-       for non-subregs.  */
+       ordering compare that can be shared with this one.  */
     comp_mode = CCUNSmode;
   else
     comp_mode = CCmode;

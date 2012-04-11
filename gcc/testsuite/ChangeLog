@@ -1,3 +1,54 @@
+2012-04-11  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/52621
+	* gfortran.dg/pr52621.f90: New testcase.
+
+2012-04-11  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/52918
+	* g++.dg/torture/pr52918-1.C: New testcase.
+	* g++.dg/torture/pr52918-2.C: Likewise.
+
+2012-04-11  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/52729
+	* gfortran.dg/block_11.f90: New.
+
+2012-04-11  Nick Clifton  <nickc@redhat.com>
+
+	* gcc.dg/stack-usage-1.c (SIZE): Define for the RL78.
+
+2012-04-11  Peter Bergner  <bergner@vnet.ibm.com>
+
+	PR target/16458
+	* gcc.target/powerpc/pr16458-1.c: New test.
+	* gcc.target/powerpc/pr16458-2.c: Likewise.
+	* gcc.target/powerpc/pr16458-3.c: Likewise.
+	* gcc.target/powerpc/pr16458-4.c: Likewise.
+
+2012-04-11  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/builtin-bswap-1.c: Test __builtin_bswap16 & __builtin_bswap64.
+	* gcc.dg/builtin-bswap-4.c: Test __builtin_bswap16.
+	* gcc.dg/builtin-bswap-5.c: Likewise.
+	* gcc.target/i386/builtin-bswap-4.c: New test.
+
+2012-04-11  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR 24985
+	* lib/prune.exp: Add -fno-diagnostics-show-caret.
+
+2012-04-11  Richard Guenther  <rguenther@suse.de>
+
+	PR rtl-optimization/52881
+	* gcc.dg/torture/pr52881.c: New testcase.
+	* gcc.dg/torture/pr52913.c: Likewise.
+
+2012-04-11  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/52912
+	* gcc.dg/torture/pr52912.c: New testcase.
+
 2010-04-10  Michael Matz  <matz@suse.de>
 
 	* gcc.dg/vect/vect-outer-1-big-array.c: Adjust.
