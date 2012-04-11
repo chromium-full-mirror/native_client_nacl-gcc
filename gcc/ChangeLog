@@ -1,3 +1,37 @@
+2012-04-11  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/host-linux.c (TRY_EMPTY_VM_SPACE): Defined to
+	0x60000000 if __x86_64 is defined and __LP64__ isn't defined.
+
+2012-04-11  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR rtl-optimization/52876
+	* emit-rtl.c (set_reg_attrs_from_value): Handle arbitrary value.
+	Don't call mark_reg_pointer for incompatible pointer sign
+	extension.
+
+	* reginfo.c (reg_scan_mark_refs): Call set_reg_attrs_from_value 
+	directly.
+
+2012-04-11  Bernd Schmidt  <bernds@codesourcery.com>
+
+	* fold-const.c (fold_unary_loc): Use GET_MODE_PRECISION for
+	comparisons against TYPE_PRECISION.
+	* tree-ssa-forwprop.c (combine_conversions): Likewise.
+
+2012-04-11  Xinliang David Li  <davidxl@google.com>
+
+	* tree-passes.h: Remove TODO_dump_func.
+	* tree-ssa-tail-merge.c (tail_merge_optimize): Remove TODO_dump_func.
+	* trans-mem.c: Remove TODO_dump_func.
+	* ira.c: Remove TODO_dump_func.
+
+2012-04-11  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/i386/i386.c (ix86_option_override_internal): Check
+	SUBTARGET_OVERRIDE_OPTIONS and SUBSUBTARGET_OVERRIDE_OPTIONS
+	after TARGET_64BIT is updated.
+
 2012-04-11  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	* config/sh/sh.h: Remove old secondary reload code.

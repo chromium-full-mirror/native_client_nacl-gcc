@@ -1,3 +1,23 @@
+2012-04-11  Fabien Chêne  <fabien@gcc.gnu.org>
+
+	PR c++/52465
+	* parser.c (cp_parser_class_name): Call strip_using_decl and
+	return the target decl.
+	* name-lookup.c (strip_using_decl): Returns NULL_TREE if the decl
+	to be stripped is NULL_TREE.
+	(qualify_lookup): Call strip_using_decl and perform some checks on
+	the target decl.
+
+2012-04-11  Jason Merrill  <jason@redhat.com>
+
+	PR debug/45088
+	* decl.c (grokdeclarator): Strip the injected-class-name typedef
+	if we are building a declaration or compound type.
+
+	PR c++/52906
+	* decl.c (check_tag_decl): Don't complain about attributes if we
+	don't even have a type.
+
 2012-04-10  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	* cvt.c (convert_to_void): Update comment.
