@@ -733,15 +733,15 @@
 		 (match_operand:SI 2 "reg_or_int_operand" "rI,rI,k,Pj,Pj,L, L,PJ,PJ,?n")))]
   "TARGET_32BIT"
   "@
-   add%?\\t%0, %1, %2
-   add%?\\t%0, %1, %2
-   add%?\\t%0, %2, %1
-   addw%?\\t%0, %1, %2
-   addw%?\\t%0, %1, %2
-   sub%?\\t%0, %1, #%n2
-   sub%?\\t%0, %1, #%n2
-   subw%?\\t%0, %1, #%n2
-   subw%?\\t%0, %1, #%n2
+   %j0add%?\\t%0, %1, %2
+   %j0add%?\\t%0, %1, %2
+   %j0add%?\\t%0, %2, %1
+   %j0addw%?\\t%0, %1, %2
+   %j0addw%?\\t%0, %1, %2
+   %j0sub%?\\t%0, %1, #%n2
+   %j0sub%?\\t%0, %1, #%n2
+   %j0subw%?\\t%0, %1, #%n2
+   %j0subw%?\\t%0, %1, #%n2
    #"
   "TARGET_32BIT
    && GET_CODE (operands[2]) == CONST_INT
@@ -832,8 +832,8 @@
 	(plus:SI (match_dup 1) (match_dup 2)))]
   "TARGET_ARM"
   "@
-   add%.\\t%0, %1, %2
-   sub%.\\t%0, %1, #%n2"
+   %j0add%.\\t%0, %1, %2
+   %j0sub%.\\t%0, %1, #%n2"
   [(set_attr "conds" "set")]
 )
 
@@ -874,8 +874,8 @@
 		 (match_operand:SI 3 "arm_addimm_operand" "I,L")))]
   "TARGET_32BIT && INTVAL (operands[2]) == -INTVAL (operands[3])"
   "@
-   add%.\\t%0, %1, %3
-   sub%.\\t%0, %1, #%n3"
+   %j0add%.\\t%0, %1, %3
+   %j0sub%.\\t%0, %1, #%n3"
   [(set_attr "conds" "set")]
 )
 
@@ -930,8 +930,8 @@
 	(plus:SI (match_dup 1) (match_dup 2)))]
   "TARGET_32BIT"
   "@
-   add%.\\t%0, %1, %2
-   sub%.\\t%0, %1, #%n2"
+   %j0add%.\\t%0, %1, %2
+   %j0sub%.\\t%0, %1, #%n2"
   [(set_attr "conds" "set")]
 )
 
@@ -945,8 +945,8 @@
 	(plus:SI (match_dup 1) (match_dup 2)))]
   "TARGET_32BIT"
   "@
-   add%.\\t%0, %1, %2
-   sub%.\\t%0, %1, #%n2"
+   %j0add%.\\t%0, %1, %2
+   %j0sub%.\\t%0, %1, #%n2"
   [(set_attr "conds" "set")]
 )
 
@@ -1229,9 +1229,9 @@
 		  (match_operand:SI 2 "reg_or_int_operand" "r,rI,r, r")))]
   "TARGET_32BIT"
   "@
-   rsb%?\\t%0, %2, %1
-   sub%?\\t%0, %1, %2
-   sub%?\\t%0, %1, %2
+   %j0rsb%?\\t%0, %2, %1
+   %j0sub%?\\t%0, %1, %2
+   %j0sub%?\\t%0, %1, %2
    #"
   "&& (GET_CODE (operands[1]) == CONST_INT
        && !const_ok_for_arm (INTVAL (operands[1])))"
@@ -1268,8 +1268,8 @@
 	(minus:SI (match_dup 1) (match_dup 2)))]
   "TARGET_32BIT"
   "@
-   sub%.\\t%0, %1, %2
-   rsb%.\\t%0, %2, %1"
+   %j0sub%.\\t%0, %1, %2
+   %j0rsb%.\\t%0, %2, %1"
   [(set_attr "conds" "set")]
 )
 
@@ -1281,8 +1281,8 @@
 	(minus:SI (match_dup 1) (match_dup 2)))]
   "TARGET_32BIT"
   "@
-   sub%.\\t%0, %1, %2
-   rsb%.\\t%0, %2, %1"
+   %j0sub%.\\t%0, %1, %2
+   %j0rsb%.\\t%0, %2, %1"
   [(set_attr "conds" "set")]
 )
 
@@ -3444,9 +3444,9 @@
 	else
 	  output_asm_insn (\"it\\t%d5\", operands);
       }
-    output_asm_insn (\"%i4%d5\\t%0, %1, %2\", operands);
+    output_asm_insn (\"%j0%i4%d5\\t%0, %1, %2\", operands);
     if (need_else)
-      output_asm_insn (\"%i4%D5\\t%0, %1, %3\", operands);
+      output_asm_insn (\"%j0%i4%D5\\t%0, %1, %3\", operands);
     return \"\";
   }"
   [(set_attr "conds" "clob")
@@ -5851,7 +5851,7 @@
   "TARGET_32BIT"
   "@
    cmp%?\\t%0, #0
-   sub%.\\t%0, %1, #0"
+   %j0sub%.\\t%0, %1, #0"
   [(set_attr "conds" "set")]
 )
 
@@ -9006,7 +9006,7 @@
               (match_operand:SI 5 "shift_amount_operand" "M,M,M,r")])
            (match_operand:SI 2 "s_register_operand" "rk,rk,r,rk")]))]
   "TARGET_32BIT"
-  "%i1%?\\t%0, %2, %4%S3"
+  "%j0%i1%?\\t%0, %2, %4%S3"
   [(set_attr "predicable" "yes")
    (set_attr "shift" "4")
    (set_attr "arch" "a,t2,t2,a")
@@ -9061,7 +9061,7 @@
 	(match_op_dup 1 [(match_op_dup 3 [(match_dup 4) (match_dup 5)])
 			 (match_dup 2)]))]
   "TARGET_32BIT"
-  "%i1%.\\t%0, %2, %4%S3"
+  "%j0%i1%.\\t%0, %2, %4%S3"
   [(set_attr "conds" "set")
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
@@ -9078,7 +9078,7 @@
 	 (const_int 0)))
    (clobber (match_scratch:SI 0 "=r,r"))]
   "TARGET_32BIT"
-  "%i1%.\\t%0, %2, %4%S3"
+  "%j0%i1%.\\t%0, %2, %4%S3"
   [(set_attr "conds" "set")
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
@@ -9091,7 +9091,7 @@
 		   [(match_operand:SI 3 "s_register_operand" "r,r")
 		    (match_operand:SI 4 "shift_amount_operand" "M,r")])))]
   "TARGET_32BIT"
-  "sub%?\\t%0, %1, %3%S2"
+  "%j0sub%?\\t%0, %1, %3%S2"
   [(set_attr "predicable" "yes")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
@@ -9109,7 +9109,7 @@
 	(minus:SI (match_dup 1)
 		  (match_op_dup 2 [(match_dup 3) (match_dup 4)])))]
   "TARGET_32BIT"
-  "sub%.\\t%0, %1, %3%S2"
+  "%j0sub%.\\t%0, %1, %3%S2"
   [(set_attr "conds" "set")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
@@ -9125,7 +9125,7 @@
 	 (const_int 0)))
    (clobber (match_scratch:SI 0 "=r,r"))]
   "TARGET_32BIT"
-  "sub%.\\t%0, %1, %3%S2"
+  "%j0sub%.\\t%0, %1, %3%S2"
   [(set_attr "conds" "set")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
@@ -9314,7 +9314,7 @@
   "TARGET_ARM"
   "*
     if (GET_CODE (operands[4]) == LT && operands[3] == const0_rtx)
-      return \"%i5\\t%0, %1, %2, lsr #31\";
+      return \"%j0%i5\\t%0, %1, %2, lsr #31\";
 
     output_asm_insn (\"cmp\\t%2, %3\", operands);
     if (GET_CODE (operands[5]) == AND)
@@ -9323,7 +9323,7 @@
       output_asm_insn (\"rsb%D4\\t%0, %1, #0\", operands);
     else if (which_alternative != 0)
       output_asm_insn (\"mov%D4\\t%0, %1\", operands);
-    return \"%i5%d4\\t%0, %1, #1\";
+    return \"%j0%i5%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
    (set_attr "length" "12")]
@@ -9341,7 +9341,7 @@
     output_asm_insn (\"cmp\\t%2, %3\", operands);
     if (which_alternative != 0)
       output_asm_insn (\"mov%D4\\t%0, %1\", operands);
-    return \"sub%d4\\t%0, %1, #1\";
+    return \"%j0sub%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
    (set_attr "length" "8,12")]

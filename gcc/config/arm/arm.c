@@ -14203,7 +14203,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		  /* Registers overlap so split out the increment.  */
 		  if (emit)
 		    {
-		      output_asm_insn ("add%?\t%1, %1, %2", otherops);
+		      output_asm_insn ("%j1add%?\t%1, %1, %2", otherops);
 		      output_asm_insn ("%b1ldr%(d%)\t%0, [%1] @split",
                                        otherops);
 		    }
@@ -14346,7 +14346,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 			{
 			  if (emit)
 			    {
-			      output_asm_insn ("add%?\t%0, %1, %2", otherops);
+			      output_asm_insn ("%j0add%?\t%0, %1, %2",
+                                               otherops);
 			      output_asm_insn ("%b1ldr%(d%)\t%0, [%1]",
                                                operands);
 			    }
@@ -14368,21 +14369,22 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      if (emit)
 			{
 			  if (!(const_ok_for_arm (INTVAL (otherops[2]))))
-			    output_asm_insn ("sub%?\t%0, %1, #%n2", otherops);
+			    output_asm_insn ("%j0sub%?\t%0, %1, #%n2",
+                                             otherops);
 			  else
-			    output_asm_insn ("add%?\t%0, %1, %2", otherops);
+			    output_asm_insn ("%j0add%?\t%0, %1, %2", otherops);
 			}
 		    }
 		  else
 		    {
 		      if (emit)
-			output_asm_insn ("add%?\t%0, %1, %2", otherops);
+			output_asm_insn ("%j0add%?\t%0, %1, %2", otherops);
 		    }
 		}
 	      else
 		{
 		  if (emit)
-		    output_asm_insn ("sub%?\t%0, %1, %2", otherops);
+		    output_asm_insn ("%j0sub%?\t%0, %1, %2", otherops);
 		}
 
 	      if (count)
@@ -14916,11 +14918,13 @@ output_add_immediate (rtx *operands)
     {
       if (n < 0)
 	output_multi_immediate (operands,
-				"sub%?\t%0, %1, %2", "sub%?\t%0, %0, %2", 2,
+				"%j0sub%?\t%0, %1, %2",
+                                "%j0sub%?\t%0, %0, %2", 2,
 				-n);
       else
 	output_multi_immediate (operands,
-				"add%?\t%0, %1, %2", "add%?\t%0, %0, %2", 2,
+				"%j0add%?\t%0, %1, %2",
+                                "%j0add%?\t%0, %0, %2", 2,
 				n);
     }
 
@@ -18037,6 +18041,20 @@ arm_print_operand (FILE *stream, rtx x, int code)
 	  if (regno != SP_REGNUM && regno != PC_REGNUM)
 	    fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
 	}
+      return;
+
+    case 'j':
+      /* Used to prefix an instruction, repeating the output (register)
+         operand.  Normally, produces no output.  Under -msfi-nacl1,
+         produces "sfi_sp " if the output operand is the SP.  */
+      if (GET_CODE (x) != REG)
+	{
+	  output_operand_lossage ("invalid operand for code '%c'", code);
+	  return;
+	}
+
+      if (TARGET_SFI_NACL1 && REGNO (x) == SP_REGNUM)
+        fputs ("sfi_sp ", stream);
       return;
 
     default:
