@@ -98,3 +98,10 @@
 
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC GNU_USER_TARGET_ENDFILE_SPEC
+
+/* We feed the file of standard assembler macros as an extra input file
+   before the actual assembly code.  This file will be installed in some
+   place like ${tool_prefix}/lib/.  */
+#undef SUBTARGET_EXTRA_ASM_SPEC
+#define SUBTARGET_EXTRA_ASM_SPEC        \
+  "nacl-arm-macros.s%s"
