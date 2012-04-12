@@ -13709,7 +13709,8 @@ fp_const_from_val (REAL_VALUE_TYPE *r)
    RFE is nonzero if the instruction should also copy spsr to cpsr.  */
 
 static void
-print_multi_reg (FILE *stream, const char *instr, unsigned reg,
+print_multi_reg (FILE *stream, const char *prefix,
+                 const char *instr, unsigned reg,
 		 unsigned long mask, int rfe)
 {
   unsigned i;
@@ -13717,6 +13718,8 @@ print_multi_reg (FILE *stream, const char *instr, unsigned reg,
 
   gcc_assert (!rfe || (mask & (1 << PC_REGNUM)));
   fputc ('\t', stream);
+  if (prefix != NULL)
+    fputs (prefix, stream);
   asm_fprintf (stream, instr, reg);
   fputc ('{', stream);
 
@@ -15650,6 +15653,13 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	    strcpy (p, "}");
 	}
 
+      if (TARGET_SFI_NACL1 && (live_regs_mask & (1 << SP_REGNUM)))
+        {
+          char orig_instr[sizeof instr];
+          strcpy (orig_instr, instr);
+          strcpy (stpcpy (instr, "sfi_sp "), orig_instr);
+        }
+
       output_asm_insn (instr, & operand);
 
       /* See if we need to generate an extra instruction to
@@ -15678,7 +15688,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	  break;
 
 	case ARM_FT_INTERWORKED:
-	  sprintf (instr, "bx%s\t%%|lr", conditional);
+	  sprintf (instr, "%%*bx%s\t%%|lr", conditional);
 	  break;
 
 	case ARM_FT_EXCEPTION:
@@ -15689,7 +15699,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	default:
 	  /* Use bx if it's available.  */
 	  if (arm_arch5 || arm_arch4t)
-	    sprintf (instr, "bx%s\t%%|lr", conditional);
+	    sprintf (instr, "%%*bx%s\t%%|lr", conditional);
 	  else
 	    sprintf (instr, "mov%s\t%%|pc, %%|lr", conditional);
 	  break;
@@ -15820,6 +15830,8 @@ arm_output_epilogue (rtx sibling)
   int really_return = (sibling == NULL);
   int start_reg;
   arm_stack_offsets *offsets;
+  const char *sfi_sp_prefix = TARGET_SFI_NACL1 ? "sfi_sp " : "";
+  const char *sfi_bx_prefix = TARGET_SFI_NACL1 ? "sfi_" : "";
 
   /* If we have already generated the return instruction
      then it is futile to generate anything else.  */
@@ -15997,14 +16009,17 @@ arm_output_epilogue (rtx sibling)
          place, then omit the subtraction.  */
       if (offsets->outgoing_args != (1 + (int) bit_count (saved_regs_mask))
 	  || cfun->calls_alloca)
-	asm_fprintf (f, "\tsub\t%r, %r, #%d\n", SP_REGNUM, FP_REGNUM,
+	asm_fprintf (f, "\t%ssub\t%r, %r, #%d\n",
+                     sfi_sp_prefix, SP_REGNUM, FP_REGNUM,
 		     4 * bit_count (saved_regs_mask));
-      print_multi_reg (f, "ldmfd\t%r, ", SP_REGNUM, saved_regs_mask, 0);
+      print_multi_reg (f, sfi_sp_prefix,
+                       "ldmfd\t%r, ", SP_REGNUM, saved_regs_mask, 0);
 
       if (IS_INTERRUPT (func_type))
 	/* Interrupt handlers will have pushed the
 	   IP onto the stack, so restore it now.  */
-	print_multi_reg (f, "ldmfd\t%r!, ", SP_REGNUM, 1 << IP_REGNUM, 0);
+	print_multi_reg (f, sfi_sp_prefix,
+                         "ldmfd\t%r!, ", SP_REGNUM, 1 << IP_REGNUM, 0);
     }
   else
     {
@@ -16193,13 +16208,14 @@ arm_output_epilogue (rtx sibling)
 	       (i.e. "ldmfd sp!...").  We know that the stack pointer is
 	       in the list of registers and if we add writeback the
 	       instruction becomes UNPREDICTABLE.  */
-	    print_multi_reg (f, "ldmfd\t%r, ", SP_REGNUM, saved_regs_mask,
+	    print_multi_reg (f, sfi_sp_prefix,
+                             "ldmfd\t%r, ", SP_REGNUM, saved_regs_mask,
 			     rfe);
 	  else if (TARGET_ARM)
-	    print_multi_reg (f, "ldmfd\t%r!, ", SP_REGNUM, saved_regs_mask,
-			     rfe);
+	    print_multi_reg (f, NULL, "ldmfd\t%r!, ",
+                             SP_REGNUM, saved_regs_mask, rfe);
 	  else
-	    print_multi_reg (f, "pop\t", SP_REGNUM, saved_regs_mask, 0);
+	    print_multi_reg (f, NULL, "pop\t", SP_REGNUM, saved_regs_mask, 0);
 	}
 
       if (crtl->args.pretend_args_size)
@@ -16217,8 +16233,8 @@ arm_output_epilogue (rtx sibling)
 
   /* Stack adjustment for exception handler.  */
   if (crtl->calls_eh_return)
-    asm_fprintf (f, "\tadd\t%r, %r, %r\n", SP_REGNUM, SP_REGNUM,
-		 ARM_EH_STACKADJ_REGNUM);
+    asm_fprintf (f, "\t%sadd\t%r, %r, %r\n", sfi_sp_prefix,
+                 SP_REGNUM, SP_REGNUM, ARM_EH_STACKADJ_REGNUM);
 
   /* Generate the return instruction.  */
   switch ((int) ARM_FUNC_TYPE (func_type))
@@ -16233,17 +16249,17 @@ arm_output_epilogue (rtx sibling)
       break;
 
     case ARM_FT_INTERWORKED:
-      asm_fprintf (f, "\tbx\t%r\n", LR_REGNUM);
+      asm_fprintf (f, "\t%sbx\t%r\n", sfi_bx_prefix, LR_REGNUM);
       break;
 
     default:
       if (IS_STACKALIGN (func_type))
 	{
 	  /* See comment in arm_expand_prologue.  */
-	  asm_fprintf (f, "\tmov\t%r, %r\n", SP_REGNUM, 0);
+	  asm_fprintf (f, "\t%smov\t%r, %r\n", sfi_sp_prefix, SP_REGNUM, 0);
 	}
       if (arm_arch5 || arm_arch4t)
-	asm_fprintf (f, "\tbx\t%r\n", LR_REGNUM);
+	asm_fprintf (f, "\t%sbx\t%r\n", sfi_bx_prefix, LR_REGNUM);
       else
 	asm_fprintf (f, "\tmov\t%r, %r\n", PC_REGNUM, LR_REGNUM);
       break;
@@ -17983,23 +17999,8 @@ arm_print_operand (FILE *stream, rtx x, int code)
       }
       return;
 
-    case 'j':
-      /* Used to prefix a "bx", repeating the (register) operand.
-	 Normally, produces no output.  Under -msfi-nacl1, produces the
-	 "sfi_" prefix unless the register is LR.  */
-      if (GET_CODE (x) != REG)
-	{
-	  output_operand_lossage ("invalid operand for code '%c'", code);
-	  return;
-	}
-
-      if (TARGET_SFI_NACL1
-	  && REGNO (x) != LR_REGNUM)
-	fprintf (stream, "sfi_");
-      return;
-
     case '*':
-      /* Used to prefix a "bl" or "blx".  */
+      /* Used to prefix a "bl", "blx", or "bx".  */
       if (TARGET_SFI_NACL1)
 	fprintf (stream, "sfi_");
       return;

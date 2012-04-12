@@ -8934,7 +8934,7 @@
   "TARGET_ARM"
   "*
   if (arm_arch5 || arm_arch4t)
-    return \"%j0bx%?\\t%0\\t%@ indirect register jump\";
+    return \"%*bx%?\\t%0\\t%@ indirect register jump\";
   return \"mov%?\\t%|pc, %0\\t%@ indirect register jump\";
   "
   [(set_attr "predicable" "yes")]

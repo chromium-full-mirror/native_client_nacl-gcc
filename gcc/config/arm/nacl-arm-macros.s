@@ -14,33 +14,32 @@
 .endm
 
 @ Used in place of bx (indirect jump), no difference but the mnemonic.
-@ Note you don't want to use this for return (bx lr), since SFI is not required.
 @ NB: GCC output uses this.
-.macro sfi_bx reg
+.macro sfi_bx reg, cond=
 	.bundle_lock
 	_sfi_cmask \reg
-	bx \reg
+	bx\cond \reg
 	.bundle_unlock
 .endm
 
-.macro _sfi_bl label, target
+.macro _sfi_bl label, target, cond=
 	adr lr, \label
-	b \target
+	b\cond \target
 	.p2align 4
 \label\():
 .endm
 
 @ Used in place of bl (direct call), no difference but the mnemonic.
 @ NB: GCC output uses this.
-.macro sfi_bl target
-	_sfi_bl .Lsfi.\@, \target
+.macro sfi_bl target, cond=
+	_sfi_bl .Lsfi.\@, \target, \cond
 .endm
 
-.macro _sfi_blx label, reg
+.macro _sfi_blx label, reg, cond
 	adr lr, \label
 	.bundle_lock
 	_sfi_cmask \reg
-	bx \reg
+	bx\cond \reg
 	.bundle_unlock
 	.p2align 4
 \label\():
@@ -48,14 +47,42 @@
 
 @ Used in place of blx (indirect call), no difference but the mnemonic.
 @ NB: GCC output uses this.
-.macro sfi_blx target
-	_sfi_blx .Lsfi.\@, \target
+.macro sfi_blx target, cond=
+	_sfi_blx .Lsfi.\@, \target, \cond
 .endm
 
-@ Just "bx lr" as normal, but for parity we define an alias.
-.macro sfi_ret
-	bx lr
+.macro _sfi_condify_1 macro, cond
+	.macro \macro\cond args:vararg
+	\macro \args, \cond
+	.endm
 .endm
+.macro _sfi_condify macro
+	_sfi_condify_1 \macro, eq
+	_sfi_condify_1 \macro, ne
+	_sfi_condify_1 \macro, cs
+	_sfi_condify_1 \macro, cc
+	_sfi_condify_1 \macro, mi
+	_sfi_condify_1 \macro, pl
+	_sfi_condify_1 \macro, vs
+	_sfi_condify_1 \macro, vc
+	_sfi_condify_1 \macro, hi
+	_sfi_condify_1 \macro, ls
+	_sfi_condify_1 \macro, ge
+	_sfi_condify_1 \macro, lt
+	_sfi_condify_1 \macro, gt
+	_sfi_condify_1 \macro, le
+	_sfi_condify_1 \macro, al
+	_sfi_condify_1 \macro, nv
+.endm
+
+@ Conditionalized variants of the branching macros.
+@ NB: GCC output uses (some of) these.
+_sfi_condify sfi_bl
+_sfi_condify sfi_blx
+_sfi_condify sfi_bx
+
+.purgem _sfi_condify_1
+.purgem _sfi_condify
 
 @ ldr/str syntax cheat sheet:
 @ [Rn, offset] => *(Rn + offset)
@@ -139,13 +166,12 @@
 .endm
 
 
-@ For popping multiple registers, including sp and lr.
-@ Note you don't want to use this if sp and lr are not touched.
+@ For popping multiple registers, including sp.
+@ Note you don't want to use this if sp is not touched.
 .macro sfi_popm reglist:vararg
 	.bundle_lock
 	pop \reglist
 	_sfi_dmask sp
-	_sfi_dmask lr
 	.bundle_unlock
 .endm
 
@@ -155,12 +181,21 @@
 @ usual ARM instruction syntax, unmodified.  It has the downside
 @ that the base register appears twice, thus introducing the
 @ possibility of errors where the base register in the first parameter
-@ is not the actual base register used in the address mode syntax.
+@ is not the actual base register used in the addressing mode syntax.
 @ NB: GCC output uses this.
 .macro sfi_breg basereg, insn:vararg
 	.bundle_lock
 	_sfi_dmask \basereg
 	\insn
+	.bundle_unlock
+.endm
+
+@ Macro to precede an instruction that touches sp.
+@ NB: GCC output uses this.
+.macro sfi_sp insn:vararg
+	.bundle_lock
+	\insn
+	_sfi_dmask sp
 	.bundle_unlock
 .endm
 
