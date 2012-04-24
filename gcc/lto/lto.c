@@ -208,7 +208,7 @@ lto_materialize_function (struct cgraph_node *node)
   const char *data, *name;
   size_t len;
 
-  decl = node->decl;
+  decl = node->symbol.decl;
   /* Read in functions with body (analyzed nodes)
      and also functions that are needed to produce virtual clones.  */
   if (cgraph_function_with_gimple_body_p (node) || has_analyzed_clone_p (node))
@@ -221,7 +221,7 @@ lto_materialize_function (struct cgraph_node *node)
 	 WPA mode, the body of the function is not needed.  */
       if (!flag_wpa)
 	{
-	  file_data = node->local.lto_file_data;
+	  file_data = node->symbol.lto_file_data;
 	  name = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl));
 
 	  /* We may have renamed the declaration, e.g., a static function.  */
@@ -1424,13 +1424,13 @@ cmp_partitions_order (const void *a, const void *b)
   int ordera = -1, orderb = -1;
 
   if (VEC_length (cgraph_node_ptr, pa->cgraph_set->nodes))
-    ordera = VEC_index (cgraph_node_ptr, pa->cgraph_set->nodes, 0)->order;
+    ordera = VEC_index (cgraph_node_ptr, pa->cgraph_set->nodes, 0)->symbol.order;
   else if (VEC_length (varpool_node_ptr, pa->varpool_set->nodes))
-    ordera = VEC_index (varpool_node_ptr, pa->varpool_set->nodes, 0)->order;
+    ordera = VEC_index (varpool_node_ptr, pa->varpool_set->nodes, 0)->symbol.order;
   if (VEC_length (cgraph_node_ptr, pb->cgraph_set->nodes))
-    orderb = VEC_index (cgraph_node_ptr, pb->cgraph_set->nodes, 0)->order;
+    orderb = VEC_index (cgraph_node_ptr, pb->cgraph_set->nodes, 0)->symbol.order;
   else if (VEC_length (varpool_node_ptr, pb->varpool_set->nodes))
-    orderb = VEC_index (varpool_node_ptr, pb->varpool_set->nodes, 0)->order;
+    orderb = VEC_index (varpool_node_ptr, pb->varpool_set->nodes, 0)->symbol.order;
   return orderb - ordera;
 }
 
@@ -1868,18 +1868,15 @@ read_cgraph_and_symbols (unsigned nfiles, const char **fnames)
   lto_symtab_merge_cgraph_nodes ();
   ggc_collect ();
 
+  /* FIXME: ipa_transforms_to_apply holds list of passes that have optimization
+     summaries computed and needs to apply changes.  At the moment WHOPR only
+     supports inlining, so we can push it here by hand.  In future we need to stream
+     this field into ltrans compilation.  */
   if (flag_ltrans)
-    for (node = cgraph_nodes; node; node = node->next)
-      {
-	/* FIXME: ipa_transforms_to_apply holds list of passes that have optimization
-	   summaries computed and needs to apply changes.  At the moment WHOPR only
-	   supports inlining, so we can push it here by hand.  In future we need to stream
-	   this field into ltrans compilation.  */
-	if (node->analyzed)
-	  VEC_safe_push (ipa_opt_pass, heap,
-			 node->ipa_transforms_to_apply,
-			 (ipa_opt_pass)&pass_ipa_inline);
-      }
+    FOR_EACH_DEFINED_FUNCTION (node)
+      VEC_safe_push (ipa_opt_pass, heap,
+		     node->ipa_transforms_to_apply,
+		     (ipa_opt_pass)&pass_ipa_inline);
   lto_symtab_free ();
 
   timevar_pop (TV_IPA_LTO_CGRAPH_MERGE);
@@ -1923,9 +1920,9 @@ materialize_cgraph (void)
      nodes and read the functions if we are not running in WPA mode.  */
   timevar_push (TV_IPA_LTO_GIMPLE_IN);
 
-  for (node = cgraph_nodes; node; node = node->next)
+  FOR_EACH_FUNCTION (node)
     {
-      if (node->local.lto_file_data)
+      if (node->symbol.lto_file_data)
 	{
 	  lto_materialize_function (node);
 	  lto_stats.num_input_cgraph_nodes++;

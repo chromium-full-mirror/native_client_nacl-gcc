@@ -703,22 +703,18 @@ dump_passes (void)
 
   create_pass_tab();
 
-  n = cgraph_nodes;
-  while (n)
-    {
-      if (DECL_STRUCT_FUNCTION (n->decl))
-        {
-          node = n;
-          break;
-        }
-      n = n->next;
-    }
+  FOR_EACH_DEFINED_FUNCTION (n)
+    if (DECL_STRUCT_FUNCTION (n->symbol.decl))
+      {
+	node = n;
+	break;
+      }
 
   if (!node)
     return;
 
-  push_cfun (DECL_STRUCT_FUNCTION (node->decl));
-  current_function_decl = node->decl;
+  push_cfun (DECL_STRUCT_FUNCTION (node->symbol.decl));
+  current_function_decl = node->symbol.decl;
 
   dump_pass_list (all_lowering_passes, 1);
   dump_pass_list (all_small_ipa_passes, 1);
@@ -1662,12 +1658,12 @@ do_per_function (void (*callback) (void *data), void *data)
   else
     {
       struct cgraph_node *node;
-      for (node = cgraph_nodes; node; node = node->next)
-	if (node->analyzed && gimple_has_body_p (node->decl)
-	    && (!node->clone_of || node->decl != node->clone_of->decl))
+      FOR_EACH_DEFINED_FUNCTION (node)
+	if (gimple_has_body_p (node->symbol.decl)
+	    && (!node->clone_of || node->symbol.decl != node->clone_of->symbol.decl))
 	  {
-	    push_cfun (DECL_STRUCT_FUNCTION (node->decl));
-	    current_function_decl = node->decl;
+	    push_cfun (DECL_STRUCT_FUNCTION (node->symbol.decl));
+	    current_function_decl = node->symbol.decl;
 	    callback (data);
 	    if (!flag_wpa)
 	      {
@@ -1714,8 +1710,8 @@ do_per_function_toporder (void (*callback) (void *data), void *data)
 	  node->process = 0;
 	  if (cgraph_function_with_gimple_body_p (node))
 	    {
-	      push_cfun (DECL_STRUCT_FUNCTION (node->decl));
-	      current_function_decl = node->decl;
+	      push_cfun (DECL_STRUCT_FUNCTION (node->symbol.decl));
+	      current_function_decl = node->symbol.decl;
 	      callback (data);
 	      free_dominance_info (CDI_DOMINATORS);
 	      free_dominance_info (CDI_POST_DOMINATORS);
@@ -1866,10 +1862,10 @@ execute_todo (unsigned int flags)
       cgraph_remove_unreachable_nodes (true, dump_file);
     }
 
-  if ((flags & TODO_dump_cgraph) && dump_file && !current_function_decl)
+  if ((flags & TODO_dump_symtab) && dump_file && !current_function_decl)
     {
       gcc_assert (!cfun);
-      dump_cgraph (dump_file);
+      dump_symtab (dump_file);
       /* Flush the file.  If verification fails, we won't be able to
 	 close the file before aborting.  */
       fflush (dump_file);
@@ -2337,7 +2333,7 @@ ipa_write_summaries (void)
 	     ordering then matches the one IPA-passes get in their stmt_fixup
 	     hooks.  */
 
-	  push_cfun (DECL_STRUCT_FUNCTION (node->decl));
+	  push_cfun (DECL_STRUCT_FUNCTION (node->symbol.decl));
 	  renumber_gimple_stmt_uids ();
 	  pop_cfun ();
 	}
@@ -2346,8 +2342,8 @@ ipa_write_summaries (void)
     }
   vset = varpool_node_set_new ();
 
-  for (vnode = varpool_nodes; vnode; vnode = vnode->next)
-    if (vnode->needed && (!vnode->alias || vnode->alias_of))
+  FOR_EACH_DEFINED_VARIABLE (vnode)
+    if ((!vnode->alias || vnode->alias_of))
       varpool_node_set_add (vset, vnode);
 
   ipa_write_summaries_1 (set, vset);
@@ -2418,9 +2414,9 @@ ipa_write_optimization_summaries (cgraph_node_set set, varpool_node_set vset)
 	 For functions newly born at WPA stage we need to initialize
 	 the uids here.  */
       if (node->analyzed
-	  && gimple_has_body_p (node->decl))
+	  && gimple_has_body_p (node->symbol.decl))
 	{
-	  push_cfun (DECL_STRUCT_FUNCTION (node->decl));
+	  push_cfun (DECL_STRUCT_FUNCTION (node->symbol.decl));
 	  renumber_gimple_stmt_uids ();
 	  pop_cfun ();
 	}
@@ -2658,11 +2654,11 @@ function_called_by_processed_nodes_p (void)
        e;
        e = e->next_caller)
     {
-      if (e->caller->decl == current_function_decl)
+      if (e->caller->symbol.decl == current_function_decl)
         continue;
       if (!cgraph_function_with_gimple_body_p (e->caller))
         continue;
-      if (TREE_ASM_WRITTEN (e->caller->decl))
+      if (TREE_ASM_WRITTEN (e->caller->symbol.decl))
         continue;
       if (!e->caller->process && !e->caller->global.inlined_to)
       	break;
