@@ -14555,7 +14555,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      otherops[0] = operands[1];
 	      otherops[1] = XEXP (XEXP (operands[0], 0), 0);
 	      if (emit)
-		output_asm_insn ("%b0str%(d%)\t%0, [%1, %2]", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]", otherops);
 	      return "";
 	    }
 	  /* Fall through */
@@ -14591,7 +14591,7 @@ output_move_quad (rtx *operands)
           switch (GET_CODE (XEXP (operands[1], 0)))
             {
             case REG:
-              output_asm_insn ("%b0ldm%(ia%)\t%m1, %M0", operands);
+              output_asm_insn ("%b1ldm%(ia%)\t%m1, %M0", operands);
               break;
 
             case LABEL_REF:
@@ -18011,9 +18011,11 @@ arm_print_operand (FILE *stream, rtx x, int code)
 
     case 'b':
       /* Used to prefix a load or store instruction, repeating the memory
-	 operand.  Normally, produces no output.  Under -msfi-nacl1,
+	 operand.  It can also be used with a plain register operand, when
+	 that is being used as the base register in a load or store
+	 instruction.  Normally, produces no output.  Under -msfi-nacl1,
 	 produces "sfi_breg REG, " unless REG is SP or PC.  */
-      if (GET_CODE (x) != MEM)
+      if (GET_CODE (x) != MEM && GET_CODE (x) != REG)
 	{
 	  output_operand_lossage ("invalid operand for code '%c'", code);
 	  return;
@@ -18021,22 +18023,43 @@ arm_print_operand (FILE *stream, rtx x, int code)
 
       if (TARGET_SFI_NACL1)
 	{
-	  rtx addr = XEXP (x, 0);
 	  int regno;
-          switch (GET_CODE (addr))
+          switch (GET_CODE (x))
             {
-            case LABEL_REF:
-            case SYMBOL_REF:
-              regno = PC_REGNUM;
-              break;
-            default:
-	      /* It might be (plus (reg...) ...) or suchlike.  */
-	      addr = XEXP (addr, 0);
-	      gcc_assert (GET_CODE (addr) == REG);
-              /* Fall through.  */
             case REG:
-              regno = REGNO (addr);
+              regno = REGNO (x);
               break;
+
+            case MEM:
+              {
+                rtx addr = XEXP (x, 0);
+                while (GET_CODE (addr) != REG)
+                  {
+                    switch (GET_CODE (addr))
+                      {
+                      case LABEL_REF:
+                      case SYMBOL_REF:
+                        addr = NULL;
+                        regno = PC_REGNUM;
+                        break;
+
+                      default:
+                        /* It might be (plus (reg...) ...) or suchlike.  */
+                        addr = XEXP (addr, 0);
+                        continue;
+                      }
+                    break;
+                  }
+                if (addr != NULL)
+                  {
+                    gcc_assert (GET_CODE (addr) == REG);
+                    regno = REGNO (addr);
+                  }
+              }
+              break;
+
+            default:
+	      gcc_unreachable ();
             }
 	  if (regno != SP_REGNUM && regno != PC_REGNUM)
 	    fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
