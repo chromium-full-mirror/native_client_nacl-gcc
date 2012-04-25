@@ -1,3 +1,210 @@
+2012-04-25  Jakub Jelinek  <jakub@redhat.com>
+
+	* common.opt (flag_debug_types_section): Default to 0.
+	(dwarf_version): Default to 4.
+	(dwarf_record_gcc_switches): Default to 1.
+	(dwarf_strict): Default to 0.
+	* toplev.c (process_options): Don't handle dwarf_strict
+	or dwarf_version here.
+	* config/vxworks.c (vxworks_override_options): Don't
+	test whether dwarf_strict or dwarf_version are negative,
+	instead test !global_options_set.x_dwarf_*.
+	* config/darwin.c (darwin_override_options): Default to
+	dwarf_version 2.
+	* doc/invoke.texi: Note that -gdwarf-4, -grecord-gcc-switches
+	and -fno-debug-types-section are now the default.
+
+2012-04-25  Jan Hubicka  <jh@suse.cz>
+
+	* cgraphunit.c: Update toplevel comment.
+	(tree_rest_of_compilation): Merge into cgraph_expand_function.
+	(cgraph_analyze_function): Make static.
+	(cgraph_decide_is_function_needed): Make static.
+	(cgraph_add_new_function): Use expand_function instead of
+	rest_of_compilation.
+	(clone_of_p, verify_edge_count_and_frequency, cgraph_debug_gimple_stmt,
+	verify_edge_corresponds_to_fndecl, verify_cgraph_node, verify_cgraph):
+	Move to cgraph.c
+	(cgraph_inline_p): Remove.
+	(cgraph_preserve_function_body_p): Move to ipa-inline-transform.
+	(init_cgraph): Add comment.
+	* cgraphbuild.c (record_reference, mark_address, mark_load,
+	mark_store): Do not call analyze_expr hook.
+	* cgraph.c: Update toplevel comment.
+	(clone_of_p, verify_edge_count_and_frequency, cgraph_debug_gimple_stmt,
+	verify_edge_corresponds_to_fndecl, verify_cgraph_node, verify_cgraph):
+	Move fere from cgraphunit.c
+	(cgraph_mark_force_output_node): Move to cgraph.h
+	* cgraph.h: Reorder so the comments match the function placement.
+	(cgraph_analyze_function, cgraph_decide_is_function_needed): Remove.
+	(cgraph_mark_force_output_node): Move here from cgraph.c
+	* tree.c (free_lang_data): Do not clear analyze_expr hook.
+	* ipa-inline-transform.c (preserve_function_body_p): New function.
+	(inline_transform): Update.
+	* langhooks.c (lhd_callgraph_analyze_expr): Remove.
+	* langhooks.h (lang_hooks_for_callgraph): Remove.
+	(lang_hooks): Remove callgraph.
+	* tree-inline.c (expand_call_inline): Do not use cgraph_inline_p.
+	* varpool.c: Remove out of date comment.
+	* langhooks-def.h (lhd_callgraph_analyze_expr): Remove.
+	(LANG_HOOKS_CALLGRAPH_ANALYZE_EXPR): Remove.
+
+2012-04-25  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/53089 
+	* cgraphunit.c (referred_to_p): Move ahead in file to avoid forward declaration.
+	(cgraph_finalize_function): Finalize them here.
+	* symtab.c (dump_symtab): Dump ctors and dtors.
+
+2012-04-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/52979
+	* stor-layout.c (get_best_mode): Don't return mode with bitsize
+	larger than maxbits.  Don't compute maxbits modulo align.
+	Also check that unit bytes long store at bitpos / unit * unit
+	doesn't affect bits beyond bitregion_end.
+	* expmed.c (store_bit_field_1): Avoid trying insv if OP_MODE MEM
+	would not fit into bitregion_start ... bitregion_end + 1 bit
+	region.
+	(store_split_bit_field): Decrease unit close to end of bitregion_end
+	if access is restricted in order to avoid mutual recursion.
+
+	PR tree-optimization/53058
+	* double-int.h (double_int_max_value, double_int_min_value): New
+	prototypes.
+	* double-int.c (double_int_max_value, double_int_min_value): New
+	functions.
+	* tree-vrp.c (register_edge_assert_for_2): Compare mask
+	for LE_EXPR or GT_EXPR with double_int_max_value
+	instead of double_int_mask.
+
+2012-04-25  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vectorizer.h (vect_loop_versioning): Adjust prototype.
+	* tree-vect-loop.c (vect_transform_loop): Adjust.
+	* tree-vect-loop-manip.c (vect_do_peeling_for_loop_bound): Record
+	the maximum number of iterations for the epilogue loop.
+	(vect_loop_versioning): Remove case re-using the peeled
+	epilogue loop.
+
+2012-04-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c/52880
+	* c-typeck.c (set_nonincremental_init,
+	set_nonincremental_init_from_string): Pass true instead of false
+	as IMPLICIT to add_pending_init.
+
+2012-04-25  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	* c-typeck.c (pop_init_level): Improve diagnostics.
+
+2012-04-25  Uros Bizjak  <ubizjak@gmail.com>
+
+	* compare-elim.c (try_eliminate_compare): Also handle operands with
+	implicit extensions.
+
+2012-04-25  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000 (SAVE_INLINE_VRS, REST_INLINE_VRS,
+	V_SAVE_INLINE, SAVRES_LR, SAVRES_SAVE, SAVRES_REG,
+	SAVRES_GPR, SAVRES_FPR, SAVRES_VR): Define.
+	(no_global_regs_above): Delete.
+	(no_global_regs): New function.
+	(rs6000_savres_strategy): Handle vector regs.  Use proper lr_save_p
+	value for load multiple test.
+	(savres_routine_syms): Increase size.
+	(rs6000_savres_routine_name, rs6000_savres_routine_sym,
+	ptr_regno_for_savres, rs6000_emit_savres_rtx): Pass in int selector
+	rather than a number of boolean flags.  Update all callers.
+	(rs6000_savres_routine_name): Generate vector save/restore names.
+	(rs6000_savres_routine_sym): Handle vector regs.  Delete forward decl.
+	(ptr_regno_for_savres, rs6000_emit_savres_rtx): Likewise.
+	(rs6000_emit_prologue): Delete saving_FPRs_inline, saving_GPRs_inline
+	and using_store_multiple.  Expand uses.  Don't always use r11 as
+	frame reg when needed for out-of-line saves.  Set up initial offset
+	for out-of-line vector saves when buying stack frame.  Handle pointer
+	reg setup for out-of-line fp save.  Emit call to out-of-line vector
+	save function.  Choose r11 or r12 for vrsave reg when available for
+	better scheduling.
+	(rs6000_output_function_prologue): Don't emit .extern for ELF.
+	(rs6000_emit_epilogue): Choose a better frame reg when restoring
+	from back-chain to suit out-of-line vector restore functions.  Emit
+	call to out-of-line vector restore function.  Adjust register used
+	for cr restore.  Tweak pointer register setup for gpr restore.
+	* config/rs6000/rs6000.h (FIRST_SAVED_GP_REGNO): Take into account
+	FIXED_R13.
+	* config/rs6000/sysv4.h (FP_SAVE_INLINE, GP_SAVE_INLINE): Simplify.
+	(V_SAVE_INLINE): Define.
+	* config/rs6000/altivec.md (save_vregs_*, restore_vregs_*): New insns.
+
+2012-04-25  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (rs6000_savres_strategy): Allow
+	out-of-line save/restore for large frames.  Don't disable
+	out-of-line saves on ABI_AIX when using static chain reg.
+	(rs6000_emit_prologue): Adjust cr_save_regno on ABI_AIX to not
+	clobber static chain reg, and tweak for out-of-line gpr saves
+	that use r1.
+
+2012-04-25  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (START_USE, END_USE, NOT_INUSE): Define.
+	(rs6000_emit_prologue): Use the above to catch register overlap.
+
+2012-04-25  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (rs6000_emit_stack_reset): Delete forward
+	decl.  Move logic selecting update reg to callers.  Update all callers.
+	(rs6000_emit_allocate_stack): Add copy_off param.
+	(emit_frame_save): Don't handle reg+reg addressing.
+	(ptr_regno_for_savres): New function, extracted from..
+	(rs6000_emit_savres_rtx): ..here.  Add lr_offset param.
+	(rs6000_emit_prologue): Generate frame_ptr_rtx as we need it.
+	Set frame_reg_rtx to r11 whenever r11 is needed, and merge
+	frame offset adjustment for out-of-line save with copy from sp.
+	Simplify condition controlling whether cr is saved early or
+	late.  Use ptr_regno_for_savres to verify correct reg is set
+	up for out-of-line saves.  Pass the actual pointer reg used to
+	rs6000_emit_savres_rtx so rtl matches insns in out-of-line
+	function.  Rearrange spe vars so code is similar to that
+	elsewhere in this function.  Don't update frame_off when spe
+	save code will restore r11.  Use emit_frame_save for spe and
+	gpr saves.  Consolidate darwin out-of-line gpr setup with that
+	for other abis.  Don't assume frame_offset is zero and frame
+	reg is sp when setting up altivec reg saves, and calculate
+	exact offset requirement.
+	(rs6000_emit_epilogue): Use HOST_WIDE_INT for frame_off.  Tidy
+	spe restore code.  Consolidate darwin out-of-line gpr setup
+	with that for other abis.
+
+2012-04-25  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (rs6000_frame_related): Don't emit a
+	REG_FRAME_RELATED_EXPR note when the instruction exactly matches
+	the replacement.
+	(emit_frame_save): Delete frame_ptr param.  Rename total_size to
+	frame_reg_to_sp.
+	(rs6000_emit_prologue): Add sp_off.  Update rs6000_frame_related
+	and emit_frame_save calls.  Cope with possibly missing note.
+
+2012-04-24  Sriraman Tallam  <tmsriram@google.com>
+
+	* config/i386/i386.c (build_processor_model_struct): New function.
+	(make_var_decl): New function.
+	(fold_builtin_cpu): New function.
+	(ix86_fold_builtin): New function.
+	(make_cpu_type_builtin): New function.
+	(ix86_init_platform_type_builtins): New function.
+	(ix86_expand_builtin): Expand new builtins by folding them.
+	(ix86_init_builtins): Make new builtins to detect CPU type.
+	(TARGET_FOLD_BUILTIN): New macro.
+	(IX86_BUILTIN_CPU_INIT): New enum value.
+	(IX86_BUILTIN_CPU_IS): New enum value.
+	(IX86_BUILTIN_CPU_SUPPORTS): New enum value.
+	* config/i386/i386-builtin-types.def: New function type.
+	* testsuite/gcc.target/builtin_target.c: New testcase.
+	* doc/extend.texi: Document builtins.
+
 2012-04-24  Olivier Hainque  <hainque@adacore.com>
 
 	* common.opt (gdwarf-): Initialize dwarf_version to -1 instead of 2.
@@ -103,8 +310,7 @@
 2012-04-24  Jakub Jelinek  <jakub@redhat.com>
 
 	PR middle-end/53084
-	* varasm.c (compute_reloc_for_constant): Handle ADDR_EXPR
-	of MEM_REF.
+	* varasm.c (compute_reloc_for_constant): Handle ADDR_EXPR of MEM_REF.
 	(output_addressed_constants): Likewise.
 
 	PR middle-end/52999
