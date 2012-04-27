@@ -1,3 +1,79 @@
+2012-04-27   Ollie Wild  <aaw@google.com>
+
+	* doc/invoke.texi (Wliteral-suffix): Document new option.
+
+2012-04-27  Tom Tromey  <tromey@redhat.com>
+
+	* dwarf2out.c (dwarf_stack_op_name): Use get_DW_OP_name.
+	(dwarf_tag_name): Use get_DW_TAG_name.
+	(dwarf_attr_name): Use get_DW_AT_name.
+	(dwarf_form_name): Use get_DW_FORM_name.
+	* dwarf2cfi.c (dwarf_cfi_name): Use get_DW_CFA_name.
+
+2012-04-27  Paolo Bonzini  <bonzini@gnu.org>
+
+	* tree-ssa-phiopt.c (conditional_replacement): Replace PHIs
+	whose arguments are -1 and 0, by negating the result of the
+	conditional.
+
+2012-04-27  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR target/53138
+	* config/i386/i386.md (x86_mov<mode>cc_0_m1_neg): Add clobber.
+
+2012-04-27  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow.h (is_hidden_global_store): Remove.
+	* tree-ssa-sink.c (is_hidden_global_store): Likewise.
+	* tree-ssa-alias.h (ref_may_alias_global_p): Declare.
+	(stmt_may_clobber_global_p): Likewise.
+	* tree-ssa-alias.c (ref_may_alias_global_p): New function.
+	(stmt_may_clobber_global_p): Likewise.
+	* tree-ssa-dce.c (mark_stmt_if_obviously_necessary): Call
+	stmt_may_clobber_global_p.
+	* tree-ssa-dse.c (dse_possible_dead_store_p): Likewise.
+
+2012-04-27  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* cfg.c (disconnect_src): Do df_mark_solutions_dirty in the right
+	place.
+
+	* tree-switch-conversion.c (struct switch_conv_info): Add range_max,
+	reorganize some fields and update comments.  Rename bit_test_uniq
+	and bit_test_count to uniq resp. count.  Remove bit_test_bb.
+	(collect_switch_conv_info): New function, collects info about a
+	GIMPLE_SWITCH into a struct switch_conv_info.
+	(check_range): Simplify to use pre-recorded info.  Fix think-o in
+	range-branch ratio check.
+	(check_process_case): Remove function.
+	(check_all_empty_except_final): New function, verifies that all
+	non-final basic blocks are empty.
+	(process_switch): Simplify to use pre-recorded info.  Call
+	collect_switch_conv_info to do that.  Assert that degenerate switch
+	statements have been cleaned up.
+
+2012-04-27  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/27139
+	* tree-ssa-forwprop.c (combine_conversions): Handle INT->FP->INT.
+
+2012-04-25  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/53130
+	* c-typeck.c (pop_init_level): Use %qD instead of %qT.
+
+2012-04-27  Tom de Vries  <tom@codesourcery.com>
+
+	PR tree-optimization/51879
+	* tree-ssa-sccvn.h (struct vn_reference_s): Add result_vdef field.
+	* tree-ssa-sccvn.c (mark_use_processed): New function, factored out
+	of ...
+	(defs_to_varying): ... here.  Don't set use_processed.
+	(visit_reference_op_call): Handle gimple_vdef.
+	Handle case that lhs is NULL_TREE.
+	(visit_use): Use mark_use_processed.  Handle calls with side-effect
+	using visit_reference_op_call.
+
 2012-04-26  Richard Sandiford  <richard.sandiford@linaro.org>
 
 	* sched-deps.c (fixup_sched_groups): Rename to...

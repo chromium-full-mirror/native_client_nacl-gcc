@@ -1,3 +1,39 @@
+2012-04-27   Ollie Wild  <aaw@google.com>
+
+	* g++.dg/cpp0x/Wliteral-suffix.c: New test.
+
+2012-04-27  Paolo Bonzini  <bonzini@gnu.org>
+
+	* gcc.c-torture/execute/20120427-2.c: New testcase.
+	* gcc.dg/tree-ssa/phi-opt-10.c: New testcase.
+	* gcc.dg/tree-ssa/ssa-pre-28.c: Bypass new optimization.
+	* gcc.dg/tree-ssa/ssa-ifcombine-7.c: Look into ifcombine dump.
+
+2012-04-27  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR target/53138
+	* gcc.c-torture/execute/20120427-1.c: New testcase.
+
+2012-04-27  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/27139
+	* gcc.dg/tree-ssa/forwprop-18.c: New test.
+
+2012-04-27  Tom de Vries  <tom@codesourcery.com>
+
+	PR tree-optimization/51879
+	* gcc.dg/pr51879.c: New test.
+	* gcc.dg/pr51879-2.c: Same.
+	* gcc.dg/pr51879-3.c: Same.
+	* gcc.dg/pr51879-4.c: Same.
+	* gcc.dg/pr51879-6.c: Same.
+
+2012-04-26  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/53096
+	* g++.dg/cpp0x/defaulted35.C: New.
+	* g++.dg/cpp0x/defaulted15.C: Adjust.
+
 2012-04-26  Janis Johnson  <janisjo@codesourcery.com>
 
 	* gcc.dg/bf-ms-layout.c: Adjust offsets to fit ms-bitfield
