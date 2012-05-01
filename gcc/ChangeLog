@@ -1,3 +1,105 @@
+2012-05-01  Bernd Schmidt  <bernds@codesourcery.com>
+
+	* ira.c (allocated_reg_info_size): New static variable.
+	(expand_reg_info): Manage it. Call
+	setup_preferred_alternate_classes_for_new_pseudos.
+	(ira): Don't do it here.  Remove local allocated_reg_info_size,
+	set the global before calling find_moveable_pseudos.
+	(find_moveable_pseudos): Call expand_reg_info rather than
+	resize_reg_info.
+
+2012-05-01  Richard Henderson  <rth@redhat.com>
+
+	* common.opt (fsync-libcalls): New.
+	* doc/invoke.texi: Document it.
+	* optabs.c (init_sync_libfuncs): Honor it.
+
+2012-05-01  Kenneth Zadeck  <zadeck@naturalbridge.com>
+	    Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* Makefile.in (lower-subreg.o, target-globals.o): Depend on
+	lower-subreg.h.
+	* lower-subreg.h: New file.
+	* target-globals.h (this_target_lower_subreg): Declare.
+	(target_globals): Add lower_subreg;
+	(restore_target_globals): Restore this_target_lower_subreg.
+	* target-globals.c: Include it.
+	(default_target_globals): Add default_target_lower_subreg.
+	(save_target_globals): Initialize target_lower_subreg.
+	* rtl.h (init_lower_subreg): Added declaration.
+	* toplev.c (backend_init_target): Call initializer for lower-subreg
+	pass.
+	* lower-subreg.c (LOG_COSTS, FORCE_LOWERING): New macros.
+	(default_target_lower_subreg): New variable.
+	(this_target_lower_subreg): Likewise.
+	(twice_word_mode, choices): New macros.
+	(shift_cost, compute_splitting_shift, compute_costs)
+	(init_lower_subreg): New functions.
+	(resolve_simple_move): Add speed_p argument.  Check choices.
+	(find_pseudo_copy): Don't check the mode size here.
+	(resolve_simple_move): Assert the mode size.
+	(find_decomposable_shift_zext): Add speed_p argument and return
+	a bool.  Check choices.
+	(resolve_shift_zext): Add comment.
+	(dump_shift_choices, dump_choices): New functions.
+	(decompose_multiword_subregs): Dump list of profitable
+	transformations.  Add code to skip non profitable transformations.
+	Update calls to simple_move and find_decomposable_shift_zext.
+
+2012-05-01  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+	* config/arm/arm-protos.h (thumb_unexpanded_epilogue): Rename to...
+        (thumb1_unexpanded_epilogue): ...this.
+	* config/arm/arm.c (thumb_unexpanded_epilogue): Rename to...
+        (thumb1_unexpanded_epilogue): ...this.
+	* config/arm/arm.md (thumb_unexpanded_epilogue): Rename to...
+        (thumb1_unexpanded_epilogue): ...this.
+
+2012-05-01  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm/linux-eabi.h (GLIBC_DYNAMIC_LINKER_DEFAULT): Avoid ifdef
+	comparing enumeration values.  Update comments.
+
+2012-05-01  Alan Modra  <amodra@gmail.com>
+
+	PR target/53038
+	* config/rs6000/rs6000.c (load_lr_save, restore_saved_lr,
+	load_cr_save, add_crlr_cfa_restore): New functions.
+	(rs6000_restore_saved_cr): Rename to..
+	(restore_saved_cr): ..this.  Add cfa_restore notes for cr.
+	(rs6000_emit_epilogue): Use new functions.  Adjust condition
+	for emitting lr and cr cfa_restore.  Emit cfa_restores for fp
+	regs when using out-of-line restore only when shrink wrapping.
+
+2012-04-30  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR middle-end/53136
+	* ipa-prop.c (ipa_print_node_jump_functions): Wrap multiple
+	calls to cgraph_node_name in xstrdup.
+	(ipa_make_edge_direct_to_target): Ditto.
+	* cgraph.c (dump_cgraph_node): Ditto.
+	* tree-sra.c (convert_callers_for_node): Ditto.
+	* lto-symtab.c (lto_cgraph_replace_node): Ditto.
+	* ipa-cp.c (perhaps_add_new_callers): Ditto.
+	* cgraphunit.c (cgraph_redirect_edge_call_stmt_to_callee): Ditto.
+	(cgraph_materialize_all_clones): Ditto.
+	* ipa-inline.c (report_inline_failed_reason): Ditto.
+	(want_early_inline_function_p): Ditto.
+	(edge_badness): Ditto.
+	(update_edge_key): Ditto.
+	(flatten_function): Ditto.
+	(ipa_inline): Ditto.
+	(inlinw_always_inline_functions): Ditto.
+	(early_inline_small_functions): Ditto.
+
+2012-04-30  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53141
+	* config/i386/i386.md (*umul<mode><dwi>3_1): Switch places of
+	constraints 0 and 1.
+
 012-04-30  Jan Hubicka  <jh@suse.cz>
 
 	* cgraph.c (ld_plugin_symbol_resolution_names): Move to symtab.c
@@ -35,8 +137,7 @@
 	(varpool_remove_unreferenced_decls): Remove.
 	* ipa-inline-transform.c (clone_inlined_nodes): Dissolve comdat groups.
 	(preserve_function_body_p): Make static.
-	* toplev.c (compile_file): Update comments;
-	update.
+	* toplev.c (compile_file): Update comments; update.
 	* cgraphunit.c: Update comments.
 	(cgraph_expand_all_functions): Rename to ...
 	(expand_all_functions): ... this one; update.
@@ -66,11 +167,12 @@
 	* optimize.c (maybe_clone_body): Use symtab_add_to_same_comdat_group.
 	* method.c (use_thunk): Likewise.
 	* semantics.c (maybe_add_lambda_conv_op): Likewise.
-	* decl2.c (maybe_emit_vtables): Likewise.	
+	* decl2.c (maybe_emit_vtables): Likewise.
 	(cp_write_global_declarations): Use finalize_compilation_unit.
 	* parser.c (cp_parser_asm_definition): Use add_asm_node.
 	* lto-streamer-in.c (lto_input_toplevel_asms): Use add_asm_node
-	* c-decl.c (c_write_global_declarations): Use finalize_compilation_unit.
+	* c-decl.c (c_write_global_declarations): Use
+	finalize_compilation_unit.
 	* langhooks.c (write_global_declarations): Update.
 	* ipa.c (cgraph_externally_visible_p): Update.
 	(dissolve_same_comdat_group_list): Remove.
@@ -84,7 +186,8 @@
 	(symtab_make_decl_local): New.
 	* passes.c (register_pass): Update comments.
 	* c-parser.c (c_parser_asm_definition): Update.
-	* varpool.c (varpool_analyze_node): Use fixup_same_cpp_alias_visibility.
+	* varpool.c (varpool_analyze_node): Use
+	fixup_same_cpp_alias_visibility.
 	(varpool_remove_unreferenced_decls): Make static.
 	(varpool_assemble_pending_decls): Rename to ...
 	(varpool_output_variables): ... this one; call
