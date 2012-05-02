@@ -4622,7 +4622,9 @@ build_compound_literal (location_t loc, tree type, tree init, bool non_const)
   TREE_USED (decl) = 1;
   DECL_READ_P (decl) = 1;
   TREE_TYPE (decl) = type;
-  TREE_READONLY (decl) = TYPE_READONLY (type);
+  TREE_READONLY (decl) = (TYPE_READONLY (type)
+			  || (TREE_CODE (type) == ARRAY_TYPE
+			      && TYPE_READONLY (TREE_TYPE (type))));
   store_init_value (loc, decl, init, NULL_TREE);
 
   if (TREE_CODE (type) == ARRAY_TYPE && !COMPLETE_TYPE_P (type))
@@ -5809,12 +5811,12 @@ grokdeclarator (const struct c_declarator *declarator,
 	}
     }
 
-  /* Did array size calculations overflow?  */
-
+  /* Did array size calculations overflow or does the array cover more
+     than half of the address-space?  */
   if (TREE_CODE (type) == ARRAY_TYPE
       && COMPLETE_TYPE_P (type)
       && TREE_CODE (TYPE_SIZE_UNIT (type)) == INTEGER_CST
-      && TREE_OVERFLOW (TYPE_SIZE_UNIT (type)))
+      && ! valid_constant_size_p (TYPE_SIZE_UNIT (type)))
     {
       if (name)
 	error_at (loc, "size of array %qE is too large", name);
