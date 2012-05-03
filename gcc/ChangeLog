@@ -1,3 +1,199 @@
+2012-05-03  Jason Merrill  <jason@redhat.com>
+
+	* dwarf2out.c (die_struct): Add comdat_type_p flag.  Use it instead of
+	use_debug_types to discriminate the die_id union.
+	(print_die, assign_symbol_names, copy_decls_walk): Likewise.
+	(build_abbrev_table, output_die): Likewise.
+	(prune_unused_types_walk_attribs): Likewise.
+	(generate_type_signature, copy_declaration_context): Set it.
+	(remove_child_or_replace_with_skeleton): Set it.
+	(dwarf2out_start_source_file, dwarf2out_end_source_file): Don't
+	check use_debug_types.
+	(dwarf2out_finish): Do break_out_includes after .debug_types.
+
+2012-05-03  Jason Merrill  <jason@redhat.com>
+
+	* dwarf2out.c (modified_type_die): Use scope_die_for.
+	(gen_type_die_with_usage, dwarf2out_finish): Likewise.
+	(uses_local_type_r, uses_local_type): New.
+	(scope_die_for): Keep a type that uses a local type in local scope.
+	Use get_context_die for namespace and type scope.
+
+2012-05-03  Jason Merrill  <jason@redhat.com>
+
+	* config/i386/i386.c (ix86_code_end): Set DECL_IGNORED_P on the
+	pc thunk.
+	* dwarf2out.c (output_aranges): Skip DECL_IGNORED_P functions.
+	(dwarf2out_finish): Likewise.
+
+2012-05-03  Martin Jambor  <mjambor@suse.cz>
+
+	* builtins.c (get_object_alignment_1): Return whether we can determine
+	the alignment or conservatively assume byte alignment.  Return the
+	alignment by reference.  Use get_pointer_alignment_1 for dereference
+	alignment.
+	(get_pointer_alignment_1): Return whether we can determine the
+	alignment or conservatively assume byte alignment.  Return the
+	alignment by reference.  Use get_ptr_info_alignment to get SSA name
+	alignment.
+	(get_object_alignment): Update call to get_object_alignment_1.
+	(get_object_or_type_alignment): Likewise, fall back to type alignment
+	only when it returned false.
+	(get_pointer_alignment): Update call to get_pointer_alignment_1.
+	* fold-const.c (get_pointer_modulus_and_residue): Update call to
+	get_object_alignment_1.
+	* ipa-prop.c (ipa_modify_call_arguments): Update call to
+	get_pointer_alignment_1.
+	* tree-sra.c (build_ref_for_offset): Likewise, fall back to the type
+	of MEM_REF or TARGET_MEM_REF only when it returns false.
+	* tree-ssa-ccp.c (get_value_from_alignment): Update call to
+	get_object_alignment_1.
+	(ccp_finalize): Use set_ptr_info_alignment.
+	* tree.h (get_object_alignment_1): Update declaration.
+	(get_pointer_alignment_1): Likewise.
+	* gimple-pretty-print.c (dump_gimple_phi): Use get_ptr_info_alignment.
+	(dump_gimple_stmt): Likewise.
+	* tree-flow.h (ptr_info_def): Updated comments of fields align and
+	misalign.
+	(get_ptr_info_alignment): Declared.
+	(mark_ptr_info_alignment_unknown): Likewise.
+	(set_ptr_info_alignment): Likewise.
+	(adjust_ptr_info_misalignment): Likewise.
+	* tree-ssa-address.c (copy_ref_info): Use new access functions to get
+	and set alignment of SSA names.
+	* tree-ssa-loop-ivopts.c (rewrite_use_nonlinear_expr): Call
+	mark_ptr_info_alignment_unknown.
+	* tree-ssanames.c (get_ptr_info_alignment): New function.
+	(mark_ptr_info_alignment_unknown): Likewise.
+	(set_ptr_info_alignment): Likewise.
+	(adjust_ptr_info_misalignment): Likewise.
+	(get_ptr_info): Call mark_ptr_info_alignment_unknown.
+	* tree-vect-data-refs.c (vect_create_addr_base_for_vector_ref):
+	Likewise.
+	(bump_vector_ptr): Likewise.
+	* tree-vect-stmts.c (create_array_ref): Use set_ptr_info_alignment.
+	(vectorizable_store): Likewise.
+	(vectorizable_load): Likewise.
+
+2012-05-03  Michael Matz  <matz@suse.de>
+
+	* basic-block.h (struct rtl_bb_info, struct gimple_bb_info): Move
+	in front of basic_block_def.
+	(struct basic_block_def): Make il.gimple the full struct, not a
+	pointer.
+	(__assert_gimple_bb_smaller_rtl_bb): Asserting typedef.
+
+	* cfgexpand.c (expand_gimple_basic_block): Clear all il.gimple
+	members.
+	* gimple-iterator.c (gimple_stmt_iterator): Don't special case
+	NULL il.gimple, which can't happen anymore.
+	* gimple.h (bb_seq): il.gimple can't be NULL.
+	(bb_seq_add): Ditto.
+	(set_bb_seq): Adjust.
+	(gsi_start_bb, gsi_last_bb): Tidy.
+	* lto-streamer-in.c (make_new_block): Don't zero members that
+	are zeroed already, don't allocate a gimple_bb_info.
+	* tree-cfg.c (create_bb): Don't allocate a gimple_bb_info.
+	(remove_bb): Clear all il.gimple members.
+	(gimple_verify_flow_info): Adjust for flat il.gimple.
+	* tree-flow-inline.h (phi_nodes, phi_nodes_ptr, set_phi_nodes): Adjust.
+
+	* coretypes.h (const_gimple_seq): Remove typedef.
+	* gimple.h (gimple_seq_first): Take gimple_seq.
+	(gimple_seq_first_stmt): Ditto.
+	(gimple_seq_last): Ditto.
+	(gimple_seq_last_stmt): Ditto.
+	(gimple_seq_empty_p): Ditto.
+
+2012-05-03  Richard Guenther  <rguenther@suse.de>
+
+	* tree-ssa-pre.c (valid_in_sets): Remove checking of trapping
+	operations.
+	(prune_clobbered_mems): Do it here.  Do not uselessly sort
+	expressions.
+	(compute_avail): Do not add possibly trapping operations to
+	EXP_GEN if they might not be executed in the block.
+
+2012-05-03  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/alpha/elf.h (MAX_OFILE_ALIGNMENT): Remove.
+
+2012-05-03  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* tree-switch-conversion.c (gen_inbound_check): Free post-dominance
+	information as early as possible.  Update dominance info instead of
+	discarding it.
+
+2012-05-03  Richard Guenther  <rguenther@suse.de>
+
+	* tree-ssa-pre.c (debug_bitmap_sets_for): New function.
+	(union_contains_value): Remove.
+	(vro_valid_in_sets): Likewise.
+	(op_valid_in_sets): New function.
+	(valid_in_sets): Use op_valid_in_sets.
+	(insert_into_preds_of_block): Move dumping ...
+	(do_regular_insertion): ... here.
+	(do_partial_partial_insertion): ... and here.  Dump that
+	we've found a partial partial redundancy.
+	(insert): Dump the current insert iteration.
+
+2012-05-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR plugins/53126
+	* gcc-ar.c (main): If GCC_EXEC_PREFIX is set in env,
+	append program name to it and pass that as first argument
+	to make_relative_prefix.  Always pass standard_libexec_prefix
+	as last argument to make_relative_prefix.  If
+	make_relative_prefix returns NULL, fall back to
+	standard_libexec_prefix.
+
+	PR debug/53174
+	* tree-predcom.c (remove_stmt): Call reset_debug_uses on stmts being
+	removed.
+
+	PR target/53187
+	* config/arm/arm.c (arm_select_cc_mode): If x has MODE_CC class
+	mode, return that mode.
+
+	PR target/53194
+	* config/i386/i386-c.c (ix86_target_macros_internal): Don't
+	define __ATOMIC_HLE_* macros here.
+	(ix86_target_macros): But here, using cpp_define_formatted.
+
+2012-05-03  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53144
+	* tree-ssa-sccvn.c (vn_reference_lookup_or_insert_constant_for_pieces):
+	Rename to ...
+	(vn_reference_lookup_or_insert_for_pieces): ... this.  Properly deal
+	with SSA name values.
+	(vn_reference_lookup_3): Adjust callers.
+
+2012-05-03  Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	* config/i386/driver-i386.c (host_detect_local_cpu): Reset
+	has_fma4 for AMD processors with both fma3 and fma4 support.
+
+2012-05-03  Kirill Yukhin  <kirill.yukhin@intel.com>
+
+	PR target/53201
+	* config/i386/driver-i386.c (host_detect_local_cpu): Add space to
+	"-mno-hle".
+
+2012-05-03  Michael Matz  <matz@suse.de>
+
+	PR bootstrap/53197
+	* tree-ssa-dse.c (dse_optimize_stmt): Take pointer to iterator.
+	(dse_enter_block): Properly iterate the whole sequence even
+	if the last statement was removed.
+
+2012-05-02  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/alpha/vms.h (SUBTARGET_OVERRIDE_OPTIONS): For pic code,
+	unset flag_jump_tables.
+	* stmt.c (expand_case): Remove special flag_pic case conditional
+	on ASM_OUTPUT_ADDR_DIFF_ELT not being defined.
+
 2012-05-02  Ulrich Weigand  <ulrich.weigand@linaro.org>
 
 	* common/config/s390/s390-common.c (s390_option_optimization_table):
@@ -75,7 +271,7 @@
 	(gsi_seq): Adjust.
 	* tree-flow-inline.h (phi_nodes_ptr): New function.
 
-	* gimple-iterator.c (gsi_insert_seq_nodes_before): Adjust to 
+	* gimple-iterator.c (gsi_insert_seq_nodes_before): Adjust to
 	datastructure and interface change.
 	(gsi_insert_seq_before_without_update): Ditto.
 	(gsi_insert_seq_nodes_after): Ditto.
@@ -83,8 +279,7 @@
 	(gsi_split_seq_after): Ditto, don't use gimple_seq_alloc.
 	(gsi_split_seq_before): Ditto.
 	(gsi_start_phis): Adjust.
-	* tree-vect-loop.c (vect_determine_vectorization_factor): Use
-	gsi_none.
+	* tree-vect-loop.c (vect_determine_vectorization_factor): Use gsi_none.
 	(vect_transform_loop): Ditto.
 	* gimple.c (gimple_seq_add_stmt, gimple_seq_add_seq,
 	gimple_seq_copy): Don't use gimple_seq_alloc.
@@ -170,15 +365,13 @@
 
 	* tree-ssa-loop-im.c (move_computations_stmt): First remove
 	then insert stmt.
-	* tree-complex.c (update_complex_components_on_edge): Don't
-	copy gsi.
+	* tree-complex.c (update_complex_components_on_edge): Don't copy gsi.
 	* tree-phinodes.c (resize_phi_node): Don't resize stmt in-place,
 	return new stmt.
 	(reserve_phi_args_for_new_edge): Change call to above,
 	use gsi_set_stmt.
 
-	* omp-low.c (lower_omp): Change prototype to take pointer to
-	sequence.
+	* omp-low.c (lower_omp): Change prototype to take pointer to sequence.
 	(lower_rec_input_clauses): Use gimple_seq_add_seq instead of
 	iterators.  Adjust call to lower_omp.
 	(lower_lastprivate_clauses): Adjust call to lower_omp.
@@ -210,8 +403,7 @@
 	(gimple_try_catch_may_fallthru): Call gsi_start with lvalue.
 	* tree-nested.c (walk_body): Take pointer to sequence, use
 	walk_gimple_seq_mod.
-	(walk_function): Adjust call to walk_body, set possibly changed
-	body.
+	(walk_function): Adjust call to walk_body, set possibly changed body.
 	(walk_gimple_omp_for): Adjust calls to walk_body.
 	(convert_nonlocal_omp_clauses): Ditto.
 	(convert_nonlocal_reference_stmt): Ditto.
@@ -281,11 +473,10 @@
 	* config/i386/i386-c.c (ix86_target_macros_internal): Set
 	HLE defines.
 	(ix86_target_string)<-mhle>: New.
-	(ix86_valid_target_attribute_inner_p)<OPT_mhle>: Ditto.
-	* config/i386/i386.c (ix86_target_string)<OPTION_MASK_ISA_HLE>:
-	New.
-	(ix86_valid_target_attribute_inner_p)<OPT_mhle>: Ditto.
-	(ix86_option_override_internal)<PTA_HLE>: New switch, set it
+	(ix86_valid_target_attribute_inner_p) <OPT_mhle>: Ditto.
+	* config/i386/i386.c (ix86_target_string) <OPTION_MASK_ISA_HLE>: New.
+	(ix86_valid_target_attribute_inner_p) <OPT_mhle>: Ditto.
+	(ix86_option_override_internal) <PTA_HLE>: New switch, set it
 	enabled for generic, generic64 and core-avx2.
 	(ix86_print_operand): Generate HLE lock prefixes.
 	(ix86_memmodel_check): New.
@@ -347,7 +538,8 @@
 	(host_integerp): Likewise.
 	(int_fits_type_p): Likewise.
 	* varasm.c (output_constructor_regular_field): Sign-extend the
-	field-offset to cater for negative offsets produced by the Ada frontend.
+	field-offset to cater for negative offsets produced by the Ada
+	frontend.
 	* omp-low.c (extract_omp_for_data): Convert the loop step to
 	signed for pointer adjustments.
 
@@ -400,6 +592,7 @@
 2012-05-01  Kenneth Zadeck  <zadeck@naturalbridge.com>
 	    Richard Sandiford  <r.sandiford@uk.ibm.com>
 
+	PR rtl-optimization/52543
 	* Makefile.in (lower-subreg.o, target-globals.o): Depend on
 	lower-subreg.h.
 	* lower-subreg.h: New file.
@@ -430,15 +623,15 @@
 	Update calls to simple_move and find_decomposable_shift_zext.
 
 2012-05-01  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
 	* config/arm/arm-protos.h (thumb_unexpanded_epilogue): Rename to...
-        (thumb1_unexpanded_epilogue): ...this.
+	(thumb1_unexpanded_epilogue): ...this.
 	* config/arm/arm.c (thumb_unexpanded_epilogue): Rename to...
-        (thumb1_unexpanded_epilogue): ...this.
+	(thumb1_unexpanded_epilogue): ...this.
 	* config/arm/arm.md (thumb_unexpanded_epilogue): Rename to...
-        (thumb1_unexpanded_epilogue): ...this.
+	(thumb1_unexpanded_epilogue): ...this.
 
 2012-05-01  Richard Earnshaw  <rearnsha@arm.com>
 
@@ -474,7 +667,7 @@
 	(update_edge_key): Ditto.
 	(flatten_function): Ditto.
 	(ipa_inline): Ditto.
-	(inlinw_always_inline_functions): Ditto.
+	(inline_always_inline_functions): Ditto.
 	(early_inline_small_functions): Ditto.
 
 2012-04-30  Uros Bizjak  <ubizjak@gmail.com>
