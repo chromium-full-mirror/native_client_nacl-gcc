@@ -501,6 +501,9 @@
 ;; Used for Thumb-2 conditional execution.
 (define_attr "ce_count" "" (const_int 1))
 
+;; Attributes for TARGET_SFI_NACL1 stuff (%*, %b, and %j uses).
+(include "nacl-attrs.md")
+
 ;;---------------------------------------------------------------------------
 ;; Mode iterators
 
@@ -5660,7 +5663,7 @@
 )
 
 ;; For thumb1 split imm move [256-510] into mov [1-255] and add #255
-(define_split 
+(define_split
   [(set (match_operand:SI 0 "register_operand" "")
 	(match_operand:SI 1 "const_int_operand" ""))]
   "TARGET_THUMB1 && satisfies_constraint_Pe (operands[1])"
@@ -8327,7 +8330,8 @@
    (clobber (reg:SI LR_REGNUM))]
   "TARGET_ARM && arm_arch5"
   "%*blx%?\\t%0"
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_blx"))]
 )
 
 (define_insn "*call_reg_arm"
@@ -8439,7 +8443,8 @@
    (clobber (reg:SI LR_REGNUM))]
   "TARGET_ARM && arm_arch5"
   "%*blx%?\\t%1"
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_blx"))]
 )
 
 (define_insn "*call_value_reg_arm"
@@ -8520,7 +8525,8 @@
   {
     return NEED_PLT_RELOC ? \"%*bl%?\\t%a0(PLT)\" : \"%*bl%?\\t%a0\";
   }"
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_bl"))]
 )
 
 (define_insn "*call_value_symbol"
@@ -8536,7 +8542,8 @@
   {
     return NEED_PLT_RELOC ? \"%*bl%?\\t%a1(PLT)\" : \"%*bl%?\\t%a1\";
   }"
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_bl"))]
 )
 
 (define_insn "*call_insn"
@@ -8959,7 +8966,8 @@
     return \"%*bx%?\\t%0\\t%@ indirect register jump\";
   return \"mov%?\\t%|pc, %0\\t%@ indirect register jump\";
   "
-  [(set_attr "predicable" "yes")]
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr "length_sfi_bx"))]
 )
 
 (define_insn "*load_indirect_jump"
@@ -11291,7 +11299,8 @@
    (clobber (reg:CC CC_REGNUM))]
   "TARGET_SOFT_TP"
   "%*bl\\t__aeabi_read_tp\\t@ load_tp_soft"
-  [(set_attr "conds" "clob")]
+  [(set_attr "conds" "clob")
+   (set (attr "length") (attr "length_sfi_bl"))]
 )
 
 ;; tls descriptor call
@@ -11310,7 +11319,7 @@
     return "%*bl\\t%c0(tlscall)";
   }
   [(set_attr "conds" "clob")
-   (set_attr "length" "4")]
+   (set (attr "length") (attr "length_sfi_bl"))]
 )
 
 ;;
