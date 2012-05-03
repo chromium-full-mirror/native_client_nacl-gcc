@@ -58,3 +58,56 @@
   (if_then_else (match_test "TARGET_SFI_NACL1")
                 (const_int 24)
                 (const_int 4)))
+
+;; Boolean meta-attribute that represents whether a "%j0"
+;; instruction would actually use the "sfi_sp" prefix.
+(define_attr "sfi_sp_op0" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "REGNO (operands[0]) == SP_REGNUM"))
+                (const_string "yes")
+                (const_string "no")))
+
+;; The "length" attribute for a "%j0" instruction.  When %0 is
+;; SP_REGNUM, this is a two-instruction bundle-locked sequence.
+;; Hence the worst case is that it starts at the last spot of a
+;; bundle so it's pushed to the next bundle, making it three
+;; instructions.
+(define_attr "length_sp_op0" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for a sequence of up to three instructions where each
+;; one might be a "length_sp_op0" case by itself.
+(define_attr "length_sp_op0_by_3" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 36)          ; 12 * 3
+                (const_int 12)))
+
+;; Same, but for a sequence of up to four instructions where each
+;; one might be a "length_sp_op0" case by itself.
+(define_attr "length_sp_op0_by_4" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 48)          ; 12 * 4
+                (const_int 16)))
+
+;; Same, but for a sequence of two instructions where one of them
+;; might be a "length_sp_op0" case by itself.
+(define_attr "length_sp_op0_plus_1" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 16)          ; 12 + 4
+                (const_int 8)))
+
+;; Same, but for a sequence of three instructions where one of them
+;; might be a "length_sp_op0" case by itself.
+(define_attr "length_sp_op0_plus_2" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 20)          ; 12 + 8
+                (const_int 12)))
+
+;; Same, but for a sequence of up to three instructions where each
+;; of two of them might be a "length_sp_op0" case by itself.
+(define_attr "length_sp_op0_by_2_plus_1" ""
+  (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 28)          ; (12 * 2) + 4
+                (const_int 12)))

@@ -758,7 +758,9 @@
 		      operands[1], 0);
   DONE;
   "
-  [(set_attr "length" "4,4,4,4,4,4,4,4,4,16")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "9")
+				      (attr "length_sp_op0_by_4")
+				      (attr "length_sp_op0")))
    (set_attr "predicable" "yes")
    (set_attr "arch" "*,*,*,t2,t2,*,*,t2,t2,*")]
 )
@@ -838,7 +840,8 @@
   "@
    %j0add%.\\t%0, %1, %2
    %j0sub%.\\t%0, %1, #%n2"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 (define_insn "*addsi3_compare0_scratch"
@@ -880,7 +883,8 @@
   "@
    %j0add%.\\t%0, %1, %3
    %j0sub%.\\t%0, %1, #%n3"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 ;; Convert the sequence
@@ -936,7 +940,8 @@
   "@
    %j0add%.\\t%0, %1, %2
    %j0sub%.\\t%0, %1, #%n2"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 (define_insn "*addsi3_compare_op2"
@@ -951,7 +956,8 @@
   "@
    %j0add%.\\t%0, %1, %2
    %j0sub%.\\t%0, %1, #%n2"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 (define_insn "*compare_addsi2_op0"
@@ -1245,7 +1251,9 @@
                       INTVAL (operands[1]), operands[0], operands[2], 0);
   DONE;
   "
-  [(set_attr "length" "4,4,4,16")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "3")
+				      (attr "length_sp_op0_by_4")
+				      (attr "length_sp_op0")))
    (set_attr "predicable" "yes")]
 )
 
@@ -1274,7 +1282,8 @@
   "@
    %j0sub%.\\t%0, %1, %2
    %j0rsb%.\\t%0, %2, %1"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 (define_insn "*subsi3_compare"
@@ -1287,7 +1296,8 @@
   "@
    %j0sub%.\\t%0, %1, %2
    %j0rsb%.\\t%0, %2, %1"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (attr "length_sp_op0"))]
 )
 
 (define_expand "decscc"
@@ -3457,7 +3467,7 @@
    (set (attr "length")
 	(if_then_else (eq_attr "is_thumb" "yes")
 		      (const_int 14)
-		      (const_int 12)))]
+		      (attr "length_sp_op0_by_2_plus_1")))]
 )
 
 (define_code_iterator SAT [smin smax])
@@ -5862,7 +5872,10 @@
   "@
    cmp%?\\t%0, #0
    %j0sub%.\\t%0, %1, #0"
-  [(set_attr "conds" "set")]
+  [(set_attr "conds" "set")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_int 4)
+				      (attr "length_sp_op0")))]
 )
 
 ;; Subroutine to store a half word from a register into memory.
@@ -9043,7 +9056,8 @@
 			  (if_then_else
 			   (match_operand:SI 3 "mult_operator" "")
 			   (const_string "no") (const_string "yes"))])
-   (set_attr "type" "alu_shift,alu_shift,alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift,alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 (define_split
   [(set (match_operand:SI 0 "s_register_operand" "")
@@ -9080,7 +9094,8 @@
   [(set_attr "conds" "set")
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
-   (set_attr "type" "alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 (define_insn "*arith_shiftsi_compare0_scratch"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -9097,7 +9112,8 @@
   [(set_attr "conds" "set")
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
-   (set_attr "type" "alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 (define_insn "*sub_shiftsi"
   [(set (match_operand:SI 0 "s_register_operand" "=r,r")
@@ -9110,7 +9126,8 @@
   [(set_attr "predicable" "yes")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
-   (set_attr "type" "alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 (define_insn "*sub_shiftsi_compare0"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -9128,7 +9145,8 @@
   [(set_attr "conds" "set")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
-   (set_attr "type" "alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 (define_insn "*sub_shiftsi_compare0_scratch"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -9144,7 +9162,8 @@
   [(set_attr "conds" "set")
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
-   (set_attr "type" "alu_shift,alu_shift_reg")])
+   (set_attr "type" "alu_shift,alu_shift_reg")
+   (set (attr "length") (attr "length_sp_op0"))])
 
 
 (define_insn "*and_scc"
@@ -9341,7 +9360,7 @@
     return \"%j0%i5%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
-   (set_attr "length" "12")]
+   (set (attr "length") (attr "length_sp_op0_by_3"))]
 )
 
 (define_insn "*cond_sub"
@@ -9359,7 +9378,9 @@
     return \"%j0sub%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
-   (set_attr "length" "8,12")]
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (attr "length_sp_op0_plus_1")
+				      (attr "length_sp_op0_plus_2")))]
 )
 
 (define_insn "*cmp_ite0"
@@ -10725,8 +10746,12 @@
   else /* TARGET_THUMB1 */
     return thumb1_unexpanded_epilogue ();
   "
-  ; Length is absolute worst case
-  [(set_attr "length" "44")
+  ;; Length is absolute worst case.
+  ;; Under TARGET_SFI_NACL1, there may be up to three "sfi_sp" cases
+  ;; plus one "sfi_bx", each of the four potentially adding two instructions.
+  [(set (attr "length") (if_then_else (match_test "TARGET_SFI_NACL1")
+				      (const_int 76)
+				      (const_int 44)))
    (set_attr "type" "block")
    ;; We don't clobber the conditions, but the potential length of this
    ;; operation is sufficient to make conditionalizing the sequence
