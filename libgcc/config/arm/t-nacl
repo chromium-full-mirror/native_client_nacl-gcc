@@ -1,0 +1,12 @@
+# We don't use EABI unwind info, so drop what t-bpabi set here.
+LIB2ADDEH =
+
+# Use a version of div0 which raises SIGFPE.
+LIB1ASMFUNCS := $(filter-out _dvmd_tls,$(LIB1ASMFUNCS)) _dvmd_lnx
+
+# NaCl does not support Thumb or interworking at all.
+LIB1ASMFUNCS := $(filter-out _thumb1_% _call_via_rX _interwork_call_via_rX,\
+	     		     $(LIB1ASMFUNCS))
+
+# We don't need crt[in].o for libgcc.so and they just cause bootstrap troubles.
+SHLIB_LDFLAGS += -nostartfiles

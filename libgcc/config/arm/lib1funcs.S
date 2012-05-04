@@ -2,7 +2,7 @@
 @ Division routines, written by Richard Earnshaw, (rearnsha@armltd.co.uk)
 
 /* Copyright 1995, 1996, 1998, 1999, 2000, 2003, 2004, 2005, 2007, 2008,
-   2009, 2010 Free Software Foundation, Inc.
+   2009, 2010, 2012 Free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -24,10 +24,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 <http://www.gnu.org/licenses/>.  */
 
 /* An executable stack is *not* required for these functions.  */
-#if defined(__ELF__) && defined(__linux__)
+#if defined(__ELF__) && (defined(__linux__) || defined(__native_client__))
 .section .note.GNU-stack,"",%progbits
 .previous
-#endif  /* __ELF__ and __linux__ */
+#endif  /* __ELF__ and (__linux__ or __native_client__) */
 
 #ifdef __ARM_EABI__
 /* Some attributes that are common to all routines in this file.  */
@@ -89,7 +89,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    long multiply instructions.  That includes v3M.  */
 # define __ARM_ARCH__ 4
 #endif
-	
+
 #if defined(__ARM_ARCH_5__) || defined(__ARM_ARCH_5T__) \
 	|| defined(__ARM_ARCH_5E__) || defined(__ARM_ARCH_5TE__) \
 	|| defined(__ARM_ARCH_5TEJ__)
@@ -125,12 +125,24 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # define __prefer_thumb__
 #endif
 
+/* Under Native Client, we must use the nacl-arm-macros.s wrappers
+   on certain instructions.  */
+#ifdef __native_client__
+# define SFI(insn)	CONCAT2 (sfi_, insn)
+# define PC_IN_POP	lr
+# define RET_TO_POP	sfi_bx	lr
+#else
+# define SFI(insn)	insn
+# define PC_IN_POP	pc
+# define RET_TO_POP	/* We loaded directly into the pc.  */
+#endif
+
 /* How to return from a function call depends on the architecture variant.  */
 
 #if (__ARM_ARCH__ > 4) || defined(__ARM_ARCH_4T__)
 
-# define RET		bx	lr
-# define RETc(x)	bx##x	lr
+# define RET		SFI(bx)		lr
+# define RETc(x)	SFI(bx##x)	lr
 
 /* Special precautions for interworking on armv4t.  */
 # if (__ARM_ARCH__ == 4)
@@ -230,17 +242,19 @@ LSYM(Lend_fde):
 	/* Mark LR as restored.  */
 97:	cfi_pop 97b - \unwind, 0xe, 0x0
 	.endif
-	bx\cond	lr
+	SFI(bx\cond)	lr
 #else
 	/* Caller is responsible for providing IT instruction.  */
 	.ifc "\regs",""
-	ldr\cond	pc, [sp], #8
+	ldr\cond	PC_IN_POP, [sp], #8
+	RET_TO_POP
 	.else
 # if defined(__thumb2__)
-	pop\cond	{\regs, pc}
+	pop\cond	{\regs, PC_IN_POP}
 # else
-	ldm\cond\dirn	sp!, {\regs, pc}
+	ldm\cond\dirn	sp!, {\regs, PC_IN_POP}
 # endif
+	RET_TO_POP
 	.endif
 #endif
 .endm
@@ -293,7 +307,7 @@ LSYM(Lend_fde):
 .macro ARM_LDIV0 name signed
 	str	lr, [sp, #-8]!
 98:	cfi_push 98b - __\name, 0xe, -0x8, 0x8
-	bl	SYM (__div0) __PLT__
+	SFI(bl)	SYM (__div0) __PLT__
 	mov	r0, #0			@ About as wrong as it could be.
 	RETLDM	unwind=98b
 .endm
@@ -365,7 +379,7 @@ LSYM(Lend_fde):
 .macro THUMB_LDIV0 name signed
 	push	{ r1, lr }
 98:	cfi_push 98b - __\name, 0xe, -0x4, 0x8
-	bl	SYM (__div0)
+	SFI(bl)	SYM (__div0)
 	mov	r0, #0			@ About as wrong as it could be.
 #if defined (__INTERWORKING__)
 	pop	{ r1, r2 }
@@ -438,7 +452,7 @@ SYM (__\name):
 .endm
 #define EQUIV .thumb_set
 .macro  ARM_CALL name
-	bl	__\name
+	SFI(bl)	__\name
 .endm
 
 #elif defined(__INTERWORKING_STUBS__)
@@ -450,13 +464,13 @@ SYM (__\name):
 	.arm
 /* A hook to tell gdb that we've switched to ARM mode.  Also used to call
    directly from other local arm routines.  */
-_L__\name:		
+_L__\name:
 .endm
 #define EQUIV .thumb_set
 /* Branch directly to a function declared with ARM_FUNC_START.
    Must be called in arm mode.  */
 .macro  ARM_CALL name
-	bl	_L__\name
+	SFI(bl)	_L__\name
 .endm
 
 #else /* !(__INTERWORKING_STUBS__ || __thumb2__) */
@@ -474,7 +488,7 @@ SYM (__\name):
 .endm
 #define EQUIV .set
 .macro  ARM_CALL name
-	bl	__\name
+	SFI(bl)	__\name
 .endm
 #endif
 
@@ -509,7 +523,7 @@ SYM (__\name):
 #define xxl r0
 #define yyh r3
 #define yyl r2
-#endif	
+#endif
 
 #ifdef __ARM_EABI__
 .macro	WEAK name
@@ -536,7 +550,7 @@ pc		.req	r15
 
 /* ------------------------------------------------------------------------ */
 /*		Bodies of the division and modulo routines.		    */
-/* ------------------------------------------------------------------------ */	
+/* ------------------------------------------------------------------------ */
 .macro ARM_DIV_BODY dividend, divisor, result, curbit
 
 #if __ARM_ARCH__ >= 5 && ! defined (__OPTIMIZE_SIZE__)
@@ -589,7 +603,7 @@ pc		.req	r15
 	mov	\divisor, \divisor, lsl \result
 	mov	\curbit, \curbit, lsl \result
 	mov	\result, #0
-	
+
 #else /* __ARM_ARCH__ < 5 */
 
 	@ Initially shift the divisor left 3 bits if possible,
@@ -603,7 +617,7 @@ pc		.req	r15
 
 	@ Unless the divisor is very big, shift it up in multiples of
 	@ four bits, since this is the amount of unwinding in the main
-	@ division loop.  Continue shifting until the divisor is 
+	@ division loop.  Continue shifting until the divisor is
 	@ larger than the dividend.
 1:	cmp	\divisor, #0x10000000
 	cmplo	\divisor, \dividend
@@ -649,7 +663,7 @@ pc		.req	r15
 #endif /* __ARM_ARCH__ < 5 || defined (__OPTIMIZE_SIZE__) */
 
 .endm
-/* ------------------------------------------------------------------------ */	
+/* ------------------------------------------------------------------------ */
 .macro ARM_DIV2_ORDER divisor, order
 
 #if __ARM_ARCH__ >= 5
@@ -704,14 +718,14 @@ pc		.req	r15
 	clz	\spare, \dividend
 	sub	\order, \order, \spare
 	mov	\divisor, \divisor, lsl \order
-	
+
 #else /* __ARM_ARCH__ < 5 */
 
 	mov	\order, #0
 
 	@ Unless the divisor is very big, shift it up in multiples of
 	@ four bits, since this is the amount of unwinding in the main
-	@ division loop.  Continue shifting until the divisor is 
+	@ division loop.  Continue shifting until the divisor is
 	@ larger than the dividend.
 1:	cmp	\divisor, #0x10000000
 	cmplo	\divisor, \dividend
@@ -776,7 +790,7 @@ pc		.req	r15
 LSYM(Loop1):
 	@ Unless the divisor is very big, shift it up in multiples of
 	@ four bits, since this is the amount of unwinding in the main
-	@ division loop.  Continue shifting until the divisor is 
+	@ division loop.  Continue shifting until the divisor is
 	@ larger than the dividend.
 	cmp	divisor, work
 	bhs	LSYM(Lbignum)
@@ -801,8 +815,8 @@ LSYM(Loop2):
 LSYM(Loop3):
 	@ Test for possible subtractions ...
   .if \modulo
-	@ ... On the final pass, this may subtract too much from the dividend, 
-	@ so keep track of which subtractions are done, we can fix them up 
+	@ ... On the final pass, this may subtract too much from the dividend,
+	@ so keep track of which subtractions are done, we can fix them up
 	@ afterwards.
 	mov	overdone, #0
 	cmp	dividend, divisor
@@ -871,7 +885,7 @@ LSYM(Lover3):
 	orr	result, work
 LSYM(Lover4):
   .endif
-	
+
 	cmp	dividend, #0			@ Early termination?
 	beq	LSYM(Lover5)
 	lsr	curbit,  #4			@ No, any more bits to do?
@@ -887,8 +901,8 @@ LSYM(Lover5):
 	lsl	work, #28
 	and	overdone, work
 	beq	LSYM(Lgot_result)
-	
-	@ If we terminated early, because dividend became zero, then the 
+
+	@ If we terminated early, because dividend became zero, then the
 	@ bit in ip will not be in the bottom nibble, and we should not
 	@ perform the additions below.  We must test for this though
 	@ (rather relying upon the TSTs to prevent the additions) since
@@ -898,7 +912,7 @@ LSYM(Lover5):
 	mov	work, #0x7
 	tst	curbit, work
 	beq	LSYM(Lgot_result)
-	
+
 	mov	curbit, ip
 	mov	work, #3
 	ror	curbit, work
@@ -924,7 +938,7 @@ LSYM(Lover7):
 	add	dividend, work
   .endif
 LSYM(Lgot_result):
-.endm	
+.endm
 /* ------------------------------------------------------------------------ */
 /*		Start of the Real Functions				    */
 /* ------------------------------------------------------------------------ */
@@ -940,13 +954,13 @@ LSYM(Lgot_result):
 LSYM(udivsi3_skip_div0_test):
 	mov	curbit, #1
 	mov	result, #0
-	
+
 	push	{ work }
 	cmp	dividend, divisor
 	blo	LSYM(Lgot_result)
 
 	THUMB_DIV_MOD_BODY 0
-	
+
 	mov	r0, result
 	pop	{ work }
 	RET
@@ -978,11 +992,11 @@ LSYM(udivsi3_skip_div0_test):
 	bls	11f
 	tst	r1, r2
 	beq	12f
-	
+
 	ARM_DIV_BODY r0, r1, r2, r3
-	
+
 	mov	r0, r2
-	RET	
+	RET
 
 11:	do_it	eq, e
 	moveq	r0, #1
@@ -1003,7 +1017,7 @@ FUNC_START aeabi_uidivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	push	{r0, r1, lr}
-	bl	LSYM(udivsi3_skip_div0_test)
+	SFI(bl)	LSYM(udivsi3_skip_div0_test)
 	POP	{r1, r2, r3}
 	mul	r2, r0
 	sub	r1, r1, r2
@@ -1012,7 +1026,7 @@ FUNC_START aeabi_uidivmod
 ARM_FUNC_START aeabi_uidivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
-	mov     r2, r0 
+	mov     r2, r0
 	udiv	r0, r0, r1
 	mls     r1, r0, r1, r2
 	RET
@@ -1021,14 +1035,14 @@ ARM_FUNC_START aeabi_uidivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	stmfd	sp!, { r0, r1, lr }
-	bl	LSYM(udivsi3_skip_div0_test)
+	SFI(bl)	LSYM(udivsi3_skip_div0_test)
 	ldmfd	sp!, { r1, r2, lr }
 	mul	r3, r2, r0
 	sub	r1, r1, r3
 	RET
 #endif
 	FUNC_END aeabi_uidivmod
-	
+
 #endif /* L_udivsi3 */
 /* ------------------------------------------------------------------------ */
 #ifdef L_umodsi3
@@ -1052,18 +1066,18 @@ ARM_FUNC_START aeabi_uidivmod
 	mov	curbit, #1
 	cmp	dividend, divisor
 	bhs	LSYM(Lover10)
-	RET	
+	RET
 
 LSYM(Lover10):
 	push	{ work }
 
 	THUMB_DIV_MOD_BODY 1
-	
+
 	pop	{ work }
 	RET
-	
+
 #else  /* ARM version.  */
-	
+
 	FUNC_START umodsi3
 
 	subs	r2, r1, #1			@ compare divisor with 1
@@ -1075,11 +1089,11 @@ LSYM(Lover10):
 	RETc(ls)
 
 	ARM_MOD_BODY r0, r1, r2, r3
-	
-	RET	
+
+	RET
 
 #endif /* ARM version.  */
-	
+
 	DIV_FUNC_END umodsi3 unsigned
 
 #endif /* L_umodsi3 */
@@ -1088,7 +1102,7 @@ LSYM(Lover10):
 
 #if defined(__prefer_thumb__)
 
-	FUNC_START divsi3	
+	FUNC_START divsi3
 	FUNC_ALIAS aeabi_idiv divsi3
 
 	cmp	divisor, #0
@@ -1112,7 +1126,7 @@ LSYM(Lover11):
 	blo	LSYM(Lgot_result)
 
 	THUMB_DIV_MOD_BODY 0
-	
+
 	mov	r0, result
 	mov	work, ip
 	cmp	work, #0
@@ -1133,8 +1147,8 @@ LSYM(Lover12):
 	RET
 
 #else /* ARM/Thumb-2 version.  */
-	
-	ARM_FUNC_START divsi3	
+
+	ARM_FUNC_START divsi3
 	ARM_FUNC_ALIAS aeabi_idiv divsi3
 
 	cmp	r1, #0
@@ -1154,16 +1168,16 @@ LSYM(divsi3_skip_div0_test):
 	beq	12f
 
 	ARM_DIV_BODY r3, r1, r0, r2
-	
+
 	cmp	ip, #0
 	do_it	mi
 	rsbmi	r0, r0, #0
-	RET	
+	RET
 
 10:	teq	ip, r0				@ same sign ?
 	do_it	mi
 	rsbmi	r0, r0, #0
-	RET	
+	RET
 
 11:	do_it	lo
 	movlo	r0, #0
@@ -1181,7 +1195,7 @@ LSYM(divsi3_skip_div0_test):
 	RET
 
 #endif /* ARM version */
-	
+
 	DIV_FUNC_END divsi3 signed
 
 #if defined(__prefer_thumb__)
@@ -1189,7 +1203,7 @@ FUNC_START aeabi_idivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	push	{r0, r1, lr}
-	bl	LSYM(divsi3_skip_div0_test)
+	SFI(bl)	LSYM(divsi3_skip_div0_test)
 	POP	{r1, r2, r3}
 	mul	r2, r0
 	sub	r1, r1, r2
@@ -1207,14 +1221,14 @@ ARM_FUNC_START aeabi_idivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	stmfd	sp!, { r0, r1, lr }
-	bl	LSYM(divsi3_skip_div0_test)
+	SFI(bl)	LSYM(divsi3_skip_div0_test)
 	ldmfd	sp!, { r1, r2, lr }
 	mul	r3, r2, r0
 	sub	r1, r1, r3
 	RET
 #endif
 	FUNC_END aeabi_idivmod
-	
+
 #endif /* L_divsi3 */
 /* ------------------------------------------------------------------------ */
 #ifdef L_modsi3
@@ -1253,17 +1267,17 @@ LSYM(Lover11):
 	blo	LSYM(Lgot_result)
 
 	THUMB_DIV_MOD_BODY 1
-		
+
 	pop	{ work }
 	cmp	work, #0
 	bpl	LSYM(Lover12)
 	neg	dividend, dividend
 LSYM(Lover12):
 	pop	{ work }
-	RET	
+	RET
 
 #else /* ARM version.  */
-	
+
 	FUNC_START modsi3
 
 	cmp	r1, #0
@@ -1282,10 +1296,10 @@ LSYM(Lover12):
 
 10:	cmp	ip, #0
 	rsbmi	r0, r0, #0
-	RET	
+	RET
 
 #endif /* ARM version */
-	
+
 	DIV_FUNC_END modsi3 signed
 
 #endif /* L_modsi3 */
@@ -1305,7 +1319,7 @@ LSYM(Lover12):
 	RET
 	FUNC_END div0
 #endif
-	
+
 #endif /* L_divmodsi_tools */
 /* ------------------------------------------------------------------------ */
 #ifdef L_dvmd_lnx
@@ -1325,7 +1339,7 @@ LSYM(Lover12):
 
 	do_push	{r1, lr}
 	mov	r0, #SIGFPE
-	bl	SYM(raise) __PLT__
+	SFI(bl)	SYM(raise) __PLT__
 	RETLDM	r1
 
 #ifdef __ARM_EABI__
@@ -1334,7 +1348,7 @@ LSYM(Lover12):
 #else
 	FUNC_END div0
 #endif
-	
+
 #endif /* L_dvmd_lnx */
 #ifdef L_clear_cache
 #if defined __ARM_EABI__ && defined __linux__
@@ -1381,7 +1395,7 @@ LSYM(Lover12):
 
 	FUNC_START lshrdi3
 	FUNC_ALIAS aeabi_llsr lshrdi3
-	
+
 #ifdef __thumb__
 	lsr	al, r2
 	mov	r3, ah
@@ -1408,12 +1422,12 @@ LSYM(Lover12):
 	FUNC_END lshrdi3
 
 #endif
-	
+
 #ifdef L_ashrdi3
-	
+
 	FUNC_START ashrdi3
 	FUNC_ALIAS aeabi_lasr ashrdi3
-	
+
 #ifdef __thumb__
 	lsr	al, r2
 	mov	r3, ah
@@ -1450,7 +1464,7 @@ LSYM(Lover12):
 
 	FUNC_START ashldi3
 	FUNC_ALIAS aeabi_llsl ashldi3
-	
+
 #ifdef __thumb__
 	lsl	ah, r2
 	mov	r3, al
@@ -1559,18 +1573,18 @@ ARM_FUNC_START clzdi2
 	bne	1f
 # ifdef __ARMEB__
 	mov	r0, xxl
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 	add	r0, r0, #32
 	b 2f
 1:
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 # else
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 	add	r0, r0, #32
 	b 2f
 1:
 	mov	r0, xxh
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 # endif
 2:
 # if defined(__ARM_ARCH_6M__)
@@ -1659,11 +1673,11 @@ ARM_FUNC_START ctzsi2
 #endif /* L_clzsi2 */
 
 /* ------------------------------------------------------------------------ */
-/* These next two sections are here despite the fact that they contain Thumb 
+/* These next two sections are here despite the fact that they contain Thumb
    assembler because their presence allows interworked code to be linked even
    when the GCC library is this one.  */
-		
-/* Do not build the interworking functions when the target architecture does 
+
+/* Do not build the interworking functions when the target architecture does
    not support Thumb instructions.  (This can be a multilib option).  */
 #if defined __ARM_ARCH_4T__ || defined __ARM_ARCH_5T__\
       || defined __ARM_ARCH_5TE__ || defined __ARM_ARCH_5TEJ__ \
@@ -1671,12 +1685,12 @@ ARM_FUNC_START ctzsi2
 
 #if defined L_call_via_rX
 
-/* These labels & instructions are used by the Arm/Thumb interworking code. 
-   The address of function to be called is loaded into a register and then 
-   one of these labels is called via a BL instruction.  This puts the 
-   return address into the link register with the bottom bit set, and the 
+/* These labels & instructions are used by the Arm/Thumb interworking code.
+   The address of function to be called is loaded into a register and then
+   one of these labels is called via a BL instruction.  This puts the
+   return address into the link register with the bottom bit set, and the
    code here switches to the correct mode before executing the function.  */
-	
+
 	.text
 	.align 0
         .force_thumb
@@ -1715,10 +1729,10 @@ ARM_FUNC_START ctzsi2
 #if defined L_interwork_call_via_rX
 
 /* These labels & instructions are used by the Arm/Thumb interworking code,
-   when the target address is in an unknown instruction set.  The address 
+   when the target address is in an unknown instruction set.  The address
    of function to be called is loaded into a register and then one of these
-   labels is called via a BL instruction.  This puts the return address 
-   into the link register with the bottom bit set, and the code here 
+   labels is called via a BL instruction.  This puts the return address
+   into the link register with the bottom bit set, and the code here
    switches to the correct mode before executing the function.  Unfortunately
    the target code cannot be relied upon to return via a BX instruction, so
    instead we have to store the resturn address on the stack and allow the
@@ -1737,7 +1751,7 @@ ARM_FUNC_START ctzsi2
    The third, _interwork_r11_call_via_rN(), works in the same way but
    uses r11 instead of r7.  It is useful if the caller does not really
    need a frame pointer.  */
-	
+
 	.text
 	.align 0
 
@@ -1800,7 +1814,7 @@ LSYM(Lchange_\register):
 	interwork_with_frame r7,\register,_interwork_r7_call_via_\register
 	interwork_with_frame r11,\register,_interwork_r11_call_via_\register
 .endm
-	
+
 	interwork r0
 	interwork r1
 	interwork r2
@@ -1815,7 +1829,7 @@ LSYM(Lchange_\register):
 	interwork fp
 	interwork ip
 	interwork sp
-	
+
 	/* The LR case has to be handled a little differently...  */
 	.code 16
 
@@ -1823,7 +1837,7 @@ LSYM(Lchange_\register):
 
 	bx 	pc
 	nop
-	
+
 	.code 32
 	.globl .Lchange_lr
 .Lchange_lr:
@@ -1832,9 +1846,9 @@ LSYM(Lchange_\register):
 	mov	ip, lr
 	adreq	lr, _arm_return
 	bx	ip
-	
+
 	SIZE	(_interwork_call_via_lr)
-	
+
 #endif /* L_interwork_call_via_rX */
 #endif /* !__thumb2__ */
 
@@ -1844,7 +1858,7 @@ LSYM(Lchange_\register):
    of 32-bit entires).  They are only permitted to clobber r12
    and r14 and r0 must be preserved on exit.  */
 #ifdef L_thumb1_case_sqi
-	
+
 	.text
 	.align 0
         .force_thumb
@@ -1863,7 +1877,7 @@ LSYM(Lchange_\register):
 #endif
 
 #ifdef L_thumb1_case_uqi
-	
+
 	.text
 	.align 0
         .force_thumb
@@ -1882,7 +1896,7 @@ LSYM(Lchange_\register):
 #endif
 
 #ifdef L_thumb1_case_shi
-	
+
 	.text
 	.align 0
         .force_thumb
@@ -1902,7 +1916,7 @@ LSYM(Lchange_\register):
 #endif
 
 #ifdef L_thumb1_case_uhi
-	
+
 	.text
 	.align 0
         .force_thumb
@@ -1922,7 +1936,7 @@ LSYM(Lchange_\register):
 #endif
 
 #ifdef L_thumb1_case_si
-	
+
 	.text
 	.align 0
         .force_thumb

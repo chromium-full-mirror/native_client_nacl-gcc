@@ -105,3 +105,9 @@
 #undef SUBTARGET_EXTRA_ASM_SPEC
 #define SUBTARGET_EXTRA_ASM_SPEC        \
   "nacl-arm-macros.s%s"
+
+/* Clear the instruction cache from BEG to END.  This is used only
+   for trampolines on an executable stack, which NaCl cannot support
+   anyway.  */
+#undef  CLEAR_INSN_CACHE
+#define CLEAR_INSN_CACHE(BEG, END) abort ()
