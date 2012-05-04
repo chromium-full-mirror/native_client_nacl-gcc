@@ -111,3 +111,61 @@
   (if_then_else (eq_attr "sfi_sp_op0" "yes")
                 (const_int 28)          ; (12 * 2) + 4
                 (const_int 12)))
+
+;; Boolean meta-attribute that represents whether a "%b0"
+;; instruction would actually use the "sfi_breg" prefix.
+(define_attr "sfi_breg_op0" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "arm_sfi_breg_operand (operands[0]) != -1"))
+                (const_string "yes")
+                (const_string "no")))
+
+;; Boolean meta-attribute that represents whether a "%b1"
+;; instruction would actually use the "sfi_breg" prefix.
+(define_attr "sfi_breg_op1" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "arm_sfi_breg_operand (operands[1]) != -1"))
+                (const_string "yes")
+                (const_string "no")))
+
+;; The "length" attribute for a "%b0" instruction.  When %0 uses a
+;; base register requiring sandboxing, this is a two-instruction
+;; bundle-locked sequence.  Hence the worst case is that it starts
+;; at the last spot of a bundle so it's pushed to the next bundle,
+;; making it three instructions.
+(define_attr "length_breg_op0" ""
+  (if_then_else (eq_attr "sfi_breg_op0" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for "%b1" rather than "%b0".
+(define_attr "length_breg_op1" ""
+  (if_then_else (eq_attr "sfi_breg_op1" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for a sequence of three instructions where each of two
+;; of them is a "length_breg_op0" case by itself.
+(define_attr "length_breg_op0_by_2_plus_1" ""
+  (if_then_else (eq_attr "sfi_breg_op0" "yes")
+                (const_int 28)          ; (12 * 2) + 4
+                (const_int 12)))
+
+;; The "length" attribute to replace (set_attr "length" "2,4").
+;; That is, in alternative 0 it's a short Thumb-2 instruction.
+;; In alternative 1, it's a "length_breg_op0" case.
+;;
+;; Note that this is used in define_insn's where there are two
+;; alternatives in the constraints, but no alternatives in the
+;; output template.  GCC won't let us use (eq_attr "alternative" "1")
+;; in such cases, so we have to resort to testing it in C.
+(define_attr "length_breg_op0_alt1_or_t2" ""
+  (if_then_else (match_test "which_alternative == 1")
+                (attr "length_breg_op0")
+                (const_int 2)))
+
+;; Same, but for operand 1 instead of operand 0.
+(define_attr "length_breg_op1_alt1_or_t2" ""
+  (if_then_else (match_test "which_alternative == 1")
+                (attr "length_breg_op1")
+                (const_int 2)))

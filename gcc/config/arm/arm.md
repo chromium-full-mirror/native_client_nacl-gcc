@@ -3422,7 +3422,7 @@
    (set (attr "length")
 	(if_then_else (eq_attr "is_thumb" "yes")
 		      (const_int 14)
-		      (const_int 12)))
+		      (attr "length_breg_op0_by_2_plus_1")))
    (set_attr "type" "store1")]
 )
 
@@ -4012,7 +4012,7 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%?\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set_attr "length" "2,4")
+   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
    (set_attr "predicable" "yes")
    (set_attr "type" "load1")])
 
@@ -4024,7 +4024,7 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%(sh%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set_attr "length" "2,4")
+   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
    (set_attr "predicable" "yes")
    (set_attr "type" "load_byte")])
 
@@ -4036,7 +4036,7 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%(h%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set_attr "length" "2,4")
+   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
    (set_attr "predicable" "yes")
    (set_attr "type" "load_byte")])
 
@@ -4047,7 +4047,7 @@
   "unaligned_access && TARGET_32BIT"
   "%b0str%?\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set_attr "length" "2,4")
+   (set (attr "length") (attr "length_breg_op0_alt1_or_t2"))
    (set_attr "predicable" "yes")
    (set_attr "type" "store1")])
 
@@ -4058,7 +4058,7 @@
   "unaligned_access && TARGET_32BIT"
   "%b0str%(h%)\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set_attr "length" "2,4")
+   (set (attr "length") (attr "length_breg_op0_alt1_or_t2"))
    (set_attr "predicable" "yes")
    (set_attr "type" "store1")])
 
@@ -4646,6 +4646,9 @@
    #
    %b1ldr%(h%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_string "*")
+				      (attr "length_breg_op1")))
    (set_attr "predicable" "yes")]
 )
 
@@ -4657,6 +4660,9 @@
    uxth%?\\t%0, %1
    %b1ldr%(h%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_string "*")
+				      (attr "length_breg_op1")))
    (set_attr "predicable" "yes")]
 )
 
@@ -4737,7 +4743,9 @@
   "@
    #
    %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
-  [(set_attr "length" "8,4")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_int 8)
+				      (attr "length_breg_op1")))
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
 )
@@ -4750,6 +4758,9 @@
    uxtb%(%)\\t%0, %1
    %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
   [(set_attr "type" "alu_shift,load_byte")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_string "*")
+				      (attr "length_breg_op1")))
    (set_attr "predicable" "yes")]
 )
 
@@ -4980,7 +4991,9 @@
   "@
    #
    %b1ldr%(sh%)\\t%0, %1"
-  [(set_attr "length" "8,4")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_int 8)
+				      (attr "length_breg_op1")))
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -4996,6 +5009,9 @@
    sxth%?\\t%0, %1
    %b1ldr%(sh%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_string "*")
+				      (attr "length_breg_op1")))
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
    (set_attr "neg_pool_range" "*,244")]
@@ -5040,6 +5056,7 @@
   "TARGET_ARM && arm_arch4"
   "%b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "load_byte")
+   (set (attr "length") (attr "length_breg_op1"))
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "256")
    (set_attr "neg_pool_range" "244")]
@@ -5080,7 +5097,9 @@
   "@
    #
    %b1ldr%(sb%)\\t%0, %1"
-  [(set_attr "length" "8,4")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_int 8)
+				      (attr "length_breg_op1")))
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -5096,6 +5115,9 @@
    sxtb%?\\t%0, %1
    %b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
+   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
+				      (const_string "*")
+				      (attr "length_breg_op1")))
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
    (set_attr "neg_pool_range" "*,244")]
@@ -5592,6 +5614,11 @@
    %b1ldr%?\\t%0, %1
    %b0str%?\\t%1, %0"
   [(set_attr "type" "*,*,*,*,load1,store1")
+   (set (attr "length") (cond [(eq_attr "alternative" "4")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "5")
+			       (attr "length_breg_op0")]
+			      (const_string "*")))
    (set_attr "insn" "mov,mov,mvn,mov,*,*")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,*,*,*,4096,*")
@@ -5625,8 +5652,8 @@
    #
    ldmia\\t%1, {%0}
    stmia\\t%0, {%1}
-   %b1ldr\\t%0, %1
-   %b0str\\t%1, %0
+   ldr\\t%0, %1
+   str\\t%1, %0
    mov\\t%0, %1"
   [(set_attr "length" "2,2,4,4,2,2,2,2,2")
    (set_attr "type" "*,*,*,*,load1,store1,load1,store1,*")
@@ -5754,6 +5781,7 @@
   "TARGET_32BIT && flag_pic"
   "%b1ldr%?\\t%0, %1"
   [(set_attr "type" "load1")
+   (set (attr "length") (attr "length_breg_op1"))
    (set_attr "pool_range" "4096")
    (set (attr "neg_pool_range")
 	(if_then_else (eq_attr "is_thumb" "no")
@@ -6289,6 +6317,11 @@
    %b0str%(h%)\\t%1, %0\\t%@ movhi
    %b1ldr%(h%)\\t%0, %1\\t%@ movhi"
   [(set_attr "type" "*,*,store1,load1")
+   (set (attr "length") (cond [(eq_attr "alternative" "2")
+			       (attr "length_breg_op0")
+			       (eq_attr "alternative" "3")
+			       (attr "length_breg_op1")]
+			      (const_string "*")))
    (set_attr "predicable" "yes")
    (set_attr "insn" "mov,mvn,*,*")
    (set_attr "pool_range" "*,*,*,256")
@@ -6436,15 +6469,22 @@
   "@
    mov%?\\t%0, %1
    mvn%?\\t%0, #%B1
-   %b1ldr%(b%)\\t%0, %1
-   %b0str%(b%)\\t%1, %0
+   ldr%(b%)\\t%0, %1
+   str%(b%)\\t%1, %0
    %b1ldr%(b%)\\t%0, %1
    %b0str%(b%)\\t%1, %0"
   [(set_attr "type" "*,*,load1,store1,load1,store1")
    (set_attr "insn" "mov,mvn,*,*,*,*")
    (set_attr "predicable" "yes")
    (set_attr "arch" "any,any,t2,t2,any,any")
-   (set_attr "length" "4,4,2,2,4,4")]
+   (set (attr "length") (cond [(ior (eq_attr "alternative" "2")
+				    (eq_attr "alternative" "3"))
+			       (const_int 2)
+			       (eq_attr "alternative" "4")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "5")
+			       (attr "length_breg_op0")]
+			      (const_int 4)))]
 )
 
 (define_insn "*thumb1_movqi_insn"
@@ -6455,8 +6495,8 @@
        || register_operand (operands[1], QImode))"
   "@
    add\\t%0, %1, #0
-   %b1ldrb\\t%0, %1
-   %b0strb\\t%1, %0
+   ldrb\\t%0, %1
+   strb\\t%1, %0
    mov\\t%0, %1
    mov\\t%0, %1
    mov\\t%0, %1"
@@ -6529,7 +6569,15 @@
   [(set_attr "conds" "unconditional")
    (set_attr "type" "load1,store1,*,*")
    (set_attr "insn" "*,*,mov,mov")
-   (set_attr "length" "4,4,4,8")
+   (set (attr "length") (cond [(eq_attr "alternative" "0")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "1")
+			       (attr "length_breg_op0")
+			       (eq_attr "alternative" "3")
+			       (if_then_else (match_test "arm_arch_thumb2")
+					     (const_int 4)
+					     (const_int 8))]
+			      (const_int 4)))
    (set_attr "predicable" "yes")]
 )
 
@@ -6618,6 +6666,11 @@
    %b1ldr%?\\t%0, %1\\t%@ float
    %b0str%?\\t%1, %0\\t%@ float"
   [(set_attr "predicable" "yes")
+   (set (attr "length") (cond [(eq_attr "alternative" "1")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "2")
+			       (attr "length_breg_op0")]
+			      (const_string "*")))
    (set_attr "type" "*,load1,store1")
    (set_attr "insn" "mov,*,*")
    (set_attr "pool_range" "*,4096,*")
@@ -10622,7 +10675,11 @@
     output_asm_insn (\"%I3%?\\t%0, %1, %2\", arith);
     return \"\";
   }"
-  [(set_attr "length" "12")
+  ;; It's too hairy to compute which operands are involved in the loads,
+  ;; so just assume the worst case (see "length_breg_op0_by_2_plus_1").
+  [(set (attr "length") (if_then_else (match_test "TARGET_SFI_NACL1")
+				      (const_int 28) ; (12 * 2) + 4
+				      (const_int 12)))
    (set_attr "predicable" "yes")
    (set_attr "type" "load1")]
 )

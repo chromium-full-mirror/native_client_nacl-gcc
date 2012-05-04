@@ -17524,6 +17524,51 @@ arm_print_condition (FILE *stream)
     }
 }
 
+/* If X is an operand for which %b<n> will expand to the "sfi_breg" prefix,
+   return the register number.  Otherwise return -1.  */
+int
+arm_sfi_breg_operand (rtx x)
+{
+  int regno;
+
+  switch (GET_CODE (x))
+    {
+    case REG:
+      regno = REGNO (x);
+      break;
+
+    case MEM:
+      {
+        rtx addr = XEXP (x, 0);
+        while (GET_CODE (addr) != REG)
+          {
+            switch (GET_CODE (addr))
+              {
+              case LABEL_REF:
+              case SYMBOL_REF:
+                return -1;
+
+              default:
+                /* It might be (plus (reg...) ...) or suchlike.  */
+                addr = XEXP (addr, 0);
+                continue;
+              }
+            break;
+          }
+        if (addr != NULL)
+          {
+            gcc_assert (GET_CODE (addr) == REG);
+            regno = REGNO (addr);
+          }
+      }
+      break;
+
+    default:
+      gcc_unreachable ();
+    }
+
+  return (regno != SP_REGNUM && regno != PC_REGNUM) ? regno : -1;
+}
 
 /* If CODE is 'd', then the X is a condition operand and the instruction
    should only be executed if the condition is true.
@@ -18215,48 +18260,11 @@ arm_print_operand (FILE *stream, rtx x, int code)
 	}
 
       if (TARGET_SFI_NACL1)
-	{
-	  int regno;
-          switch (GET_CODE (x))
-            {
-            case REG:
-              regno = REGNO (x);
-              break;
-
-            case MEM:
-              {
-                rtx addr = XEXP (x, 0);
-                while (GET_CODE (addr) != REG)
-                  {
-                    switch (GET_CODE (addr))
-                      {
-                      case LABEL_REF:
-                      case SYMBOL_REF:
-                        addr = NULL;
-                        regno = PC_REGNUM;
-                        break;
-
-                      default:
-                        /* It might be (plus (reg...) ...) or suchlike.  */
-                        addr = XEXP (addr, 0);
-                        continue;
-                      }
-                    break;
-                  }
-                if (addr != NULL)
-                  {
-                    gcc_assert (GET_CODE (addr) == REG);
-                    regno = REGNO (addr);
-                  }
-              }
-              break;
-
-            default:
-	      gcc_unreachable ();
-            }
-	  if (regno != SP_REGNUM && regno != PC_REGNUM)
-	    fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
-	}
+        {
+          int regno = arm_sfi_breg_operand (x);
+          if (regno != -1)
+            fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
+        }
       return;
 
     case 'j':
