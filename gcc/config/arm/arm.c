@@ -17563,6 +17563,9 @@ arm_sfi_breg_operand (rtx x)
       }
       break;
 
+    case CONST:
+      return -1;
+
     default:
       gcc_unreachable ();
     }
