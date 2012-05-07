@@ -2190,7 +2190,7 @@ unsigned char ix86_arch_features[X86_ARCH_LAST];
 /* Feature tests against the various architecture variations, used to create
    ix86_arch_features based on the processor mask.  */
 static unsigned int initial_ix86_arch_features[X86_ARCH_LAST] = {
-  /* X86_ARCH_CMOVE: Conditional move was added for pentiumpro.  */
+  /* X86_ARCH_CMOV: Conditional move was added for pentiumpro.  */
   ~(m_386 | m_486 | m_PENT | m_K6),
 
   /* X86_ARCH_CMPXCHG: Compare and exchange was added for 80486.  */
@@ -3504,7 +3504,7 @@ ix86_option_override_internal (bool main_args_p)
 	   -mtune (rather than -march) points us to a processor that has them.
 	   However, the VIA C3 gives a SIGILL, so we only do that for i686 and
 	   higher processors.  */
-	if (TARGET_CMOVE
+	if (TARGET_CMOV
 	    && (processor_alias_table[i].flags & (PTA_PREFETCH_SSE | PTA_SSE)))
 	  x86_prefetch_sse = true;
 	break;
@@ -3779,12 +3779,6 @@ ix86_option_override_internal (bool main_args_p)
 		 "for correctness", prefix, suffix);
       target_flags |= MASK_ACCUMULATE_OUTGOING_ARGS;
     }
-
-  /* For sane SSE instruction set generation we need fcomi instruction.
-     It is safe to enable all CMOVE instructions.  Also, RDRAND intrinsic
-     expands to a sequence that includes conditional move. */
-  if (TARGET_SSE || TARGET_RDRND)
-    TARGET_CMOVE = 1;
 
   /* Figure out what ASM_GENERATE_INTERNAL_LABEL builds as a prefix.  */
   {
@@ -7705,7 +7699,7 @@ setup_incoming_varargs_64 (CUMULATIVE_ARGS *cum)
   for (i = cum->regno; i < max; i++)
     {
       mem = gen_rtx_MEM (word_mode,
-			 plus_constant (save_area, i * UNITS_PER_WORD));
+			 plus_constant (Pmode, save_area, i * UNITS_PER_WORD));
       MEM_NOTRAP_P (mem) = 1;
       set_mem_alias_set (mem, set);
       emit_move_insn (mem,
@@ -7741,7 +7735,8 @@ setup_incoming_varargs_64 (CUMULATIVE_ARGS *cum)
 
       for (i = cum->sse_regno; i < max; ++i)
 	{
-	  mem = plus_constant (save_area, i * 16 + ix86_varargs_gpr_size);
+	  mem = plus_constant (Pmode, save_area,
+			       i * 16 + ix86_varargs_gpr_size);
 	  mem = gen_rtx_MEM (smode, mem);
 	  MEM_NOTRAP_P (mem) = 1;
 	  set_mem_alias_set (mem, set);
@@ -7770,7 +7765,7 @@ setup_incoming_varargs_ms_64 (CUMULATIVE_ARGS *cum)
       rtx reg, mem;
 
       mem = gen_rtx_MEM (Pmode,
-			 plus_constant (virtual_incoming_args_rtx,
+			 plus_constant (Pmode, virtual_incoming_args_rtx,
 					i * UNITS_PER_WORD));
       MEM_NOTRAP_P (mem) = 1;
       set_mem_alias_set (mem, set);
@@ -9239,7 +9234,7 @@ choose_baseaddr (HOST_WIDE_INT cfa_offset)
     }
   gcc_assert (base_reg != NULL);
 
-  return plus_constant (base_reg, base_offset);
+  return plus_constant (Pmode, base_reg, base_offset);
 }
 
 /* Emit code to save registers in the prologue.  */
@@ -9294,7 +9289,7 @@ ix86_emit_save_reg_using_mov (enum machine_mode mode, unsigned int regno,
 	     the re-aligned stack frame, which provides us with a copy
 	     of the CFA that will last past the prologue.  Install it.  */
 	  gcc_checking_assert (cfun->machine->fs.fp_valid);
-	  addr = plus_constant (hard_frame_pointer_rtx,
+	  addr = plus_constant (Pmode, hard_frame_pointer_rtx,
 				cfun->machine->fs.fp_offset - cfa_offset);
 	  mem = gen_rtx_MEM (mode, addr);
 	  add_reg_note (insn, REG_CFA_DEF_CFA, mem);
@@ -9304,7 +9299,7 @@ ix86_emit_save_reg_using_mov (enum machine_mode mode, unsigned int regno,
 	  /* The frame pointer is a stable reference within the
 	     aligned frame.  Use it.  */
 	  gcc_checking_assert (cfun->machine->fs.fp_valid);
-	  addr = plus_constant (hard_frame_pointer_rtx,
+	  addr = plus_constant (Pmode, hard_frame_pointer_rtx,
 				cfun->machine->fs.fp_offset - cfa_offset);
 	  mem = gen_rtx_MEM (mode, addr);
 	  add_reg_note (insn, REG_CFA_EXPRESSION,
@@ -9317,7 +9312,8 @@ ix86_emit_save_reg_using_mov (enum machine_mode mode, unsigned int regno,
      use by the unwind info.  */
   else if (base != m->fs.cfa_reg)
     {
-      addr = plus_constant (m->fs.cfa_reg, m->fs.cfa_offset - cfa_offset);
+      addr = plus_constant (Pmode, m->fs.cfa_reg,
+			    m->fs.cfa_offset - cfa_offset);
       mem = gen_rtx_MEM (mode, addr);
       add_reg_note (insn, REG_CFA_OFFSET, gen_rtx_SET (VOIDmode, mem, reg));
     }
@@ -9763,7 +9759,8 @@ ix86_adjust_stack_and_probe (const HOST_WIDE_INT size)
 	    adjust = PROBE_INTERVAL;
 
 	  emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-				  plus_constant (stack_pointer_rtx, -adjust)));
+				  plus_constant (Pmode, stack_pointer_rtx,
+						 -adjust)));
 	  emit_stack_probe (stack_pointer_rtx);
 	}
 
@@ -9773,12 +9770,13 @@ ix86_adjust_stack_and_probe (const HOST_WIDE_INT size)
         adjust = size + PROBE_INTERVAL - i;
 
       emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-			      plus_constant (stack_pointer_rtx, -adjust)));
+			      plus_constant (Pmode, stack_pointer_rtx,
+					     -adjust)));
       emit_stack_probe (stack_pointer_rtx);
 
       /* Adjust back to account for the additional first interval.  */
       last = emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-				     plus_constant (stack_pointer_rtx,
+				     plus_constant (Pmode, stack_pointer_rtx,
 						    PROBE_INTERVAL + dope)));
     }
 
@@ -9804,7 +9802,7 @@ ix86_adjust_stack_and_probe (const HOST_WIDE_INT size)
 
       /* SP = SP_0 + PROBE_INTERVAL.  */
       emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-			      plus_constant (stack_pointer_rtx,
+			      plus_constant (Pmode, stack_pointer_rtx,
 					     - (PROBE_INTERVAL + dope))));
 
       /* LAST_ADDR = SP_0 + PROBE_INTERVAL + ROUNDED_SIZE.  */
@@ -9834,14 +9832,14 @@ ix86_adjust_stack_and_probe (const HOST_WIDE_INT size)
       if (size != rounded_size)
 	{
 	  emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-			          plus_constant (stack_pointer_rtx,
+			          plus_constant (Pmode, stack_pointer_rtx,
 						 rounded_size - size)));
 	  emit_stack_probe (stack_pointer_rtx);
 	}
 
       /* Adjust back to account for the additional first interval.  */
       last = emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-				     plus_constant (stack_pointer_rtx,
+				     plus_constant (Pmode, stack_pointer_rtx,
 						    PROBE_INTERVAL + dope)));
 
       release_scratch_register_on_entry (&sr);
@@ -9857,10 +9855,10 @@ ix86_adjust_stack_and_probe (const HOST_WIDE_INT size)
       rtx expr = gen_rtx_SEQUENCE (VOIDmode, rtvec_alloc (2));
       XVECEXP (expr, 0, 0)
 	= gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-		       plus_constant (stack_pointer_rtx, -size));
+		       plus_constant (Pmode, stack_pointer_rtx, -size));
       XVECEXP (expr, 0, 1)
 	= gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-		       plus_constant (stack_pointer_rtx,
+		       plus_constant (Pmode, stack_pointer_rtx,
 				      PROBE_INTERVAL + dope + size));
       add_reg_note (last, REG_FRAME_RELATED_EXPR, expr);
       RTX_FRAME_RELATED_P (last) = 1;
@@ -9929,9 +9927,11 @@ ix86_emit_probe_stack_range (HOST_WIDE_INT first, HOST_WIDE_INT size)
 	 it exceeds SIZE.  If only one probe is needed, this will not
 	 generate any code.  Then probe at FIRST + SIZE.  */
       for (i = PROBE_INTERVAL; i < size; i += PROBE_INTERVAL)
-	emit_stack_probe (plus_constant (stack_pointer_rtx, -(first + i)));
+	emit_stack_probe (plus_constant (Pmode, stack_pointer_rtx,
+					 -(first + i)));
 
-      emit_stack_probe (plus_constant (stack_pointer_rtx, -(first + size)));
+      emit_stack_probe (plus_constant (Pmode, stack_pointer_rtx,
+				       -(first + size)));
     }
 
   /* Otherwise, do the same as above, but in a loop.  Note that we must be
@@ -9979,7 +9979,8 @@ ix86_emit_probe_stack_range (HOST_WIDE_INT first, HOST_WIDE_INT size)
 	 that SIZE is equal to ROUNDED_SIZE.  */
 
       if (size != rounded_size)
-	emit_stack_probe (plus_constant (gen_rtx_PLUS (Pmode,
+	emit_stack_probe (plus_constant (Pmode,
+					 gen_rtx_PLUS (Pmode,
 						       stack_pointer_rtx,
 						       sr.reg),
 					 rounded_size - size));
@@ -10232,7 +10233,7 @@ ix86_expand_prologue (void)
       /* We don't want to interpret this push insn as a register save,
 	 only as a stack adjustment.  The real copy of the register as
 	 a save will be done later, if needed.  */
-      t = plus_constant (stack_pointer_rtx, -UNITS_PER_WORD);
+      t = plus_constant (Pmode, stack_pointer_rtx, -UNITS_PER_WORD);
       t = gen_rtx_SET (VOIDmode, stack_pointer_rtx, t);
       add_reg_note (insn, REG_CFA_ADJUST_CFA, t);
       RTX_FRAME_RELATED_P (insn) = 1;
@@ -10253,7 +10254,7 @@ ix86_expand_prologue (void)
 	}
 
       /* Grab the argument pointer.  */
-      t = plus_constant (stack_pointer_rtx, m->fs.sp_offset);
+      t = plus_constant (Pmode, stack_pointer_rtx, m->fs.sp_offset);
       insn = emit_insn (gen_rtx_SET (VOIDmode, crtl->drap_reg, t));
       RTX_FRAME_RELATED_P (insn) = 1;
       m->fs.cfa_reg = crtl->drap_reg;
@@ -10269,7 +10270,7 @@ ix86_expand_prologue (void)
 	 address can be reached via (argp - 1) slot.  This is needed
 	 to implement macro RETURN_ADDR_RTX and intrinsic function
 	 expand_builtin_return_addr etc.  */
-      t = plus_constant (crtl->drap_reg, -UNITS_PER_WORD);
+      t = plus_constant (Pmode, crtl->drap_reg, -UNITS_PER_WORD);
       t = gen_frame_mem (word_mode, t);
       insn = emit_insn (gen_push (t));
       RTX_FRAME_RELATED_P (insn) = 1;
@@ -10459,7 +10460,7 @@ ix86_expand_prologue (void)
 	  RTX_FRAME_RELATED_P (insn) = 1;
 	  add_reg_note (insn, REG_FRAME_RELATED_EXPR,
 			gen_rtx_SET (VOIDmode, stack_pointer_rtx,
-				     plus_constant (stack_pointer_rtx,
+				     plus_constant (Pmode, stack_pointer_rtx,
 						    -allocate)));
 	}
       m->fs.sp_offset += allocate;
@@ -10614,7 +10615,7 @@ ix86_emit_restore_reg_using_pop (rtx reg)
 
   if (m->fs.cfa_reg == stack_pointer_rtx)
     {
-      rtx x = plus_constant (stack_pointer_rtx, UNITS_PER_WORD);
+      rtx x = plus_constant (Pmode, stack_pointer_rtx, UNITS_PER_WORD);
       x = gen_rtx_SET (VOIDmode, stack_pointer_rtx, x);
       add_reg_note (insn, REG_CFA_ADJUST_CFA, x);
       RTX_FRAME_RELATED_P (insn) = 1;
@@ -10676,7 +10677,8 @@ ix86_emit_leave (void)
       m->fs.cfa_offset = m->fs.sp_offset;
 
       add_reg_note (insn, REG_CFA_DEF_CFA,
-		    plus_constant (stack_pointer_rtx, m->fs.sp_offset));
+		    plus_constant (Pmode, stack_pointer_rtx,
+				   m->fs.sp_offset));
       RTX_FRAME_RELATED_P (insn) = 1;
     }
   ix86_add_cfa_restore_note (insn, hard_frame_pointer_rtx,
@@ -10889,7 +10891,7 @@ ix86_expand_epilogue (int style)
 	  if (frame_pointer_needed)
 	    {
 	      t = gen_rtx_PLUS (Pmode, hard_frame_pointer_rtx, sa);
-	      t = plus_constant (t, m->fs.fp_offset - UNITS_PER_WORD);
+	      t = plus_constant (Pmode, t, m->fs.fp_offset - UNITS_PER_WORD);
 	      emit_insn (gen_rtx_SET (VOIDmode, sa, t));
 
 	      t = gen_frame_mem (Pmode, hard_frame_pointer_rtx);
@@ -10904,7 +10906,7 @@ ix86_expand_epilogue (int style)
 		 bother resetting the CFA to the SP for the duration of
 		 the return insn.  */
 	      add_reg_note (insn, REG_CFA_DEF_CFA,
-			    plus_constant (sa, UNITS_PER_WORD));
+			    plus_constant (Pmode, sa, UNITS_PER_WORD));
 	      ix86_add_queued_cfa_restore_notes (insn);
 	      add_reg_note (insn, REG_CFA_RESTORE, hard_frame_pointer_rtx);
 	      RTX_FRAME_RELATED_P (insn) = 1;
@@ -10919,7 +10921,7 @@ ix86_expand_epilogue (int style)
 	  else
 	    {
 	      t = gen_rtx_PLUS (Pmode, stack_pointer_rtx, sa);
-	      t = plus_constant (t, m->fs.sp_offset - UNITS_PER_WORD);
+	      t = plus_constant (Pmode, t, m->fs.sp_offset - UNITS_PER_WORD);
 	      insn = emit_insn (gen_rtx_SET (VOIDmode, stack_pointer_rtx, t));
 	      ix86_add_queued_cfa_restore_notes (insn);
 
@@ -10928,7 +10930,7 @@ ix86_expand_epilogue (int style)
 		{
 		  m->fs.cfa_offset = UNITS_PER_WORD;
 		  add_reg_note (insn, REG_CFA_DEF_CFA,
-				plus_constant (stack_pointer_rtx,
+				plus_constant (Pmode, stack_pointer_rtx,
 					       UNITS_PER_WORD));
 		  RTX_FRAME_RELATED_P (insn) = 1;
 		}
@@ -12593,7 +12595,7 @@ legitimize_pic_address (rtx orig, rtx reg)
 						 base == reg ? NULL_RTX : reg);
 
 	      if (CONST_INT_P (new_rtx))
-		new_rtx = plus_constant (base, INTVAL (new_rtx));
+		new_rtx = plus_constant (Pmode, base, INTVAL (new_rtx));
 	      else
 		{
 		  if (GET_CODE (new_rtx) == PLUS && CONSTANT_P (XEXP (new_rtx, 1)))
@@ -13113,7 +13115,8 @@ ix86_legitimize_address (rtx x, rtx oldx ATTRIBUTE_UNUSED,
 	      x = gen_rtx_PLUS (Pmode,
 				gen_rtx_PLUS (Pmode, XEXP (XEXP (x, 0), 0),
 					      XEXP (XEXP (XEXP (x, 0), 1), 0)),
-				plus_constant (other, INTVAL (constant)));
+				plus_constant (Pmode, other,
+					       INTVAL (constant)));
 	    }
 	}
 
@@ -18832,6 +18835,11 @@ ix86_expand_int_movcc (rtx operands[])
   rtx op0 = XEXP (operands[1], 0);
   rtx op1 = XEXP (operands[1], 1);
 
+  if (GET_MODE (op0) == TImode
+      || (GET_MODE (op0) == DImode
+	  && !TARGET_64BIT))
+    return false;
+
   start_sequence ();
   compare_op = ix86_expand_compare (code, op0, op1);
   compare_seq = get_insns ();
@@ -20686,7 +20694,7 @@ ix86_split_long_move (rtx operands[])
       /* Compensate for the stack decrement by 4.  */
       if (!TARGET_64BIT && nparts == 3
 	  && mode == XFmode && TARGET_128BIT_LONG_DOUBLE)
-	src_base = plus_constant (src_base, 4);
+	src_base = plus_constant (Pmode, src_base, 4);
 
       /* src_base refers to the stack pointer and is
 	 automatically decreased by emitted push.  */
@@ -20750,7 +20758,7 @@ ix86_split_long_move (rtx operands[])
 	  part[1][0] = replace_equiv_address (part[1][0], base);
 	  for (i = 1; i < nparts; i++)
 	    {
-	      tmp = plus_constant (base, UNITS_PER_WORD * i);
+	      tmp = plus_constant (Pmode, base, UNITS_PER_WORD * i);
 	      part[1][i] = replace_equiv_address (part[1][i], tmp);
 	    }
 	}
@@ -22366,7 +22374,8 @@ ix86_expand_movmem (rtx dst, rtx src, rtx count_exp, rtx align_exp,
 	     sufficiently aligned, maintain aliasing info accurately.  */
 	  dst = expand_constant_movmem_prologue (dst, &src, destreg, srcreg,
 						 desired_align, align_bytes);
-	  count_exp = plus_constant (count_exp, -align_bytes);
+	  count_exp = plus_constant (counter_mode (count_exp),
+				     count_exp, -align_bytes);
 	  count -= align_bytes;
 	}
       if (need_zero_guard
@@ -22758,7 +22767,8 @@ ix86_expand_setmem (rtx dst, rtx count_exp, rtx val_exp, rtx align_exp,
 	     sufficiently aligned, maintain aliasing info accurately.  */
 	  dst = expand_constant_setmem_prologue (dst, destreg, promoted_val,
 						 desired_align, align_bytes);
-	  count_exp = plus_constant (count_exp, -align_bytes);
+	  count_exp = plus_constant (counter_mode (count_exp),
+				     count_exp, -align_bytes);
 	  count -= align_bytes;
 	}
       if (need_zero_guard
@@ -24465,7 +24475,8 @@ ix86_static_chain (const_tree fndecl, bool incoming_p)
 	      if (fndecl == current_function_decl)
 		ix86_static_chain_on_stack = true;
 	      return gen_frame_mem (SImode,
-				    plus_constant (arg_pointer_rtx, -8));
+				    plus_constant (Pmode,
+						   arg_pointer_rtx, -8));
 	    }
 	  regno = SI_REG;
 	}
@@ -24587,7 +24598,7 @@ ix86_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
 	 (call-saved) register static chain; this push is 1 byte.  */
       offset += 5;
       disp = expand_binop (SImode, sub_optab, fnaddr,
-			   plus_constant (XEXP (m_tramp, 0),
+			   plus_constant (Pmode, XEXP (m_tramp, 0),
 					  offset - (MEM_P (chain) ? 1 : 0)),
 			   NULL_RTX, 1, OPTAB_DIRECT);
       emit_move_insn (mem, disp);
@@ -32568,7 +32579,7 @@ x86_this_parameter (tree function)
 	  regno = CX_REG;
 	  if (aggr)
 	    return gen_rtx_MEM (SImode,
-				plus_constant (stack_pointer_rtx, 4));
+				plus_constant (Pmode, stack_pointer_rtx, 4));
 	}
       else
         {
@@ -32578,13 +32589,15 @@ x86_this_parameter (tree function)
 	      regno = DX_REG;
 	      if (nregs == 1)
 		return gen_rtx_MEM (SImode,
-				    plus_constant (stack_pointer_rtx, 4));
+				    plus_constant (Pmode,
+						   stack_pointer_rtx, 4));
 	    }
 	}
       return gen_rtx_REG (SImode, regno);
     }
 
-  return gen_rtx_MEM (SImode, plus_constant (stack_pointer_rtx, aggr ? 8 : 4));
+  return gen_rtx_MEM (SImode, plus_constant (Pmode, stack_pointer_rtx,
+					     aggr ? 8 : 4));
 }
 
 /* Determine whether x86_output_mi_thunk can succeed.  */
@@ -32686,7 +32699,7 @@ x86_output_mi_thunk (FILE *file,
       emit_move_insn (tmp, this_mem);
 
       /* Adjust the this parameter.  */
-      vcall_addr = plus_constant (tmp, vcall_offset);
+      vcall_addr = plus_constant (Pmode, tmp, vcall_offset);
       if (TARGET_64BIT
 	  && !ix86_legitimate_address_p (ptr_mode, vcall_addr, true))
 	{

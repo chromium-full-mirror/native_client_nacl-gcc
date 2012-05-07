@@ -1,3 +1,82 @@
+2012-05-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53239
+	* g++.dg/opt/vrp3.C: New test.
+	* g++.dg/opt/vrp3-aux.cc: New file.
+	* g++.dg/opt/vrp3.h: New file.
+
+2012-05-07  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* g++.dg/debug/dwarf2/nested-3.C: Allow for / comments and missing
+	.uleb128 support in assembler output.
+
+2012-05-07  Richard Guenther  <rguenther@suse.de>
+
+	PR lto/42987
+	* g++.dg/lto/pr42987_0.C: New testcase.
+	* g++.dg/lto/pr42987_1.C: Likewise.
+
+2012-05-07  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53255
+	* gfortran.dg/typebound_operator_15.f90: New.
+
+2012-05-06  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41587
+	* gfortran.dg/class_array_13.f90: New.
+
+2012-05-06  Tristan Gingold  <gingold@adacore.com>
+
+	* gnat.dg/warn7.adb: New test.
+
+2012-05-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/specs/renamings.ads: Rename to...
+	* gnat.dg/specs/renaming1.ads: ...this.
+	* gnat.dg/specs/renaming2.ads: New test.
+	* gnat.dg/specs/renaming2_pkg1.ads: New helper.
+	* gnat.dg/specs/renaming2_pkg2.ads: Likewise.
+	* gnat.dg/specs/renaming2_pkg3.ads: Likewise.
+	* gnat.dg/specs/renaming2_pkg4.ad[sb]: Likewise.
+
+2012-05-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/discr36.ad[sb]: New test.
+	* gnat.dg/discr36_pkg.ad[sb]: New helper.
+
+2012-05-05  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/43772
+	* c-c++-common/pr43772.c: New.
+
+2012-05-05  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/41600
+	* gfortran.dg/select_type_26.f03 : New test.
+	* gfortran.dg/select_type_27.f03 : New test.
+
+	PR fortran/53191
+	* gfortran.dg/select_type_28.f03 : New test.
+
+2012-05-05  Janne Blomqvist  <jb@gcc.gnu.org>
+
+	PR fortran/49010
+	PR fortran/24518
+	* gfortran.dg/mod_sign0_1.f90: New test.
+	* gfortran.dg/mod_large_1.f90: New test.
+
+2012-05-04  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53175
+	gfortran.dg/public_private_module_5.f90: New.
+
+2012-05-04  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53111
+	* gfortran.dg/constructor_7.f90: New.
+	* gfortran.dg/constructor_8.f90: New.
+
 2012-05-04  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/53166
@@ -92,10 +171,10 @@
 
 2012-05-03  Greta Yorsh  <Greta.Yorsh@arm.com>
 
-       * gcc.dg/fixed-point/composite-type.c (dg-options): Add
-       option -ftrack-macro-expansion=0.
-       * gcc.dg/fixed-point/operator-bitwise.c (dg-options): Add
-       option -ftrack-macro-expansion=0.
+	* gcc.dg/fixed-point/composite-type.c (dg-options): Add
+	option -ftrack-macro-expansion=0.
+	* gcc.dg/fixed-point/operator-bitwise.c (dg-options): Add
+	option -ftrack-macro-expansion=0.
 
 2012-05-03  Greta Yorsh  <Greta.Yorsh@arm.com>
 
@@ -260,11 +339,11 @@
 
 	Fix expansion point loc for macro-like tokens
 	* gcc.dg/debug/dwarf2/pr41445-5.c: Adjust.
-    	* gcc.dg/debug/dwarf2/pr41445-6.c: Likewise.
+	* gcc.dg/debug/dwarf2/pr41445-6.c: Likewise.
 
 	Fix token pasting with -ftrack-macro-expansion
 	* gcc.dg/cpp/paste17.c: New test case for
-    	-ftrack-macro-expansion=2 mode only.
+	-ftrack-macro-expansion=2 mode only.
 	* gcc.dg/cpp/macro-exp-tracking-5.c: Likewise.
 
 2012-04-30  Eric Botcazou  <ebotcazou@adacore.com>
@@ -274,7 +353,7 @@
 2012-04-29  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR 53149
-        * gcc.dg/20011021-1.c: Adjust testcase.
+	* gcc.dg/20011021-1.c: Adjust testcase.
 
 2012-04-29  Thomas Koenig  <tkoenig@gcc.gnu.org>
 
