@@ -17573,6 +17573,7 @@ arm_sfi_breg_operand (rtx x)
       break;
 
     case CONST:
+    case SYMBOL_REF:
       return -1;
 
     default:

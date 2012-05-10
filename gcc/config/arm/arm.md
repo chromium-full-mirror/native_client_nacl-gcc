@@ -5742,10 +5742,26 @@
 	(mem:SI (plus:SI (match_operand:SI 1 "register_operand" "")
 			 (unspec:SI [(match_operand:SI 2 "" "")]
 				    UNSPEC_PIC_SYM))))]
-  "flag_pic"
+  "flag_pic && !TARGET_SFI_NACL1"
   [(set (match_dup 3) (unspec:SI [(match_dup 2)] UNSPEC_PIC_SYM))
    (set (match_dup 0) (mem:SI (plus:SI (match_dup 1) (match_dup 3))))]
   "operands[3] = can_create_pseudo_p () ? gen_reg_rtx (SImode) : operands[0];"
+)
+
+;; Split calculate_pic_address into a move, an add, and a load.
+;; This is required for TARGET_SFI_NACL1 to avoid using multiple registers
+;; in an address expression.
+(define_split
+  [(set (match_operand:SI 0 "register_operand" "")
+	(mem:SI (plus:SI (match_operand:SI 1 "register_operand" "")
+			 (unspec:SI [(match_operand:SI 2 "" "")]
+				    UNSPEC_PIC_SYM))))]
+  "flag_pic && TARGET_SFI_NACL1"
+  [(set (match_dup 3) (unspec:SI [(match_dup 2)] UNSPEC_PIC_SYM))
+   (set (match_dup 4) (plus:SI (match_dup 1) (match_dup 3)))
+   (set (match_dup 0) (mem:SI (match_dup 4)))]
+  "operands[3] = can_create_pseudo_p () ? gen_reg_rtx (SImode) : operands[0];
+   operands[4] = can_create_pseudo_p () ? gen_reg_rtx (SImode) : operands[0];"
 )
 
 ;; operand1 is the memory address to go into
