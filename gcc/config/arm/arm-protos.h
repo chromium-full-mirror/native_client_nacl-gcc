@@ -250,6 +250,8 @@ extern int vfp3_const_double_for_fract_bits (rtx);
 extern void arm_expand_vec_perm (rtx target, rtx op0, rtx op1, rtx sel);
 extern bool arm_expand_vec_perm_const (rtx target, rtx op0, rtx op1, rtx sel);
 
+extern bool arm_autoinc_modes_ok_p (enum machine_mode, enum arm_auto_incmodes);
+
 extern int arm_sfi_breg_operand (rtx x);
 
 #endif /* ! GCC_ARM_PROTOS_H */
