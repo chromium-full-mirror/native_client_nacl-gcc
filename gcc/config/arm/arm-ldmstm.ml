@@ -1,5 +1,5 @@
 (* Auto-generate ARM ldm/stm patterns
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010, 2012 Free Software Foundation, Inc.
    Contributed by CodeSourcery.
 
    This file is part of GCC.
@@ -84,7 +84,7 @@ let write_stm_set thumb nregs offset opnr first =
   begin if offset != 0 then Printf.printf "(plus:SI " end;
   Printf.printf "%s" (destreg nregs first IN thumb);
   begin if offset != 0 then Printf.printf " (const_int %d))" offset end;
-  Printf.printf ")\n%s     (match_operand:SI %d \"arm_hard_register_operand\" \"\"))" indent opnr 
+  Printf.printf ")\n%s     (match_operand:SI %d \"arm_hard_register_operand\" \"\"))" indent opnr
 
 let write_ldm_peep_set extra_indent nregs opnr first =
   let indent = "   " ^ extra_indent in
@@ -114,7 +114,7 @@ let write_const_stm_peep_set nregs opnr first =
   Printf.printf "\n";
   write_const_store nregs opnr false
 
-  
+
 let rec write_pat_sets func opnr offset first n_left =
   func offset opnr first;
   begin
@@ -133,7 +133,7 @@ let rec write_peep_sets func opnr first n_left =
       write_peep_sets func (opnr + 1) false (n_left - 1);
     end
   end
-    
+
 let can_thumb addrmode update is_store =
   match addrmode, update, is_store with
     (* Thumb1 mode only supports IA with update.  However, for LDMIA,
@@ -174,8 +174,8 @@ let write_pattern_1 name ls addrmode nregs write_set_fn update thumb =
   Printf.printf ")]\n  \"%s && XVECLEN (operands[0], 0) == %d\"\n"
     (target addrmode thumb)
     (if update then nregs + 1 else nregs);
-  Printf.printf "  \"%s%%(%s%%)\\t%%%d%s, {"
-    name astr (nregs + 1) (if update then "!" else "");
+  Printf.printf "  \"%%b%d%s%%(%s%%)\\t%%%d%s, {"
+    (nregs + 1) name astr (nregs + 1) (if update then "!" else "");
   for n = 1 to nregs; do
     Printf.printf "%%%d%s" n (if n < nregs then ", " else "")
   done;
@@ -309,12 +309,12 @@ let print_lines = List.iter (fun s -> Format.printf "%s@\n" s)
 
 (* Do it.  *)
 
-let _ = 
+let _ =
   print_lines [
 "/* ARM ldm/stm instruction patterns.  This file was automatically generated";
 "   using arm-ldmstm.ml.  Please do not edit manually.";
 "";
-"   Copyright (C) 2010 Free Software Foundation, Inc.";
+"   Copyright (C) 2012 Free Software Foundation, Inc.";
 "   Contributed by CodeSourcery.";
 "";
 "   This file is part of GCC.";
