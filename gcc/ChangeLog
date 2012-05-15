@@ -1,10 +1,88 @@
+2012-05-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/53358
+	* config/i386/i386.md (*addqi_2 peephole with QImode addition): Check
+	that operands[2] is either immediate, or q_regs_operand.
+
+2012-05-15  Richard Guenther  <rguenther@suse.de>
+
+	* cgraphunit.c (thunk_adjust): Use make_rename_temp.
+	(assemble_thunk): Likewise.  Manually rename and register
+	function arguments.
+
+2012-05-15  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53355
+	* tree-vrp.c (extract_range_from_binary_expr_1): Handle LSHIFT_EXPRs
+	by constants.
+
+2012-05-15  Tristan Gingold  <gingold@adacore.com>
+
+      * tree-ssa-strlen.c (get_string_length): Convert lhs if needed.
+
+2012-05-15  Richard Guenther  <rguenther@suse.de>
+
+	* gimple.c (gimple_set_modified): Move ...
+	* gimple.h (gimple_set_modified): ... here.
+
+2012-05-15  Tristan Gingold  <gingold@adacore.com>
+
+	* ira-color.c (move_spill_restore): Add a guard.
+
+2012-05-15  Tristan Gingold  <gingold@adacore.com>
+
+	* config/ia64/ia64.c (ia64_emit_probe_stack_range): Adjust calls to
+	plus_constant.
+
+2012-05-15  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gimplify.c (gimplify_init_constructor): Do a block move for very
+	small objects as well.
+
+2012-05-15  Bernd Schmidt  <bernds@codesourcery.com>
+
+	* ira.c (find_moveable_pseudos): Skip registers whose
+	DF_REG_EQ_USE_COUNT is nonzero.
+
+2012-05-15  Kenneth Zadeck  <zadeck@naturalbridge.com>
+
+	* doc/md.texi (fma): Define to only be applicable for single
+	rounding.
+
+2012-05-14  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/46098
+	* config/i386/i386.c (ix86_expand_special_args_builtin): Always
+	generate target register for "load" class builtins.
+
+	Revert:
+	2010-10-22  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/46098
+	* config/i386/sse.md (*avx_movu<ssemodesuffix><avxmodesuffix>):
+	Rename from avx_movu<ssemodesuffix><avxmodesuffix>.
+	(avx_movu<ssemodesuffix><avxmodesuffix>): New expander.
+	(*<sse>_movu<ssemodesuffix>): Rename from <sse>_movu<ssemodesuffix>.
+	(<sse>_movu<ssemodesuffix>): New expander.
+	(*avx_movdqu<avxmodesuffix>): Rename from avx_movdqu<avxmodesuffix>.
+	(avx_movdqu<avxmodesuffix>): New expander.
+	(*sse2_movdqu): Rename from sse2_movdqu.
+	(sse2_movdqu): New expander.
+
+2012-05-14  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR target/52607
+	* config/i386/i386.c (ix86_expand_vec_perm_const): Move code to ...
+	(canonicalize_perm): ... new function.
+	(expand_vec_perm_2vperm2f128_vshuf): New function.
+	(ix86_expand_vec_perm_const_1): Call it.
+
 2012-05-14  Andrew Pinski  <apinski@cavium.com>
 	    H.J. Lu  <hongjiu.lu@intel.com>
 	    Jakub Jelinek  <jakub@redhat.com>
 
 	PR target/53315
-	* config/i386/i386.md (xbegin_1): Use + in constraint and
-	match_dup.
+	* config/i386/i386.md (xbegin_1): Use + in constraint and match_dup.
 	(xbegin): Updated.
 
 2012-05-14  Jakub Jelinek  <jakub@redhat.com>
@@ -87,8 +165,6 @@
 	ATTR_FLAG_BUILT_IN.
 	* doc/rtl.texi (CALL_INSN_FUNCTION_USAGE): Use lowercase for rtx
 	codes.  Document meaning of sets inside CALL_INSN_FUNCTION_USAGE.
-	* c-family/c-common.c (DEF_ATTR_STRING): Define and undefine as
-	necessary.
 	* builtin-attrs.def (DEF_ATTR_FOR_STRING): Define.  Use it to
 	define a string "1".
 	(ATTR_RET1_NOTHROW_NONNULL_LEAF): New attr definition.
@@ -120,9 +196,6 @@
 	* calls.c (decl_return_flags): New static function.
 	(expand_call): Generate a SET in CALL_INSN_FUNCTION_USAGE for
 	functions that return one of their arguments.
-	* lto/lto-lang.c (handle_fnspec_attribute): New static function.
-	(lto_attribute_table): Add "fn spec".
-	(DEF_ATTR_STRING): Define and undefine along with the other macros.
 	* regcprop.c (struct kill_set_value_data): New.
 	(kill_set_value): Interpret data as a pointer to such a struct.
 	Do nothing if the caller wants the register to be ignored.
@@ -242,12 +315,12 @@
 	* opth-gen.awk: Declare common_handle_option_auto.
 	* common.opt (Wuninitialized): Use EnabledBy. Delete Init.
 	(Wmaybe-uninitialized): Likewise.
-        (Wunused-but-set-variable): Likewise.
-        (Wunused-function): Likewise.
-        (Wunused-label): Likewise.
-        (Wunused-value): Likewise.
-        (Wunused-variable): Likewise.
-        * opt-read.awk: Create opt_numbers array.
+	(Wunused-but-set-variable): Likewise.
+	(Wunused-function): Likewise.
+	(Wunused-label): Likewise.
+	(Wunused-value): Likewise.
+	(Wunused-variable): Likewise.
+	* opt-read.awk: Create opt_numbers array.
 
 2012-05-11  Richard Guenther  <rguenther@suse.de>
 
@@ -439,7 +512,7 @@
 
 2012-05-09  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
-       * doc/extend.texi (Function Attributes): Point xref to section
+	* doc/extend.texi (Function Attributes): Point xref to section
 	about Pragmas.
 
 2012-05-09  Uros Bizjak  <ubizjak@gmail.com>

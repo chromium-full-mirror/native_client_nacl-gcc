@@ -1,3 +1,33 @@
+2012-05-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/53358
+	* gcc.dg/pr53358.c: New test.
+
+2012-05-15  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/11856
+	* g++.dg/warn/Wtype-limits.C: Don't warn in templates.
+	* g++.dg/warn/Wtype-limits-Wextra.C: Likewise.
+
+2012-05-15  Olivier Hainque  <hainque@adacore.com>
+
+	* g++.dg/eh/sighandle.C: New testcase.
+
+2012-05-15  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53355
+	* gcc.dg/tree-ssa/vrp67.c: New testcase.
+
+2012-05-15  Bernhard Reutner-Fischer  <aldot@gcc.gnu.org>
+
+	* gfortran.dg/*.f90: Remove now redundant manual
+	cleanup-modules directive.
+
+2012-05-14  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.target/i386/avx256-unaligned-load-[1234].c: Update scan strings.
+	* gcc.target/i386/avx256-unaligned-store-[1234].c: Ditto.
+
 2012-05-14  Janne Blomqvist  <jb@gcc.gnu.org>
 
 	PR fortran/52428
