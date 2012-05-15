@@ -1,6 +1,7 @@
 /* ieee754-df.S double-precision floating point support for ARM
 
-   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2012
+	Free Software Foundation, Inc.
    Contributed by Nicolas Pitre (nico@cam.org)
 
    This file is free software; you can redistribute it and/or modify it
@@ -23,13 +24,13 @@
    <http://www.gnu.org/licenses/>.  */
 
 /*
- * Notes: 
- * 
+ * Notes:
+ *
  * The goal of this code is to be as fast as possible.  This is
  * not meant to be easy to understand for the casual reader.
  * For slightly simpler code please see the single precision version
  * of this file.
- * 
+ *
  * Only the default rounding mode is intended for best performances.
  * Exceptions aren't supported yet, but that can be added quite easily
  * if necessary without impacting performances.
@@ -70,7 +71,7 @@ ARM_FUNC_ALIAS aeabi_dneg negdf2
 ARM_FUNC_START aeabi_drsub
 
 	eor	xh, xh, #0x80000000	@ flip sign bit of first arg
-	b	1f	
+	b	1f
 
 ARM_FUNC_START subdf3
 ARM_FUNC_ALIAS aeabi_dsub subdf3
@@ -909,7 +910,7 @@ LSYM(Lml_n):
 
 ARM_FUNC_START divdf3
 ARM_FUNC_ALIAS aeabi_ddiv divdf3
-	
+
 	do_push	{r4, r5, r6, lr}
 
 	@ Mask out exponents, trap any zero/denormal/INF/NAN.
@@ -1129,7 +1130,7 @@ ARM_FUNC_ALIAS eqdf2 cmpdf2
 
 	@ Test for equality.
 	@ Note that 0.0 is equal to -0.0.
-2:	add	sp, sp, #4
+2:	ADD_SP	#4
 	orrs	ip, xl, xh, lsl #1	@ if x == 0.0 or -0.0
 	do_it	eq, e
 	COND(orr,s,eq)	ip, yl, yh, lsl #1	@ and y == 0.0 or -0.0
@@ -1142,7 +1143,7 @@ ARM_FUNC_ALIAS eqdf2 cmpdf2
 	@ Clear C flag
 	cmn	r0, #0
 
-	@ Compare sign, 
+	@ Compare sign,
 	teq	xh, yh
 
 	@ Compare values if same sign
@@ -1189,7 +1190,7 @@ ARM_FUNC_START aeabi_cdrcmple
 	mov	r1, r3
 	mov	r3, ip
 	b	6f
-	
+
 ARM_FUNC_START aeabi_cdcmpeq
 ARM_FUNC_ALIAS aeabi_cdcmple aeabi_cdcmpeq
 
@@ -1208,7 +1209,7 @@ ARM_FUNC_ALIAS aeabi_cdcmple aeabi_cdcmpeq
 	FUNC_END aeabi_cdcmple
 	FUNC_END aeabi_cdcmpeq
 	FUNC_END aeabi_cdrcmple
-	
+
 ARM_FUNC_START	aeabi_dcmpeq
 
 	str	lr, [sp, #-8]!
@@ -1418,7 +1419,7 @@ ARM_FUNC_ALIAS aeabi_d2f truncdfsf2
 #endif
 	shift1	lsr, xl, xl, r2
 	do_it	ne
-	orrne	xl, xl, #1		@ fold r3 for rounding considerations. 
+	orrne	xl, xl, #1		@ fold r3 for rounding considerations.
 	mov	r3, xh, lsl #11
 	mov	r3, r3, lsr #11
 	shiftop orr xl xl r3 lsl ip ip

@@ -129,10 +129,12 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    on certain instructions.  */
 #ifdef __native_client__
 # define SFI(insn)	CONCAT2 (sfi_, insn)
+# define ADD_SP		sfi_sp add sp, sp,
 # define PC_IN_POP	lr
 # define RET_TO_POP	sfi_bx	lr
 #else
 # define SFI(insn)	insn
+# define ADD_SP		add sp, sp,
 # define PC_IN_POP	pc
 # define RET_TO_POP	/* We loaded directly into the pc.  */
 #endif
@@ -580,13 +582,29 @@ pc		.req	r15
 	clz	\result, \divisor
 	sub	\curbit, \result, \curbit
 	rsbs	\curbit, \curbit, #31
+# ifdef __native_client__
+	/* Native Client does not support loading directly into pc.
+	   Its indirect branch targets must be aligned to 16 bytes.
+	   So we must pad each unrolled iteration (below) up to be four
+	   instructions, and use a temporary register for the computed pc.  */
+	adr	\result, 1f
+	addne	\curbit, \result, \curbit, lsl #4
+	mov	\result, #0
+	sfi_bx	\curbit
+.p2align 4
+1:
+# else
 	addne	\curbit, \curbit, \curbit, lsl #1
 	mov	\result, #0
 	addne	pc, pc, \curbit, lsl #2
 	nop
+# endif
 	.set	shift, 32
 	.rept	32
 	.set	shift, shift - 1
+# ifdef __native_client__
+.p2align 4
+# endif
 	cmp	\dividend, \divisor, lsl #shift
 	adc	\result, \result, \result
 	subcs	\dividend, \dividend, \divisor, lsl #shift
@@ -702,11 +720,25 @@ pc		.req	r15
 	clz	\spare, \dividend
 	sub	\order, \order, \spare
 	rsbs	\order, \order, #31
+# ifdef __native_client__
+	/* Native Client does not support loading directly into pc.
+	   Its indirect branch targets must be aligned to 16 bytes.
+	   So we must pad each unrolled iteration (below) up to be four
+	   instructions, and use a temporary register for the computed pc.  */
+	adr	\spare, 1f
+	addne	\spare, \spare, \order, lsl #4
+.p2align 4
+1:
+# else
 	addne	pc, pc, \order, lsl #3
 	nop
+# endif
 	.set	shift, 32
 	.rept	32
 	.set	shift, shift - 1
+# ifdef __native_client__
+.p2align 4
+# endif
 	cmp	\dividend, \divisor, lsl #shift
 	subcs	\dividend, \dividend, \divisor, lsl #shift
 	.endr

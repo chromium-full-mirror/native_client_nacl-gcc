@@ -1,6 +1,7 @@
 /* ieee754-sf.S single-precision floating point support for ARM
 
-   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2012
+	Free Software Foundation, Inc.
    Contributed by Nicolas Pitre (nico@cam.org)
 
    This file is free software; you can redistribute it and/or modify it
@@ -34,7 +35,7 @@
  */
 
 #ifdef L_arm_negsf2
-	
+
 ARM_FUNC_START negsf2
 ARM_FUNC_ALIAS aeabi_fneg negsf2
 
@@ -149,7 +150,7 @@ LSYM(Lad_p):
 	@ Our result is now properly aligned into r0, remaining bits in r1.
 	@ Pack final result together.
 	@ Round with MSB of r1. If halfway between two numbers, round towards
-	@ LSB of r0 = 0. 
+	@ LSB of r0 = 0.
 LSYM(Lad_e):
 	cmp	r1, #0x80000000
 	adc	r0, r0, r2, lsl #23
@@ -165,7 +166,7 @@ LSYM(Lad_a):
 	tst	r0, #0x00800000
 	sub	r2, r2, #1
 	bne	LSYM(Lad_e)
-	
+
 	@ No rounding necessary since r1 will always be 0 at this point.
 LSYM(Lad_l):
 
@@ -292,13 +293,13 @@ LSYM(Lad_i):
 
 ARM_FUNC_START floatunsisf
 ARM_FUNC_ALIAS aeabi_ui2f floatunsisf
-		
+
 	mov	r3, #0
 	b	1f
 
 ARM_FUNC_START floatsisf
 ARM_FUNC_ALIAS aeabi_i2f floatsisf
-	
+
 	ands	r3, r0, #0x80000000
 	do_it	mi
 	rsbmi	r0, r0, #0
@@ -834,7 +835,7 @@ ARM_FUNC_ALIAS eqsf2 cmpsf2
 
 	@ Compare values.
 	@ Note that 0.0 is equal to -0.0.
-2:	add	sp, sp, #4
+2:	ADD_SP	#4
 	orrs	ip, r2, r3, lsr #1	@ test if both are 0, clear C flag
 	do_it	ne
 	teqne	r0, r1			@ if not 0 compare sign
@@ -850,7 +851,7 @@ ARM_FUNC_ALIAS eqsf2 cmpsf2
 	orrne	r0, r0, #1
 	RET
 
-	@ Look for a NAN. 
+	@ Look for a NAN.
 3:	mvns	ip, r2, asr #24
 	bne	4f
 	movs	ip, r0, lsl #9
