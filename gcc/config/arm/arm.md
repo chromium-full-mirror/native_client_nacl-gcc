@@ -148,6 +148,7 @@
   VUNSPEC_TMRC          ; Used by the iWMMXt TMRC instruction.
   VUNSPEC_TMCR          ; Used by the iWMMXt TMCR instruction.
   VUNSPEC_ALIGN8        ; 8-byte alignment version of VUNSPEC_ALIGN
+  VUNSPEC_ALIGN16	; 16-byte alignment version of VUNSPEC_ALIGN
   VUNSPEC_WCMP_EQ       ; Used by the iWMMXt WCMPEQ instructions
   VUNSPEC_WCMP_GTU      ; Used by the iWMMXt WCMPGTU instructions
   VUNSPEC_WCMP_GT       ; Used by the iwMMXT WCMPGT instructions
@@ -158,6 +159,8 @@
   VUNSPEC_ATOMIC_OP	; Represent an atomic operation.
   VUNSPEC_LL		; Represent a load-register-exclusive.
   VUNSPEC_SC		; Represent a store-register-exclusive.
+  VUNSPEC_SFI_BARRIER_4	; TARGET_SFI_NACL1 version of VUNSPEC_ALIGN
+  VUNSPEC_SFI_BARRIER_8	; TARGET_SFI_NACL1 version of VUNSPEC_ALIGN
 ])
 
 ;;---------------------------------------------------------------------------
@@ -11137,6 +11140,30 @@
   assemble_align (64);
   return \"\";
   "
+)
+
+(define_insn "align_16"
+  [(unspec_volatile [(const_int 0)] VUNSPEC_ALIGN16)]
+  "TARGET_EITHER"
+  "*
+  assemble_align (128);
+  return \"\";
+  "
+)
+
+(define_insn "consttable_sfi_barrier_4"
+  [(unspec_volatile [(const_int 0)] VUNSPEC_SFI_BARRIER_4)]
+  "TARGET_SFI_NACL1"
+  "bkpt\\t0x7777\\t%@ SFI barrier for constant pool"
+  [(set_attr "length" "4")]
+)
+
+(define_insn "consttable_sfi_barrier_8"
+  [(unspec_volatile [(const_int 0)] VUNSPEC_SFI_BARRIER_8)]
+  "TARGET_SFI_NACL1"
+  "bkpt\\t0x7777\\t%@ SFI barrier for constant pool\\n\\t\
+.word\\t0xdeadbeef\\t%@ pad next item to 8-byte alignment"
+  [(set_attr "length" "8")]
 )
 
 (define_insn "consttable_end"

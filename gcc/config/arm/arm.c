@@ -12643,6 +12643,74 @@ get_label_padding (rtx label)
   return align > min_insn_size ? align - min_insn_size : 0;
 }
 
+static Mnode *
+set_minipool_offset (Mnode *mp, HOST_WIDE_INT offset)
+{
+  if (TARGET_SFI_NACL1 && mp->refcount > 0)
+    {
+      if (mp->value == NULL_RTX)
+        {
+          /* This is a barrier we created before.  If things have
+             been shuffled around such that it's no longer doing its
+             job, then drop it.  */
+          Mnode *next;
+          for (next = mp->next; next != NULL; next = next->next)
+            {
+              if (next->value == NULL_RTX)
+                next->refcount = 0;
+              if (next->refcount > 0)
+                break;
+            }
+          if (offset % 16 != 0
+              || next == NULL
+              || (mp->fix_size < 8) != (next->fix_size < 8))
+            mp->refcount = 0;
+        }
+      else if (offset % 16 == 0)
+        {
+          /* This entry would sit at a bundle boundary.
+             Insert a barrier entry before it.  */
+
+          Mnode *barrier = XNEW (Mnode);
+          barrier->fix_size = 4;
+          barrier->mode = SImode;
+          barrier->value = NULL_RTX;
+          barrier->refcount = 1;
+
+          /* These don't actually matter for the barrier, since
+             nothing refers to it.  The generic logic will wind
+             up adjusting them based on the neighbors.  */
+          barrier->min_address = HOST_WIDE_INT_MIN;
+          barrier->max_address = HOST_WIDE_INT_MAX;
+
+          /* If the next item wants 8-byte alignment, then make this
+             barrier 8 bytes long so we don't break the alignment.
+             TODO(mcgrathr): Should fiddle placement so that one 4-byte
+             item is placed after each barrier to recover the alignment
+             without wasting a word of space.  */
+          if (ARM_DOUBLEWORD_ALIGN && mp->fix_size >= 8)
+            {
+              barrier->fix_size = 8;
+              gcc_assert (mp->fix_size == 8);
+            }
+
+          barrier->next = mp;
+          barrier->prev = mp->prev;
+          if (barrier->prev == NULL)
+            minipool_vector_head = barrier;
+          else
+            barrier->prev->next = barrier;
+          mp->prev = barrier;
+
+          mp = barrier;
+        }
+    }
+
+  mp->offset = offset;
+
+  return mp;
+}
+
 /* Move a minipool fix MP from its current location to before MAX_MP.
    If MAX_MP is NULL, then MP doesn't need moving, but the addressing
    constraints may need updating.  */
@@ -12725,7 +12793,8 @@ add_minipool_forward_ref (Mfix *fix)
      exist.  */
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      if (GET_CODE (fix->value) == GET_CODE (mp->value)
+      if (mp->value != NULL_RTX
+          && GET_CODE (fix->value) == GET_CODE (mp->value)
 	  && fix->mode == mp->mode
 	  && (GET_CODE (fix->value) != CODE_LABEL
 	      || (CODE_LABEL_NUMBER (fix->value)
@@ -12859,7 +12928,7 @@ move_minipool_fix_backward_ref (Mnode *mp, Mnode *min_mp,
   offset = 0;
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      mp->offset = offset;
+      mp = set_minipool_offset (mp, offset);
       if (mp->refcount > 0)
 	offset += mp->fix_size;
 
@@ -12902,7 +12971,8 @@ add_minipool_backward_ref (Mfix *fix)
      exist.  */
   for (mp = minipool_vector_tail; mp != NULL; mp = mp->prev)
     {
-      if (GET_CODE (fix->value) == GET_CODE (mp->value)
+      if (mp->value != NULL_RTX
+          && GET_CODE (fix->value) == GET_CODE (mp->value)
 	  && fix->mode == mp->mode
 	  && (GET_CODE (fix->value) != CODE_LABEL
 	      || (CODE_LABEL_NUMBER (fix->value)
@@ -13014,11 +13084,12 @@ add_minipool_backward_ref (Mfix *fix)
 	mp->next->min_address = mp->min_address + mp->fix_size;
 
       if (mp->refcount)
-	mp->next->offset = mp->offset + mp->fix_size;
+        mp = set_minipool_offset (mp->next, mp->offset + mp->fix_size);
       else
-	mp->next->offset = mp->offset;
-
-      mp = mp->next;
+        {
+          mp->next->offset = mp->offset;
+          mp = mp->next;
+        }
     }
 
   return min_mp;
@@ -13034,7 +13105,7 @@ assign_minipool_offsets (Mfix *barrier)
 
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      mp->offset = offset;
+      mp = set_minipool_offset (mp, offset);
 
       if (mp->refcount > 0)
 	offset += mp->fix_size;
@@ -13063,12 +13134,35 @@ dump_minipool (rtx scan)
 	     INSN_UID (scan), (unsigned long) minipool_barrier->address, align64 ? 8 : 4);
 
   scan = emit_label_after (gen_label_rtx (), scan);
-  scan = emit_insn_after (align64 ? gen_align_8 () : gen_align_4 (), scan);
+  scan = emit_insn_after (TARGET_SFI_NACL1 ? gen_align_16 ()
+                          : align64 ? gen_align_8 () : gen_align_4 (), scan);
   scan = emit_label_after (minipool_vector_label, scan);
 
   for (mp = minipool_vector_head; mp != NULL; mp = nmp)
     {
-      if (mp->refcount > 0)
+      if (mp->refcount > 0 && mp->value == NULL_RTX)
+        {
+          /* This is a special marker created by set_minipool_offset.
+             It indicates we're at a multiple of the bundle size, so
+             we must insert a special barrier before the actual
+             non-instruction words in the instruction stream.  */
+
+          gcc_assert (TARGET_SFI_NACL1);
+          gcc_assert (mp->fix_size == 4 || mp->fix_size == 8);
+
+          if (mp->next == NULL || mp->next->value == NULL_RTX)
+            /* This barrier has become useless.  */
+            mp->refcount = 0;
+          else
+            {
+              gcc_assert (mp->offset % 16 == 0);
+              scan = emit_insn_after (mp->fix_size == 4
+                                      ? gen_consttable_sfi_barrier_4 ()
+                                      : gen_consttable_sfi_barrier_8 (),
+                                      scan);
+            }
+        }
+      else if (mp->refcount > 0)
 	{
 	  if (dump_file)
 	    {
@@ -26020,7 +26114,7 @@ arm_vectorize_vec_perm_const_ok (enum machine_mode vmode,
 bool
 arm_autoinc_modes_ok_p (enum machine_mode mode, enum arm_auto_incmodes code)
 {
-  /* If we are soft float and we do not have ldrd 
+  /* If we are soft float and we do not have ldrd
      then all auto increment forms are ok.  */
   if (TARGET_SOFT_FLOAT && (TARGET_LDRD || GET_MODE_SIZE (mode) <= 4))
     return true;
@@ -26035,15 +26129,15 @@ arm_autoinc_modes_ok_p (enum machine_mode mode, enum arm_auto_incmodes code)
 	{
 	  if (code != ARM_PRE_DEC)
 	    return true;
-	  else 
+	  else
 	    return false;
 	}
-      
+
       return true;
 
     case ARM_POST_DEC:
     case ARM_PRE_INC:
-      /* Without LDRD and mode size greater than 
+      /* Without LDRD and mode size greater than
 	 word size, there is no point in auto-incrementing
          because ldm and stm will not have these forms.  */
       if (!TARGET_LDRD && GET_MODE_SIZE (mode) > 4)
@@ -26055,10 +26149,10 @@ arm_autoinc_modes_ok_p (enum machine_mode mode, enum arm_auto_incmodes code)
 	return false;
 
       return true;
-     
+
     default:
       return false;
-      
+
     }
 
   return false;
@@ -26069,7 +26163,7 @@ arm_autoinc_modes_ok_p (enum machine_mode mode, enum arm_auto_incmodes code)
    Additionally, the default expansion code is not available or suitable
    for post-reload insn splits (this can occur when the register allocator
    chooses not to do a shift in NEON).
-   
+
    This function is used in both initial expand and post-reload splits, and
    handles all kinds of 64-bit shifts.
 
@@ -26317,14 +26411,14 @@ arm_emit_coreregs_64bit_shift (enum rtx_code code, rtx out, rtx in,
 }
 
 
-/* Returns true if a valid comparison operation and makes 
+/* Returns true if a valid comparison operation and makes
    the operands in a form that is valid.  */
 bool
 arm_validize_comparison (rtx *comparison, rtx * op1, rtx * op2)
 {
   enum rtx_code code = GET_CODE (*comparison);
   enum rtx_code canonical_code;
-  enum machine_mode mode = (GET_MODE (*op1) == VOIDmode) 
+  enum machine_mode mode = (GET_MODE (*op1) == VOIDmode)
     ? GET_MODE (*op2) : GET_MODE (*op1);
 
   gcc_assert (GET_MODE (*op1) != VOIDmode || GET_MODE (*op2) != VOIDmode);
@@ -26350,7 +26444,7 @@ arm_validize_comparison (rtx *comparison, rtx * op1, rtx * op2)
       if (!cmpdi_operand (*op2, mode))
 	*op2 = force_reg (mode, *op2);
       return true;
-      
+
     case SFmode:
     case DFmode:
       if (!arm_float_compare_operand (*op1, mode))
@@ -26361,7 +26455,7 @@ arm_validize_comparison (rtx *comparison, rtx * op1, rtx * op2)
     default:
       break;
     }
-  
+
   return false;
 
 }
