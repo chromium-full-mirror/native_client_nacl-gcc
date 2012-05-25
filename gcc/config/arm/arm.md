@@ -5902,7 +5902,7 @@
 			    (const_int 8)
 			    (match_operand 2 "" "")]
 			   UNSPEC_PIC_BASE)))]
-  "TARGET_ARM"
+  "TARGET_ARM && !TARGET_SFI_NACL1"
   "*
     (*targetm.asm_out.internal_label) (asm_out_file, \"LPIC\",
 				       INTVAL (operands[2]));
@@ -5910,6 +5910,25 @@
   "
   [(set_attr "predicable" "yes")]
 )
+
+;; This is the same as tls_load_dot_plus_eight, but avoids the PC+register load.
+(define_insn "tls_load_dot_plus_eight_nacl"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+	(mem:SI (unspec:SI [(match_operand:SI 1 "register_operand" "r")
+			    (const_int 8)
+			    (match_operand 2 "" "")]
+			   UNSPEC_PIC_BASE)))]
+  "TARGET_ARM"
+  "*
+    (*targetm.asm_out.internal_label) (asm_out_file, \"LPIC\",
+				       INTVAL (operands[2]));
+    return \"add%?\\t%0, %|pc, %1\\n\\t\"
+	   \"%b0ldr%?\\t%0, [%0]\\t@ tls_load_dot_plus_eight_nacl\";
+  "
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr  "length_breg_op0_plus_1"))]
+)
+
 
 ;; PIC references to local variables can generate pic_add_dot_plus_eight
 ;; followed by a load.  These sequences can be crunched down to

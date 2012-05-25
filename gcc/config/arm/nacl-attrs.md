@@ -144,6 +144,13 @@
                 (const_int 12)
                 (const_int 4)))
 
+;; Same, but for a sequence of two instructions where the second is a
+;; "length_breg_op0" case by itself.
+(define_attr "length_breg_op0_plus_1" ""
+  (if_then_else (eq_attr "sfi_breg_op0" "yes")
+                (const_int 16)          ; 12 + 4
+                (const_int 8)))
+
 ;; Same, but for a sequence of three instructions where each of two
 ;; of them is a "length_breg_op0" case by itself.
 (define_attr "length_breg_op0_by_2_plus_1" ""

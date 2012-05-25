@@ -6440,7 +6440,9 @@ legitimize_tls_address (rtx x, rtx reg)
 			    UNSPEC_TLS);
       reg = load_tls_operand (sum, reg);
 
-      if (TARGET_ARM)
+      if (TARGET_SFI_NACL1)
+	emit_insn (gen_tls_load_dot_plus_eight_nacl (reg, reg, labelno));
+      else if (TARGET_ARM)
 	emit_insn (gen_tls_load_dot_plus_eight (reg, reg, labelno));
       else if (TARGET_THUMB2)
 	emit_insn (gen_tls_load_dot_plus_four (reg, NULL, reg, labelno));
