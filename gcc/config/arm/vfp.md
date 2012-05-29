@@ -85,7 +85,12 @@
    (set_attr "type" "*,*,*,*,load1,store1,r_2_f,f_2_r,fcpys,f_loads,f_stores")
    (set_attr "insn" "mov,mov,mvn,mov,*,*,*,*,*,*,*")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
-   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")]
+   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")
+   (set (attr "length") (cond [(eq_attr "alternative" "4,9")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "5,10")
+			       (attr "length_breg_op0")]
+			      (const_int 4)))]
 )
 
 ;; See thumb2.md:thumb2_movsi_insn for an explanation of the split
