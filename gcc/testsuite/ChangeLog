@@ -1,3 +1,39 @@
+2012-05-30  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/53356
+	* g++.dg/init/new33.C: New test.
+
+2012-05-30  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53501
+	* gcc.dg/torture/pr53501.c: New testcase.
+	* c-c++-common/restrict-2.c: Adjust.
+
+2012-05-30  Alan Modra  <amodra@gmail.com>
+
+	* gcc.target/powerpc/powerpc.exp: Load torture-options.exp, call
+	torture-finish.
+
+2012-05-30  Marc Glisse  <marc.glisse@inria.fr>
+
+	* gcc.target/i386/shuf-concat.c: New test.
+
+2012-05-30  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/53519
+	* gcc.c-torture/compile/pr53519.c: New test.
+
+2012-05-30  Ramana Radhakrishnan  <ramana.radhakrishnan@linaro.org>
+
+	* gcc.target/arm/neon-vrev.c: New.
+
+2012-05-29  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51340
+	* gcc.target/sh/pr51340-1.c: New.
+	* gcc.target/sh/pr51340-2.c: New.
+	* gcc.target/sh/pr51340-3.c: New.
+
 2012-05-29  Richard Guenther  <rguenther@suse.de>
 
 	PR tree-optimization/53516

@@ -1,3 +1,72 @@
+2012-05-30  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (legitimize_tls_address) <TLS_MODEL_INITIAL_EXEC>:
+	Generate tls_initial_exec_64_sun only when !TARGET_X32.
+
+2012-05-30  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53501
+	* fold-const.c (fold_binary_loc): Make sure to call
+	fold_plusminus_mult_expr with the original sign of operands.
+
+2012-05-30  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* Makefile.in: Fix many dependencies.
+	(DWARF2_H): Depend on dwarf2.def.
+	(RTL_ERROR_H): Depend on rtl-error.h.
+	(TREE_PRETTY_PRINT_H, GIMPLE_PRETTY_PRINT_H): New.  Replace
+	all gimple-pretty-print.h and tree-pretty-print.h references.
+
+2012-05-30  Marc Glisse  <marc.glisse@inria.fr>
+
+	* simplify-rtx.c (simplify_binary_operation_1): Optimize shuffle of
+	concatenations.
+
+2012-05-30  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53522
+	* tree-emutls.c (gen_emutls_addr): Do not add globals to
+	referenced-vars.
+
+2012-05-30  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* explow.c (probe_stack_range): Restore simple control flow and stop
+	again when the probe cannot be generated if HAVE_check_stack.
+
+2012-05-30  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/53519
+	* combine.c (simplify_shift_const_1) <case NOT>: Use constm1_rtx
+	instead of GEN_INT (GET_MODE_MASK (mode)) as second operand of XOR.
+
+2012-05-30  Ramana Radhakrishnan  <ramana.radhakrishnan@linaro.org>
+
+	* config/arm/arm.c (arm_evpc_neon_vrev): Adjust off by one error.
+
+2012-05-29  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	PR debug/53453
+	* doc/tm.texi: Update.
+	* doc/tm.texi.in (SDB and DWARF) <TARGET_FORCE_AT_COMP_DIR>: Add @hook.
+	* target.def (force_at_comp_dir): New hook.
+	* config/darwin.h (TARGET_FORCE_AT_COMP_DIR): Define.
+	* dwarf2out.c (dwarf2out_finish): Check targetm.force_at_comp_dir.
+
+2012-05-29  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	* config/darwin.h (STARTFILE_SPEC): Do not use -lbundle1.o when
+	Darwin >= 10.
+	(DARWIN_DYLIB1_SPEC): Do not use -ldylib1.10.5.o when Darwin >= 10.
+	(DARWIN_CRT1_SPEC): Use -lcrt1.10.6.o when Darwin >= 10.
+
+2012-05-29  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51340
+	* config/sh/sh.c (sh_option_override): Set TARGET_FMAC if
+	flag_unsafe_math_optimizations is set.
+	* doc/invoke.texi (SH Options): Add -mno-fused-madd description.
+	Update description of -mfused-madd.
+
 2012-05-29  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/52941
@@ -105,23 +174,21 @@
 
 2012-05-29  Georg-Johann Lay  <avr@gjlay.de>
 
-	* config/avr/t-avr (s-avr-mmcu-texi): Call 
+	* config/avr/t-avr (s-avr-mmcu-texi): Call
 	gen-avr-mmcu-texi$(build_exeext) via ./ and don't assume . is in PATH.
-	
+
 2012-05-29  Michael Matz  <matz@suse.de>
 
 	* rtl.h (assign_stack_temp, assign_stack_temp_for_type,
 	assign_temp): Remove 'keep' argument.
 	(mark_temp_addr_taken): Remove prototype.
 	* tree.h (expand_decl): Remove prototype.
-	* function.c (struct temp_slot): Remove addr_taken and keep
-	member.
+	* function.c (struct temp_slot): Remove addr_taken and keep member.
 	(assign_stack_temp_for_type) Don't initialize above, remove
 	keep argument.
 	(assign_stack_temp, assign_temp): Remove keep argument.
 	(mark_temp_addr_taken): Remove.
-	(preserve_temp_slots): Remove handling of addr_taken and keep
-	members.
+	(preserve_temp_slots): Remove handling of addr_taken and keep members.
 	(free_temp_slots): Ditto.
 	* expr.c (expand_expr_real_1 <COMPOUND_LITERAL_EXPR>): Remove
 	dead code.
@@ -167,7 +234,7 @@
 	* expr.c (expand_expr_real_1 <normal_inner_ref>): Don't allocate
 	a kept temp.
 	(expand_expr_real_1 <COMPOUND_LITERAL_EXPR>): Make unreachable.
-	* gimple-fold.c (canonicalize_constructor_val): Canonicalize 
+	* gimple-fold.c (canonicalize_constructor_val): Canonicalize
 	COMPOUND_LITERAL_EXPR.
 	* function.c (expand_function_start): Don't call expand_decl,
 	instead assert that we have RTL assigned.
@@ -351,8 +418,7 @@
 	PR middle-end/53510
 	* input.c (read_line): Use XRESIZEVEC instead of XNEWVEC
 	to avoid leaking memory.  No need to handle memory allocation
-	failure.  Double string_len on each reallocation instead of
-	adding 2.
+	failure.  Double string_len on each reallocation instead of adding 2.
 	* gcov.c (read_line): Likewise.
 
 2012-05-29  Hans-Peter Nilsson  <hp@axis.com>
@@ -371,8 +437,7 @@
 
 2012-05-28  Hans-Peter Nilsson  <hp@axis.com>
 
-	* doc/md.texi (stack_protect_test): Remove negation of branch to
-	label.
+	* doc/md.texi (stack_protect_test): Remove negation of branch to label.
 	(Standard Names): Fix typos in documentation of atomic patterns.
 
 2012-05-27  Nathan Sidwell  <nathan@acm.org>
