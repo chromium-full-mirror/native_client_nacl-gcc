@@ -1,3 +1,163 @@
+2012-05-31  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* Makefile.in: Fix many dependencies.
+	* tree-profile.c: Don't include regs.h.
+	* tree-vectorizer.c: Don't include cfglayout.h.
+	* tree-vect-stmts.c: Likewise.
+	* tree-vect-slp.c: Likewise.
+	* tree-vect-loop.c: Likewise.
+	* reg-stack.c: Likewise.
+	* tree-ssa-loop-manip.c: Likewise.
+	* toplev.c: Likewise.
+	* varasm.c: Don't include cfglayout.h, basic-block.h,
+	and tree-iterator.h.
+	* tree-cfgcleanup.c: Don't include cfglayout.h.
+	* passes.c: Don't include cfglayout.h, dwarf2asm.h,
+	dwarf2out.h, dbxout.h, sdbout.h, and xcoffout.h.
+	* cgraphclones.c: Don't include plugin.h.
+
+2012-05-31  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/t-avr: Correct avr-mmcu.texi dependencies.
+	(s-avr-mmcu-texi): Don't sed on gen-avr-mmcu-texi output.
+	* doc/avr-mmcu.texi (svn:eol-style): Set to native.
+	
+2012-05-31  Richard Guenther  <rguenther@suse.de>
+
+	* tree-loop-distribution.c (struct partition_s): New struct,
+	typedef and vector type.
+	(partition_alloc, partition_free): New functions.
+	(generate_loops_for_partition, generate_builtin,
+	generate_code_for_partition, rdg_flag_uses, rdg_flag_vertex,
+	rdg_flag_vertex_and_dependent, rdg_flag_loop_exits,
+	build_rdg_partition_for_component, can_generate_builtin,
+	similar_memory_accesses, fuse_partitions_with_similar_memory_accesses,
+	rdg_build_partitions, dump_rdg_partitions, debug_rdg_partitions,
+	number_of_rw_in_partition, partition_contains_all_rw,
+	ldist_gen): Use partition_t instead of bitmap.
+
+2012-05-31  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/gen-avr-mmcu-texi.c: Sort MCUs. 
+	* doc/avr-mmcu.texi: Regenerate.
+	
+2012-05-31  Richard Guenther  <rguenther@suse.de>
+
+	* tree-loop-distribution.c (stmt_has_scalar_dependences_outside_loop):
+	Use FOR_EACH_SSA_DEF_OPERAND.
+	(generate_builtin): Adjust.
+	(stmt_generated_in_another_partition): Remove.
+	(add_scalar_computations_to_partition): Likewise.
+	(rdg_build_partitions): Do not call
+	add_scalar_computations_to_partition.
+
+2012-05-31  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* tree-dfa.c (get_ref_base_and_extent): Compute the offset using
+	double ints throughout.
+	* tree-sra.c (build_user_friendly_ref_for_offset) <RECORD_TYPE>:
+	Check that the position of the field is representable as an integer.
+
+2012-05-31  Richard Guenther  <rguenther@suse.de>
+
+	* tree-data-ref.c (dr_analyze_innermost): Properly convert
+	the MEM_REF offset to sizetype.
+
+2012-05-31  Georg-Johann Lay  <avr@gjlay.de>
+
+	* doc/invoke.texi (AVR Options): Fix typos.
+
+2012-05-31  Hans-Peter Nilsson  <hp@axis.com>
+
+	* config/cris/cris.h (CC1_SPEC): Pass through all -march=
+	and -mcpu= options.
+	(ASM_SPEC): Ditto, not just -march=v32, but translate non-v10,
+	non-v32 into --march=v0_v0_v10.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira-int.h (target_ira_int): Rename x_move_cost to
+	x_ira_register_move_cost, x_may_move_in_cost to
+	x_ira_may_move_in_cost and x_may_move_out_cost to
+	x_ira_may_move_out_cost.  Delete the old fields with
+	those names and also x_ira_max_register_move_cost,
+	x_ira_max_may_move_in_cost and x_ira_max_may_move_out_cost.
+	(move_cost, may_move_in_cost, may_move_out_cost)
+	(ira_max_register_move_cost, ira_max_may_move_in_cost)
+	(ira_max_may_move_out_cost): Delete.
+	* ira.c (init_move_cost): Rename to...
+	(ira_init_register_move_cost): ...this, deleting the old
+	function with that name.  Apply above variable renamings.
+	Retain asserts for null fields.
+	(ira_init_once): Don't initialize register move costs here.
+	(free_register_move_costs): Apply above variable renamings.
+	Remove code for deleted fields.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira.c (init_move_cost): Adjust choice of subclasses to match
+	the current ira_init_register_move_cost choice.  Use
+	ira_class_subset_p instead of reg_class_subset_p.
+	(ira_init_register_move_cost): Assert that move_cost,
+	may_move_in_cost and may_move_out_cost already hold the desired
+	values for their ira_* equivalents.  For the latter two,
+	ignore classes that can't store a register of the given mode.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira.c (setup_allocno_and_important_classes): Use
+	ira_class_hard_regs_num to check whether a class has any
+	allocatable registers.
+	(ira_init_register_move_cost): Likewise.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira.c (init_move_cost): Adjust local variable names to match
+	file conventions.  Use ira_assert instead of gcc_assert.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* regs.h (move_table, move_cost, may_move_in_cost, may_move_out_cost):
+	Move these definitions and associated target_globals fields to...
+	* ira-int.h: ...here.
+	* rtl.h (init_move_cost): Delete.
+	* reginfo.c (last_mode_for_init_move_cost, init_move_cost): Move to...
+	* ira.c: ...here, making the latter static.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira-costs.c (copy_cost): Use ira_init_register_move_cost_if_necessary
+	and ira_register_move_cost instead of init_move_cost and move_cost.
+
+2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira.h (target_ira): Delete x_ira_available_class_regs.
+	(ira_available_class_regs): Delete.
+	* ira.c (setup_available_class_regs): Delete.
+	(setup_alloc_classes): Don't call it.
+	(setup_pressure_classes): Use ira_class_hard_regs_num instead of
+	ira_available_class_regs.
+	* haifa-sched.c (print_curr_reg_pressure, setup_insn_reg_pressure_info)
+	(model_spill_cost): Likewise.
+	* ira-build.c (low_pressure_loop_node_p): Likewise.
+	* ira-color.c (color_pass): Likewise.
+	* ira-emit.c (change_loop): Likewise.
+	* ira-lives.c (inc_register_pressure, dec_register_pressure)
+	(single_reg_class, ira_implicitly_set_insn_hard_regs)
+	(process_bb_node_lives): Likewise.
+	* loop-invariant.c (gain_for_invariant): Likewise.
+
+2012-05-30  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR target/52999
+	* config/pa/pa.c (TARGET_SECTION_TYPE_FLAGS): Define.
+	(pa_section_type_flags): New.
+	(pa_legitimate_constant_p): Revert previous change.
+
+2012-05-30  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* ira.c (allocate_initial_values): Make static.
+
 2012-05-30  Uros Bizjak  <ubizjak@gmail.com>
 
 	* config/i386/i386.c (legitimize_tls_address) <TLS_MODEL_INITIAL_EXEC>:
