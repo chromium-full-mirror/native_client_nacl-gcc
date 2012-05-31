@@ -324,8 +324,9 @@
 	    [(match_operand:NARROW 1 "mem_noofs_operand" "Ua")]
 	    VUNSPEC_LL)))]
   "TARGET_HAVE_LDREXBH"
-  "ldrex<sync_sfx>%?\t%0, %C1"
-  [(set_attr "predicable" "yes")])
+  "%b1ldrex<sync_sfx>%?\t%0, %C1"
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_load_exclusivesi"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
@@ -333,8 +334,9 @@
 	  [(match_operand:SI 1 "mem_noofs_operand" "Ua")]
 	  VUNSPEC_LL))]
   "TARGET_HAVE_LDREX"
-  "ldrex%?\t%0, %C1"
-  [(set_attr "predicable" "yes")])
+  "%b1ldrex%?\t%0, %C1"
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_load_exclusivedi"
   [(set (match_operand:DI 0 "s_register_operand" "=r")
@@ -342,8 +344,9 @@
 	  [(match_operand:DI 1 "mem_noofs_operand" "Ua")]
 	  VUNSPEC_LL))]
   "TARGET_HAVE_LDREXD"
-  "ldrexd%?\t%0, %H0, %C1"
-  [(set_attr "predicable" "yes")])
+  "%b1ldrexd%?\t%0, %H0, %C1"
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_store_exclusive<mode>"
   [(set (match_operand:SI 0 "s_register_operand" "=&r")
@@ -363,8 +366,9 @@
 	   Note that the 1st register always gets the lowest word in memory.  */
 	gcc_assert ((REGNO (value) & 1) == 0 || TARGET_THUMB2);
 	operands[3] = gen_rtx_REG (SImode, REGNO (value) + 1);
-	return "strexd%?\t%0, %2, %3, %C1";
+	return "%b1strexd%?\t%0, %2, %3, %C1";
       }
-    return "strex<sync_sfx>%?\t%0, %2, %C1";
+    return "%b1strex<sync_sfx>%?\t%0, %2, %C1";
   }
-  [(set_attr "predicable" "yes")])
+  [(set_attr "predicable" "yes")
+   (set (attr "length") (attr "length_breg_op1"))])
