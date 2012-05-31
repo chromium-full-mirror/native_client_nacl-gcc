@@ -130,11 +130,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #ifdef __native_client__
 # define SFI(insn)	CONCAT2 (sfi_, insn)
 # define ADD_SP		sfi_sp add sp, sp,
+# define SUB_SP		sfi_sp sub sp, sp,
 # define PC_IN_POP	lr
 # define RET_TO_POP	sfi_bx	lr
 #else
 # define SFI(insn)	insn
 # define ADD_SP		add sp, sp,
+# define SUB_SP		sub sp, sp,
 # define PC_IN_POP	pc
 # define RET_TO_POP	/* We loaded directly into the pc.  */
 #endif
