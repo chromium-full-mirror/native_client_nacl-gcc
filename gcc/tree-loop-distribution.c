@@ -57,6 +57,7 @@ enum partition_kind { PKIND_NORMAL, PKIND_MEMSET };
 typedef struct partition_s
 {
   bitmap stmts;
+  bool has_writes;
   enum partition_kind kind;
   /* Main statement a kind != PKIND_NORMAL partition is about.  */
   gimple main_stmt;
@@ -72,6 +73,7 @@ partition_alloc (bitmap stmts)
 {
   partition_t partition = XCNEW (struct partition_s);
   partition->stmts = stmts ? stmts : BITMAP_ALLOC (NULL);
+  partition->has_writes = false;
   partition->kind = PKIND_NORMAL;
   return partition;
 }
@@ -91,6 +93,14 @@ static bool
 partition_builtin_p (partition_t partition)
 {
   return partition->kind != PKIND_NORMAL;
+}
+
+/* Returns true if the partition has an writes.  */
+
+static bool
+partition_has_writes (partition_t partition)
+{
+  return partition->has_writes;
 }
 
 /* If bit I is not set, it means that this node represents an
@@ -332,6 +342,7 @@ generate_memset_builtin (struct loop *loop, struct graph *rdg,
   gimple_seq stmt_list = NULL, stmts;
   struct data_reference *dr = XCNEW (struct data_reference);
   location_t loc;
+  tree val;
 
   stmt = partition->main_stmt;
   loc = gimple_location (stmt);
@@ -364,13 +375,44 @@ generate_memset_builtin (struct loop *loop, struct graph *rdg,
   mem = force_gimple_operand (addr_base, &stmts, true, NULL);
   gimple_seq_add_seq (&stmt_list, stmts);
 
+  /* This exactly matches the pattern recognition in classify_partition.  */
+  val = gimple_assign_rhs1 (stmt);
+  if (integer_zerop (val)
+      || real_zerop (val)
+      || TREE_CODE (val) == CONSTRUCTOR)
+    val = integer_zero_node;
+  else if (integer_all_onesp (val))
+    val = build_int_cst (integer_type_node, -1);
+  else
+    {
+      if (TREE_CODE (val) == INTEGER_CST)
+	val = fold_convert (integer_type_node, val);
+      else if (!useless_type_conversion_p (integer_type_node, TREE_TYPE (val)))
+	{
+	  gimple cstmt;
+	  tree tem = create_tmp_reg (integer_type_node, NULL);
+	  tem = make_ssa_name (tem, NULL);
+	  cstmt = gimple_build_assign_with_ops (NOP_EXPR, tem, val, NULL_TREE);
+	  gimple_seq_add_stmt (&stmt_list, cstmt);
+	  val = tem;
+	}
+    }
+
   fn = build_fold_addr_expr (builtin_decl_implicit (BUILT_IN_MEMSET));
-  fn_call = gimple_build_call (fn, 3, mem, integer_zero_node, nb_bytes);
+  fn_call = gimple_build_call (fn, 3, mem, val, nb_bytes);
   gimple_seq_add_stmt (&stmt_list, fn_call);
   gsi_insert_seq_after (&gsi, stmt_list, GSI_CONTINUE_LINKING);
 
   if (dump_file && (dump_flags & TDF_DETAILS))
-    fprintf (dump_file, "generated memset zero\n");
+    {
+      fprintf (dump_file, "generated memset");
+      if (integer_zerop (val))
+	fprintf (dump_file, " zero\n");
+      else if (integer_all_onesp (val))
+	fprintf (dump_file, " minus one\n");
+      else
+	fprintf (dump_file, "\n");
+    }
 }
 
 /* Remove and destroy the loop LOOP.  */
@@ -551,14 +593,14 @@ has_upstream_mem_writes (int u)
 }
 
 static void rdg_flag_vertex_and_dependent (struct graph *, int, partition_t,
-					   bitmap, bitmap, bool *);
+					   bitmap, bitmap);
 
 /* Flag the uses of U stopping following the information from
    upstream_mem_writes.  */
 
 static void
 rdg_flag_uses (struct graph *rdg, int u, partition_t partition, bitmap loops,
-	       bitmap processed, bool *part_has_writes)
+	       bitmap processed)
 {
   use_operand_p use_p;
   struct vertex *x = &(rdg->vertices[u]);
@@ -574,7 +616,7 @@ rdg_flag_uses (struct graph *rdg, int u, partition_t partition, bitmap loops,
 
       if (!already_processed_vertex_p (processed, v))
 	rdg_flag_vertex_and_dependent (rdg, v, partition, loops,
-				       processed, part_has_writes);
+				       processed);
     }
 
   if (gimple_code (stmt) != GIMPLE_PHI)
@@ -591,7 +633,7 @@ rdg_flag_uses (struct graph *rdg, int u, partition_t partition, bitmap loops,
 	      if (v >= 0
 		  && !already_processed_vertex_p (processed, v))
 		rdg_flag_vertex_and_dependent (rdg, v, partition, loops,
-					       processed, part_has_writes);
+					       processed);
 	    }
 	}
     }
@@ -613,7 +655,7 @@ rdg_flag_uses (struct graph *rdg, int u, partition_t partition, bitmap loops,
 
 	      if (!already_processed_vertex_p (processed, v))
 		rdg_flag_vertex_and_dependent (rdg, v, partition, loops,
-					       processed, part_has_writes);
+					       processed);
 	    }
 	}
     }
@@ -623,8 +665,7 @@ rdg_flag_uses (struct graph *rdg, int u, partition_t partition, bitmap loops,
    in LOOPS.  */
 
 static void
-rdg_flag_vertex (struct graph *rdg, int v, partition_t partition, bitmap loops,
-		 bool *part_has_writes)
+rdg_flag_vertex (struct graph *rdg, int v, partition_t partition, bitmap loops)
 {
   struct loop *loop;
 
@@ -636,7 +677,7 @@ rdg_flag_vertex (struct graph *rdg, int v, partition_t partition, bitmap loops,
 
   if (rdg_cannot_recompute_vertex_p (rdg, v))
     {
-      *part_has_writes = true;
+      partition->has_writes = true;
       bitmap_clear_bit (remaining_stmts, v);
     }
 }
@@ -646,22 +687,20 @@ rdg_flag_vertex (struct graph *rdg, int v, partition_t partition, bitmap loops,
 
 static void
 rdg_flag_vertex_and_dependent (struct graph *rdg, int v, partition_t partition,
-			       bitmap loops, bitmap processed,
-			       bool *part_has_writes)
+			       bitmap loops, bitmap processed)
 {
   unsigned i;
   VEC (int, heap) *nodes = VEC_alloc (int, heap, 3);
   int x;
 
   bitmap_set_bit (processed, v);
-  rdg_flag_uses (rdg, v, partition, loops, processed, part_has_writes);
+  rdg_flag_uses (rdg, v, partition, loops, processed);
   graphds_dfs (rdg, &v, 1, &nodes, false, remaining_stmts);
-  rdg_flag_vertex (rdg, v, partition, loops, part_has_writes);
+  rdg_flag_vertex (rdg, v, partition, loops);
 
   FOR_EACH_VEC_ELT (int, nodes, i, x)
     if (!already_processed_vertex_p (processed, x))
-      rdg_flag_vertex_and_dependent (rdg, x, partition, loops, processed,
-				     part_has_writes);
+      rdg_flag_vertex_and_dependent (rdg, x, partition, loops, processed);
 
   VEC_free (int, heap, nodes);
 }
@@ -693,7 +732,7 @@ collect_condition_stmts (struct loop *loop, VEC (gimple, heap) **conds)
 
 static void
 rdg_flag_loop_exits (struct graph *rdg, bitmap loops, partition_t partition,
-		     bitmap processed, bool *part_has_writes)
+		     bitmap processed)
 {
   unsigned i;
   bitmap_iterator bi;
@@ -709,8 +748,7 @@ rdg_flag_loop_exits (struct graph *rdg, bitmap loops, partition_t partition,
       bitmap new_loops = BITMAP_ALLOC (NULL);
 
       if (!already_processed_vertex_p (processed, v))
-	rdg_flag_vertex_and_dependent (rdg, v, partition, new_loops, processed,
-				       part_has_writes);
+	rdg_flag_vertex_and_dependent (rdg, v, partition, new_loops, processed);
 
       EXECUTE_IF_SET_IN_BITMAP (new_loops, 0, i, bi)
 	if (bitmap_set_bit (loops, i))
@@ -727,8 +765,7 @@ rdg_flag_loop_exits (struct graph *rdg, bitmap loops, partition_t partition,
    including the loop exit conditions.  */
 
 static partition_t
-build_rdg_partition_for_component (struct graph *rdg, rdgc c,
-				   bool *part_has_writes)
+build_rdg_partition_for_component (struct graph *rdg, rdgc c)
 {
   int i, v;
   partition_t partition = partition_alloc (NULL);
@@ -737,10 +774,9 @@ build_rdg_partition_for_component (struct graph *rdg, rdgc c,
 
   FOR_EACH_VEC_ELT (int, c->vertices, i, v)
     if (!already_processed_vertex_p (processed, v))
-      rdg_flag_vertex_and_dependent (rdg, v, partition, loops, processed,
-				     part_has_writes);
+      rdg_flag_vertex_and_dependent (rdg, v, partition, loops, processed);
 
-  rdg_flag_loop_exits (rdg, loops, partition, processed, part_has_writes);
+  rdg_flag_loop_exits (rdg, loops, partition, processed);
 
   BITMAP_FREE (processed);
   BITMAP_FREE (loops);
@@ -865,7 +901,19 @@ classify_partition (loop_p loop, struct graph *rdg, partition_t partition)
 	    return;
 	  partition->main_stmt = stmt;
 	  rhs = gimple_assign_rhs1 (stmt);
-	  if (!(integer_zerop (rhs) || real_zerop (rhs)))
+	  if (!(integer_zerop (rhs)
+		|| integer_all_onesp (rhs)
+		|| real_zerop (rhs)
+		|| (TREE_CODE (rhs) == CONSTRUCTOR
+		    && !TREE_CLOBBER_P (rhs))
+		|| (INTEGRAL_TYPE_P (TREE_TYPE (rhs))
+		    && (TYPE_MODE (TREE_TYPE (gimple_assign_lhs (stmt)))
+			== TYPE_MODE (unsigned_char_type_node)))))
+	    return;
+	  if (TREE_CODE (rhs) == SSA_NAME
+	      && !SSA_NAME_IS_DEFAULT_DEF (rhs)
+	      && flow_bb_inside_loop_p
+		   (loop, gimple_bb (SSA_NAME_DEF_STMT (rhs))))
 	    return;
 	  if (VEC_length (data_reference_p, RDG_DATAREFS (rdg, i)) != 1)
 	    return;
@@ -952,18 +1000,18 @@ rdg_build_partitions (struct graph *rdg, VEC (rdgc, heap) *components,
   FOR_EACH_VEC_ELT (rdgc, components, i, x)
     {
       partition_t np;
-      bool part_has_writes = false;
       int v = VEC_index (int, x->vertices, 0);
 
       if (bitmap_bit_p (processed, v))
 	continue;
 
-      np = build_rdg_partition_for_component (rdg, x, &part_has_writes);
+      np = build_rdg_partition_for_component (rdg, x);
       bitmap_ior_into (partition->stmts, np->stmts);
+      partition->has_writes = partition_has_writes (np);
       bitmap_ior_into (processed, np->stmts);
       partition_free (np);
 
-      if (part_has_writes)
+      if (partition_has_writes (partition))
 	{
 	  if (dump_file && (dump_flags & TDF_DETAILS))
 	    {
@@ -1346,9 +1394,19 @@ tree_loop_distribution (void)
 
 	      /* If we are only performing pattern detection restrict
 		 what we try to distribute to stores from constants.  */
-	      if (!flag_tree_loop_distribution
-		  && !is_gimple_min_invariant (gimple_assign_rhs1 (stmt)))
-		continue;
+	      if (!flag_tree_loop_distribution)
+		{
+		  tree rhs = gimple_assign_rhs1 (stmt);
+		  if (!is_gimple_min_invariant (rhs)
+		      && TREE_CODE (rhs) != CONSTRUCTOR
+		      && TREE_CODE (rhs) != SSA_NAME)
+		    continue;
+		  if (TREE_CODE (rhs) == SSA_NAME
+		      && !SSA_NAME_IS_DEFAULT_DEF (rhs)
+		      && flow_bb_inside_loop_p
+			   (loop, gimple_bb (SSA_NAME_DEF_STMT (rhs))))
+		    continue;
+		}
 
 	      VEC_safe_push (gimple, heap, work_list, stmt);
 	    }
