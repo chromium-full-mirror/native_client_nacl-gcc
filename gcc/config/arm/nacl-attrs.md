@@ -128,6 +128,30 @@
                 (const_string "yes")
                 (const_string "no")))
 
+;; Boolean meta-attribute that represents whether a "%b3"
+;; instruction would actually use the "sfi_breg" prefix.
+(define_attr "sfi_breg_op3" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "arm_sfi_breg_operand (operands[3]) != -1"))
+                (const_string "yes")
+                (const_string "no")))
+
+;; Boolean meta-attribute that represents whether a "%b4"
+;; instruction would actually use the "sfi_breg" prefix.
+(define_attr "sfi_breg_op4" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "arm_sfi_breg_operand (operands[4]) != -1"))
+                (const_string "yes")
+                (const_string "no")))
+
+;; Boolean meta-attribute that represents whether a "%b5"
+;; instruction would actually use the "sfi_breg" prefix.
+(define_attr "sfi_breg_op5" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "arm_sfi_breg_operand (operands[5]) != -1"))
+                (const_string "yes")
+                (const_string "no")))
+
 ;; The "length" attribute for a "%b0" instruction.  When %0 uses a
 ;; base register requiring sandboxing, this is a two-instruction
 ;; bundle-locked sequence.  Hence the worst case is that it starts
@@ -141,6 +165,24 @@
 ;; Same, but for "%b1" rather than "%b0".
 (define_attr "length_breg_op1" ""
   (if_then_else (eq_attr "sfi_breg_op1" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for "%b3" rather than "%b0".
+(define_attr "length_breg_op3" ""
+  (if_then_else (eq_attr "sfi_breg_op3" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for "%b4" rather than "%b0".
+(define_attr "length_breg_op4" ""
+  (if_then_else (eq_attr "sfi_breg_op4" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for "%b5" rather than "%b0".
+(define_attr "length_breg_op5" ""
+  (if_then_else (eq_attr "sfi_breg_op5" "yes")
                 (const_int 12)
                 (const_int 4)))
 

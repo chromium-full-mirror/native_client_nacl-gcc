@@ -184,6 +184,8 @@ let write_pattern_1 name ls addrmode nregs write_set_fn update thumb =
   begin if not thumb then
     Printf.printf "\n   (set_attr \"predicable\" \"yes\")";
   end;
+  Printf.printf "\n   (set (attr \"length\") (attr \"length_breg_op%d\"))"
+    (nregs + 1);
   Printf.printf "])\n\n"
 
 let write_ldm_pattern addrmode nregs update =
