@@ -1,3 +1,28 @@
+2012-06-06  Richard Guenther  <rguenther@suse.de>
+
+	PR testsuite/32380
+	* gfortran.dg/vect/pr32380.f: Adjust number of expected vectorized
+	loops.
+
+2012-06-06  Fabien Chêne  <fabien@gcc.gnu.org>
+
+	PR c++/52841
+	* g++.dg/cpp0x/pr52841.C: New testcase.
+
+2012-06-06  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53081
+	* gcc.dg/tree-ssa/ldist-20.c: New testcase.
+	* gcc.dg/tree-ssa/loop-19.c: Add -fno-tree-loop-distribute-patterns.
+
+2012-06-05  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	* gcc.target/powerpc/pr53487.c: New test.
+
+2012-06-05  Pat Haugen <pthaugen@us.ibm.com>
+
+	* gcc.target/powerpc/lhs-1.c: Use parm instead of stack space.
+
 2012-06-05  Edmar Wienskoski  <edmar@freescale.com>
 
 	* gcc.dg/tree-ssa/vector-3.c: Adjust regular expression.
