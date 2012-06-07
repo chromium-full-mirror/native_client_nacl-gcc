@@ -1,3 +1,25 @@
+2012-06-07  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* genhooks.c (main): Set progname.
+	(emit_documentation): Remove variable found_start, always bail out
+	when a place is missing.
+	* doc/tm.texi.in (C++ ABI): Add @hook
+	TARGET_CXX_DECL_MANGLING_CONTEXT.
+
+2012-06-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/53580
+	* omp-low.c (scan_omp): Change first argument to
+	gimple_seq *, call walk_gimple_seq_mod instead of
+	walk_gimple_seq.
+	(scan_sharing_clauses, scan_omp_parallel, scan_omp_task,
+	scan_omp_for, scan_omp_sections, scan_omp_single,
+	execute_lower_omp): Adjust callers.
+	(scan_omp_1_stmt): Likewise.  If check_omp_nesting_restrictions
+	returns false, replace stmt with GIMPLE_NOP.
+	(check_omp_nesting_restrictions): Instead of issuing warnings,
+	issue errors and return false if any errors were reported.
+
 2012-06-06  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* doc/invoke.texi (fconserve-space): Remove documentation.
@@ -176,17 +198,6 @@
 
 	* ira-costs.c (setup_regno_cost_classes_by_aclass): Use uniform
 	classes instead of pressure classes.
-
-2012-06-04   Sterling Augustine  <saugustine@google.com>
-
-	* gcc/c-family/c-pretty-print.h (pp_c_flag_gnu_v3): New enumerator.
-	* gcc/c-family/c-pretty-print.c (pp_c_specifier_qualifier_list): Check
-	it at both the start and end of the function.
-	* gcc/cp/error.c (dump_decl): Check pp_c_flag_gnu_v3.
-	(decl_as_dwarf_string, lang_decl_dwarf_name): New functions.
-	(lang_decl_name): Handle namespace decls.
-	* gcc/cp/cp-tree.h: Declare decl_as_dwarf_string, lang_decl_dwarf_name.
-	* gcc/cp/cp-lang.c: Call them.
 
 2012-06-04  Aldy Hernandez  <aldyh@redhat.com>
 
