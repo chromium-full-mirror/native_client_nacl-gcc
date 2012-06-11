@@ -24329,7 +24329,7 @@ arm_dbx_register_number (unsigned int regno)
   if (IS_FPA_REGNUM (regno))
     return (TARGET_AAPCS_BASED ? 96 : 16) + regno - FIRST_FPA_REGNUM;
 
-  if (IS_VFP_REGNUM (regno))
+  if (regno >= FIRST_VFP_REGNUM && regno <= LAST_HI_VFP_REGNUM)
     {
       /* See comment in arm_dwarf_register_span.  */
       if (VFP_REGNO_OK_FOR_SINGLE (regno))
@@ -24343,6 +24343,17 @@ arm_dbx_register_number (unsigned int regno)
 
   if (IS_IWMMXT_REGNUM (regno))
     return 112 + regno - FIRST_IWMMXT_REGNUM;
+
+  if (regno == CC_REGNUM || regno == VFPCC_REGNUM)
+    /* These are not really registers.  */
+    return -1;
+
+  if (regno == CC_REGNUM + 1 /* sfp */ || regno == CC_REGNUM + 2 /* afp */)
+    return 11; /* r11 = fp */
+
+  if (IS_CIRRUS_REGNUM (regno))
+    /* There are no DWARF register numbers assigned for these.  */
+    return -1;
 
   gcc_unreachable ();
 }

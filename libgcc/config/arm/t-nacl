@@ -1,6 +1,3 @@
-# We don't use EABI unwind info, so drop what t-bpabi set here.
-LIB2ADDEH =
-
 # Use a version of div0 which raises SIGFPE.
 # TODO(mcgrathr): Not doing this yet because there is no "raise" to call.
 # When we do it, it should probably be a special NaCl-specific version of
