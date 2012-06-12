@@ -1,3 +1,161 @@
+2012-06-12  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/ia64/sync.md (fetchop_name): Change ior attribute to "or".
+
+2012-06-12  Richard Henderson  <rth@redhat.com>
+
+	* config/rs6000/sync.md (atomic_load, atomic_store): Use INT1 mode
+	iterator instead of INT.
+
+2012-06-12  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* opts.c: Add -fhoist-adjacent-loads to -O2 and above.
+	* tree-ssa-phiopt.c (tree_ssa_phiopt_worker): Add argument to forward
+	declaration.
+	(hoist_adjacent_loads, gate_hoist_loads): New forward declarations.
+	(tree_ssa_phiopt): Call gate_hoist_loads.
+	(tree_ssa_cs_elim): Add parm to tree_ssa_phiopt_worker call.
+	(tree_ssa_phiopt_worker): Add do_hoist_loads to formal arg list; call
+	hoist_adjacent_loads.
+	(local_mem_dependence): New function.
+	(hoist_adjacent_loads): Likewise.
+	(gate_hoist_loads): Likewise.
+	* common.opt (fhoist-adjacent-loads): New switch.
+	* Makefile.in (tree-ssa-phiopt.o): Added dependencies.
+
+2012-06-12  Michael Matz  <matz@suse.de>
+
+	* alias.c (nonoverlapping_component_refs_p): Take two rtx arguments.
+	(nonoverlapping_memrefs_p): Don't call it here ...
+	(true_dependence_1): ... but here.
+
+2012-06-12  Richard Guenther  <rguenther@suse.de>
+
+	* emit-rtl.c (set_mem_attributes_minus_bitpos): Remove dead code.
+	* alias.c (ao_ref_from_mem): MEM_EXPR is conservative, MEM_OFFSET
+	and MEM_SIZE only refines it.  Reflect that and be less conservative
+	if either of the latter is not known.
+
+2012-06-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/53589
+	* cfgrtl.c (force_nonfallthru_and_redirect): Do asm_goto_edge
+	discovery even when e->dest != target.  If any LABEL_REF points
+	to e->dest label, redirect it to target's label.
+
+2012-06-12  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* config/sh/sh.c (output_stack_adjust): Remove !epilogue_p
+	condition for generating REG_FRAME_RELATED_EXPR note.
+	(pop): Add code for generating REG_CFA_RESTORE,
+	REG_CFA_ADJUST_CFA notes. Set RTX_FRAME_RELATED_P to 1.
+	(sh_expand_epilogue): Use frame_insn() for FP to SP move.
+	Set 'frame_p' of calls to output_stack_adjust() to 'true'.
+
+2012-06-11  Richard Henderson  <rth@redhat.com>
+
+	* config/alpha/alpha.c (HWI_HEX2): Add missing shift.
+	* vmsdbgout.c (VMS_EPOCH_OFFSET): Add LL suffix.
+
+	* config/alpha/alpha.c (alpha_trampoline_init): Split large constants.
+
+2012-06-12  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/tm.texi.in (Addressing Modes) <TARGET_LEGITIMIZE_ADDRESS>:
+	Mention that this hook needs to be defined for native TLS.
+	* doc/tm.texi: Regenerate.
+
+2012-06-11  Mike Stump  <mikestump@comcast.net>
+
+	* emit-rtl.c (init_emit_once): Iterate through the
+	MODE_PARTIAL_INT modes with MIN_MODE_PARTIAL_INT and
+	MAX_MODE_PARTIAL_INT, as GET_MODE_WIDER_MODE doesn't step through
+	all the MIN_MODE_PARTIAL_INT modes anymore.
+
+2012-06-12  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* gcc/config/mips/mips-tables.opt (xlp): Fix merge typo.
+
+2012-06-11  Roland McGrath  <mcgrathr@google.com>
+
+	* dwarf2out.c (const_ok_for_output_1): Detect a TLS UNSPEC using
+	SYMBOL_REF_TLS_MODEL rather than DECL_THREAD_LOCAL_P, in case it's
+	not a VAR_DECL.  Also don't limit it to UNSPECs with exactly one
+	operand.
+
+2012-06-11  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53511
+	* config/sh/sh.md (fmasf4): New expander.
+	(*macsf3): Rename to fmasf4_i.  Adapt to fma pattern.
+	(mac_media): Rename to fmasf4_media.  Adapt to fma pattern.
+	* config/sh/sh.opt (mfused-madd): Remove.
+	* config/sh/sh.c (sh_option_override): Remove mfused-madd handling.
+	(builtin_description bdesc): Remove __builtin_sh_media_FMAC_S.
+	* config.gcc (sh[123456789lbe]*-*-* | sh-*-*): Add fused-madd.opt
+	as extra options.
+	* doc/invoke.texi (SH Options): Update mfused-madd and mno-fused-madd
+	descriptions.
+
+2012-06-11  Richard Henderson  <rth@redhat.com>
+
+	* dwarf2cfi.c (scan_trace): Handle annulled branch-taken delay slots.
+
+2012-06-11  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53470
+	* tree.c (free_lang_data_in_type): Do not clear TYPE_CONTEXT but
+	replace it with the first non-BLOCK context.
+
+2012-06-11  Richard Guenther  <rguenther@suse.de>
+
+	* alias.c (aliases_everything_p): Remove.
+	(DIFFERENT_ALIAS_SETS_P): Likewise.
+	(true_dependence_1): Use mems_in_disjoint_alias_sets_p directly.
+	Do not use aliases_everything_p or special-case ANDs.  Do not
+	special-case BLKmode moves.
+	(may_alias_p): Likewise.  Handle BLKmode similar like everywhere
+	- for SCATCH only.
+
+2012-06-09  Hans-Peter Nilsson  <hp@axis.com>
+
+	Fix CRIS build errors with --enable-build-with-cxx.
+	* config/cris/cris.c (cris_emit_trap_for_misalignment): Rename
+	variable "and" to "andop".
+	* config/cris/sync.md ("atomic_fetch_<atomic_op_name><mode>"): Use
+	temporary variable for memory model, passing C++-type-correct
+	parameter type to expand_mem_thread_fence.
+	("atomic_compare_and_swap<mode>"): Ditto.
+
+2012-06-09  Richard Henderson  <rth@redhat.com>
+
+	PR c++/53602
+	* cfgcleanup.c (execute_jump): Rename from rest_of_handle_jump2.
+	(pass_jump): Rename from pass_jump2.
+	(execute_jump2, pass_jump2): New.
+	* combine-stack-adj.c (rest_of_handle_stack_adjustments): Don't
+	perform cfg cleanup here.  Move the test of PUSH_ROUNDING
+	and ACCUMULATE_OUTGOING_ARGS test...
+	(gate_handle_stack_adjustments): ... here.
+	* passes.c (init_optimization_passes): Update for pass_jump2 rename.
+	Place new pass_jump2 after pass_stack_adjustments.
+	* tree-pass.h (pass_jump): Declare.
+
+2012-06-09  Kenneth Zadeck <zadeck@naturalbridge.com>
+
+	* simplify-rtx.c (simplify_const_binary_operation): Fixed shift
+	count trucation.
+
+2012-06-08  Richard Henderson  <rth@redhat.com>
+
+        PR c++/53602
+        * combine-stack-adj.c (force_move_args_size_note): Add ARGS_SIZE
+        note to a clobber insn when no other insn is available.
+
+2012-06-08  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/avr.c (avr_case_values_threshold): Return 7.
+
 2012-06-07  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* genhooks.c (main): Set progname.
@@ -369,13 +527,15 @@
 2012-06-03  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/53512
-	* sh.opt (mfsca, mfsrra): New options.
-	* sh.md (rsqrtsf2): Use TARGET_FPU_ANY and TARGET_FSRRA	condition.
+	* config/sh/sh.opt (mfsca, mfsrra): New options.
+	* config/sh/sh.md (rsqrtsf2): Use TARGET_FPU_ANY and TARGET_FSRRA
+	condition.
 	(fsca): Use TARGET_FPU_ANY and TARGET_FSCA condition.
 	(sinssf2, cossf2): Fold expanders to ...
 	(sincossf3): ... this new expander.  Use TARGET_FPU_ANY and
 	TARGET_FSCA condition.
-	* sh.c (sh_option_override): Handle TARGET_FSRRA and TARGET_FSCA.
+	* config/sh/sh.c (sh_option_override): Handle TARGET_FSRRA and
+	TARGET_FSCA.
 	* doc/invoke.texi (SH Options): Add descriptions for -mfsca,
 	-mno-fsca, -mfsrra, -mno-fsrra.
 
@@ -418,7 +578,8 @@
 	* varasm.c (output_constructor_bitfield): Likewise.
 	* tree-vrp.c (register_edge_assert_for_2): Likewise.
 	* double-int.c (rshift_double, lshift_double): Likewise.
-	* double-int.h (double_int_fits_in_uhwi_p, double_int, double_int): Likewise.
+	* double-int.h (double_int_fits_in_uhwi_p, double_int, double_int):
+	Likewise.
 	* simplify-rtx.c (mode_signbit_p)
 	(simplify_const_unary_operation, simplify_binary_operation_1)
 	(simplify_immed_subreg): Likewise.
@@ -510,11 +671,11 @@
 	Add CRIS atomic patterns for 1, 2, and 4 bytes.
 	* config/cris/cris.c (cris_emit_trap_for_misalignment): New function.
 	* config/cris/cris-protos.h: Declare it.
-	* config/cris/cris.h [!TARGET_DEFAULT, TARGET_CPU_DEFAULT == 32] 
+	* config/cris/cris.h [!TARGET_DEFAULT, TARGET_CPU_DEFAULT == 32]
 	(TARGET_DEFAULT): Add alignment by 32.
 	[!TARGET_DEFAULT, TARGET_CPU_DEFAULT == 10] (TARGET_DEFAULT): New
 	case, as TARGET_CPU_DEFAULT == 0 but with alignment as for
-	TARGET_CPU_DEFAULT == 32. 
+	TARGET_CPU_DEFAULT == 32.
 	(TARGET_TRAP_UNALIGNED_ATOMIC): New macro.
 	* config/cris/cris.md: Include sync.md.  Avoid allocating specific
 	numbers by replacing the define_constants for all UNSPECs with the
@@ -768,7 +929,7 @@
 	* config/cris/cris.h (CC1_SPEC): Pass through all -march=
 	and -mcpu= options.
 	(ASM_SPEC): Ditto, not just -march=v32, but translate non-v10,
-	non-v32 into --march=v0_v0_v10.
+	non-v32 into --march=v0_v10.
 
 2012-05-31  Richard Sandiford  <rdsandiford@googlemail.com>
 
