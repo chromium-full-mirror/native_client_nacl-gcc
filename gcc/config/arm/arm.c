@@ -17036,7 +17036,12 @@ arm_get_frame_offsets (void)
 	  else
 	    for (i = 4; i <= (TARGET_THUMB1 ? LAST_LO_REGNUM : 11); i++)
 	      {
-		if ((offsets->saved_regs_mask & (1 << i)) == 0)
+                /* While the gratuitous register save/restore is ordinarily
+                   harmless, if a register is marked as fixed it may be
+                   entirely forbidden by the system ABI to touch it, so we
+                   should avoid those registers.  */
+		if (!fixed_regs[i]
+                    && (offsets->saved_regs_mask & (1 << i)) == 0)
 		  {
 		    reg = i;
 		    break;
