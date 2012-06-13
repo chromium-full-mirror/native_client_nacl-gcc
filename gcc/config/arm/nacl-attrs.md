@@ -67,6 +67,14 @@
                 (const_string "yes")
                 (const_string "no")))
 
+;; Boolean meta-attribute that represents whether a "%j1"
+;; instruction would actually use the "sfi_sp" prefix.
+(define_attr "sfi_sp_op1" "no,yes"
+  (if_then_else (and (match_test "TARGET_SFI_NACL1")
+                     (match_test "REGNO (operands[1]) == SP_REGNUM"))
+                (const_string "yes")
+                (const_string "no")))
+
 ;; The "length" attribute for a "%j0" instruction.  When %0 is
 ;; SP_REGNUM, this is a two-instruction bundle-locked sequence.
 ;; Hence the worst case is that it starts at the last spot of a
@@ -74,6 +82,12 @@
 ;; instructions.
 (define_attr "length_sp_op0" ""
   (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                (const_int 12)
+                (const_int 4)))
+
+;; Same, but for "%j1".
+(define_attr "length_sp_op1" ""
+  (if_then_else (eq_attr "sfi_sp_op1" "yes")
                 (const_int 12)
                 (const_int 4)))
 
@@ -218,3 +232,23 @@
   (if_then_else (match_test "which_alternative == 1")
                 (attr "length_breg_op1")
                 (const_int 2)))
+
+;; The "length" attribute for a "%j1%b0" instruction.  When %1 is
+;; SP_REGNUM and %0 uses a base register requiring sandboxing, this
+;; is a three-instruction bundle-locked sequence.  Hence the worst
+;; case is that it starts at the second-to-last spot of a bundle so
+;; it's pushed to the next bundle, making it five instructions.
+(define_attr "length_breg_op0_sp_op1" ""
+  (if_then_else (eq_attr "sfi_breg_op0" "yes")
+                (if_then_else (eq_attr "sfi_sp_op1" "yes")
+                              (const_int 20)
+                              (attr "length_breg_op0"))
+                (attr "length_sp_op1")))
+
+;; Same, but for "%j0%b1".
+(define_attr "length_breg_op1_sp_op0" ""
+  (if_then_else (eq_attr "sfi_breg_op1" "yes")
+                (if_then_else (eq_attr "sfi_sp_op0" "yes")
+                              (const_int 20)
+                              (attr "length_breg_op1"))
+                (attr "length_sp_op0")))

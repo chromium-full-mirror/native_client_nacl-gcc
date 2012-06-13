@@ -60,15 +60,15 @@
   switch (which_alternative)
     {
     case 0: case 1:
-      return \"mov%?\\t%0, %1\";
+      return \"%j0mov%?\\t%0, %1\";
     case 2:
-      return \"mvn%?\\t%0, #%B1\";
+      return \"%j0mvn%?\\t%0, #%B1\";
     case 3:
-      return \"movw%?\\t%0, %1\";
+      return \"%j0movw%?\\t%0, %1\";
     case 4:
-      return \"%b1ldr%?\\t%0, %1\";
+      return \"%j0%b1ldr%?\\t%0, %1\";
     case 5:
-      return \"%b0str%?\\t%1, %0\";
+      return \"%j1%b0str%?\\t%1, %0\";
     case 6:
       return \"fmsr%?\\t%0, %1\\t%@ int\";
     case 7:
@@ -86,10 +86,12 @@
    (set_attr "insn" "mov,mov,mvn,mov,*,*,*,*,*,*,*")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
    (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "4,9")
-			       (attr "length_breg_op1")
+   (set (attr "length") (cond [(eq_attr "alternative" "0,1,2,3")
+			       (attr "length_sp_op0")
+			       (eq_attr "alternative" "4,9")
+			       (attr "length_breg_op1_sp_op0")
 			       (eq_attr "alternative" "5,10")
-			       (attr "length_breg_op0")]
+			       (attr "length_breg_op0_sp_op1")]
 			      (const_int 4)))]
 )
 
