@@ -1,3 +1,48 @@
+2012-06-14  Richard Guenther  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/vrp.h: New testcase.
+	* gcc.dg/tree-ssa/vrp68.c: Likewise.
+
+2012-06-13  Christian Bruel  <christian.bruel@st.com>
+
+	PR target/53621
+	* gcc.dg/stack-usage-1.c: Force -fomit-frame-pointer on SH.
+
+2012-06-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.target/mips/mips.exp (mips-dg-options): Handle -msynci.
+
+2012-06-13  Janis Johnson  <janisjo@codesourcery.com>
+
+	PR testsuite/20771
+	* lib/dg-pch.exp (dg-flags-pch): Add flags to make compile lines in
+	test summary unique.
+
+	* lib/scanasm.exp (scan-assembler, scan-assembler-not, scan-hidden,
+	scan-not-hiddent, scan-file, scan-file-not, scan-stack-usage,
+	scan-stack-usage-not): Don't strip torture options from test name.
+
+	* lib/scandump.exp (scan-dump-times): Use printable version of
+	regexp in test summary line.
+
+	* gcc.dg/di-longlong64-sync-1.c: Add comments to checks for multiple
+	messages reported for one line of source code.
+	* gcc.dg/format/few-1.c: Likewise.
+	* gcc.dg/ia64-sync-2.c: Likewise.
+	* gcc.dg/sync-2.c: Likewise.
+	* gcc.dg/noncompile/pr44517.c: Likewise.
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/49888
+	* gcc.dg/guality/pr49888.c: New.
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* g++.dg/tree-ssa/ivopts-2.C: Adjust for coalescing.
+	* gcc.dg/tree-ssa/forwprop-11.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-fre-1.c: Likewise.
+
 2012-06-13  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/53643

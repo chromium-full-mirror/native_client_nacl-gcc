@@ -1,3 +1,204 @@
+2012-06-14  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.c (arm_cirrus_insn_p): Delete.
+	(cirrus_reorg): Delete.
+	(arm_reorg): Don't call cirrus_reorg.
+	(arm_final_prescan_insn_p): Don't check for cirrus insns.
+	* arm.md (define_attr "type"): Remove mav_farith and mav_dmult.
+	(adddi3, subdi3): Remove Maverick support.
+	(arm_adddi3): Likewise.
+	(adddi_sesidi_di, adddi_zesidi_di): Likewise.
+	(addsf3, adddf3): Likewise.
+	(subsf3, subdf3): Likewise.
+	(mulsf3, muldf3): Likewise.
+	(ashldi3, ashrdi3, lshrdi3): Likewise.
+	(floatsisf2, floatsidf2): Likewise.
+	(fix_truncsfsi2, fix_truncdfsi2): Likewise.
+	(arm_movdi, thumb1_movdi_insn): Likewise.
+	(arm_cmpdi_insn): Likewise.
+	(cirrus_cmpsf, cirrus_cmpdf, cirrus_cmpdi): Likewise.
+	(cirrus.md): Don't include.
+	* cirrus.md: Delete file.
+	* t-arm (MD_INCLUDES): Remove cirrus.md.
+
+2012-06-14  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* dwarf2out.c (function_possibly_abstracted_p): New static function.
+	(gen_subprogram_die): Use it function_possibly_abstracted_p in lieu of
+	cgraph_function_possibly_inlined_p.
+	(gen_inlined_subroutine_die): Return if the origin is to be ignored.
+	(process_scope_var): Do not emit concrete instances of abstracted
+	nested functions from here.
+	(gen_decl_die): Emit the abstract instance if the function is possibly
+	abstracted and not only possibly inlined.
+	(dwarf2out_finish): Find the first non-abstract parent instance and
+	attach concrete instances on the limbo list to it.
+
+2012-06-14  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.md (divsf3, divdf3): Remove FPA support.
+	(negsf2, negdf2): Likewise.
+	(sqrtsf2, sqrtdf2): Likewise.
+	(movdfcc): Likewise.
+	(modsf3, moddf3, movxf): Delete.
+	(push_fp_multi): Delete.
+	(fpa.md): Don't include it.
+	* fpa.md: Delete file.
+	* t-arm (MD_INCLUDES): Remove fpa.md.
+
+2012-06-14  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* tree-vectorizer.h (vect_get_stmt_cost): Move from tree-vect-stmts.c.
+	(cost_for_stmt): Remove decl.
+	(vect_get_single_scalar_iteration_cost): Correct typo in name.
+	* tree-vect-loop.c (vect_get_cost): Remove.
+	(vect_get_single_scalar_iteration_cost): Correct typo in name; use
+	vect_get_stmt_cost rather than vect_get_cost.
+	(vect_get_known_peeling_cost): Use vect_get_stmt_cost rather than
+	vect_get_cost.
+	(vect_estimate_min_profitable_iters): Correct typo in call to
+	vect_get_single_scalar_iteration_cost; use vect_get_stmt_cost rather
+	than vect_get_cost.
+	(vect_model_reduction_cost): Use vect_get_stmt_cost rather than
+	vect_get_cost.
+	(vect_model_induction_cost): Likewise.
+	* tree-vect-data-refs.c (vect_peeling_hash_get_lowest_cost): Correct
+	typo in call to vect_get_single_scalar_iteration_cost.
+	* tree-vect-stmts.c (vect_get_stmt_cost): Move to tree-vectorizer.h.
+	(cost_for_stmt): Remove unnecessary function.
+	* Makefile.in (TREE_VECTORIZER_H): Update dependencies.
+
+2012-06-14  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.opt (mfp=2, mfp=3, mfpe, mfpe=2, mfpe=3): Delete options.
+        * arm-fpus.def (fpa, fpe2, fpe3, maverick): Delete FPU types.
+	* arm-tables.opt: Regenerated.
+        * doc/invoke.texi: Remove references to deleted options.
+
+2012-06-14  Sandeep Kumar Singh  <Sandeep.Singh2@kpitcummins.com>
+
+	* config/h8300/genmova.sh: Modified to add offset bits of 
+	mova/Sz assembly instruction for memory access.
+	* config/h8300/h8300.c: Likewise.
+	* config/h8300/mova.md: Likewise.
+
+2012-06-12  Christian Bruel  <christian.bruel@st.com>
+
+	PR target/53621
+	* config/sh/sh.c (sh_option_override): Don't force
+	 flag_omit_frame_pointer and maccumulate_outgoing_args.
+	* config/sh/sh.opt (maccumulate-outgoing-args): Init as Var.
+
+2012-06-14  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vrp.c (VR_INITIALIZER): New define.
+	(ranges_from_anti_range): New function.
+	(extract_range_from_binary_expr_1): Decompose operations on
+	VR_ANTI_RANGEs to operations on VR_RANGE.
+	(extract_range_from_unary_expr_1): Likewise.
+	(extract_range_from_binary_expr_1, extract_range_from_binary_expr,
+	extract_range_from_unary_expr_1, extract_range_from_unary_expr,
+	extract_range_from_cond_expr, adjust_range_with_scev,
+	vrp_visit_assignment_or_call, vrp_visit_phi_node,
+	simplify_bit_ops_using_ranges): Use VR_INITIALIZER.
+
+2012-06-13  Richard Henderson  <rth@redhat.com>
+
+	* hwint.h (HOST_WIDEST_INT_C): New.
+	(HOST_WIDE_INT_C): New.
+	(HOST_WIDE_INT_1): Use it.
+	* config/alpha/alpha.c (alpha_trampoline_init): Use it.
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/49888
+	* var-tracking.c: Include alias.h.
+	(overlapping_mems): New struct.
+	(drop_overlapping_mem_locs): New.
+	(clobber_overlapping_mems): New.
+	(var_mem_delete_and_set, var_mem_delete): Call it.
+	(val_bind): Likewise, but only if modified.
+	(compute_bb_dataflow, emit_notes_in_bb): Call it on MEMs.
+	* Makefile.in (var-tracking.o): Depend in $(ALIAS_H).
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/47624
+	* var-tracking.c (loc_exp_dep_pool): New.
+	(vt_emit_notes): Create and release the pool.
+	(compute_bb_dataflow): Use value-based locations in MO_VAL_SET.
+	(emit_notes_in_bb): Likewise.
+	(loc_exp_dep_insert): Deal with NOT_ONEPART vars.
+	(notify_dependents_of_changed_value): Likewise.
+	(notify_dependents_of_resolved_value): Check that NOT_ONEPART
+	variables don't have a VAR_LOC_DEP_LST.
+	(emit_note_insn_var_location): Expand NOT_ONEPART locs that are
+	VALUEs or MEMs of VALUEs.
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/52983
+	PR debug/48866
+	* dce.c (word_dce_process_block): Insert debug temps only if the
+	insn is not marked.
+	(dce_process_block): Likewise, and if debug.used is not empty,
+	and only after iterating over all DEFs that might mark the insn.
+
+2012-06-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* common.opt (ftree-coalesce-inlined-vars): New.
+	(ftree-coalesce-vars): New.
+	* doc/invoke.texi: Document them.
+	* tree-ssa-copyrename.c (copy_rename_partition_coalesce):
+	Implement them.
+
+2012-06-13  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* read-rtl.c (mapping): Remove index field.  Add current_value field.
+	Define heap vectors.
+	(iterator_group): Fix long line.  Remove num_builtins field and
+	uses_iterator fields.  Make apply_iterator take a void * parameter.
+	(iterator_use, atttribute_use): New structures.
+	(iterator_traverse_data, BELLWETHER_CODE, bellwether_codes): Delete.
+	(current_iterators, iterator_uses, attribute_uses): New variables.
+	(uses_mode_iterator_p, uses_code_iterator_p): Delete.
+	(apply_mode_iterator, apply_code_iterator): Take a void * parameter.
+	(map_attr_string, apply_iterator_to_string): Remove iterator
+	and value parameters.  Look through all current iterator values
+	for a matching attribute.
+	(mode_attr_index, apply_mode_maps): Delete.
+	(apply_iterator_to_rtx): Replace with...
+	(copy_rtx_for_iterators): ...this new function.
+	(uses_iterator_p, apply_iterator_traverse): Delete.
+	(apply_attribute_uses, add_current_iterators, apply_iterators): New
+	functions.
+	(add_mapping): Remove index field.  Set current_value field.
+	(initialize_iterators): Don't set num_builtins and uses_iterator_p
+	fields.
+	(find_iterator): Delete.
+	(record_iterator_use, record_attribute_use): New functions.
+	(record_potential_iterator_use): New function.
+	(check_code_iterator): Remove handling of bellwether codes.
+	(read_rtx): Remove mode maps.  Truncate iterator and attribute uses.
+	(read_rtx_code, read_nested_rtx, read_rtx_variadic): Remove mode_maps
+	parameter.  Use the first code iterator value instead of the
+	bellwether_codes array.  Use record_potential_iterator_use
+	for modes.
+
+2012-06-13  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53568
+	* config/sh/sh.md (bswapsi2): New expander.
+	(swapbsi2): New insn.
+
+2012-06-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/53647
+	* config/i386/i386.c (ix86_tune_cost): New variable.
+	(ix86_option_override_internal): Set ix86_tune_cost.  Use
+	ix86_tune_cost for simultaneous_prefetches, prefetch_block,
+	l1_cache_size and l2_cache_size.
+
 2012-06-13  Richard Guenther  <rguenther@suse.de>
 
 	* tree-vrp.c (vrp_meet): Properly meet equivalent ranges.
