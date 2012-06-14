@@ -12988,6 +12988,8 @@ dump_minipool (rtx scan)
   Mnode * mp;
   Mnode * nmp;
   int align64 = 0;
+  HOST_WIDE_INT offset;
+  HOST_WIDE_INT last_sfi_barrier;
 
   if (ARM_DOUBLEWORD_ALIGN)
     for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
@@ -13007,6 +13009,8 @@ dump_minipool (rtx scan)
                           : align64 ? gen_align_8 () : gen_align_4 (), scan);
   scan = emit_label_after (minipool_vector_label, scan);
 
+  offset = 0;
+  last_sfi_barrier = 0;
   for (mp = minipool_vector_head; mp != NULL; mp = nmp)
     {
       if (mp->refcount > 0 && mp->value == NULL_RTX)
@@ -13016,14 +13020,34 @@ dump_minipool (rtx scan)
              we must insert a special barrier before the actual
              non-instruction words in the instruction stream.  */
 
+          Mnode *next;
+
           gcc_assert (TARGET_SFI_NACL1);
           gcc_assert (mp->fix_size == 4 || mp->fix_size == 8);
 
-          if (mp->next == NULL || mp->next->value == NULL_RTX)
+          /* Determine if this barrier has become useless.  That is,
+             if it's the last thing in the minipool or it's followed
+             immediately by another barrier.  We must not consider
+             any abandoned entries (refcount == 0) while looking at
+             the logically "next" entry.
+
+             TODO(mcgrathr): Figure out if this can really ever
+             happen, and if so, maybe make something else smarter so
+             it doesn't.  */
+          next = mp->next;
+          while (next != NULL && next->refcount == 0)
+            next = next->next;
+
+          if (next == NULL || next->value == NULL_RTX)
             /* This barrier has become useless.  */
             mp->refcount = 0;
           else
             {
+              if (dump_file)
+                fprintf (dump_file,
+                         ";;  Offset %u SFI barrier for length %d\n",
+                         (unsigned) mp->offset, mp->fix_size);
+              last_sfi_barrier = mp->offset;
               gcc_assert (mp->offset % 16 == 0);
               scan = emit_insn_after (mp->fix_size == 4
                                       ? gen_consttable_sfi_barrier_4 ()
@@ -13042,6 +13066,18 @@ dump_minipool (rtx scan)
 	      arm_print_value (dump_file, mp->value);
 	      fputc ('\n', dump_file);
 	    }
+
+          if (TARGET_SFI_NACL1)
+            {
+              /* Do some sanity checks:
+                 1. Every 16-byte boundary must be a barrier, not a real entry.
+                 2. No entry can span a 16-byte alignment boundary.
+                 3. The last barrier emitted must be < 16 bytes before here.  */
+              gcc_assert (mp->offset % 16 != 0);
+              gcc_assert (mp->offset / 16
+                          == (mp->offset + mp->fix_size - 1) / 16);
+              gcc_assert (mp->offset - last_sfi_barrier < 16);
+            }
 
 	  switch (mp->fix_size)
 	    {
@@ -13079,6 +13115,14 @@ dump_minipool (rtx scan)
 	      gcc_unreachable ();
 	    }
 	}
+
+      if (mp->refcount > 0)
+        {
+          /* Purely a sanity check that the recorded offsets match
+             the sequence in which we are emitting the entries.  */
+          gcc_assert (offset == mp->offset);
+          offset += mp->fix_size;
+        }
 
       nmp = mp->next;
       free (mp);
