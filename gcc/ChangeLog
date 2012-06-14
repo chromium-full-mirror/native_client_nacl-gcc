@@ -1,3 +1,23 @@
+2012-06-14  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* config/tilegx/sync.md (atomic_fetch_sub<mode>): Fix typo.
+
+2012-06-14  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53568
+	* config/sh/sh.md: Add peephole for swapbsi2.
+	(*swapbisi2_and_shl8, *swapbhisi2): New insns and splits.
+
+2012-06-14  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*zero_extendsidi2): Remove x,x alternative.
+	(*zero_extendsidi2_rex64): Ditto.
+
+2012-06-14  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/53639
+	* config/i386/i386.md (*anddi_1 into *andsi_1_zext splitter): New.
+
 2012-06-14  Richard Earnshaw  <rearnsha@arm.com>
 
 	* arm.c (arm_cirrus_insn_p): Delete.
@@ -77,7 +97,7 @@
 
 2012-06-14  Sandeep Kumar Singh  <Sandeep.Singh2@kpitcummins.com>
 
-	* config/h8300/genmova.sh: Modified to add offset bits of 
+	* config/h8300/genmova.sh: Modified to add offset bits of
 	mova/Sz assembly instruction for memory access.
 	* config/h8300/h8300.c: Likewise.
 	* config/h8300/mova.md: Likewise.
@@ -182,8 +202,7 @@
 	(read_rtx): Remove mode maps.  Truncate iterator and attribute uses.
 	(read_rtx_code, read_nested_rtx, read_rtx_variadic): Remove mode_maps
 	parameter.  Use the first code iterator value instead of the
-	bellwether_codes array.  Use record_potential_iterator_use
-	for modes.
+	bellwether_codes array.  Use record_potential_iterator_use for modes.
 
 2012-06-13  Oleg Endo  <olegendo@gcc.gnu.org>
 
