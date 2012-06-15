@@ -26,12 +26,14 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    glibc vs newlib options
  */
 
-#define GNU_USER_TARGET_OS_CPP_BUILTINS()                       \
-    do {                                                        \
-        builtin_define ("__native_client__");                   \
-        builtin_assert ("system=nacl");                         \
-        builtin_assert ("system=posix");                        \
-    } while (0)
+#define GNU_USER_TARGET_OS_CPP_BUILTINS()               \
+  do {                                                  \
+    builtin_define ("__native_client__");               \
+    builtin_assert ("system=nacl");                     \
+    builtin_assert ("system=posix");                    \
+    builtin_define (BYTES_BIG_ENDIAN ? "__BIG_ENDIAN__" \
+                    : "__LITTLE_ENDIAN__");             \
+  } while (0)
 
 /* Since non-instructions can never go into code sections,
    this is always false for Native Client targets.  */
