@@ -38,3 +38,8 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 /* Since non-instructions can never go into code sections,
    this is always false for Native Client targets.  */
 #define JUMP_TABLES_IN_TEXT_SECTION     0
+
+/* Every Native Client platform has a va_list type of the same
+   size and minimum alignment, even if it just contains unused
+   padding space to reach that size.  */
+#define VA_LIST_TYPE_SIZE               16
