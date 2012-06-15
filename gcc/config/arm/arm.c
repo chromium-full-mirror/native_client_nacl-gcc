@@ -12534,6 +12534,9 @@ set_minipool_offset (Mnode *mp, HOST_WIDE_INT offset)
 
           mp = barrier;
         }
+
+      if (mp->refcount > 0)
+        gcc_assert ((offset % 16 == 0) == (mp->value == NULL_RTX));
     }
 
   mp->offset = offset;
@@ -12905,7 +12908,7 @@ add_minipool_backward_ref (Mfix *fix)
   if (mp->prev)
     mp = mp->prev;
   else
-    mp->offset = 0;
+    mp = set_minipool_offset (mp, 0);
 
   /* Scan over the following entries and adjust their offsets.  */
   while (mp->next != NULL)
@@ -12914,12 +12917,11 @@ add_minipool_backward_ref (Mfix *fix)
 	mp->next->min_address = mp->min_address + mp->fix_size;
 
       if (mp->refcount)
-        mp = set_minipool_offset (mp->next, mp->offset + mp->fix_size);
+	mp->next = set_minipool_offset (mp->next, mp->offset + mp->fix_size);
       else
-        {
-          mp->next->offset = mp->offset;
-          mp = mp->next;
-        }
+	mp->next = set_minipool_offset (mp->next, mp->offset);
+
+      mp = mp->next;
     }
 
   return min_mp;
