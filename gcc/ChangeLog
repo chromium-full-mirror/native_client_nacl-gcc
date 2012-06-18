@@ -1,4 +1,265 @@
-2012-06-15   Easwaran Raman  <eraman@google.com>
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm-protos.h (arm_output_epilogue): Remove.
+        * config/arm/arm.c (print_multi_reg): Remove.
+        (vfp_output_fldmd): Likewise.
+        (arm_output_epilogue): Likewise.
+        * config/arm/arm.md (epilogue_insns): Update condition and code.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm-protos.h (thumb2_expand_return): New declaration.
+        * config/arm/arm.c (thumb2_expand_return): New function.
+        * config/arm/arm.md (return): Update condition and code.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm-protos.h (output_return_instruction): New parameter and
+	int to bool change of parameter types.
+        * config/arm/arm.c (output_return_instruction): Likewise.
+        * config/arm/arm.md (arm_simple_return): New pattern.
+        (arm_return, cond_return, cond_return_inverted): Add new arguments.
+        * config/arm/thumb2.md (thumb2_return): Update condition and code.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm-protos.h (arm_expand_epilogue): New declaration.
+        * config/arm/arm.c (arm_expand_epilogue): New function.
+        * config/arm/arm.md (epilogue): Update condition and code.
+        (sibcall_epilogue): Likewise.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm.c (arm_expand_epilogue_apcs_frame): New function.
+        * config/arm/arm.md (arm_addsi3) Add an alternative.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm.md (vfp_pop_multiple_with_writeback) New
+	define_insn.
+        * config/arm/predicates.md (pop_multiple_fp) New special predicate.
+        * config/arm/arm.c (arm_emit_vfp_multi_reg_pop): New function.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+            Sameera Deshpande  <sameera.deshpande@arm.com>
+            Greta Yorsh  <greta.yorsh@arm.com>
+
+        * config/arm/arm.md (load_multiple_with_writeback) New define_insn.
+        (load_multiple, pop_multiple_with_writeback_and_return) Likewise.
+        (pop_multiple_with_return, ldr_with_return) Likewise.
+        * config/arm/predicates.md (pop_multiple_return) New special predicate.
+        * config/arm/arm-protos.h (arm_output_multireg_pop) New declaration.
+        * config/arm/arm.c (arm_output_multireg_pop) New function.
+        (arm_emit_multi_reg_pop): New function.
+
+2012-06-18  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.c (ldm_stm_operation_p): Require SP
+	as base register for loads if SP is in the register list.
+
+2012-06-18  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53693
+	* tree-vect-patterns.c (vect_operation_fits_smaller_type):
+	Reject operands with more than one use.
+
+2012-06-18  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR tree-optimization/53703
+	* tree-ssa-phiopt.c (hoist_adjacent_loads): Skip virtual phis;
+	correctly set bb_for_def[12].
+
+2012-06-18  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/vax/vax.h (VMS_TARGET): Remove.
+
+2012-06-18  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vrp.c (extract_range_from_assert): Split out range
+	intersecting code.
+	(intersect_ranges): New function.
+	(vrp_intersect_ranges): Likewise.
+
+2012-06-18  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.c (s390_gimplify_va_arg): Revert change from
+	r187965.
+
+2012-06-18  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* doc/md.texi: Document int iterators.
+	* read-rtl.c (ints): New iterator group.
+	(find_int): Int iterator group callback.
+	(apply_int_iterator): Likewise.
+	(apply_iterators): Traverse int iterator table and add all the used
+	iterators to list.
+	(initialize_iterators): Initialize data structures and callbacks for int
+	iterators.
+	(read_rtx): Parse and read mappings for int iterators.
+	(read_rtx_code): Record int iterator usage.
+
+2012-06-18  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR middle-end/53698
+	* expr.c (expand_expr_addr_expr_1): Convert to tmode before
+	performing an addition.
+
+2012-06-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* output.h (split_double): Move prototype to rtl.h.
+	(constructor_static_from_elts_p): Move prototype to tree.c.
+	* rtl.h (split_double): Moved here from output.h.
+	* tree.h (constructor_static_from_elts_p): Moved here from output.h.
+	* final.c (split_double): Move from here ...
+	* rtlanal.c (split_double): ... to here.
+	* expr.c: Do not include output.h.
+
+2012-06-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* cfglayout.h: Remove.
+	* cfglayout.c: Remove.
+	* function.h (struct function): Remove x_last_location field.
+	* function.c: Do not include cfglayout.h.
+	(expand_function_start): Do not call no-op force_next_line_note.
+	(expand_function_end): Likewise.
+	* cfgrtl.c: Do not include cfglayout.h.  Include gt-cfgrtl.h.
+	(unlink_insn_chain): Moved here from cfglayout.c.
+	(skip_insns_after_block, label_for_bb, record_effective_endpoints,
+	into_cfg_layout_mode, outof_cfg_layout_mode,
+	pass_into_cfg_layout_mode, pass_outof_cfg_layout_mode,
+	relink_block_chain, fixup_reorder_chain, verify_insn_chain,
+	fixup_fallthru_exit_predecessor, force_one_exit_fallthru,
+	cfg_layout_can_duplicate_bb_p, duplicate_insn_chain,
+	cfg_layout_duplicate_bb, cfg_layout_initialize, break_superblocks,
+	cfg_layout_finalize): Likewise.
+	(rtl_can_remove_branch_p): Likewise.
+	* rtl.h (insn_scope): Move prototype from cfglayout.h here.
+	(duplicate_insn_chain): Likewise.
+	(force_next_line_note): Remove prototype.
+	* emit-rtl.c: Do not include tree-flow.h, egad.  Include vecprim.h.
+	(last_location): Remove #define to emit.x_last_location.
+	(force_next_line_note): Remove no-op function.
+	(init_emit): Don't set x_last_location.
+	(block_locators_locs, block_locators_blocks, locations_locators_locs,
+	locations_locators_vals, prologue_locator, epilogue_locator,
+	curr_location, last_location, curr_block, last_block, curr_rtl_loc):
+	Move POD to here from cfglayout.c.
+	(insn_locators_alloc, insn_locators_finalize, insn_locators_free,
+	set_curr_insn_source_location, get_curr_insn_source_location,
+	set_curr_insn_block, get_curr_insn_block, curr_insn_locator,
+	locator_scope, insn_scope, locator_location, locator_line, insn_line,
+	locator_file, insn_file, locator_eq): Move to here from cfglayout.c.
+	* cfghooks.h: Remove double-include protection.
+	(can_copy_bbs_p, copy_bbs): Move prototypes from cfglayout.h to here.
+	* cfghooks.c (can_copy_bbs_p, copy_bbs): Move to here from cfglayout.c.
+	* final.c: Do not include cfglayout.h.
+	(choose_inner_scope, change_scope): Move to here from cfglayout.c.
+	(reemit_insn_block_notes): Likewise.  Make static.
+	* tree-flow.h (tree_could_trap_p, operation_could_trap_helper_p,
+	operation_could_trap_p, tree_could_throw_p): Move from here...
+	* tree.h: ... to here.
+	* gengtype.c (open_base_files): Remove cfglayout.h from the list.
+	* profile.c: Do not include cfghooks.h.
+	* cfgloopmanip.c: Do not include cfglayout.h and cfghooks.h.
+	* modulo-sched.c: Likewise.
+	* loop-unswitch.c: Do not include cfglayout.h.
+	* sched-ebb.c: Likewise.
+	* tracer.c: Likewise.
+	* ddg.c: Likewise.
+	* tree-vect-loop-manip.c: Likewise.
+	* loop-init.c: Likewise.
+	* dwarf2out.c: Likewise.
+	* hw-doloop.c: Likewise.
+	* loop-unroll.c: Likewise.
+	* cfgcleanup.c: Likewise.
+	* bb-reorder.c: Likewise.
+	* sched-rgn.c: Likewise.
+	* tree-cfg.c: Likewise.
+	* config/alpha/alpha.c: Likewise.
+	* config/spu/spu.c: Likewise.
+	* config/sparc/sparc.c: Likewise.
+	* config/sh/sh.c: Likewise.
+	* config/c6x/c6x.c: Likewise.
+	* config/ia64/ia64.c: Likewise.
+	* config/rs6000/rs6000.c: Likewise.
+	* config/score/score.c: Likewise.
+	* config/mips/mips.c: Likewise.
+	* config/bfin/bfin.c: Likewise.
+	* Makefile.in (CFGAYOUT_H): Remove, and fixup users.
+	* config/rs6000/t-rs6000 (rs6000.o): Do not depend on cfglayout.h.
+	* config/spu/t-spu-elf (spu.o: $): Likewise.
+	* config/sparc/t-sparc (sparc.o): Do not depend on CFGLAYOUT_H.
+
+2012-06-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* cfgloop.h: Do not include rtl.h.
+	(enum iv_extend_code): New.
+	(struct rtx_iv): Use iv_extend_code instead of rtx_code.
+	* Makefile.in (CFGLOOP_H): Do not depend on RTL_H.
+	* loop-iv.c (iv_extend_to_rtx_code): New function to translate
+	an IV_EXTEND_CODE to an RTX_CODE.
+	(dump_iv_info): Update for rtx_iv field type change.
+	(iv_constant): Likewise.
+	(iv_subreg): Likewise.
+	(iv_extend): Likewise.
+	(iv_neg): Likewise.
+	(iv_add): Likewise.
+	(iv_mult): Likewise.
+	(iv_shift): Likewise.
+	(get_biv_step_1): Likewise.
+	(get_biv_step): Likewise.
+	(iv_analyze_biv): Likewise.
+	(get_iv_value): Likewise.
+	(shorten_into_mode): Likewise.
+	(canonicalize_iv_subregs): Likewise.
+	* sese.c (sese_build_liveouts): Use MAY_HAVE_DEBUG_STMTS instead
+	of MAY_HAVE_DEBUG_INSNS.
+	* tree-ssa-loop-ivopts.c: Include recog.h after expr.h.
+	* tree-ssa-loop-prefetch.c: Likewise.
+
+2012-06-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* expmed.c (ceil_log2): Move from here...
+	* hwint.c: ... to here for older GCCs...
+	* hwint.h: ... and here for newer GCCs.
+	* rtl.h (ceil_log2): Remove prototype.
+
+	* tree-phinodes.c: Do not include rtl.h.
+	* Makefile.in (tree-phinodes.o): Do not depend on RTL_H.
+
+2012-06-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/cris/cris.h (TARGET_ELF): Remove.
+	(FORCE_EH_FRAME_INFO_IN_DATA_SECTION): Remove.
+	(CRIS_ASM_OUTPUT_ALIGNED_DECL_COMMON): Simpify using TARGET_ELF==1.
+	(LOCAL_LABEL_PREFIX): Likewise.
+	* config/cris/cris.c (cris_target_asm_named_section): Remove.
+	(cris_option_override): Simpify using TARGET_ELF==1.
+	(cris_file_start): Likewise.
+	* config/cris/cris-protos.h (cris_target_asm_named_section): Remove.
+
+2012-06-17  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/sse.md (vcvtph2ps): Fix vec_select selector.
+
+2012-06-16  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR middle-end/53590
+	* tree-inline.c (initialize_cfun): Copy can_delete_dead_exceptions.
+
+2012-06-15  Easwaran Raman  <eraman@google.com>
 
 	* passes.c (init_optimization_passes): Remove pass_call_cdce
 	from its current position and insert after pass_dce.
@@ -110,8 +371,7 @@
 	* expmed.c (choose_multiplier): No longer static.
 	Change multiplier_ptr from rtx * to UHWI *.
 	(expand_divmod): Adjust callers.
-	* tree-vect-patterns.c (vect_recog_sdivmod_pow2_pattern):
-	Renamed to...
+	* tree-vect-patterns.c (vect_recog_sdivmod_pow2_pattern): Renamed to...
 	(vect_recog_divmod_pattern): ... this.  Pass bb_vinfo as last
 	argument to new_stmt_vec_info.  Attempt to optimize also divisions
 	by non-pow2 constants if integer vector division isn't supported.

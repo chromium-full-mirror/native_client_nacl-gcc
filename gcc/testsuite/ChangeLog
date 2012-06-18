@@ -1,3 +1,59 @@
+2012-06-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53692
+	* gfortran.dg/elemental_optional_args_6.f90: New.
+
+2012-06-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53526
+	* gfortran.dg/coarray_lib_move_alloc_1.f90: New.
+	* gfortran.dg/coarray/move_alloc_1.f90
+
+2012-06-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53526
+	* gfortran.dg/coarray_27.f90: New.
+
+2012-06-18  Joey Ye <Joey.Ye@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* gcc.target/arm/epilog-1.c: New test.
+
+2012-06-18  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53693
+	* g++.dg/torture/pr53693.C: New testcase.
+
+2012-06-18  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR tree-optimization/53703
+	* gcc.dg/torture/pr53703.c: New test.
+
+2012-06-18  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR middle-end/53698
+	* gcc.target/i386/pr53698.c: New test.
+
+2012-06-17  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.target/i386/pr33329.c (f): Increase tabs array to 1024.
+
+2012-06-17  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53691
+	PR fortran/53685
+	* gfortran.dg/transfer_check_3.f90: New.
+
+2012-06-17  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.dg/tree-ssa/vrp68.c: Fix scan-tree-dump-times argument order.
+
+2012-06-16  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/53642
+	PR fortran/45170
+	* gfortran.dg/deferred_type_param_8.f90: New.
+
 2012-06-15  Janis Johnson  <janosjo@codesourcery.com>
 
 	* lib/gcov.exp (verify-lines, verify-branches, verify-calls): Use
@@ -265,7 +321,7 @@
 	* gcc.target/sh/pr51340-1.c: Delete obsolete test case.
 	* gcc.target/sh/pr51340-2.c: Likewise.
 	* gcc.target/sh/pr51340-3.c: Likewise.
-	
+
 2012-06-12  Michael Matz  <matz@suse.de>
 
 	* gcc.dg/torture/alias-1.c: New test.

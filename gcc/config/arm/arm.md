@@ -730,9 +730,9 @@
 ;;  (plus (reg rN) (reg sp)) into (reg rN).  In this case reload will
 ;; put the duplicated register first, and not try the commutative version.
 (define_insn_and_split "*arm_addsi3"
-  [(set (match_operand:SI          0 "s_register_operand" "=r, k,r,r, k, r, k,r, k, r")
-	(plus:SI (match_operand:SI 1 "s_register_operand" "%rk,k,r,rk,k, rk,k,rk,k, rk")
-		 (match_operand:SI 2 "reg_or_int_operand" "rI,rI,k,Pj,Pj,L, L,PJ,PJ,?n")))]
+  [(set (match_operand:SI          0 "s_register_operand" "=r, k,r,r, k, r, k,k,r, k, r")
+	(plus:SI (match_operand:SI 1 "s_register_operand" "%rk,k,r,rk,k, rk,k,r,rk,k, rk")
+		 (match_operand:SI 2 "reg_or_int_operand" "rI,rI,k,Pj,Pj,L, L,L,PJ,PJ,?n")))]
   "TARGET_32BIT"
   "@
    %j0add%?\\t%0, %1, %2
@@ -740,6 +740,7 @@
    %j0add%?\\t%0, %2, %1
    %j0addw%?\\t%0, %1, %2
    %j0addw%?\\t%0, %1, %2
+   %j0sub%?\\t%0, %1, #%n2
    %j0sub%?\\t%0, %1, #%n2
    %j0sub%?\\t%0, %1, #%n2
    %j0subw%?\\t%0, %1, #%n2
@@ -756,11 +757,11 @@
 		      operands[1], 0);
   DONE;
   "
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "9")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "10")
 				      (attr "length_sp_op0_by_4")
 				      (attr "length_sp_op0")))
    (set_attr "predicable" "yes")
-   (set_attr "arch" "*,*,*,t2,t2,*,*,t2,t2,*")]
+   (set_attr "arch" "*,*,*,t2,t2,*,*,a,t2,t2,*")]
 )
 
 (define_insn_and_split "*thumb1_addsi3"
@@ -8615,8 +8616,20 @@
 
 (define_expand "return"
   [(return)]
-  "TARGET_32BIT && USE_RETURN_INSN (FALSE)"
-  "")
+  "(TARGET_ARM || (TARGET_THUMB2
+                   && ARM_FUNC_TYPE (arm_current_func_type ()) == ARM_FT_NORMAL
+                   && !IS_STACKALIGN (arm_current_func_type ())))
+    && USE_RETURN_INSN (FALSE)"
+  "
+  {
+    if (TARGET_THUMB2)
+      {
+        thumb2_expand_return ();
+        DONE;
+      }
+  }
+  "
+)
 
 ;; Often the return insn will be the same as loading from memory, so set attr
 (define_insn "*arm_return"
@@ -8629,7 +8642,7 @@
         arm_ccfsm_state += 2;
         return \"\";
       }
-    return output_return_instruction (const_true_rtx, TRUE, FALSE);
+    return output_return_instruction (const_true_rtx, true, false, false);
   }"
   [(set_attr "type" "load1")
    (set_attr "length" "12")
@@ -8650,7 +8663,7 @@
         arm_ccfsm_state += 2;
         return \"\";
       }
-    return output_return_instruction (operands[0], TRUE, FALSE);
+    return output_return_instruction (operands[0], true, false, false);
   }"
   [(set_attr "conds" "use")
    (set_attr "length" "12")
@@ -8671,11 +8684,28 @@
         arm_ccfsm_state += 2;
         return \"\";
       }
-    return output_return_instruction (operands[0], TRUE, TRUE);
+    return output_return_instruction (operands[0], true, true, false);
   }"
   [(set_attr "conds" "use")
    (set_attr "length" "12")
    (set_attr "type" "load1")]
+)
+
+(define_insn "*arm_simple_return"
+  [(simple_return)]
+  "TARGET_ARM"
+  "*
+  {
+    if (arm_ccfsm_state == 2)
+      {
+        arm_ccfsm_state += 2;
+        return \"\";
+      }
+    return output_return_instruction (const_true_rtx, true, false, true);
+  }"
+  [(set_attr "type" "branch")
+   (set_attr "length" "4")
+   (set_attr "predicable" "yes")]
 )
 
 ;; Generate a sequence of instructions to determine if the processor is
@@ -10673,14 +10703,21 @@
   if (crtl->calls_eh_return)
     emit_insn (gen_prologue_use (gen_rtx_REG (Pmode, 2)));
   if (TARGET_THUMB1)
-    thumb1_expand_epilogue ();
-  else if (USE_RETURN_INSN (FALSE))
-    {
-      emit_jump_insn (gen_return ());
-      DONE;
-    }
-  emit_jump_insn (gen_rtx_UNSPEC_VOLATILE (VOIDmode,
-	gen_rtvec (1, ret_rtx), VUNSPEC_EPILOGUE));
+   {
+     thumb1_expand_epilogue ();
+     emit_jump_insn (gen_rtx_UNSPEC_VOLATILE (VOIDmode,
+                     gen_rtvec (1, ret_rtx), VUNSPEC_EPILOGUE));
+   }
+  else if (HAVE_return)
+   {
+     /* HAVE_return is testing for USE_RETURN_INSN (FALSE).  Hence,
+        no need for explicit testing again.  */
+     emit_jump_insn (gen_return ());
+   }
+  else if (TARGET_32BIT)
+   {
+    arm_expand_epilogue (true);
+   }
   DONE;
   "
 )
@@ -10697,31 +10734,20 @@
 ;; to add an unspec of the link register to ensure that flow
 ;; does not think that it is unused by the sibcall branch that
 ;; will replace the standard function epilogue.
-(define_insn "sibcall_epilogue"
-  [(parallel [(unspec:SI [(reg:SI LR_REGNUM)] UNSPEC_PROLOGUE_USE)
-              (unspec_volatile [(return)] VUNSPEC_EPILOGUE)])]
-  "TARGET_32BIT"
-  "*
-  if (use_return_insn (FALSE, next_nonnote_insn (insn)))
-    return output_return_instruction (const_true_rtx, FALSE, FALSE);
-  return arm_output_epilogue (next_nonnote_insn (insn));
-  "
-;; Length is absolute worst case
-  [(set_attr "length" "44")
-   (set_attr "type" "block")
-   ;; We don't clobber the conditions, but the potential length of this
-   ;; operation is sufficient to make conditionalizing the sequence
-   ;; unlikely to be profitable.
-   (set_attr "conds" "clob")]
+(define_expand "sibcall_epilogue"
+   [(parallel [(unspec:SI [(reg:SI LR_REGNUM)] UNSPEC_PROLOGUE_USE)
+               (unspec_volatile [(return)] VUNSPEC_EPILOGUE)])]
+   "TARGET_32BIT"
+   "
+   arm_expand_epilogue (false);
+   DONE;
+   "
 )
 
 (define_insn "*epilogue_insns"
   [(unspec_volatile [(return)] VUNSPEC_EPILOGUE)]
-  "TARGET_EITHER"
+  "TARGET_THUMB1"
   "*
-  if (TARGET_32BIT)
-    return arm_output_epilogue (NULL);
-  else /* TARGET_THUMB1 */
     return thumb1_unexpanded_epilogue ();
   "
   ;; Length is absolute worst case.
@@ -10992,6 +11018,124 @@
   ""
   ""
   [(set_attr "length" "0")]
+)
+
+;; Pop (as used in epilogue RTL)
+;;
+(define_insn "*load_multiple_with_writeback"
+  [(match_parallel 0 "load_multiple_operation"
+    [(set (match_operand:SI 1 "s_register_operand" "+rk")
+          (plus:SI (match_dup 1)
+                   (match_operand:SI 2 "const_int_operand" "I")))
+     (set (match_operand:SI 3 "s_register_operand" "=rk")
+          (mem:SI (match_dup 1)))
+        ])]
+  "TARGET_32BIT && (reload_in_progress || reload_completed)"
+  "*
+  {
+    arm_output_multireg_pop (operands, /*return_pc=*/false,
+                                       /*cond=*/const_true_rtx,
+                                       /*reverse=*/false,
+                                       /*update=*/true);
+    return \"\";
+  }
+  "
+  [(set_attr "type" "load4")
+   (set_attr "predicable" "yes")]
+)
+
+;; Pop with return (as used in epilogue RTL)
+;;
+;; This instruction is generated when the registers are popped at the end of
+;; epilogue.  Here, instead of popping the value into LR and then generating
+;; jump to LR, value is popped into PC directly.  Hence, the pattern is combined
+;;  with (return).
+(define_insn "*pop_multiple_with_writeback_and_return"
+  [(match_parallel 0 "pop_multiple_return"
+    [(return)
+     (set (match_operand:SI 1 "s_register_operand" "+rk")
+          (plus:SI (match_dup 1)
+                   (match_operand:SI 2 "const_int_operand" "I")))
+     (set (match_operand:SI 3 "s_register_operand" "=rk")
+          (mem:SI (match_dup 1)))
+        ])]
+  "TARGET_32BIT && (reload_in_progress || reload_completed)"
+  "*
+  {
+    arm_output_multireg_pop (operands, /*return_pc=*/true,
+                                       /*cond=*/const_true_rtx,
+                                       /*reverse=*/false,
+                                       /*update=*/true);
+    return \"\";
+  }
+  "
+  [(set_attr "type" "load4")
+   (set_attr "predicable" "yes")]
+)
+
+(define_insn "*pop_multiple_with_return"
+  [(match_parallel 0 "pop_multiple_return"
+    [(return)
+     (set (match_operand:SI 2 "s_register_operand" "=rk")
+          (mem:SI (match_operand:SI 1 "s_register_operand" "rk")))
+        ])]
+  "TARGET_32BIT && (reload_in_progress || reload_completed)"
+  "*
+  {
+    arm_output_multireg_pop (operands, /*return_pc=*/true,
+                                       /*cond=*/const_true_rtx,
+                                       /*reverse=*/false,
+                                       /*update=*/false);
+    return \"\";
+  }
+  "
+  [(set_attr "type" "load4")
+   (set_attr "predicable" "yes")]
+)
+
+;; Load into PC and return
+(define_insn "*ldr_with_return"
+  [(return)
+   (set (reg:SI PC_REGNUM)
+        (mem:SI (post_inc:SI (match_operand:SI 0 "s_register_operand" "+rk"))))]
+  "TARGET_32BIT && (reload_in_progress || reload_completed)"
+  "ldr%?\t%|pc, [%0], #4"
+  [(set_attr "type" "load1")
+   (set_attr "predicable" "yes")]
+)
+;; Pop for floating point registers (as used in epilogue RTL)
+(define_insn "*vfp_pop_multiple_with_writeback"
+  [(match_parallel 0 "pop_multiple_fp"
+    [(set (match_operand:SI 1 "s_register_operand" "+rk")
+          (plus:SI (match_dup 1)
+                   (match_operand:SI 2 "const_int_operand" "I")))
+     (set (match_operand:DF 3 "arm_hard_register_operand" "")
+          (mem:DF (match_dup 1)))])]
+  "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP"
+  "*
+  {
+    int num_regs = XVECLEN (operands[0], 0);
+    char pattern[100];
+    rtx op_list[2];
+    strcpy (pattern, \"fldmfdd\\t\");
+    strcat (pattern, reg_names[REGNO (SET_DEST (XVECEXP (operands[0], 0, 0)))]);
+    strcat (pattern, \"!, {\");
+    op_list[0] = XEXP (XVECEXP (operands[0], 0, 1), 0);
+    strcat (pattern, \"%P0\");
+    if ((num_regs - 1) > 1)
+      {
+        strcat (pattern, \"-%P1\");
+        op_list [1] = XEXP (XVECEXP (operands[0], 0, num_regs - 1), 0);
+      }
+
+    strcat (pattern, \"}\");
+    output_asm_insn (pattern, op_list);
+    return \"\";
+  }
+  "
+  [(set_attr "type" "load4")
+   (set_attr "conds" "unconditional")
+   (set_attr "predicable" "no")]
 )
 
 ;; Special patterns for dealing with the constant pool
@@ -11450,6 +11594,27 @@
 
 ;; Load the load/store multiple patterns
 (include "ldmstm.md")
+
+;; Patterns in ldmstm.md don't cover more than 4 registers. This pattern covers
+;; large lists without explicit writeback generated for APCS_FRAME epilogue.
+(define_insn "*load_multiple"
+  [(match_parallel 0 "load_multiple_operation"
+    [(set (match_operand:SI 2 "s_register_operand" "=rk")
+          (mem:SI (match_operand:SI 1 "s_register_operand" "rk")))
+        ])]
+  "TARGET_32BIT"
+  "*
+  {
+    arm_output_multireg_pop (operands, /*return_pc=*/false,
+                                       /*cond=*/const_true_rtx,
+                                       /*reverse=*/false,
+                                       /*update=*/false);
+    return \"\";
+  }
+  "
+  [(set_attr "predicable" "yes")]
+)
+
 ;; Vector bits common to IWMMXT and Neon
 (include "vec-common.md")
 ;; Load the Intel Wireless Multimedia Extension patterns
