@@ -13853,6 +13853,7 @@ arm_output_multireg_pop (rtx *operands, bool return_pc, rtx cond, bool reverse,
   int num_saves = XVECLEN (operands[0], 0);
   unsigned int regno;
   unsigned int regno_base = REGNO (operands[1]);
+  const char *sfi_sp_prefix = "";
 
   offset = 0;
   offset += update ? 1 : 0;
@@ -13867,6 +13868,9 @@ arm_output_multireg_pop (rtx *operands, bool return_pc, rtx cond, bool reverse,
       /* If base register is in the list, there must be no explicit update.  */
       if (regno == regno_base)
         gcc_assert (!update);
+
+      if (TARGET_SFI_NACL1 && regno == SP_REGNUM)
+        sfi_sp_prefix = "sfi_sp ";
     }
 
   conditional = reverse ? "%?%D0" : "%?%d0";
@@ -13874,18 +13878,26 @@ arm_output_multireg_pop (rtx *operands, bool return_pc, rtx cond, bool reverse,
     {
       /* Output pop (not stmfd) because it has a shorter encoding.  */
       gcc_assert (update);
-      sprintf (pattern, "pop%s\t{", conditional);
+      sprintf (pattern, "%spop%s\t{", sfi_sp_prefix, conditional);
     }
   else
     {
       /* Output ldmfd when the base register is SP, otherwise output ldmia.
          It's just a convention, their semantics are identical.  */
       if (regno_base == SP_REGNUM)
-        sprintf (pattern, "ldm%sfd\t", conditional);
+        sprintf (pattern, "%sldm%sfd\t", sfi_sp_prefix, conditional);
       else if (TARGET_UNIFIED_ASM)
-        sprintf (pattern, "ldmia%s\t", conditional);
+        sprintf (pattern, "%s%s%sldmia%s\t",
+                 TARGET_SFI_NACL1 ? "sfi_breg " : "",
+                 TARGET_SFI_NACL1 ? reg_names[regno_base] : "",
+                 TARGET_SFI_NACL1 ? ", " : "",
+                 conditional);
       else
-        sprintf (pattern, "ldm%sia\t", conditional);
+        sprintf (pattern, "%s%s%sldm%sia\t",
+                 TARGET_SFI_NACL1 ? "sfi_breg " : "",
+                 TARGET_SFI_NACL1 ? reg_names[regno_base] : "",
+                 TARGET_SFI_NACL1 ? ", " : "",
+                 conditional);
 
       strcat (pattern, reg_names[regno_base]);
       if (update)
@@ -13912,6 +13924,36 @@ arm_output_multireg_pop (rtx *operands, bool return_pc, rtx cond, bool reverse,
     strcat (pattern, "^");
 
   output_asm_insn (pattern, &cond);
+}
+
+/* Compute the instruction length for that.  */
+int
+get_attr_length_arm_multireg_pop (rtx *operands)
+{
+  if (TARGET_SFI_NACL1)
+    {
+      unsigned int regno_base = REGNO (operands[1]);
+      int num_saves = XVECLEN (operands[0], 0);
+      int i;
+      bool has_sp = false;
+      for (i = 0; i < num_saves; ++i)
+        {
+          if (REGNO (XEXP (XVECEXP (operands[0], 0, i), 0)) == SP_REGNUM)
+            {
+              has_sp = true;
+              break;
+            }
+        }
+      if (has_sp)
+        {
+          gcc_assert (regno_base == SP_REGNUM);
+          return 12;
+        }
+      else if (regno_base != SP_REGNUM && regno_base != PC_REGNUM)
+        return 12;
+    }
+
+  return 4;
 }
 
 

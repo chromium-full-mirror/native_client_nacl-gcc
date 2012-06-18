@@ -11041,6 +11041,8 @@
   }
   "
   [(set_attr "type" "load4")
+   (set (attr "length")
+	(symbol_ref "get_attr_length_arm_multireg_pop (operands)"))
    (set_attr "predicable" "yes")]
 )
 
