@@ -1,68 +1,176 @@
+2012-06-19  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (FIST_ROUNDING): New int iterator.
+	(rounding): Handle UNSPEC_FIST_{FLOOR,CEIL}.
+	(ROUNDING): Ditto.
+	(*fist<mode>2_<rounding>_1): Macroize insn from
+	*fist<mode>2_{floor,ceil}_1 using FIST_ROUNDING int iterator.
+	(fistdi2_<rounding>): Macroize insn from
+	fistdi2_{floor,ceil} using FIST_ROUNDING int iterator.
+	(fistdi2_<rounding>_with_temp and splitters): Macroize insn and
+	corresponding splitters from fistdi2_{floor,ceil} and corresponding
+	splitters using FIST_ROUNDING int iterator.
+	(fist<mode>2_<rounding>): Macroize insn from
+	fist<mode>2_{floor,ceil} using FIST_ROUNDING int iterator.
+	(fist<mode>2_<rounding>_with_temp and splitters): Macroize insn and
+	corresponding splitters from fist<mode>2_{floor,ceil} and corresponding
+	splitters using FIST_ROUNDING int iterator.
+	(l<rounding>xf<mode>2): Macroize expander from l{floor,ceil}xf<mode>2
+	using FIST_ROUNDING int iterator.
+
+2012-06-19  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386-protos.h (ix86_expand_sse2_mulv4si3): Declare.
+	* config/i386/i386.c (ix86_expand_sse2_mulv4si3): New.
+	* config/i386/predicates.md (nonimmediate_or_const_vector_operand): New.
+	* config/i386/sse.md (sse2_mulv4si3): Delete.
+	(mul<VI4_AVX2>3): Use ix86_expand_sse2_mulv4si3 and
+	nonimmediate_or_const_vector_operand.
+
+2012-06-19  Richard Henderson  <rth@redhat.com>
+
+	* expmed.c (struct init_expmed_rtl): Split ...
+	(init_expmed_one_mode): ... out of ...
+	(init_expmed): ... here.  Initialize integer vector modes also.
+	(synth_mult): Handle integer vector modes.
+	(choose_mult_variant): Likewise.
+	(expand_mult_const): Likewise.
+	(expand_mult): Likewise.
+	* machmode.h (GET_MODE_UNIT_BITSIZE): New.
+
+2012-06-19  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (ix86_rtx_costs): Handle CONST_VECTOR, and
+	integral vector modes.
+
+2012-06-19  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (FRNDINT_ROUNDING): New int iterator.
+	(rounding): New int attribute.
+	(ROUNDING): Ditto.
+	(frndintxf2_<rounding>): Macroize insn from
+	frndintxf2_{floor,ceil,trunc} using FRNDINT_ROUNDING int iterator.
+	(frndintxf2_<rounding>_i387): Macroize insn from
+	frndintxf2_{floor,ceil,trunc}_i387 using FRNDINT_ROUNDING int iterator.
+
+2012-06-19  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vrp.c (union_ranges): New function.
+	(vrp_meet_1): Use union_ranges.
+	(vrp_meet): Dump what we union and call vrp_meet_1.
+
+2012-06-19  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.md (enum unspec): Delete UNSPEC_SIN and UNSPEC_COS.
+	(attr type): Remove fmul, ffmul, farith, ffarith, float_em
+	f_fpa_load, f_fpa_store, f_mem_r, r_mem_f.
+	(attr write_conflict, attr core_cycles): Update.
+	* arm-generic.md (r_mem_f_wbuf): Delete reservation.
+
+2012-06-19  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vrp.c (intersect_ranges): Handle more cases.
+	(vrp_intersect_ranges): Dump what we intersect and call ...
+	(vrp_intersect_ranges_1): ... this.
+
+2012-06-19  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53708
+	* tree-vect-data-refs.c (vect_can_force_dr_alignment_p): Preserve
+	user-supplied alignment and alignment of decls with the used
+	attribute.
+
+2012-06-18  Lawrence Crowl  <crowl@google.com>
+
+	* timevar.def (TV_PHASE_GENERATE): Rename to TV_PHASE_LATE_ASM.
+	(TV_PHASE_CGRAPH): Rename to TV_PHASE_OPT_GEN.
+	(TV_PHASE_STREAM_IN): New.
+	(TV_PHASE_STREAM_OUT): New.
+	* timevar.c (validate_phases): New.
+	(timevar_print): Call validate_phases.
+	* c-decl.c (c_write_global_declarations): Rename use of TV_PHASE_CGRAPH
+	to TV_PHASE_OPT_GEN.
+	* langhooks.c (write_global_declarations): Rename use of
+	TV_PHASE_CGRAPH to TV_PHASE_OPT_GEN.  Use TV_PHASE_DBGINFO instead of
+	TV_PHASE_CHECK_DBGINFO.
+	* toplev.c (compile_file): Rename use of TV_PHASE_GENERATE to
+	TV_PHASE_LATE_ASM.  Move start of TV_PHASE_LATE_ASM to after call to
+	lang_hooks.decls.final_write_globals.
+
+2012-06-18  David Edelshn  <dje.gcc@gmail.com>
+
+	* config/rs6000/aix52.h (TARGET_EXTRA_BUILTINS): Define as 0.
+
+2012-06-18  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53712
+	* config/i386/sse.md (*sse4_2_pcmpestr_unaligned): New.
+	(*sse4_2_pcmpistr_unaligned): New.
+
 2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
-        * config/arm/arm-protos.h (arm_output_epilogue): Remove.
-        * config/arm/arm.c (print_multi_reg): Remove.
-        (vfp_output_fldmd): Likewise.
-        (arm_output_epilogue): Likewise.
-        * config/arm/arm.md (epilogue_insns): Update condition and code.
-
-2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
-
-        * config/arm/arm-protos.h (thumb2_expand_return): New declaration.
-        * config/arm/arm.c (thumb2_expand_return): New function.
-        * config/arm/arm.md (return): Update condition and code.
+	* config/arm/arm-protos.h (arm_output_epilogue): Remove.
+	* config/arm/arm.c (print_multi_reg): Remove.
+	(vfp_output_fldmd): Likewise.
+	(arm_output_epilogue): Likewise.
+	* config/arm/arm.md (epilogue_insns): Update condition and code.
 
 2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
-        * config/arm/arm-protos.h (output_return_instruction): New parameter and
-	int to bool change of parameter types.
-        * config/arm/arm.c (output_return_instruction): Likewise.
-        * config/arm/arm.md (arm_simple_return): New pattern.
-        (arm_return, cond_return, cond_return_inverted): Add new arguments.
-        * config/arm/thumb2.md (thumb2_return): Update condition and code.
+	* config/arm/arm-protos.h (thumb2_expand_return): New declaration.
+	* config/arm/arm.c (thumb2_expand_return): New function.
+	* config/arm/arm.md (return): Update condition and code.
 
 2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
-        * config/arm/arm-protos.h (arm_expand_epilogue): New declaration.
-        * config/arm/arm.c (arm_expand_epilogue): New function.
-        * config/arm/arm.md (epilogue): Update condition and code.
-        (sibcall_epilogue): Likewise.
-
-2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
-
-        * config/arm/arm.c (arm_expand_epilogue_apcs_frame): New function.
-        * config/arm/arm.md (arm_addsi3) Add an alternative.
+	* config/arm/arm-protos.h (output_return_instruction): New parameter
+	and int to bool change of parameter types.
+	* config/arm/arm.c (output_return_instruction): Likewise.
+	* config/arm/arm.md (arm_simple_return): New pattern.
+	(arm_return, cond_return, cond_return_inverted): Add new arguments.
+	* config/arm/thumb2.md (thumb2_return): Update condition and code.
 
 2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
-        * config/arm/arm.md (vfp_pop_multiple_with_writeback) New
-	define_insn.
-        * config/arm/predicates.md (pop_multiple_fp) New special predicate.
-        * config/arm/arm.c (arm_emit_vfp_multi_reg_pop): New function.
+	* config/arm/arm-protos.h (arm_expand_epilogue): New declaration.
+	* config/arm/arm.c (arm_expand_epilogue): New function.
+	* config/arm/arm.md (epilogue): Update condition and code.
+	(sibcall_epilogue): Likewise.
 
 2012-06-18  Ian Bolton  <ian.bolton@arm.com>
-            Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <greta.yorsh@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
 
-        * config/arm/arm.md (load_multiple_with_writeback) New define_insn.
-        (load_multiple, pop_multiple_with_writeback_and_return) Likewise.
-        (pop_multiple_with_return, ldr_with_return) Likewise.
-        * config/arm/predicates.md (pop_multiple_return) New special predicate.
-        * config/arm/arm-protos.h (arm_output_multireg_pop) New declaration.
-        * config/arm/arm.c (arm_output_multireg_pop) New function.
-        (arm_emit_multi_reg_pop): New function.
+	* config/arm/arm.c (arm_expand_epilogue_apcs_frame): New function.
+	* config/arm/arm.md (arm_addsi3) Add an alternative.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
+
+	* config/arm/arm.md (vfp_pop_multiple_with_writeback) New define_insn.
+	* config/arm/predicates.md (pop_multiple_fp) New special predicate.
+	* config/arm/arm.c (arm_emit_vfp_multi_reg_pop): New function.
+
+2012-06-18  Ian Bolton  <ian.bolton@arm.com>
+	    Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
+
+	* config/arm/arm.md (load_multiple_with_writeback) New define_insn.
+	(load_multiple, pop_multiple_with_writeback_and_return) Likewise.
+	(pop_multiple_with_return, ldr_with_return) Likewise.
+	* config/arm/predicates.md (pop_multiple_return) New special predicate.
+	* config/arm/arm-protos.h (arm_output_multireg_pop) New declaration.
+	* config/arm/arm.c (arm_output_multireg_pop) New function.
+	(arm_emit_multi_reg_pop): New function.
 
 2012-06-18  Greta Yorsh  <Greta.Yorsh@arm.com>
 
@@ -105,8 +213,8 @@
 	(apply_int_iterator): Likewise.
 	(apply_iterators): Traverse int iterator table and add all the used
 	iterators to list.
-	(initialize_iterators): Initialize data structures and callbacks for int
-	iterators.
+	(initialize_iterators): Initialize data structures and callbacks for
+	int iterators.
 	(read_rtx): Parse and read mappings for int iterators.
 	(read_rtx_code): Record int iterator usage.
 
@@ -282,7 +390,7 @@
 
 	PR c++/51033
 	* c-typeck.c (c_build_vec_perm_expr): Move to c-family/c-common.c.
-        * c-tree.h (c_build_vec_perm_expr): Move to c-family/c-common.h.
+	* c-tree.h (c_build_vec_perm_expr): Move to c-family/c-common.h.
 
 2012-06-15  Georg-Johann Lay  <avr@gjlay.de>
 

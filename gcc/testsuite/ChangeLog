@@ -1,3 +1,16 @@
+2012-06-19  Richard Henderson  <rth@redhat.com>
+
+	* gcc.target/i386/pr33329.c: Change multiplier constant to 12345.
+
+2012-06-19  Richard Guenther  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/vrp68.c: Adjust testcase.
+
+2012-06-18  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53712
+	* gcc.target/i386/pr53712.c: New test.
+
 2012-06-18  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/53692
