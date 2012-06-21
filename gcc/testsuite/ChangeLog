@@ -1,3 +1,18 @@
+2012-06-21  Meador Inge  <meadori@codesourcery.com>
+
+	PR c/53702
+	* gcc.dg/Wunused-local-typedefs.c: New testcase.
+
+2012-06-21  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* testsuite/gcc.dg/pch/ident-1.c: New test.
+	* testsuite/gcc.dg/pch/ident-1.hs: Header file for new test.
+
+2012-06-21  Michael Matz  <matz@suse.de>
+
+	PR middle-end/53688
+	* gcc.c-torture/execute/pr53688.c: New test.
+
 2012-06-20  Richard Guenther  <rguenther@suse.de>
 
 	PR tree-optimization/30318
@@ -24,7 +39,7 @@
 
 2012-06-16 Ville Voutilainen <ville.voutilainen@gmail.com>
 
-        * g++.dg/cpp0x/override4.C: New.
+	* g++.dg/cpp0x/override4.C: New.
 
 2012-06-14  Jason Merrill  <jason@redhat.com>
 

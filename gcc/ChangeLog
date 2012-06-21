@@ -1,3 +1,81 @@
+2012-06-21  Meador Inge  <meadori@codesourcery.com>
+
+	PR c/53702
+	* c-decl.c (c_push_function_context): Restore the behavior to reuse
+	the language function allocated for -Wunused-local-typedefs.
+	(c_pop_function_context): If necessary, clear the language function
+	created in c_push_function_context.  Always clear out the
+	x_cur_stmt_list field of the restored language function.
+
+2012-06-21   Sterling Augustine  <saugustine@google.com>
+        Cary Coutant  <ccoutant@google.com>
+
+	* dwarf2out.c (is_cu_die, is_namespace_die, is_class_die,
+	add_AT_pubnames, add_enumerator_pubname, want_pubnames): New functions.
+	(comdat_type_struct): New field 'skeleton_die'.
+	(breakout_comdat_types): Update it.
+	(add_pubname): Rework logic.  Call is_class_die, is_cu_die and
+	is_namespace_die.  Fix minor style violation.  Call want_pubnames.
+	(add_pubname_string): Call want_pubnames.
+	(add_pubtype): Rework logic for calculating type name.  Call
+	is_namespace_die.  Call want_pubnames.
+	(output_pubnames): Move conditional logic deciding when to produce the
+	section from dwarf2out_finish.  Use new skeleton_die field.
+	(base_type_die): Call add_pubtype.
+	(gen_enumeration_type_die): Unconditionally call add_pubtype.
+	(gen_subprogram_die): Adjust calls to add_pubname.
+	(gen_namespace_die): Call add_pubname_string.
+	(dwarf2out_finish): Call add_AT_pubnames; Move logic on when to
+	produce pubnames and pubtypes sections to output_pubnames.
+	(common.opt): New option '-gpubnames'.
+	(invoke.texi): Document it.
+
+2012-06-21  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/m32c/m32c-pragma.c: Remove unnecessary includes.
+
+2012-06-21  Michael Matz  <matz@suse.de>
+
+	PR middle-end/53688
+	* builtins.c (get_memory_rtx): Always build an all-aliasing MEM_REF
+	with correct size.
+
+2012-06-21  Richard Guenther  <rguenther@suse.de>
+
+	* tree-inline.c (estimate_num_insns): Estimate call cost for
+	tailcalls properly.
+
+2012-06-20  Rüdiger Sonderfeld  <ruediger@c-plusplus.de>
+
+	* tree.h (DECL_SOURCE_COLUMN): New accessor.
+
+2012-06-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (SINCOS): New int iterator.
+	(sincos): New int attribute.
+	(*<sincos>xf2_i387): Macroize insn from *{sin,cos}xf2_i387 using
+	SINCOS int iterator.
+	(*<sincos>_extend<mode>xf2_i387): Macroize insn from
+	*{sin,cos}_extend<mode>xf2_i387 using SINCOS int iterator.
+
+2012-06-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (RDFSGSBASE): New int iterator.
+	(WRFSGSBASE): Ditto.
+	(fsgs): New int attribute.
+	(rd<fsgs>base<mode>): Macroize insn from rd<fsgs>base<mode> using
+	RDFSGSBASE int iterator.
+	(wr<fsgs>base<mode>): Macroize insn from wr<fsgs>base<mode> using
+	WRFSGSBASE int iterator.
+
+2012-06-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (<rounding_insn><mode>2): Macroize expander
+	from {floor,ceil,btrunc}<mode>2 using FIST_ROUNDING int iterator.
+	(l<rounding_insn><MODEF:mode><SWI48:mode>2): Macroize expander
+	from l{floor,ceil}<MODEF:mode><SWI48:mode>2 using FIST_ROUNDING
+	int iterator.
+
 2012-06-20  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* system.h: Poison ASM_OUTPUT_IDENT and IDENT_ASM_OP.
@@ -26,7 +104,7 @@
 	* config/i386/i386.md (IEEE_MAXMIN): New int iterator.
 	(ieee_maxmin): New int attribute.
 	(*ieee_s<ieee_maxmin><mode>3): Macroize insn from
-	*ieee_s{max,min}<mode>3 using IEEE_MAXMIN mode iterator.
+	*ieee_s{max,min}<mode>3 using IEEE_MAXMIN int iterator.
 
 2012-06-20  Steven Bosscher  <steven@gcc.gnu.org>
 
@@ -7860,7 +7938,7 @@
 	* tree.h (warn_if_unused_value): Move declaration from here.
 	* stmt.c (warn_if_unused_value): Move definition from here.
 
-2010-04-10  Michael Matz  <matz@suse.de>
+2012-04-10  Michael Matz  <matz@suse.de>
 
 	* tree-vectorizer.h (_loop_vec_info.strided_stores): Rename to
 	grouped_stores.
@@ -12587,7 +12665,7 @@
 	* config/alpha/alpha.c (alpha_option_override): Default to
 	full IEEE compliance mode for Go language.
 
-2011-01-29  Tijl Coosemans  <tijl@coosemans.org>
+2012-01-29  Tijl Coosemans  <tijl@coosemans.org>
 
 	* config/freebsd-spec.h [TARGET_LIBC_PROVIDES_SSP]
 	(LINK_SSP_SPEC): Define.
@@ -13170,7 +13248,7 @@
 
 	* cfgrtl.c (rtl_dump_bb): Do not dump insns for {ENTRY|EXIT}_BLOCK.
 
-2011-01-20  Tijl Coosemans  <tijl@coosemans.org>
+2012-01-20  Tijl Coosemans  <tijl@coosemans.org>
 
 	* config/i386/i386.c: Fix checks for !TARGET_MACHO.
 	* config/rs6000/rs6000.c: Likewise.
