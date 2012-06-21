@@ -1,7 +1,7 @@
 ; Options for the IA-32 and AMD64 ports of the compiler.
 
 ; Copyright (C) 2005, 2006, 2007, 2008, 2009,
-; 2010, 2011 Free Software Foundation, Inc.
+; 2010, 2011, 2012 Free Software Foundation, Inc.
 ;
 ; This file is part of GCC.
 ;
@@ -498,15 +498,15 @@ Support MMX, SSE, SSE2, SSE3 and SSE4A built-in functions and code generation
 
 mfma4
 Target Report Mask(ISA_FMA4) Var(ix86_isa_flags) Save
-Support FMA4 built-in functions and code generation 
+Support FMA4 built-in functions and code generation
 
 mxop
 Target Report Mask(ISA_XOP) Var(ix86_isa_flags) Save
-Support XOP built-in functions and code generation 
+Support XOP built-in functions and code generation
 
 mlwp
 Target Report Mask(ISA_LWP) Var(ix86_isa_flags) Save
-Support LWP built-in functions and code generation 
+Support LWP built-in functions and code generation
 
 mabm
 Target Report Mask(ISA_ABM) Var(ix86_isa_flags) Save
@@ -595,3 +595,7 @@ Split 32-byte AVX unaligned store
 mrtm
 Target Report Mask(ISA_RTM) Var(ix86_isa_flags) Save
 Support RTM built-in functions and code generation
+
+msfi-cflow-nacl1
+Target Report Mask(SFI_CFLOW_NACL1)
+Generate code for Native Client software fault isolation of control transfers

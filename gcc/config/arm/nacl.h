@@ -49,19 +49,7 @@
 /* Do nacl-specific parts of TARGET_OPTION_OVERRIDE.  */
 #undef SUBTARGET_OVERRIDE_OPTIONS
 #define SUBTARGET_OVERRIDE_OPTIONS                                    \
-  if (TARGET_SFI_NACL1)                                               \
-    {                                                                 \
-      /* All functions and branch targets are aligned to at least the \
-         bundle size in native client. */                             \
-      if (align_functions < NACL_ARM_BUNDLE_ALIGN)                    \
-        align_functions = NACL_ARM_BUNDLE_ALIGN;                      \
-      if (align_jumps < NACL_ARM_BUNDLE_ALIGN)                        \
-        align_jumps = NACL_ARM_BUNDLE_ALIGN;                          \
-      if (align_labels < NACL_ARM_BUNDLE_ALIGN)                       \
-        align_labels = NACL_ARM_BUNDLE_ALIGN;                         \
-      if (align_loops < NACL_ARM_BUNDLE_ALIGN)                        \
-        align_loops = NACL_ARM_BUNDLE_ALIGN;                          \
-    }
+  NACL_MIN_ALIGN (TARGET_SFI_NACL1, NACL_ARM_BUNDLE_ALIGN)
 
 /* r9 is reserved for the thread pointer.  */
 #undef  SUBTARGET_CONDITIONAL_REGISTER_USAGE

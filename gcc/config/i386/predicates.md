@@ -570,6 +570,7 @@
 (define_predicate "indirect_branch_operand"
   (ior (match_operand 0 "register_operand")
        (and (not (match_test "TARGET_X32"))
+	    (not (match_test "TARGET_SFI_CFLOW_NACL1"))
 	    (match_operand 0 "memory_operand"))))
 
 ;; Test for a valid operand for a call instruction.

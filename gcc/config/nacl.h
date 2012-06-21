@@ -32,14 +32,32 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
     builtin_assert ("system=nacl");                     \
     builtin_assert ("system=posix");                    \
     builtin_define (BYTES_BIG_ENDIAN ? "__BIG_ENDIAN__" \
-                    : "__LITTLE_ENDIAN__");             \
+		    : "__LITTLE_ENDIAN__");             \
   } while (0)
 
 /* Since non-instructions can never go into code sections,
    this is always false for Native Client targets.  */
+#undef  JUMP_TABLES_IN_TEXT_SECTION
 #define JUMP_TABLES_IN_TEXT_SECTION     0
 
 /* Every Native Client platform has a va_list type of the same
    size and minimum alignment, even if it just contains unused
    padding space to reach that size.  */
 #define VA_LIST_TYPE_SIZE               16
+
+#define NACL_MIN_ALIGN(condition, bundle_size)                          \
+  do {                                                                  \
+    if (condition)                                                      \
+      {                                                                 \
+	/* All functions and branch targets are aligned to at least the \
+	   bundle size in native client. */                             \
+	if (align_functions < bundle_size)                              \
+	  align_functions = bundle_size;                                \
+	if (align_jumps < bundle_size)                                  \
+	  align_jumps = bundle_size;                                    \
+	if (align_labels < bundle_size)                                 \
+	  align_labels = bundle_size;                                   \
+	if (align_loops < bundle_size)                                  \
+	  align_loops = bundle_size;                                    \
+      }                                                                 \
+  } while (0)
