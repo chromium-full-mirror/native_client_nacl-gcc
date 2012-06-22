@@ -1,3 +1,142 @@
+2012-06-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/53383
+	* doc/invoke.texi: Add a warning for -mpreferred-stack-boundary=3.
+
+	* config/i386/i386.c (ix86_option_override_internal): Allow
+	-mpreferred-stack-boundary=3 for 64-bit if SSE is disabled.
+
+	* config/i386/i386.h (MIN_STACK_BOUNDARY): Set to 64 for 64-bit
+	if SSE is disabled.
+
+2012-06-22  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* double-int.c (double_int_multiple_of): New function.
+	* double-int.h (double_int_multiple_of): New decl.
+	* tree-ssa-loop-ivopts.c (add_cost, zero_cost): Remove undefs.
+	(mbc_entry_hash): New forward decl.
+	(mbc_entry_eq): Likewise.
+	(zero_cost): Change to no_cost.
+	(mult_costs): New static var.
+	(cost_tables_exist): Likewise.
+	(initialize_costs): New function.
+	(finalize_costs): Likewise.
+	(tree_ssa_iv_optimize_init): Call initialize_costs.
+	(add_cost): Change to add_regs_cost; distinguish costs by speed.
+	(multiply_regs_cost): New function.
+	(add_const_cost): Likewise.
+	(extend_or_trunc_reg_cost): Likewise.
+	(negate_reg_cost): Likewise.
+	(multiply_by_cost): Change to multiply_by_const_cost; distinguish
+	costs by speed.
+	(get_address_cost): Change add_cost to add_regs_cost; change
+	multiply_by_cost to multiply_by_const_cost.
+	(force_expr_to_var_cost): Change zero_cost to no_cost; change
+	add_cost to add_regs_cost; change multiply_by_cost to
+	multiply_by_const_cost.
+	(split_cost): Change zero_cost to no_cost.
+	(ptr_difference_cost): Likewise.
+	(difference_cost): Change zero_cost to no_cost; change multiply_by_cost
+	to multiply_by_const_cost.
+	(get_computation_cost_at): Change add_cost to add_regs_cost; change
+	multiply_by_cost to multiply_by_const_cost.
+	(determine_use_iv_cost_generic): Change zero_cost to no_cost.
+	(determine_iv_cost): Change add_cost to add_regs_cost.
+	(iv_ca_new): Change zero_cost to no_cost.
+	(tree_ssa_iv_optimize_finalize): Call finalize_costs.
+	* tree-ssa-address.c (most_expensive_mult_to_index): Change
+	multiply_by_cost to multiply_by_const_cost.
+	* tree-flow.h (multiply_by_cost): Change to multiply_by_const_cost.
+	(add_regs_cost): New decl.
+	(multiply_regs_cost): Likewise.
+	(add_const_cost): Likewise.
+	(extend_or_trunc_reg_cost): Likewise.
+	(negate_reg_cost): Likewise.
+
+2012-06-22  Richard Guenther  <rguenther@suse.de>
+
+	Merge from graphite branch
+	2011-08-10  Sebastian Pop <sebpop@gmail.com>
+    
+	* graphite-sese-to-poly.c (build_scop_drs): Fix memory leak.
+
+	2012-01-13  Tobias Grosser  <tobias@grosser.es>
+
+	* tree-flow.h (parallelized_function_p): Declare.
+	* tree-parloops.c (parallelized_function_p): Export.
+	* graphite.c (graphite_transform_loops): Do not run graphite on
+	already parallel functions.
+
+2012-06-22  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (rs6000_pre_atomic_barrier): Pass in and
+	return mem.  Convert to indirect addressing if not indirect or
+	indexed.  Adjust all callers.
+
+2012-06-22  Richard Guenther  <rguenther@suse.de>
+
+	* gcov-iov.c: Include bconfig.h and system.h.
+
+2012-06-22  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* doc/include/texinfo.tex: Update to version 2012-06-05.14.
+
+2012-06-22  Richard Guenther  <rguenther@suse.de>
+
+	PR gcov-profile/53744
+	* gcov-iov.c (main): Treat "" and "prerelease" the same.
+
+2012-06-22  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR debug/53704
+	* dwarf2out.c (gen_compile_unit_die): Use DW_LANG_Fortran90 as language
+	for GNU Fortran if in strict DWARF2 mode.
+
+2012-06-22  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* tree-ssa-live.c (remove_unused_scope_block_p): Remove again
+	DECL_IGNORED_P non-reg vars even if they are used.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53671
+	PR debug/49888
+	* var-tracking.c (vt_get_canonicalize_base): New.
+	(vt_canonicalize_addr, vt_stack_offset_p): New.
+	(vt_canon_true_dep): New.
+	(drop_overlapping_mem_locs): Use vt_canon_true_dep.
+	(clobber_overlaping_mems): Use vt_canonicalize_addr.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53671
+	PR debug/49888
+	* var-tracking.c (vt_initialize): Record initial offset between
+	arg pointer and stack pointer.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53671
+	PR debug/49888
+	* var-tracking.c (vt_init_cfa_base): Drop redundant recording of
+	CFA base.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53671
+	PR debug/49888
+	* alias.c (memrefs_conflict_p): Improve handling of AND for
+	alignment.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	* ddg.c (build_intra_loop_deps): Discard deps of nondebug on debug.
+
+2012-06-21  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53682
+	* cselib.c (promote_debug_loc): Don't crash on NULL argument.
+
 2012-06-21  Meador Inge  <meadori@codesourcery.com>
 
 	PR c/53702
@@ -8,7 +147,7 @@
 	x_cur_stmt_list field of the restored language function.
 
 2012-06-21   Sterling Augustine  <saugustine@google.com>
-        Cary Coutant  <ccoutant@google.com>
+             Cary Coutant  <ccoutant@google.com>
 
 	* dwarf2out.c (is_cu_die, is_namespace_die, is_class_die,
 	add_AT_pubnames, add_enumerator_pubname, want_pubnames): New functions.
@@ -27,8 +166,8 @@
 	(gen_namespace_die): Call add_pubname_string.
 	(dwarf2out_finish): Call add_AT_pubnames; Move logic on when to
 	produce pubnames and pubtypes sections to output_pubnames.
-	(common.opt): New option '-gpubnames'.
-	(invoke.texi): Document it.
+	* common.opt (-gpubnames): New option.
+	* doc/invoke.texi: Document it.
 
 2012-06-21  Steven Bosscher  <steven@gcc.gnu.org>
 
