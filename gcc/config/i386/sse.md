@@ -3943,7 +3943,7 @@
 (define_insn "sse_loadlps"
   [(set (match_operand:V4SF 0 "nonimmediate_operand"     "=x,x,x,x,m")
 	(vec_concat:V4SF
-	  (match_operand:V2SF 2 "nonimmediate_operand"   " 0,x,m,x,x")
+	  (match_operand:V2SF 2 "nonimmediate_operand"   " 0,x,m,m,x")
 	  (vec_select:V2SF
 	    (match_operand:V4SF 1 "nonimmediate_operand" " x,x,0,x,0")
 	    (parallel [(const_int 2) (const_int 3)]))))]
@@ -5213,70 +5213,13 @@
    (set_attr "prefix" "orig,vex")
    (set_attr "mode" "TI")])
 
-(define_insn_and_split "mul<mode>3"
+(define_expand "mul<mode>3"
   [(set (match_operand:VI1_AVX2 0 "register_operand")
 	(mult:VI1_AVX2 (match_operand:VI1_AVX2 1 "register_operand")
 		       (match_operand:VI1_AVX2 2 "register_operand")))]
-  "TARGET_SSE2
-   && can_create_pseudo_p ()"
-  "#"
-  "&& 1"
-  [(const_int 0)]
+  "TARGET_SSE2"
 {
-  rtx t[6];
-  int i;
-  enum machine_mode mulmode = <sseunpackmode>mode;
-
-  for (i = 0; i < 6; ++i)
-    t[i] = gen_reg_rtx (<MODE>mode);
-
-  /* Unpack data such that we've got a source byte in each low byte of
-     each word.  We don't care what goes into the high byte of each word.
-     Rather than trying to get zero in there, most convenient is to let
-     it be a copy of the low byte.  */
-  emit_insn (gen_<vec_avx2>_interleave_high<mode> (t[0], operands[1],
-						   operands[1]));
-  emit_insn (gen_<vec_avx2>_interleave_high<mode> (t[1], operands[2],
-						   operands[2]));
-  emit_insn (gen_<vec_avx2>_interleave_low<mode> (t[2], operands[1],
-						  operands[1]));
-  emit_insn (gen_<vec_avx2>_interleave_low<mode> (t[3], operands[2],
-						  operands[2]));
-
-  /* Multiply words.  The end-of-line annotations here give a picture of what
-     the output of that instruction looks like.  Dot means don't care; the
-     letters are the bytes of the result with A being the most significant.  */
-  emit_insn (gen_rtx_SET (VOIDmode, gen_lowpart (mulmode, t[4]),
-			  gen_rtx_MULT (mulmode,	/* .A.B.C.D.E.F.G.H */
-					gen_lowpart (mulmode, t[0]),
-					gen_lowpart (mulmode, t[1]))));
-  emit_insn (gen_rtx_SET (VOIDmode, gen_lowpart (mulmode, t[5]),
-			  gen_rtx_MULT (mulmode,	/* .I.J.K.L.M.N.O.P */
-					gen_lowpart (mulmode, t[2]),
-					gen_lowpart (mulmode, t[3]))));
-
-  /* Extract the even bytes and merge them back together.  */
-  if (<MODE>mode == V16QImode)
-    ix86_expand_vec_extract_even_odd (operands[0], t[5], t[4], 0);
-  else
-    {
-      /* Since avx2_interleave_{low,high}v32qi used above aren't cross-lane,
-	 this can't be normal even extraction, but one where additionally
-	 the second and third quarter are swapped.  That is even one insn
-	 shorter than even extraction.  */
-      rtvec v = rtvec_alloc (32);
-      for (i = 0; i < 32; ++i)
-	RTVEC_ELT (v, i)
-	  = GEN_INT (i * 2 + ((i & 24) == 8 ? 16 : (i & 24) == 16 ? -16 : 0));
-      t[0] = operands[0];
-      t[1] = t[5];
-      t[2] = t[4];
-      t[3] = gen_rtx_CONST_VECTOR (<MODE>mode, v);
-      ix86_expand_vec_perm_const (t);
-    }
-
-  set_unique_reg_note (get_last_insn (), REG_EQUAL,
-		       gen_rtx_MULT (<MODE>mode, operands[1], operands[2]));
+  ix86_expand_vecop_qihi (MULT, operands[0], operands[1], operands[2]);
   DONE;
 })
 
@@ -7875,25 +7818,25 @@
   [(match_operand:<sseunpackmode> 0 "register_operand")
    (match_operand:VI124_AVX2 1 "register_operand")]
   "TARGET_SSE2"
-  "ix86_expand_sse_unpack (operands, false, false); DONE;")
+  "ix86_expand_sse_unpack (operands[0], operands[1], false, false); DONE;")
 
 (define_expand "vec_unpacks_hi_<mode>"
   [(match_operand:<sseunpackmode> 0 "register_operand")
    (match_operand:VI124_AVX2 1 "register_operand")]
   "TARGET_SSE2"
-  "ix86_expand_sse_unpack (operands, false, true); DONE;")
+  "ix86_expand_sse_unpack (operands[0], operands[1], false, true); DONE;")
 
 (define_expand "vec_unpacku_lo_<mode>"
   [(match_operand:<sseunpackmode> 0 "register_operand")
    (match_operand:VI124_AVX2 1 "register_operand")]
   "TARGET_SSE2"
-  "ix86_expand_sse_unpack (operands, true, false); DONE;")
+  "ix86_expand_sse_unpack (operands[0], operands[1], true, false); DONE;")
 
 (define_expand "vec_unpacku_hi_<mode>"
   [(match_operand:<sseunpackmode> 0 "register_operand")
    (match_operand:VI124_AVX2 1 "register_operand")]
   "TARGET_SSE2"
-  "ix86_expand_sse_unpack (operands, true, true); DONE;")
+  "ix86_expand_sse_unpack (operands[0], operands[1], true, true); DONE;")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -10607,60 +10550,42 @@
    (set_attr "prefix_extra" "2")
    (set_attr "mode" "TI")])
 
-;; SSE2 doesn't have some shift variants, so define versions for XOP
-(define_expand "ashlv16qi3"
-  [(set (match_operand:V16QI 0 "register_operand")
-	(ashift:V16QI
-	  (match_operand:V16QI 1 "register_operand")
+(define_expand "<shift_insn><mode>3"
+  [(set (match_operand:VI1_AVX2 0 "register_operand")
+	(any_shift:VI1_AVX2
+	  (match_operand:VI1_AVX2 1 "register_operand")
 	  (match_operand:SI 2 "nonmemory_operand")))]
-  "TARGET_XOP"
+  "TARGET_SSE2"
 {
-  rtx reg = gen_reg_rtx (V16QImode);
-  rtx par;
-  int i;
+  if (TARGET_XOP && <MODE>mode == V16QImode)
+    {
+      bool negate = false;
+      rtx (*gen) (rtx, rtx, rtx);
+      rtx tmp, par;
+      int i;
 
-  par = gen_rtx_PARALLEL (V16QImode, rtvec_alloc (16));
-  for (i = 0; i < 16; i++)
-    XVECEXP (par, 0, i) = operands[2];
+      if (<CODE> != ASHIFT)
+	{
+	  if (CONST_INT_P (operands[2]))
+	    operands[2] = GEN_INT (-INTVAL (operands[2]));
+	  else
+	    negate = true;
+	}
+      par = gen_rtx_PARALLEL (V16QImode, rtvec_alloc (16));
+      for (i = 0; i < 16; i++)
+        XVECEXP (par, 0, i) = operands[2];
 
-  emit_insn (gen_vec_initv16qi (reg, par));
-  emit_insn (gen_xop_shav16qi3 (operands[0], operands[1], reg));
-  DONE;
-})
+      tmp = gen_reg_rtx (V16QImode);
+      emit_insn (gen_vec_initv16qi (tmp, par));
 
-(define_expand "<shift_insn>v16qi3"
-  [(set (match_operand:V16QI 0 "register_operand")
-	(any_shiftrt:V16QI
-	  (match_operand:V16QI 1 "register_operand")
-	  (match_operand:SI 2 "nonmemory_operand")))]
-  "TARGET_XOP"
-{
-  rtx reg = gen_reg_rtx (V16QImode);
-  rtx par;
-  bool negate = false;
-  rtx (*shift_insn)(rtx, rtx, rtx);
-  int i;
+      if (negate)
+	emit_insn (gen_negv16qi2 (tmp, tmp));
 
-  if (CONST_INT_P (operands[2]))
-    operands[2] = GEN_INT (-INTVAL (operands[2]));
+      gen = (<CODE> == LSHIFTRT ? gen_xop_shlv16qi3 : gen_xop_shav16qi3);
+      emit_insn (gen (operands[0], operands[1], tmp));
+    }
   else
-    negate = true;
-
-  par = gen_rtx_PARALLEL (V16QImode, rtvec_alloc (16));
-  for (i = 0; i < 16; i++)
-    XVECEXP (par, 0, i) = operands[2];
-
-  emit_insn (gen_vec_initv16qi (reg, par));
-
-  if (negate)
-    emit_insn (gen_negv16qi2 (reg, reg));
-
-  if (<CODE> == LSHIFTRT)
-    shift_insn = gen_xop_shlv16qi3;
-  else
-    shift_insn = gen_xop_shav16qi3;
-
-  emit_insn (shift_insn (operands[0], operands[1], reg));
+    ix86_expand_vecop_qihi (<CODE>, operands[0], operands[1], operands[2]);
   DONE;
 })
 
