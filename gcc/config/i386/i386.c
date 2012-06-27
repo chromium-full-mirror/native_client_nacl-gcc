@@ -25758,6 +25758,7 @@ enum ix86_builtins
   IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V8SI,
   IX86_BUILTIN_VEC_WIDEN_UMUL_ODD_V4SI,
   IX86_BUILTIN_VEC_WIDEN_UMUL_ODD_V8SI,
+  IX86_BUILTIN_VEC_WIDEN_SMUL_EVEN_V4SI,
   IX86_BUILTIN_VEC_WIDEN_UMUL_EVEN_V4SI,
   IX86_BUILTIN_VEC_WIDEN_UMUL_EVEN_V8SI,
 
@@ -26620,7 +26621,9 @@ static const struct builtin_description bdesc_args[] =
   { OPTION_MASK_ISA_SSE2, CODE_FOR_sse2_umulv1siv1di3, "__builtin_ia32_pmuludq", IX86_BUILTIN_PMULUDQ, UNKNOWN, (int) V1DI_FTYPE_V2SI_V2SI },
   { OPTION_MASK_ISA_SSE2, CODE_FOR_sse2_umulv2siv2di3, "__builtin_ia32_pmuludq128", IX86_BUILTIN_PMULUDQ128, UNKNOWN, (int) V2DI_FTYPE_V4SI_V4SI },
   { OPTION_MASK_ISA_SSE2, CODE_FOR_sse2_umulv2siv2di3, "__builtin_vw_umul_even_v4si", IX86_BUILTIN_VEC_WIDEN_UMUL_EVEN_V4SI, UNKNOWN, (int) V2UDI_FTYPE_V4USI_V4USI },
+  { OPTION_MASK_ISA_SSE2, CODE_FOR_vec_widen_smult_even_v4si, "__builtin_ia32_vw_smul_even_v4si", IX86_BUILTIN_VEC_WIDEN_SMUL_EVEN_V4SI, UNKNOWN, (int) V2DI_FTYPE_V4SI_V4SI },
   { OPTION_MASK_ISA_SSE2, CODE_FOR_vec_widen_umult_odd_v4si, "__builtin_ia32_vw_umul_odd_v4si", IX86_BUILTIN_VEC_WIDEN_UMUL_ODD_V4SI, UNKNOWN, (int) V2UDI_FTYPE_V4USI_V4USI },
+  { OPTION_MASK_ISA_SSE2, CODE_FOR_vec_widen_smult_odd_v4si, "__builtin_ia32_vw_smul_odd_v4si", IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V4SI, UNKNOWN, (int) V2DI_FTYPE_V4SI_V4SI },
 
   { OPTION_MASK_ISA_SSE2, CODE_FOR_sse2_pmaddwd, "__builtin_ia32_pmaddwd128", IX86_BUILTIN_PMADDWD128, UNKNOWN, (int) V4SI_FTYPE_V8HI_V8HI },
 
@@ -26747,7 +26750,6 @@ static const struct builtin_description bdesc_args[] =
   { OPTION_MASK_ISA_SSE4_1, CODE_FOR_uminv4si3, "__builtin_ia32_pminud128", IX86_BUILTIN_PMINUD128, UNKNOWN, (int) V4SI_FTYPE_V4SI_V4SI },
   { OPTION_MASK_ISA_SSE4_1, CODE_FOR_uminv8hi3, "__builtin_ia32_pminuw128", IX86_BUILTIN_PMINUW128, UNKNOWN, (int) V8HI_FTYPE_V8HI_V8HI },
   { OPTION_MASK_ISA_SSE4_1, CODE_FOR_sse4_1_mulv2siv2di3, "__builtin_ia32_pmuldq128", IX86_BUILTIN_PMULDQ128, UNKNOWN, (int) V2DI_FTYPE_V4SI_V4SI },
-  { OPTION_MASK_ISA_SSE4_1, CODE_FOR_vec_widen_smult_odd_v4si, "__builtin_ia32_vw_smul_odd_v4si", IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V4SI, UNKNOWN, (int) V2DI_FTYPE_V4SI_V4SI },
   { OPTION_MASK_ISA_SSE4_1, CODE_FOR_mulv4si3, "__builtin_ia32_pmulld128", IX86_BUILTIN_PMULLD128, UNKNOWN, (int) V4SI_FTYPE_V4SI_V4SI },
 
   /* SSE4.1 */
@@ -31067,18 +31069,10 @@ ix86_builtin_mul_widen_even (tree type)
   switch (TYPE_MODE (type))
     {
     case V4SImode:
-      if (uns_p)
-	{
-	  if (!TARGET_SSE2)
-	    return NULL;
-	  code = IX86_BUILTIN_VEC_WIDEN_UMUL_EVEN_V4SI;
-	}
-      else
-	{
-	  if (!TARGET_SSE4_1)
-	    return NULL;
-	  code = IX86_BUILTIN_PMULDQ128;
-	}
+      if (!TARGET_SSE2)
+	return NULL;
+      code = (uns_p ? IX86_BUILTIN_VEC_WIDEN_UMUL_EVEN_V4SI
+	      : IX86_BUILTIN_VEC_WIDEN_SMUL_EVEN_V4SI);
       break;
 
     case V8SImode:
@@ -31103,18 +31097,10 @@ ix86_builtin_mul_widen_odd (tree type)
   switch (TYPE_MODE (type))
     {
     case V4SImode:
-      if (uns_p)
-	{
-	  if (!TARGET_SSE2)
-	    return NULL;
-	  code = IX86_BUILTIN_VEC_WIDEN_UMUL_ODD_V4SI;
-	}
-      else
-	{
-	  if (!TARGET_SSE4_1)
-	    return NULL;
-	  code = IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V4SI;
-	}
+      if (!TARGET_SSE2)
+	return NULL;
+      code = (uns_p ? IX86_BUILTIN_VEC_WIDEN_UMUL_ODD_V4SI
+	      : IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V4SI);
       break;
 
     case V8SImode:
@@ -32116,24 +32102,38 @@ ix86_rtx_costs (rtx x, int code_i, int outer_code_i, int opno, int *total,
 
     case CONST_DOUBLE:
       if (mode == VOIDmode)
-	*total = 0;
-      else
-	switch (standard_80387_constant_p (x))
-	  {
-	  case 1: /* 0.0 */
-	    *total = 1;
-	    break;
-	  default: /* Other constants */
-	    *total = 2;
-	    break;
-	  case 0:
-	  case -1:
-	    break;
-	  }
-      /* FALLTHRU */
-
+	{
+	  *total = 0;
+	  return true;
+	}
+      switch (standard_80387_constant_p (x))
+	{
+	case 1: /* 0.0 */
+	  *total = 1;
+	  return true;
+	default: /* Other constants */
+	  *total = 2;
+	  return true;
+	case 0:
+	case -1:
+	  break;
+	}
+      if (SSE_FLOAT_MODE_P (mode))
+	{
     case CONST_VECTOR:
-      /* Start with (MEM (SYMBOL_REF)), since that's where
+	  switch (standard_sse_constant_p (x))
+	    {
+	    case 0:
+	      break;
+	    case 1:  /* 0: xor eliminates false dependency */
+	      *total = 0;
+	      return true;
+	    default: /* -1: cmp contains false dependency */
+	      *total = 1;
+	      return true;
+	    }
+	}
+      /* Fall back to (MEM (SYMBOL_REF)), since that's where
 	 it'll probably end up.  Add a penalty for size.  */
       *total = (COSTS_N_INSNS (1)
 		+ (flag_pic != 0 && !TARGET_64BIT)
@@ -32292,6 +32292,14 @@ ix86_rtx_costs (rtx x, int code_i, int outer_code_i, int opno, int *total,
 	      else if (TARGET_SSSE3)
 		extra = 6;
 	      *total = cost->fmul * 2 + cost->fabs * extra;
+	    }
+	  /* V*DImode is emulated with 5-8 insns.  */
+	  else if (mode == V2DImode || mode == V4DImode)
+	    {
+	      if (TARGET_XOP && mode == V2DImode)
+		*total = cost->fmul * 2 + cost->fabs * 3;
+	      else
+		*total = cost->fmul * 3 + cost->fabs * 5;
 	    }
 	  /* Without sse4.1, we don't have PMULLD; it's emulated with 7
 	     insns, including two PMULUDQ.  */
@@ -38766,12 +38774,12 @@ ix86_expand_mul_widen_evenodd (rtx dest, rtx op1, rtx op2,
 	  emit_insn (gen_xop_pmacsdqh (dest, op1, op2, x));
 	  return;
 	}
+
+      x = GEN_INT (GET_MODE_UNIT_BITSIZE (mode));
       op1 = expand_binop (wmode, lshr_optab, gen_lowpart (wmode, op1),
-			  GEN_INT (GET_MODE_UNIT_BITSIZE (mode)), NULL,
-			  1, OPTAB_DIRECT);
+			  x, NULL, 1, OPTAB_DIRECT);
       op2 = expand_binop (wmode, lshr_optab, gen_lowpart (wmode, op2),
-			  GEN_INT (GET_MODE_UNIT_BITSIZE (mode)), NULL,
-			  1, OPTAB_DIRECT);
+			  x, NULL, 1, OPTAB_DIRECT);
       op1 = gen_lowpart (mode, op1);
       op2 = gen_lowpart (mode, op2);
     }
@@ -38793,7 +38801,38 @@ ix86_expand_mul_widen_evenodd (rtx dest, rtx op1, rtx op2,
       x = gen_xop_pmacsdql (dest, op1, op2, x);
     }
   else
-    gcc_unreachable ();
+    {
+      rtx s1, s2, t0, t1, t2;
+
+      /* The easiest way to implement this without PMULDQ is to go through
+	 the motions as if we are performing a full 64-bit multiply.  With
+	 the exception that we need to do less shuffling of the elements.  */
+
+      /* Compute the sign-extension, aka highparts, of the two operands.  */
+      s1 = ix86_expand_sse_cmp (gen_reg_rtx (mode), GT, CONST0_RTX (mode),
+				op1, pc_rtx, pc_rtx);
+      s2 = ix86_expand_sse_cmp (gen_reg_rtx (mode), GT, CONST0_RTX (mode),
+				op2, pc_rtx, pc_rtx);
+
+      /* Multiply LO(A) * HI(B), and vice-versa.  */
+      t1 = gen_reg_rtx (wmode);
+      t2 = gen_reg_rtx (wmode);
+      emit_insn (gen_sse2_umulv2siv2di3 (t1, s1, op2));
+      emit_insn (gen_sse2_umulv2siv2di3 (t2, s2, op1));
+
+      /* Multiply LO(A) * LO(B).  */
+      t0 = gen_reg_rtx (wmode);
+      emit_insn (gen_sse2_umulv2siv2di3 (t0, op1, op2));
+
+      /* Combine and shift the highparts into place.  */
+      t1 = expand_binop (wmode, add_optab, t1, t2, t1, 1, OPTAB_DIRECT);
+      t1 = expand_binop (wmode, ashl_optab, t1, GEN_INT (32), t1,
+			 1, OPTAB_DIRECT);
+
+      /* Combine high and low parts.  */
+      force_expand_binop (wmode, add_optab, t0, t1, dest, 1, OPTAB_DIRECT);
+      return;
+    }
   emit_insn (x);
 }
 
@@ -38913,6 +38952,88 @@ ix86_expand_sse2_mulv4si3 (rtx op0, rtx op1, rtx op2)
   res_1 = emit_insn (gen_vec_interleave_lowv4si (op0, res_1, res_2));
 
   set_unique_reg_note (res_1, REG_EQUAL, gen_rtx_MULT (V4SImode, op1, op2));
+}
+
+void
+ix86_expand_sse2_mulvxdi3 (rtx op0, rtx op1, rtx op2)
+{
+  enum machine_mode mode = GET_MODE (op0);
+  rtx t1, t2, t3, t4, t5, t6;
+
+  if (TARGET_XOP && mode == V2DImode)
+    {
+      /* op1: A,B,C,D, op2: E,F,G,H */
+      op1 = gen_lowpart (V4SImode, op1);
+      op2 = gen_lowpart (V4SImode, op2);
+
+      t1 = gen_reg_rtx (V4SImode);
+      t2 = gen_reg_rtx (V4SImode);
+      t3 = gen_reg_rtx (V2DImode);
+      t4 = gen_reg_rtx (V2DImode);
+
+      /* t1: B,A,D,C */
+      emit_insn (gen_sse2_pshufd_1 (t1, op1,
+				    GEN_INT (1),
+				    GEN_INT (0),
+				    GEN_INT (3),
+				    GEN_INT (2)));
+
+      /* t2: (B*E),(A*F),(D*G),(C*H) */
+      emit_insn (gen_mulv4si3 (t2, t1, op2));
+
+      /* t3: (B*E)+(A*F), (D*G)+(C*H) */
+      emit_insn (gen_xop_phadddq (t3, t2));
+
+      /* t4: ((B*E)+(A*F))<<32, ((D*G)+(C*H))<<32 */
+      emit_insn (gen_ashlv2di3 (t4, t3, GEN_INT (32)));
+
+      /* op0: (((B*E)+(A*F))<<32)+(B*F), (((D*G)+(C*H))<<32)+(D*H) */
+      emit_insn (gen_xop_pmacsdql (op0, op1, op2, t4));
+    }
+  else
+    {
+      enum machine_mode nmode;
+      rtx (*umul) (rtx, rtx, rtx);
+
+      if (mode == V2DImode)
+	{
+	  umul = gen_sse2_umulv2siv2di3;
+	  nmode = V4SImode;
+	}
+      else if (mode == V4DImode)
+	{
+	  umul = gen_avx2_umulv4siv4di3;
+	  nmode = V8SImode;
+	}
+      else
+	gcc_unreachable ();
+
+
+      /* Multiply low parts.  */
+      t1 = gen_reg_rtx (mode);
+      emit_insn (umul (t1, gen_lowpart (nmode, op1), gen_lowpart (nmode, op2)));
+
+      /* Shift input vectors right 32 bits so we can multiply high parts.  */
+      t6 = GEN_INT (32);
+      t2 = expand_binop (mode, lshr_optab, op1, t6, NULL, 1, OPTAB_DIRECT);
+      t3 = expand_binop (mode, lshr_optab, op2, t6, NULL, 1, OPTAB_DIRECT);
+
+      /* Multiply high parts by low parts.  */
+      t4 = gen_reg_rtx (mode);
+      t5 = gen_reg_rtx (mode);
+      emit_insn (umul (t4, gen_lowpart (nmode, t2), gen_lowpart (nmode, op2)));
+      emit_insn (umul (t5, gen_lowpart (nmode, t3), gen_lowpart (nmode, op1)));
+
+      /* Combine and shift the highparts back.  */
+      t4 = expand_binop (mode, add_optab, t4, t5, t4, 1, OPTAB_DIRECT);
+      t4 = expand_binop (mode, ashl_optab, t4, t6, t4, 1, OPTAB_DIRECT);
+
+      /* Combine high and low parts.  */
+      force_expand_binop (mode, add_optab, t1, t4, op0, 1, OPTAB_DIRECT);
+    }
+
+  set_unique_reg_note (get_last_insn (), REG_EQUAL,
+		       gen_rtx_MULT (mode, op1, op2));
 }
 
 /* Expand an insert into a vector register through pinsr insn.

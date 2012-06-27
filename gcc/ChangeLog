@@ -1,3 +1,58 @@
+2012-06-27  Nick Clifton  <nickc@redhat.com>
+
+	* config/rx/rx.md (comparesi3_extend): Remove = modifier from
+	input operand.
+
+2012-06-27  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53676
+	* tree-chrec.c (chrec_convert_1): Represent truncation to
+	a type with undefined overflow as truncation to an unsigned
+	type converted to the type with undefined overflow.
+	* tree-scalar-evolution.c (interpret_rhs_expr): For computing
+	the scalar evolution of a truncated widened operation avoid
+	looking at the non-existing evolution of the widened operation
+	result.
+
+2012-06-27  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53774
+	* tree-ssa-reassoc.c (get_rank): All default defs have
+	precomputed rank.
+	(init_reassoc): Precompute rank for all SSA default defs.
+
+2012-06-27  Nick Clifton  <nickc@redhat.com>
+
+	* config/rx/rx.md (simple_return): Use the simple_return rtx.
+
+2012-06-26  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (ix86_rtx_costs): Use standard_sse_constant_p
+	and don't fall thru from standard_80387_constant_p to the memory
+	fallback,
+
+2012-06-26  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (bdesc_args): Update.  Change
+	IX86_BUILTIN_VEC_WIDEN_SMUL_ODD_V4SI to OPTION_MASK_ISA_SSE2.
+	(IX86_BUILTIN_VEC_WIDEN_SMUL_EVEN_V4SI): New.
+	(ix86_builtin_mul_widen_even): Use it.
+	(ix86_builtin_mul_widen_odd): Relax SMUL_ODD from sse4 to sse2.
+	(ix86_expand_mul_widen_evenodd): Handle signed for sse2.
+	* config/i386/sse.md (vec_widen_<s>mult_hi_<V124_AVX2>): Allow
+	for all SSE2.
+	(vec_widen_<s>mult_lo_<V124_AVX2>): Likewise.
+	(vec_widen_<s>mult_odd_<VI4_AVX2>): Likewise.  Relax from V124_AVX2.
+	(vec_widen_smult_even_v4si): New.
+
+2012-06-26  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/sse.md (mul<VI8_AVX2>3): Change from insn_and_split
+	to expander; move guts to ...
+	* config/i386/i386.c (ix86_expand_sse2_mulvxdi3): ... here.  Add
+	highparts before shifting up.
+	* config/i386/i386-protos.h: Update.
+
 2012-06-26  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* system.h (USE_COMMON_FOR_ONE_ONLY): Poison.
