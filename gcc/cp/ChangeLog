@@ -1,3 +1,21 @@
+2012-06-26  Richard Guenther  <rguenther@suse.de>
+
+	PR c++/53752
+	* mangle.c (write_array_type): Truncate the number-of-elements
+	result.
+
+2012-06-25  Jason Merrill  <jason@redhat.com>
+
+	PR c++/53498
+	PR c++/53305
+	* pt.c (tsubst_decl) [PARM_DECL]: Don't recurse into DECL_CHAIN
+	if cp_unevaluated_operand is set.
+	(tsubst_copy) [PARM_DECL]: Don't copy before tsubsting.
+
+	PR c++/52988
+	* typeck.c (decay_conversion): Don't discard side-effects from
+	expressions of nullptr_t.
+
 2012-06-25  Florian Weimer  <fweimer@redhat.com>
 
 	* init.c (build_new_1): Warn about (T[N]) for variable N, and

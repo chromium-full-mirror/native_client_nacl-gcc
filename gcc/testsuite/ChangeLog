@@ -1,3 +1,83 @@
+2012-06-26  Janis Johnson  <janisjo@codesourcery.com>
+
+	* lib/scandump.exp (scan-dump, scan-dump-not, scan-dump-dem,
+	scan-dump-dem-not): Use printable pattern in test name.
+
+2012-06-26  Sterling Augustine  <saugustine@google.com>
+	    Dominique Dhumieres  <dominiq@lps.ens.fr>
+
+	* gcc.dg/pubtypes-2.c: Update expected output.
+	* gcc.dg/pubtypes-3.c: Likewise.
+	* gcc.dg/pubtypes-4.c: Likewise.
+
+2012-06-26  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* gcc.dg/tree-ssa/slsr-1.c: New test.
+	* gcc.dg/tree-ssa/slsr-2.c: Likewise.
+	* gcc.dg/tree-ssa/slsr-3.c: Likewise.
+	* gcc.dg/tree-ssa/slsr-4.c: Likewise.
+
+2012-06-26  Matt Turner  <mattst88@gmail.com>
+
+	PR target/35294
+	* gcc.target/arm/mmx-2.c: New.
+
+2012-06-26  Richard Guenther  <rguenther@suse.de>
+
+	PR c++/53752
+	* g++.dg/torture/pr53752.C: New testcase.
+
+2012-06-26  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53748
+	* gcc.c-torture/compile/pr53748.c: New test.
+
+2012-06-25  Jason Merrill  <jason@redhat.com>
+
+	PR c++/53498
+	PR c++/53305
+	* g++.dg/cpp0x/decltype38.C: New.
+	* g++.dg/cpp0x/variadic132.C: Remove dg-error.
+
+2012-06-25  Janis Johnson  <janisjo@codesourcery.com>
+
+	* lib/target-supports-dg.exp (testname-for-summary): New.
+	* lib/profopt.exp (profopt_execute): Define testname_with_flags.
+	* lib/gcc-dg.exp (cleanup-coverage-files, cleanup-repo-notes,
+	cleanup-stack-usage, cleanup-dump, cleanup-saved-temps, scan-module,
+	scan-module-absence, output-exists, output-exists-not: Use
+	testname-for-summary.
+	(dg-test): Clean up testname_with_flags.
+	* lib/scanasm.exp (scan-assembler, scan-assembler-not, scan-hidden,
+	scan-not-hidden, scan-file, scan-file-not, scan-stack-usage,
+	scan-stack-usage-not, scan-assembler-times, scan-assembler-dem,
+	scan-assembler-dem-not, object-size: Use testname-for-summary.
+	* lib/gcov.exp (run-gcov): Likewise.
+	* lib/scandump.exp (scan-dump, scan-dump-times, scan-dump-not,
+	scan-dump-dem, scan-dump-dem-note): Likewise.
+
+	* lib/profopt.exp: Make prof_option_list local to profopt-execute.
+	* g++.dg/tree-prof/tree-prof.exp (PROFOPT_OPTIONS): Define after
+	including profopt.opt; save and restore existing value.
+	* g++.dg/bprob/bprob.exp: Likewise.
+	* gcc.dg/matrix/matrix.exp: Likewise.
+	* gcc.dg/tree-prof/tree-prof.exp: Likewise.
+	* gcc.misc-tests/bprob.exp: Likewise; also replace formerly-ignored
+	PROFOPT_OPTIONS.
+
+2012-06-25  Richard Henderson  <rth@redhat.com>
+
+	* gcc.dg/pr53749.c: New.
+
+2012-06-25  Jason Merrill  <jason@redhat.com>
+
+	PR c++/52988
+	* g++.dg/cpp0x/nullptr28.C: New.
+
+2012-06-25  Christophe Lyon  <christophe.lyon@st.com>
+
+	* gcc.target/arm/neon-vld1_dupQ.c: New.
+
 2012-06-25  Florian Weimer  <fweimer@redhat.com>
 
 	* g++.dg/init/new35.C: New.
