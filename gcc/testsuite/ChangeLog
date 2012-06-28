@@ -1,3 +1,48 @@
+2012-06-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/51581
+	* gcc.dg/vect/pr51581-4.c: New test.
+
+	PR tree-optimization/53645
+	* gcc.c-torture/execute/pr53645-2.c: New test.
+
+2012-06-28  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53790
+	* gcc.dg/torture/pr53790.c: New testcase.
+
+2012-06-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53645
+	* gcc.c-torture/execute/pr53645.c: New test.
+
+2012-06-28  Arnaud Charlet  <charlet@adacore.com>
+
+	* gnat.dg/deep_old.adb, gnat.dg/old_errors.adb: Removed, obsolete.
+
+2012-06-28  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53671
+	PR debug/49888
+	* gcc.dg/guality/pr49888.c: Account for the possibility that
+	the variable is optimized out at the first test.
+
+2012-06-27  Jason Merrill  <jason@redhat.com>
+
+	* g++.dg/cpp0x/override2.C: Adjust.
+	* g++.dg/template/error5.C: Adjust.
+	* g++.dg/parse/crash28.C: Adjust.
+
+	PR c++/53563
+	* g++.dg/parse/template27.C: New.
+	* g++.dg/template/crash74.C: Adjust expected output.
+
+2012-06-27  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/41951
+	PR fortran/49591
+	* gfortran.dg/typebound_operator_16.f03: New.
+
 2012-06-27  Jakub Jelinek  <jakub@redhat.com>
 
 	* gcc.target/i386/sse4_1-pmuldq.c (TEST): Initialize

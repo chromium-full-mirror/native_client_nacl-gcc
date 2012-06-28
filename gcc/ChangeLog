@@ -1,3 +1,112 @@
+2012-06-28  Richard Henderson  <rth@redhat.com>
+
+	* doc/generic.texi (MULT_HIGHPART_EXPR): Document it.
+
+2012-06-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/51581
+	* tree-vect-stmts.c (permute_vec_elements): Add forward decl.
+	(vectorizable_operation): Handle vectorization of MULT_HIGHPART_EXPR
+	also using VEC_WIDEN_MULT_*_EXPR or builtin_mul_widen_* plus
+	VEC_PERM_EXPR if vector MULT_HIGHPART_EXPR isn't supported.
+	* tree-vect-patterns.c (vect_recog_divmod_pattern): Use
+	MULT_HIGHPART_EXPR instead of VEC_WIDEN_MULT_*_EXPR and shifts.
+
+	PR tree-optimization/53645
+	* tree-vect-generic.c (expand_vector_divmod): Use MULT_HIGHPART_EXPR
+	instead of VEC_WIDEN_MULT_{HI,LO}_EXPR followed by VEC_PERM_EXPR
+	if possible.
+
+2012-06-28  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR 53595
+	* config/avr/avr.c (avr_hard_regno_call_part_clobbered): New.
+	* config/avr/avr-protos.h (avr_hard_regno_call_part_clobbered): New.
+	* config/avr/avr.h (HARD_REGNO_CALL_PART_CLOBBERED): Forward to
+	avr_hard_regno_call_part_clobbered.
+
+2012-06-28  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53790
+	* expr.c (expand_expr_real_1): Verify if the type is complete
+	before inspecting its size.
+
+2012-06-28  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* doc/include/gpl.texi: Remove.
+	* doc/sourcebuild.texi (Texinfo Manuals): Don't mention gpl.texi.
+
+2012-06-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53645
+	* tree-vect-generic.c (add_rshift): New function.
+	(expand_vector_divmod): New function.
+	(expand_vector_operation): Use it for vector integer
+	TRUNC_{DIV,MOD}_EXPR by VECTOR_CST.
+	* tree-vect-patterns.c (vect_recog_divmod_pattern): Replace
+	unused lguup variable with dummy_int.
+
+2012-06-28  OLivier Hainque  <hainque@adacore.com>
+
+	* expr.c (convert_move): Latch mem integer inputs into a
+	register before expanding a multi-instructions sequence.
+
+2012-06-28  Alexandre Oliva  <aoliva@redhat.com>,
+            Uros Bizjak  <ubizjak@gmail.com>,
+            Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/53706
+	PR debug/47624
+	* var-tracking.c (vt_emit_notes): Release loc_exp_dep_pool...
+	(vt_finalize): ... here instead, if needed.
+
+2012-06-28  Alexandre Oliva  <aoliva@redhat.com>
+
+	PR debug/53740
+	PR debug/52983
+	PR debug/48866
+	* dce.c (word_dce_process_block): Check whether inserting debug
+	temps are needed even for needed insns.
+	(dce_process_block): Likewise.
+	* df-problems.c (dead_debug_add): Add comment about multi-regs.
+	(dead_debug_insert_temp): Likewise.  Don't subreg when we're
+	setting fewer regs than a multi-reg requires.
+
+2012-06-27  Richard Henderson  <rth@redhat.com>
+
+	* config/alpha/alpha.c (alpha_dimode_u): New.
+	(alpha_init_builtins): Initialize it, and use it.
+	(alpha_fold_builtin_cmpbge): Use alpha_dimode_u.
+	(alpha_fold_builtin_zapnot, alpha_fold_builtin_insxx): Likewise.
+	(alpha_fold_vector_minmax, alpha_fold_builtin_perr): Likewise.
+	(alpha_fold_builtin_pklb, alpha_fold_builtin_pkwb): Likewise.
+	(alpha_fold_builtin_unpkbl, alpha_fold_builtin_unpkbw): Likewise.
+	(alpha_fold_builtin_cttz, alpha_fold_builtin_ctlz): Likewise.
+	(alpha_fold_builtin_ctpop): Likewise.
+	(alpha_fold_builtin_umulh): Remove.
+	(alpha_fold_builtin): Use MULT_HIGHPART_EXPR for UMULH; fix
+	typo in MAX_ARGS check.
+
+2012-06-27  Richard Henderson  <rth@redhat.com>
+
+	* tree.def (MULT_HIGHPART_EXPR): New.
+	* cfgexpand.c (expand_debug_expr): Ignore it.
+	* expr.c (expand_expr_real_2): Handle it.
+	* fold-const.c (int_const_binop_1): Likewise.
+	* optabs.c (optab_for_tree_code): Likewise.
+	* tree-cfg.c (verify_gimple_assign_binary): Likewise.
+	* tree-inline.c (estimate_operator_cost): Likewise.
+	* tree-pretty-print.c (dump_generic_node): Likewise.
+	(op_code_prio, op_symbol_code): Likewise.
+	* tree.c (commutative_tree_code): Likewise.  Also handle
+	WIDEN_MULT_EXPR, VEC_WIDEN_MULT_HI_EXPR, VEC_WIDEN_MULT_LO_EXPR.
+
+2012-06-27  Richard Henderson  <rth@redhat.com>
+
+	PR target/53749
+	* config/i386/i386.c (ix86_rtx_costs): Fix typo vs UNITS_PER_WORD
+	in 2012-06-23 change.  Adjust two other DImode tests as well.
+
 2012-06-27  Nick Clifton  <nickc@redhat.com>
 
 	* config/rx/rx.md (comparesi3_extend): Remove = modifier from
