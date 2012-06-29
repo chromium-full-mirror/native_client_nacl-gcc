@@ -1,3 +1,36 @@
+2012-06-29  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/47061
+	* gcc.dg/tree-ssa/vrp71.c: New testcase.
+
+2012-06-29  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/37541
+	* gcc.dg/tree-ssa/pr37508.c: Adjust and un-XFAIL.
+
+2012-06-29  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/52589
+	* gcc.dg/tree-ssa/vrp70.c: New testcase.
+
+2012-06-28  Janis Johnson  <janisjo@codesourcery.com>
+
+	* g++.dg/cpp0x/nullptr19.c: Remove exta directives on same line.
+
+	* g++.dg/template/error46.C: Add missing comment to dg-message.
+	* g++.dg/template/crash107.C: Likewise.
+	* g++.dg/template/error47.C: Likewise.
+	* g++.dg/template/crash108.C: Likewise.
+	* g++.dg/overload/operator5.C: Likewise.
+
+	* gcc.dg/Wstrict-aliasing-converted-assigned.c: Fix syntax
+	errors in dg-message directives, add comments.
+
+2012-06-28  Kai Tietz  <ktietz@redhat.com>
+
+	* g++.dg/cpp0x/constexpr-52672.C (ul_ptr): Use SIZE_TYPE instead of
+	hard-coded 'unsigned long'.
+
 2012-06-28  Jakub Jelinek  <jakub@redhat.com>
 
 	PR tree-optimization/51581
