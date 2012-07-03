@@ -8027,6 +8027,23 @@ uses_template_parms (tree t)
   return dependent_p;
 }
 
+/* Returns true iff current_function_decl is an incompletely instantiated
+   template.  Useful instead of processing_template_decl because the latter
+   is set to 0 during fold_non_dependent_expr.  */
+
+bool
+in_template_function (void)
+{
+  tree fn = current_function_decl;
+  bool ret;
+  ++processing_template_decl;
+  ret = (fn && DECL_LANG_SPECIFIC (fn)
+	 && DECL_TEMPLATE_INFO (fn)
+	 && any_dependent_template_arguments_p (DECL_TI_ARGS (fn)));
+  --processing_template_decl;
+  return ret;
+}
+
 /* Returns true if T depends on any template parameter with level LEVEL.  */
 
 int
@@ -14401,7 +14418,7 @@ tsubst_copy_and_build (tree t,
 	LAMBDA_EXPR_DISCRIMINATOR (r)
 	  = (LAMBDA_EXPR_DISCRIMINATOR (t));
 	LAMBDA_EXPR_EXTRA_SCOPE (r)
-	  = RECUR (LAMBDA_EXPR_EXTRA_SCOPE (t));
+	  = tsubst (LAMBDA_EXPR_EXTRA_SCOPE (t), args, complain, in_decl);
 	LAMBDA_EXPR_RETURN_TYPE (r)
 	  = tsubst (LAMBDA_EXPR_RETURN_TYPE (t), args, complain, in_decl);
 
@@ -20213,6 +20230,10 @@ build_non_dependent_expr (tree expr)
 
   /* Don't wrap an initializer list, we need to be able to look inside.  */
   if (BRACE_ENCLOSED_INITIALIZER_P (expr))
+    return expr;
+
+  /* Don't wrap a dummy object, we need to be able to test for it.  */
+  if (is_dummy_object (expr))
     return expr;
 
   if (TREE_CODE (expr) == COND_EXPR)

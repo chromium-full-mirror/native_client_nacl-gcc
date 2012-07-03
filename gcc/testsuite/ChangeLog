@@ -1,3 +1,50 @@
+2012-07-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/53812
+	* g++.dg/ext/label14.C: New test.
+
+2012-07-03  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53811
+	* g++.dg/other/pr53811.C: New test.
+
+2012-07-03  Andreas Schwab  <schwab@linux-m68k.org>
+
+	PR target/28896
+	* gcc.target/m68k/stack-limit-1.c: New testcase.
+
+2012-07-03  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/recursive_call.adb: New test.
+
+2012-07-03  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/discr37.ad[sb]: New test.
+
+2012-07-03  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* g++.dg/other/packed1.C: Remove SH from xfail list.
+
+2012-07-02  Jason Merrill  <jason@redhat.com>
+
+	PR c++/53619
+	* g++.dg/cpp0x/lambda/lambda-this5.C: New.
+
+	PR c++/53783
+	* g++.dg/cpp0x/lambda/lambda-template7.C: New.
+
+	PR c++/53788
+	* g++.dg/cpp0x/decltype39.C: New.
+	* g++.dg/diagnostic/method1.C: Adjust.
+
+	PR c++/53816
+	* g++.dg/template/ref6.C: New.
+
+2012-07-02  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53568
+	* gcc.target/sh/pr53568-1.c: New.
+
 2012-07-02  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/51244
