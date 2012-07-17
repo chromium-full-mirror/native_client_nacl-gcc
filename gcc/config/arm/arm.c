@@ -24497,7 +24497,7 @@ arm_dbx_register_number (unsigned int regno)
   if (regno < 16)
     return regno;
 
-  if (IS_VFP_REGNUM (regno))
+  if (regno >= FIRST_VFP_REGNUM && regno <= LAST_HI_VFP_REGNUM)
     {
       /* See comment in arm_dwarf_register_span.  */
       if (VFP_REGNO_OK_FOR_SINGLE (regno))
@@ -24516,12 +24516,8 @@ arm_dbx_register_number (unsigned int regno)
     /* These are not really registers.  */
     return -1;
 
-  if (regno == CC_REGNUM + 1 /* sfp */ || regno == CC_REGNUM + 2 /* afp */)
-    return 11; /* r11 = fp */
-
-  if (IS_CIRRUS_REGNUM (regno))
-    /* There are no DWARF register numbers assigned for these.  */
-    return -1;
+  if (regno == CC_REGNUM + 2 /* sfp */ || regno == CC_REGNUM + 3 /* afp */)
+    return 11;                          /* r11 = fp */
 
   gcc_unreachable ();
 }
