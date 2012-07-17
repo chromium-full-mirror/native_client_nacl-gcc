@@ -40,7 +40,6 @@
 #include "tm_p.h"
 #include "cfgloop.h"
 #include "target.h"
-#include "timevar.h"
 #include "tree-pass.h"
 #include "df.h"
 #include "vec.h"
@@ -4454,7 +4453,10 @@ rest_of_handle_if_conversion (void)
   if (flag_if_conversion)
     {
       if (dump_file)
-        dump_flow_info (dump_file, dump_flags);
+	{
+	  dump_reg_info (dump_file);
+	  dump_flow_info (dump_file, dump_flags);
+	}
       cleanup_cfg (CLEANUP_EXPENSIVE);
       if_convert ();
     }

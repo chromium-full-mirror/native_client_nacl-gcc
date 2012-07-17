@@ -368,6 +368,13 @@
 	  : nonimmediate_operand) (op, mode);
 })
 
+;; Returns 1 if the operand can be used in a zero_extend.
+(define_predicate "zero_extend_operand"
+  (ior (and (match_test "TARGET_SHMEDIA")
+	    (match_operand 0 "general_extend_operand"))
+       (and (match_test "! TARGET_SHMEDIA")
+	    (match_operand 0 "arith_reg_operand"))))
+
 ;; Returns 1 if OP can be source of a simple move operation. Same as
 ;; general_operand, but a LABEL_REF is valid, PRE_DEC is invalid as
 ;; are subregs of system registers.
@@ -569,6 +576,21 @@
 	return 0;
     }
   else if (satisfies_constraint_K08 (op))
+    return 1;
+
+  return 0;
+})
+
+;; Like logical_operand but allows additional constant values which can be
+;; done with zero extensions.  Used for the second operand of and insns.
+(define_predicate "logical_and_operand"
+  (match_code "subreg,reg,const_int")
+{
+  if (logical_operand (op, mode))
+    return 1;
+
+  if (! TARGET_SHMEDIA
+      && (satisfies_constraint_Jmb (op) || satisfies_constraint_Jmw (op)))
     return 1;
 
   return 0;

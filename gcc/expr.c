@@ -45,7 +45,6 @@ along with GCC; see the file COPYING3.  If not see
 #include "intl.h"
 #include "tm_p.h"
 #include "tree-iterator.h"
-#include "tree-pass.h"
 #include "tree-flow.h"
 #include "target.h"
 #include "common/common-target.h"
@@ -8554,8 +8553,13 @@ expand_expr_real_2 (sepops ops, rtx target, enum machine_mode tmode,
       return expand_divmod (0, code, mode, op0, op1, target, unsignedp);
 
     case RDIV_EXPR:
-    case MULT_HIGHPART_EXPR:
       goto binop;
+
+    case MULT_HIGHPART_EXPR:
+      expand_operands (treeop0, treeop1, subtarget, &op0, &op1, EXPAND_NORMAL);
+      temp = expand_mult_highpart (mode, op0, op1, target, unsignedp);
+      gcc_assert (temp);
+      return temp;
 
     case TRUNC_MOD_EXPR:
     case FLOOR_MOD_EXPR:
@@ -8917,29 +8921,15 @@ expand_expr_real_2 (sepops ops, rtx target, enum machine_mode tmode,
 
     case VEC_WIDEN_MULT_HI_EXPR:
     case VEC_WIDEN_MULT_LO_EXPR:
-      {
-	tree oprnd0 = treeop0;
-	tree oprnd1 = treeop1;
-
-	expand_operands (oprnd0, oprnd1, NULL_RTX, &op0, &op1, EXPAND_NORMAL);
-	target = expand_widen_pattern_expr (ops, op0, op1, NULL_RTX,
-					    target, unsignedp);
-	gcc_assert (target);
-	return target;
-      }
-
+    case VEC_WIDEN_MULT_EVEN_EXPR:
+    case VEC_WIDEN_MULT_ODD_EXPR:
     case VEC_WIDEN_LSHIFT_HI_EXPR:
     case VEC_WIDEN_LSHIFT_LO_EXPR:
-      {
-        tree oprnd0 = treeop0;
-        tree oprnd1 = treeop1;
-
-        expand_operands (oprnd0, oprnd1, NULL_RTX, &op0, &op1, EXPAND_NORMAL);
-        target = expand_widen_pattern_expr (ops, op0, op1, NULL_RTX,
-                                            target, unsignedp);
-        gcc_assert (target);
-        return target;
-      }
+      expand_operands (treeop0, treeop1, NULL_RTX, &op0, &op1, EXPAND_NORMAL);
+      target = expand_widen_pattern_expr (ops, op0, op1, NULL_RTX,
+					  target, unsignedp);
+      gcc_assert (target);
+      return target;
 
     case VEC_PACK_TRUNC_EXPR:
     case VEC_PACK_SAT_EXPR:
@@ -10850,8 +10840,7 @@ do_store_flag (sepops ops, rtx target, enum machine_mode mode)
    0 otherwise (i.e. if there is no casesi instruction).  */
 int
 try_casesi (tree index_type, tree index_expr, tree minval, tree range,
-	    rtx table_label ATTRIBUTE_UNUSED, rtx default_label,
-	    rtx fallback_label ATTRIBUTE_UNUSED)
+	    rtx table_label, rtx default_label, rtx fallback_label)
 {
   struct expand_operand ops[5];
   enum machine_mode index_mode = SImode;

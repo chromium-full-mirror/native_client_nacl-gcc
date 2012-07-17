@@ -259,12 +259,18 @@ perform_access_checks (VEC (deferred_access_check,gc)* checks)
 {
   int i;
   deferred_access_check *chk;
+  location_t loc = input_location;
 
   if (!checks)
     return;
 
   FOR_EACH_VEC_ELT (deferred_access_check, checks, i, chk)
-    enforce_access (chk->binfo, chk->decl, chk->diag_decl);
+    {
+      input_location = chk->loc;
+      enforce_access (chk->binfo, chk->decl, chk->diag_decl);
+    }
+
+  input_location = loc;
 }
 
 /* Perform the deferred access checks.
@@ -334,6 +340,7 @@ perform_or_defer_access_check (tree binfo, tree decl, tree diag_decl)
   new_access->binfo = binfo;
   new_access->decl = decl;
   new_access->diag_decl = diag_decl;
+  new_access->loc = input_location;
 }
 
 /* Used by build_over_call in LOOKUP_SPECULATIVE mode: return whether DECL
@@ -1625,7 +1632,7 @@ finish_non_static_data_member (tree decl, tree object, tree qualifying_scope)
 /* If we are currently parsing a template and we encountered a typedef
    TYPEDEF_DECL that is being accessed though CONTEXT, this function
    adds the typedef to a list tied to the current template.
-   At tempate instantiatin time, that list is walked and access check
+   At template instantiation time, that list is walked and access check
    performed for each typedef.
    LOCATION is the location of the usage point of TYPEDEF_DECL.  */
 
