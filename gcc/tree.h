@@ -5068,12 +5068,6 @@ extern tree get_inner_reference (tree, HOST_WIDE_INT *, HOST_WIDE_INT *,
 				 tree *, enum machine_mode *, int *, int *,
 				 bool);
 
-/* Given an expression EXP that may be a COMPONENT_REF, an ARRAY_REF or an
-   ARRAY_RANGE_REF, look for whether EXP or any nested component-refs within
-   EXP is marked as PACKED.  */
-
-extern bool contains_packed_reference (const_tree exp);
-
 /* Return a tree of sizetype representing the size, in bytes, of the element
    of EXP, an ARRAY_REF or an ARRAY_RANGE_REF.  */
 
@@ -5485,7 +5479,6 @@ extern bool is_builtin_fn (tree);
 extern bool get_object_alignment_1 (tree, unsigned int *,
 				    unsigned HOST_WIDE_INT *);
 extern unsigned int get_object_alignment (tree);
-extern unsigned int get_object_or_type_alignment (tree);
 extern bool get_pointer_alignment_1 (tree, unsigned int *,
 				     unsigned HOST_WIDE_INT *);
 extern unsigned int get_pointer_alignment (tree);
