@@ -14124,6 +14124,25 @@ arm_emit_movpair (rtx dest, rtx src)
    emit_set_insn (dest, gen_rtx_LO_SUM (SImode, dest, src));
  }
 
+/* Adjust *COUNT for an instruction being emitted with a %b<n>
+   prefix, where OPERAND is %<n>.  */
+static void
+count_sfi_breg (int *count, rtx operand)
+{
+  if (count && arm_sfi_breg_operand (operand))
+    *count += 2;
+}
+
+/* Adjust *COUNT for an instruction being emitted with a %j<n>
+   prefix, where OPERAND is %<n>.  */
+static void
+count_sfi_sp (int *count, rtx operand)
+{
+  gcc_assert (GET_CODE (operand) == REG);
+  if (count && TARGET_SFI_NACL1 && REGNO (operand) == SP_REGNUM)
+    *count += 2;
+}
+
 /* Output a move between double words.  It must be REG<-MEM
    or MEM<-REG.  */
 const char *
@@ -14165,12 +14184,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b1ldm%(ia%)\t%m1, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
 	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1, #8]!", operands);
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_DEC:
@@ -14181,6 +14202,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b1ldm%(db%)\t%m1!, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case POST_INC:
@@ -14191,12 +14213,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b1ldm%(ia%)\t%m1!, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
 	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1], #-8", operands);
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_MODIFY:
@@ -14222,6 +14246,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_sp (count, otherops[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	      else
 		{
@@ -14236,6 +14262,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      if (emit)
 			output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]!",
                                          otherops);
+                      count_sfi_breg (count, otherops[1]);
 		    }
 		  else
 		    {
@@ -14247,7 +14274,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 			}
 		      if (count)
 			*count = 2;
-
+                      count_sfi_breg (count, otherops[1]);
+                      count_sfi_breg (count, otherops[1]);
 		    }
 		}
 	    }
@@ -14263,6 +14291,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    output_asm_insn ("%b1ldr%(d%)\t%0, [%1], %2", otherops);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	      else
 		{
@@ -14273,6 +14302,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_breg (count, otherops[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	    }
 	  break;
@@ -14298,6 +14329,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 
 	  if (count)
 	    *count = 2;
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	  /* ??? This needs checking for thumb2.  */
@@ -14317,19 +14349,22 @@ output_move_double (rtx *operands, bool emit, int *count)
 			{
 			case -8:
 			  if (emit)
-			    output_asm_insn ("ldm%(db%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(db%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			case -4:
 			  if (TARGET_THUMB2)
 			    break;
 			  if (emit)
-			    output_asm_insn ("ldm%(da%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(da%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			case 4:
 			  if (TARGET_THUMB2)
 			    break;
 			  if (emit)
-			    output_asm_insn ("ldm%(ib%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(ib%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			}
 		    }
@@ -14366,6 +14401,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 			    }
 			  if (count)
 			    *count = 2;
+                          count_sfi_sp (count, otherops[0]);
+                          count_sfi_breg (count, otherops[1]);
 			}
 		      else
 			{
@@ -14373,6 +14410,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 			  if (emit)
 			    output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]",
                                              otherops);
+                          count_sfi_breg (count, otherops[1]);
 			}
 		      return "";
 		    }
@@ -14393,15 +14431,18 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      if (emit)
 			output_asm_insn ("%j0add%?\t%0, %1, %2", otherops);
 		    }
+                  count_sfi_sp (count, otherops[0]);
 		}
 	      else
 		{
 		  if (emit)
 		    output_asm_insn ("%j0sub%?\t%0, %1, %2", otherops);
+                  count_sfi_sp (count, otherops[0]);
 		}
 
 	      if (count)
 		*count = 2;
+              count_sfi_breg (count, operands[1]);
 
 	      if (TARGET_LDRD)
 		return "%b1ldr%(d%)\t%0, [%1]";
@@ -14421,7 +14462,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    }
 		  if (count)
 		    *count = 2;
-
+                  count_sfi_breg (count, otherops[1]);
+                  count_sfi_breg (count, operands[1]);
 		}
 	      else
 		{
@@ -14432,6 +14474,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_breg (count, operands[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	    }
 	}
@@ -14452,12 +14496,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b0stm%(ia%)\t%m0, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
 	    output_asm_insn ("%b0str%(d%)\t%1, [%m0, #8]!", operands);
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case PRE_DEC:
@@ -14468,6 +14514,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b0stm%(db%)\t%m0!, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case POST_INC:
@@ -14478,12 +14525,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      else
 		output_asm_insn ("%b0stm%(ia%)\t%m0!, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
 	    output_asm_insn ("%b0str%(d%)\t%1, [%m0], #-8", operands);
+          count_sfi_breg (count, operands[0]);
 	  break;
 
 	case PRE_MODIFY:
@@ -14519,16 +14568,20 @@ output_move_double (rtx *operands, bool emit, int *count)
 		  if (count)
 		    *count = 2;
 		}
+              count_sfi_breg (count, otherops[1]);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  else if (GET_CODE (XEXP (operands[0], 0)) == PRE_MODIFY)
 	    {
 	      if (emit)
 		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]!", otherops);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  else
 	    {
 	      if (emit)
 		output_asm_insn ("%b1str%(d%)\t%0, [%1], %2", otherops);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  break;
 
@@ -14541,6 +14594,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		case -8:
 		  if (emit)
 		    output_asm_insn ("%b0stm%(db%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 
 		case -4:
@@ -14548,6 +14602,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    break;
 		  if (emit)
 		    output_asm_insn ("%b0stm%(da%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 
 		case 4:
@@ -14555,6 +14610,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 		    break;
 		  if (emit)
 		    output_asm_insn ("%b0stm%(ib%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 		}
 	    }
@@ -14569,6 +14625,7 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      otherops[1] = XEXP (XEXP (operands[0], 0), 0);
 	      if (emit)
 		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]", otherops);
+              count_sfi_breg (count, otherops[1]);
 	      return "";
 	    }
 	  /* Fall through */
@@ -14583,6 +14640,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 	    }
 	  if (count)
 	    *count = 2;
+          count_sfi_breg (count, operands[0]);
+          count_sfi_breg (count, otherops[0]);
 	}
     }
 
@@ -16986,6 +17045,10 @@ arm_sfi_breg_operand (rtx x)
       break;
 
     case CONST:
+    case CONST_INT:
+    case CONST_DOUBLE:
+    case CONST_VECTOR:
+    case CONST_STRING:
     case SYMBOL_REF:
       return -1;
 
