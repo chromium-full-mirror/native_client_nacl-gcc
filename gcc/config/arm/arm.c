@@ -1473,9 +1473,9 @@ arm_build_builtin_va_list (void)
 #ifdef VA_LIST_TYPE_SIZE
   /* Certain variant ABIs require that the struct be padded out to
      a larger exact size.  */
-  gcc_assert (VA_LIST_TYPE_SIZE % 4 == 0);
+  gcc_assert (VA_LIST_TYPE_SIZE % (4 * BITS_PER_UNIT) == 0);
   {
-    const unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE - 4) / 4;
+    unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE / BITS_PER_UNIT - 4) / 4;
     unsigned int i;
     tree *next_field = &DECL_CHAIN (ap_field);
     for (i = 0; i < num_pad_fields; ++i)
