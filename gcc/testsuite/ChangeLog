@@ -1,3 +1,27 @@
+2012-07-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/discr38.adb: New test.
+
+2012-07-19  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/54017
+	* c-c++-common/gomp/pr54017.c: New test.
+
+2012-07-19  Richard Guenther  <rguenther@suse.de>
+	    Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/loop_optimization11.adb: New testcase.
+	* gnat.dg/loop_optimization11_pkg.ads: Likewise.
+
+2012-07-18  Paolo Carlini  <paolo.carlini@oracle.com>
+	    Jason Merrill  <jason@redhat.com>
+
+	* g++.dg/cpp0x/sfinae37.C: New.
+	* g++.dg/template/access23.C: New.
+	* g++.dg/template/access7.C: Adjust.
+	* g++.dg/template/sfinae10.C: Don't expect errors.
+	* g++.dg/template/sfinae6_neg.C: Don't expect errors.
+
 2012-07-18  Julian Brown  <julian@codesourcery.com>
 	    Sandra Loosemore <sandra@codesroucery.com>
 
