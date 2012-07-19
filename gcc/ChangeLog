@@ -1,3 +1,53 @@
+2012-07-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/sparc/sparc.md (adddi3_insn_sp32): Add earlyclobber.
+
+2012-07-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* tree-ssa-forwprop.c (combine_conversions): Punt if the RHS of the
+	defining statement is a SSA name that occurs in abnormal PHIs.
+
+2012-07-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gimple-fold.c (canonicalize_constructor_val): Strip only useless type
+	conversions.
+
+2012-07-19  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/53942
+	* function.c (assign_parm_setup_reg): Avoid zero/sign extension
+	directly from likely spilled non-fixed hard registers, move them
+	to pseudo first.
+
+2012-07-19  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips.c (mips_set_mips16_mode): Clear SYNCI_MASK in
+	MIPS16 mode.
+
+2012-07-19  Jason Merrill  <jason@redhat.com>
+
+	PR debug/53235
+	* dwarf2out.c (get_die_parent): New.
+	(generate_type_signature): Use it.
+
+2012-07-19  Richard Henderson  <rth@redhat.com>
+
+	* config/ia64/vect.md (smulv4hi3_highpart): New.
+	(umulv4hi3_highpart): New.
+	(vec_widen_smult_even_v4hi): Rename from pmpy2_even.
+	(vec_widen_smult_odd_v4hi): Rename from pmpy2_odd.
+	(udot_prodv8qi, sdot_prodv8qi): Remove.
+	(sdot_prodv4hi, udot_prodv4hi): Remove.
+	* config/ia64/ia64.c (ia64_expand_dot_prod_v8qi): Remove.
+	* config/ia64/ia64-protos.h: Update.
+
+	* tree-vect-patterns.c (vect_recog_divmod_pattern): Do not require
+	vectors larger than UNITS_PER_WORD.
+
+	* expr.c (store_constructor): Initialize icode with CODE_FOR_nothing.
+	* tree-vect-stmts.c (vectorizable_operation): Use LAST_INSN_CODE for
+	dummy != CODE_FOR_nothing value.
+
 2012-07-19  Uros Bizjak  <ubizjak@gmail.com>
 
 	* doc/tm.texi.in (MODE_AFTER): Add entity as the first macro argument.
