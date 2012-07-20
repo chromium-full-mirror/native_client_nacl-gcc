@@ -61,3 +61,9 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 	  align_loops = bundle_size;                                    \
       }                                                                 \
   } while (0)
+
+/* Every Native Client platform has a 'long double' type that is just
+   'double', which is always the IEEE754 64-bit type.  */
+#undef LONG_DOUBLE_TYPE_SIZE
+#define LONG_DOUBLE_TYPE_SIZE		DOUBLE_TYPE_SIZE
+#undef LIBGCC2_HAS_TF_MODE
