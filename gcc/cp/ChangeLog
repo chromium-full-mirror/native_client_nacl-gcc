@@ -1,4 +1,13 @@
+2012-07-20  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54038
+	* tree.c (build_cplus_array_type): Use build_cplus_array_type to build
+	canonical array type rather than mess with its TYPE_*_VARIANT.
+
 2012-07-19  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54026
+	* typeck.c (cp_apply_type_quals_to_decl): Check COMPLETE_TYPE_P.
 
 	PR c++/54021
 	* call.c (build_cxx_call): Set optimize when folding

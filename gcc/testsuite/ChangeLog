@@ -1,3 +1,44 @@
+2012-07-20  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54038
+	* g++.dg/other/array7.C: New.
+
+2012-07-20  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* gcc.dg/tree-prof/update-loopch.c: Look for counts on the dumps of
+	the basic block and check loop depth.
+	* gcc.dg/tree-ssa/pr18133-1.c: Dump details, not blocks.  Update
+	matching patterns and comments.
+	* gcc.dg/tree-ssa/20031021-1.c: Fix check patterns.
+	* gcc.dg/tree-ssa/vector-2.c: Likewise.
+
+2012-07-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/28656
+	* c-c++-common/pr28656.c: New test.
+
+2012-07-19  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54026
+	* g++.dg/init/mutable1.C: New.
+
+2012-07-20  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/48820
+	* gfortran.dg/assumed_type_3.f90: Update dg-error.
+	* gfortran.dg/assumed_rank_1.f90: New.
+	* gfortran.dg/assumed_rank_1_c.c: New.
+	* gfortran.dg/assumed_rank_2.f90: New.
+	* gfortran.dg/assumed_rank_4.f90: New.
+	* gfortran.dg/assumed_rank_5.f90: New.
+	* gfortran.dg/assumed_rank_6.f90: New.
+	* gfortran.dg/assumed_rank_7.f90: New.
+	* gfortran.dg/assumed_rank_8.f90: New.
+	* gfortran.dg/assumed_rank_8_c.c: New.
+	* gfortran.dg/assumed_rank_9.f90: New.
+	* gfortran.dg/assumed_rank_10.f90: New.
+	* gfortran.dg/assumed_rank_12.f90: New.
+
 2012-07-19  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* gnat.dg/opt25.adb: New test.
