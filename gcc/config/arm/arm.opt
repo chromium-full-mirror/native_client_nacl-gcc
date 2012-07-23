@@ -210,6 +210,9 @@ Enum(arm_tp_type) String(auto) Value(TP_AUTO)
 EnumValue
 Enum(arm_tp_type) String(cp15) Value(TP_CP15)
 
+EnumValue
+Enum(arm_tp_type) String(r9) Value(TP_R9)
+
 mtpcs-frame
 Target Report Mask(TPCS_FRAME)
 Thumb: Generate (non-leaf) stack frames even if not needed

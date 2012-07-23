@@ -258,6 +258,7 @@ extern void (*arm_lang_output_object_attributes_hook)(void);
 
 #define TARGET_HARD_TP			(target_thread_pointer == TP_CP15)
 #define TARGET_SOFT_TP			(target_thread_pointer == TP_SOFT)
+#define TARGET_R9_TP			(target_thread_pointer == TP_R9)
 #define TARGET_GNU2_TLS			(target_tls_dialect == TLS_GNU2)
 
 /* Only 16-bit thumb code.  */
@@ -1217,7 +1218,7 @@ enum reg_class
    but prevents the compiler from extending the lifetime of these
    registers.  */
 #define TARGET_SMALL_REGISTER_CLASSES_FOR_MODE_P \
-  arm_small_register_classes_for_mode_p 
+  arm_small_register_classes_for_mode_p
 
 /* Must leave BASE_REGS reloads alone */
 #define THUMB_SECONDARY_INPUT_RELOAD_CLASS(CLASS, MODE, X)		\
@@ -1310,7 +1311,7 @@ do {									      \
 
 /* Return the maximum number of consecutive registers
    needed to represent mode MODE in a register of class CLASS.
-   ARM regs are UNITS_PER_WORD bits.  
+   ARM regs are UNITS_PER_WORD bits.
    FIXME: Is this true for iWMMX?  */
 #define CLASS_MAX_NREGS(CLASS, MODE)  \
   (ARM_NUM_REGS (MODE))
@@ -1469,14 +1470,14 @@ typedef struct GTY(()) machine_function
 machine_function;
 #endif
 
-/* As in the machine_function, a global set of call-via labels, for code 
+/* As in the machine_function, a global set of call-via labels, for code
    that is in text_section.  */
 extern GTY(()) rtx thumb_call_via_label[14];
 
 /* The number of potential ways of assigning to a co-processor.  */
 #define ARM_NUM_COPROC_SLOTS 1
 
-/* Enumeration of procedure calling standard variants.  We don't really 
+/* Enumeration of procedure calling standard variants.  We don't really
    support all of these yet.  */
 enum arm_pcs
 {
