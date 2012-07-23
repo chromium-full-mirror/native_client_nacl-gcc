@@ -1,3 +1,28 @@
+2012-07-21  Tobias Burnus  <burnus@net-b.de>
+
+	* iso-c-binding.def (C_PTRDIFF_T): New TS29113 parameter.
+	* intrinsic.texi (ISO_C_BINDING): Document it.
+
+2012-07-21  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/48820
+	* trans-intrinsic.c (gfc_conv_intrinsic_bound): Support
+	lbound/ubound with dim= for assumed-rank arrays.
+	* array.c (gfc_set_array_spec): Reject coarrays with
+	assumed shape.
+	* decl.c (merge_array_spec): Ditto. Return gfc_try.
+	(match_attr_spec, match_attr_spec): Update call.
+
+2012-07-21  Tobias Burnus  <burnus@net-b.de>
+
+	* resolve.c (resolve_formal_arglist): Put variable
+	declaration before the first assignment.
+
+2012-07-21  Tobias Burnus  <burnus@net-b.de>
+
+	* trans-expr.c (gfc_conv_derived_to_class): Fix argument passed
+	to class_array_data_assign.
+
 2012-07-20  Tobias Burnus  <burnus@net-b.de>
 
 	* decl.c (gfc_verify_c_interop_param): Allow assumed-shape

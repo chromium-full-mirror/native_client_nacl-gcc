@@ -1,18 +1,213 @@
+2012-07-23  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53961
+	* config/i386/i386.md (*lea): Add asserts to detect invalid addresses.
+	* config/i386/i386.c (ix86_print_operand_address): Ditto.
+	(ix86_decompose_address): Allow (zero_extend:DI (subreg:SI (...)))
+	addresses.  Prevent zero extensions of CONST_INT operands.
+
+2012-07-22  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sbitmap.h (struct int_list): Remove.
+	(sbitmap_intersect_of_predsucc, sbitmap_union_of_predsucc):
+	Remove prototypes of non-existing function.
+	(sbitmap_intersect_of_predecessors, sbitmap_intersect_of_successors,
+	sbitmap_union_of_predecessors, sbitmap_union_of_successors): Remove
+	unused defines.
+	(sbitmap_intersection_of_succs, sbitmap_intersection_of_preds,
+	sbitmap_union_of_succs, sbitmap_union_of_preds): Move prototypes to...
+	* basic-block.h: ... here.
+	* sbitmap.c: Do not include basic-block.h.
+	(sbitmap_intersection_of_succs, sbitmap_intersection_of_preds,
+	sbitmap_union_of_succs, sbitmap_union_of_preds): Move functions to...
+	* cfganal.c: ... here.
+	* bt-load.c (compute_out, link_btr_uses): Update for above changes.
+	* gcse.c (compute_code_hoist_vbeinout): Likewise.
+	* lcm.c (compute_antinout_edge, compute_available): Likewise.
+	* Makefile.in: Fix sbitmap.o dependencies.
+
+2012-07-23  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* config/frv/frv-protos.h (frv_ifcvt_machdep_init): Prototype.
+	* config/frv/frv.c (frv_ifcvt_machdep_init): Change type of
+	(unused) parameter to void *.
+
+2012-07-23  Richard Guenther  <rguenther@suse.de>
+
+	* tree-ssa-alias.c (dump_alias_info): Walk over local decls
+	instead of referenced vars.
+
+2012-07-22  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* coverage.c: Refer to "notes file" instead of "graph file"
+	in all comments.  Explain history of bbg prefix.
+	* gcov-io.h: Likewise.
+	* gcov.c: Likewise.
+	(find_source): Likewise in fnotice.
+	(read_graph_file): Likewise.
+	(read_count_file): Likewise.
+	* doc/gcov.texi: Document -fprofile-dir flag.  Add "notes file"
+	and "data file" explicitly in the explanation of the files.
+
+2012-07-22  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR tree-optimization/53881
+	* tree-cfg.c (group_case_labels_stmt): Look up the basic block
+	for each label and compare them instead of labels.
+
+2012-07-22  Steven Bosscher <steven@gcc.gnu.org>
+
+	* opts.c (common_handle_option): Do not set
+	flag_value_profile_transformations for -fprofile-generate.
+	* profile.c (instrument_values): Use COUNTER_FOR_HIST_TYPE.
+	(BB_TO_GCOV_INDEX): Remove.
+	(output_location): Don't use it.
+	(branch_prob): Likewise.  Don't fiddle with the index of
+	ENTRY_BLOCK_PTR and EXIT_BLOCK_PTR.  Use clear_aux_for_blocks.
+	(find_spanning_tree):
+	* gcov.c (struct function_info): Document that blocks 0 and 1
+	are the entry resp. exit blocks in gcov, too, like in GCC itself.
+	(solve_flow_graph): Use ENTRY_BLOCK and EXIT_BLOCK for special
+	blocks identification.
+	(output_lines): Likewise.
+	* value-prof.c (gimple_value_profile_transformations): Do not
+	test flag_value_profile_transformations again.
+	(gimple_ic_transform): Take a gimple_stmt_iterator like all other
+	transformation functions.
+	(gimple_values_to_profile):
+	Don't test flag_value_profile_transformations
+	* tree-profile.c (tree_profiling): Assert that the cgraph is in
+	the CGRAPH_STATE_IPA_SSA state.
+	Do not set, or look at, after_tree_profile.
+	* function.h (struct function): Remove after_tree_profile bit.
+	* omp-low.c (expand_omp_taskreg): Don't set after_tree_profile.
+	* tree-inline.c (initialize_cfun): Don't copy it.
+	* lto-streamer-out.c (output_struct_function_base): Don't stream it.
+	* lto-streamer-in.c (input_struct_function_base): Likewise.
+
+2012-07-22  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.h (TARGET_DYNSHIFT): New macro.
+	(SH_DYNAMIC_SHIFT_COST): Use it.
+	* config/sh/sh.c (expand_ashiftrt, shl_sext_kind): Likewise.
+	(sh_dynamicalize_shift_p): Add TARGET_DYNSHIFT condition.
+	Add sanity check for input value.  Add function description.
+	* config/sh/sh.md (ashlsi3, ashlsi3_std, ashrsi3_d, lshrsi3,
+	lshrsi3_d): Use TARGET_DYNSHIFT.
+
+2012-07-22  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md (negc): Delete expander.
+	(*negc): Rename insn to negc.
+
+2012-07-22  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53961
+	* config/i386/i386.md (*lea): New insn pattern.
+	(*lea_1): Remove.
+	(*lea<mode>_2): Ditto.
+	(*lea_{3,4,5,6}_zext): Ditto.
+	* config/i386/constraints.md (j): Remove address constraint.
+	* config/i386/i386.c (ix86_decompose_address): Allow SImode subreg
+	of an address.
+	(ix86_print_operand_address): Handle SImode subreg of an address.
+	(ix86_avoid_lea_for_addr): Reject zero-extended addresses for now.
+
+2012-07-22  Hans-Peter Nilsson  <hp@axis.com>
+
+	Emit executable-stack note correctly for CRIS targets.
+	* config/cris/cris.c (cris_file_end): New function.
+	(TARGET_ASM_FILE_END): Define.
+
+2012-07-22  Chung-Lin Tang  <cltang@codesourcery.com>
+	    Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    NetLogic Microsystems Inc.
+
+	* config/mips/mips.c (mips_issue_rate): Handle XLP.
+	* config/mips/mips.md: Include xlp.md.
+	* config/mips/xlp.md: New file.
+
+2012-07-21  Steven Bosscher <steven@gcc.gnu.org>
+
+	PR gcov-profile/32543
+	* profile.c (branch_prob): Update total_num_edges_instrumented and
+	report the number of edges to instrument.
+
+2012-07-21  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md: Correct comment regarding clrt and sett insns.
+
+2012-07-21  Andrew Pinski  <apinski@cavium.com>
+
+	* config/mips/mips.md (*popcountdi2_trunc): New pattern
+	to handle popcount of a truncation.
+
+2012-07-21  Andrew Pinski  <apinski@cavium.com>
+
+	* config/mips/mips-protos.h (mips_expand_ext_as_unaligned_load):
+	Add a bool argument.
+	* config/mips/mips.c (mips_block_move_straight): Update call to
+	mips_expand_ext_as_unaligned_load.
+	(mips_expand_ext_as_unaligned_load): Add unsigned_p argument.
+	Accept DImode dest when the width is that of SImode.
+	* config/mips/mips.md (extv): Update call to
+	mips_expand_ext_as_unaligned_load.
+	(extzv): Likewise.
+
+2012-07-21  Andrew Pinski  <apinski@cavium.com>
+
+	* config/mips/mips.c (mips_get_unaligned_mem): Copy *op after calling
+	adjust_address.
+
+2012-07-20  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* config/mips/mips.md (define_attr sync_*): Move before "type".
+	(define_attr "type"): New values "atomic" and "syncloop".
+	* config/mips/sync.md (atomic_exchange<mode>, atomic_fetch_add<mode>):
+	Set "type" attribute.
+	* config/mips/generic.md (generic_atomic, generic_syncloop):
+	New reservations.
+	* gcc/config/mips/10000.md, gcc/config/mips/20kc.md,
+	* gcc/config/mips/24k.md, gcc/config/mips/4130.md,
+	* gcc/config/mips/4k.md, gcc/config/mips/5400.md,
+	* gcc/config/mips/5500.md, gcc/config/mips/5k.md,
+	* gcc/config/mips/7000.md, gcc/config/mips/74k.md,
+	* gcc/config/mips/9000.md, gcc/config/mips/loongson2ef.md,
+	* gcc/config/mips/loongson3a.md, gcc/config/mips/octeon.md,
+	* gcc/config/mips/sb1.md, gcc/config/mips/sr71k.md,
+	* gcc/config/mips/xlr.md: Handle "atomic" and "syncloop" types.
+
+2012-07-20  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md: Group and sort shift related patterns.
+	(ashlsi3_n, *ashlhi3_n, lshrsi3_n): Remove length attributes.
+
+2012-07-20  Hans-Peter Nilsson  <hp@axis.com>
+
+	* config/cris/cris.c (cris_asm_output_ident): Remove unused
+	local variables section_asm_op, size, buf.
+
+2012-07-20  Pat Haugen <pthaugen@us.ibm.com>
+	    Steven Bosscher  <steven@gcc.gnu.org>
+	* config/rs6000/power4.md (power4-store-update): Fix reservation.
+	(power4-three): Likewise.
+
 2012-07-20  Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <Greta.Yorsh@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
 
-        * config/arm/arm.c (arm_cortex_a15_tune): New tune.
-        * config/arm/arm-cores.def (cortex-a15): Use it.
+	* config/arm/arm.c (arm_cortex_a15_tune): New tune.
+	* config/arm/arm-cores.def (cortex-a15): Use it.
 
 2012-07-20  Sameera Deshpande  <sameera.deshpande@arm.com>
-            Greta Yorsh  <Greta.Yorsh@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
 
-        * config/arm/arm-protos.h (tune_params): Add prefer_ldrd_strd.
-        * config/arm/arm.c (arm_slowmul_tune): Initialize it.
-        (arm_fastmul_tune, arm_strongarm_tune): Likewise.
-        (arm_xscale_tune, arm_9e_tune, arm_v6t2_tune): Likewise.
-        (arm_cortex_tune, arm_cortex_a5_tune, arm_cortex_a9_tune): Likewise.
-        (arm_fa726te_tune): Likewise.
+	* config/arm/arm-protos.h (tune_params): Add prefer_ldrd_strd.
+	* config/arm/arm.c (arm_slowmul_tune): Initialize it.
+	(arm_fastmul_tune, arm_strongarm_tune): Likewise.
+	(arm_xscale_tune, arm_9e_tune, arm_v6t2_tune): Likewise.
+	(arm_cortex_tune, arm_cortex_a5_tune, arm_cortex_a9_tune): Likewise.
+	(arm_fa726te_tune): Likewise.
 
 2012-07-20  Richard Guenther  <rguenther@suse.de>
 
@@ -45,8 +240,9 @@
 	(brief_dump_cfg): Take a flags argument, and filter out
 	TDF_COMMENT and TDF_DETAILS.
 	* pretty-print.c (pp_base_newline): Set pp_needs_newline to false.
-	* gimple-pretty-print.c (dump_gimple_bb_header): Do not use dump_bb_info
-	here, it is already called from dump_bb.  Idem for check_bb_profile.
+	* gimple-pretty-print.c (dump_gimple_bb_header): Do not use
+	dump_bb_info here, it is already called from dump_bb.  Idem for
+	check_bb_profile.
 	(dump_gimple_bb_footer): Likewise.
 	(gimple_dump_bb_buff): Call pp_flush after dump_gimple_stmt to
 	avoid broken dumps for statement histograms.
@@ -64,8 +260,8 @@
 	* passes.c (execute_function_dump): Always call print_rtl_with_bb
 	for RTL dumps.
 	* cfgrtl.c (print_rtl_with_bb): Handle printing without an up-to-date
-	CFG.  With TDF_BLOCKS and TDF_DETAILS, do DF dumps at the top and bottom
-	of each basic block.
+	CFG.  With TDF_BLOCKS and TDF_DETAILS, do DF dumps at the top and
+	bottom of each basic block.
 
 2012-07-20  Richard Guenther  <rguenther@suse.de>
 
