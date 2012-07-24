@@ -1,3 +1,221 @@
+2012-07-24  Ramana Radhakrishnan  <ramana.radhakrishnan@linaro.org>
+
+	PR target/54051
+	* config/arm/arm.c (arm_print_operand_address): Remove superfluous
+	printing of 0.
+	* config/arm/neon.md ("neon_vld3_lane<mode>":VD): Remove alignment
+	specifier.
+	("neon_vld3_lane<mode>":VMQ): Likewise.
+	("neon_vld3_dup<mode>":VDX): Likewise.
+	("neon_vst3_lane<mode>":VD): Likewise.
+	("neon_vst3_lane<mode>":VMQ): Likewise.
+
+2012-07-24  Roland McGrath  <mcgrathr@google.com>
+
+	* arm.c (arm_get_frame_offsets): Don't use fixed regs for
+	stack alignment padding.
+
+2012-07-24  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/53961
+	* config/i386/i386.c (ix86_legitimate_address_p): Move check for
+	negative constant address for TARET_X32 ...
+	(ix86_decompose_address): ... here.  Reject constant addresses
+	that don't satisfy x86_64_immediate_operand predicate.
+
+2012-07-24  Julian Brown  <julian@codesourcery.com>
+
+	* doc/sourcebuild.texi (arm_hf_eabi): Document effective-target check.
+
+2012-07-24  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sbitmap.h (SBITMAP_ELT_BITS): Use "1u" trick as for BITMAP_WORD_BITS.
+	Move test to check that there is a popcount function for the the number
+	of bits in SBITMAP_ELT_BITS to sbitmap.c.
+	* sbitmap.c: Test SBITMAP_ELT_BITS, not HOST_BITS_PER_WIDEST_FAST_INT.
+	MEM_STAT_INFO): Define in terms of their ALONE counterparts.
+
+	* configure.ac (GATHER_STATISTICS): Always define, non-zero if enabled.
+	* configure: Regenerate.
+	* statistics.h (GATHER_STATISTICS): Error out if it is not defined.
+	(GCC_MEM_STAT_ARGUMENTS): New define.
+	(ALONE_MEM_STAT_DECL): Define in terms of GCC_MEM_STAT_ARGUMENTS.
+	(ALONE_FINAL_MEM_STAT_DECL, ALONE_FINAL_PASS_MEM_STAT): New defines.
+	(MEM_STAT_DECL, FINAL_MEM_STAT_DECL, PASS_MEM_STAT,
+	FINAL_PASS_MEM_STAT): Define.
+	* ggc-internal.h (ggc_record_overhead): Use FINAL_MEM_STAT_DECL.
+	* ggc.h (ggc_record_overhead, ggc_free_overhead,
+	ggc_prune_overhead_list): Remove internal prototypes, they are defined
+	already in ggc-internal.h.
+	* ggc-common.c (struct loc_descriptor): Remove #ifdef GATHER_STATISTICS
+	wrappers.
+	(add_statistics): Likewise.
+	(dump_ggc_loc_statistics): Likewise. Return if GATHER_STATISTICS is 0.
+	* ggc-zone.c (struct page_entry): Remove #ifdef GATHER_STATISTICS
+	wrappers around "survived" and "stats" members.
+	(alloc_large_page): Always initialize survived.
+	(ggc_internal_alloc_zone_stat): Likewise.
+	Remove #ifdef GATHER_STATISTICS wrappers.  Record overhead if
+	GATHER_STATISTICS is non-0.
+	(ggc_free): Convert #ifdef GATHER_STATISTICS to if-code.
+	(sweep_pages): Always increase survived.
+	(ggc_collect_1): Convert #ifdef GATHER_STATISTICS to if-code.
+	(calculate_average_page_survival): Always define.
+	(ggc_collect): Convert #ifdef GATHER_STATISTICS to if-code.
+	(ggc_print_statistics): Likewise.
+	(ggc_pch_read): Likewise.
+	* ggc-page.c (struct globals): Always define "stats" member.
+	(ggc_internal_alloc_stat): Convert #ifdef GATHER_STATISTICS to if-code.
+	(ggc_free): Likewise.
+	(ggc_collec): Likewise.
+	(ggc_print_statistics): Likewise.
+	* bitmap.h (struct bitmap_head_def): Always define "desc" member.
+	(bitmap_initialize_stat): Convert #ifdef GATHER_STATISTICS to if-code.
+	* gimple.h (enum gimple_alloc_kind): Always define.
+	(gimple_alloc_kind): Likewise.
+	* tree-flow.h (phinodes_print_statistics): Always define.
+	(ssanames_print_statistics): Likewise.
+	* vec.h (vec_heap_free): Always define.
+	(VEC_stack_alloc): Define if GATHER_STATISTICS is non-0.
+	* alloc-pool.c (alloc_pool_descriptor): Always define.
+	(create_alloc_pool): Convert #ifdef GATHER_STATISTICS to if-code.
+	(empty_alloc_pool): Likewise.
+	(pool_alloc): Likewise.
+	(pool_free): Likewise.
+	(dump_alloc_pool_statistics): Likewise.
+	(print_statistics): Always define.
+	* bitmap.c (struct bitmap_descriptor): Always define.
+	(bitmap_register): Pass ALONE_FINAL_PASS_MEM_STAT.
+	(register_overhead): Always define.
+	(bitmap_element_free): Convert #ifdef GATHER_STATISTICS to if-code.
+	(bitmap_element_allocate): Likewise.
+	(bitmap_elt_clear_from): Likewise.
+	(bitmap_obstack_alloc_stat): Likewise.
+	(bitmap_gc_alloc_stat): Likewise.
+	(bitmap_obstack_free): Likewise.
+	(bitmap_find_bit): Likewise.
+	(bitmap_ior_and_into):  Likewise.
+	(bitmap_print): Likewise.
+	(dump_bitmap_statistics): Likewise. Return if GATHER_STATISTICS is 0.
+	* gimple.c (gimple_alloc_counts, gimple_alloc_sizes): Always define.
+	(gimple_alloc_kind_names): Likewise.
+	(gimple_alloc_stat): Convert #ifdef GATHER_STATISTICS to if-code.
+	(dump_gimple_statistics): Likewise. Return if GATHER_STATISTICS is 0.
+	* rtl.c (rtx_alloc_counts, rtx_alloc_sizes, rtvec_alloc_counts,
+	rtvec_alloc_sizes): Always define.
+	(rvec_alloc): Convert #ifdef GATHER_STATISTICS to if-code.
+	(rtx_alloc_stat): Likewise.
+	(dump_rtx_statistics): Likewise. Return if GATHER_STATISTICS is 0.
+	* tree.c (_obstack_allocated_p, tree_code_counts, tree_node_counts,
+	tree_node_sizes, tree_node_kind_names): Always define.
+	(record_node_allocation_statistics): Convert #ifdef GATHER_STATISTICS
+	to if-code.
+	(type_hash_canon): Likewise.
+	(dump_tree_statistics): Likewise.
+	* tree-ssanames.c (ssa_name_nodes_reused, ssa_name_nodes_created):
+	Always define.
+	(ssanames_print_statistics): Likewise.
+	(make_ssa_name_fn): Convert #ifdef GATHER_STATISTICS to if-code.
+	* tree-phinodes.c (phi_nodes_reused, phi_nodes_created): Always define.
+	(phinodes_print_statistics): Likewise.
+	(allocate_phi_node): Convert #ifdef GATHER_STATISTICS to if-code.
+	* vec.c (struct vec_descriptor): Always define.
+	(hash_descriptor, eq_descriptor, ptr_hash_entry, hash_ptr, eq_ptr,
+	vec_descriptor, rester_overhead, free_overhead): Likewise.
+	(cmp_statistic): Likewise.
+	(vec_heap_free): Convert #ifdef GATHER_STATISTICS to if-code.
+	(vec_heap_o_reserve_1): Likewise.
+	(dump_vec_loc_statistics): Likewise.
+
+2012-07-24  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53616
+	* tree-loop-distribution.c (ldist_gen): Do not change
+	partition ordering when merging partitions.
+
+2012-07-24  Alan Modra  <amodra@gmail.com>
+
+	PR target/53914
+	PR target/54009
+	* config/rs6000/constraints.md (Y): Use mem_operand_gpr.
+	* config/rs6000/predicates.md (word_offset_memref_operand): Delete.
+	Adjust all rs6000_legitimate_offset_address_p calls.
+	* config/rs6000/rs6000-protos.h (mem_operand_gpr): Declare.
+	(rs6000_secondary_reload_gpr): Declare.
+	(rs6000_legitimate_offset_address_p): Update prototype.
+	(rs6000_offsettable_memref_p): Delete.
+	(rs6000_secondary_reload_ppc64): Delete.
+	* config/rs6000/rs6000.c (address_offset): New function.
+	(mem_operand_gpr): Likewise.
+	(rs6000_legitimate_offset_address_p): Add worst_case param.  When
+	not worst_case assume class of regs with least restrictive offsets.
+	Adjust all calls.
+	(legitimate_lo_sum_address_p): Simplify register mode tests.
+	(rs6000_legitimize_address): Likewise.  Assume best case offset
+	addressing.  Combine ELF and MACHO lo_sum code.
+	(rs6000_mode_dependent_address): Correct offset addressing limits.
+	(rs6000_offsettable_memref_p): Make static, add reg_mode param.
+	Use reg_mode to help rs6000_legitimate_offset_address_p.
+	(rs6000_secondary_reload): Use address_offset.  Handle 32-bit multi
+	gpr load/store when offset too large.
+	(rs6000_secondary_reload_gpr): Renamed rs6000_secondary_reload_ppc64.
+	(rs6000_split_multireg_move): Adjust rs6000_offsettable_memref_p calls.
+	* config/rs6000/rs6000.md (movdf_hardfloat32): Use 'Y' constraint
+	for gpr load/store.  Order alternatives as r->Y,Y->r,r->r and
+	d->m,m->d,d->d.  Correct size of gpr load/store.
+	(movdf_softfloat32): Use 'Y' constraint for gpr load/store.  Order
+	alternatives.
+	(movti_ppc64): Likewise.
+	(movdi_internal32): Likewise.  Also disparage fprs.
+	(movdi_mfpgpr, movdi_internal64): Likewise.
+	(movtf_internal): Use 'm' for fpr load/store.  Order alternatives.
+	(movtf_softfloat): Order alternatives.
+	(extenddftf2_internal): Use 'm' and 'Y' for store.
+	(movti_power, movti_string): Use 'Y' for gpr load/store.  Order.
+	(stack_protect_setdi, stack_protect_testdi): Likewise.
+	(movdf_hardfloat64_mfpgpr, movdf_hardfloat64): Order alternatives.
+	(movdf_softfloat64): Likewise.
+	(reload_<mode>_store): Adjust reload_di_store to provide
+	reload_si_store as well.
+	(reload_<mode>_load): Likewise.
+
+2012-07-23  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51244
+	* config/sh/predicates.md (general_movsrc_operand,
+	general_movdst_operand): Reject T_REG.
+	* config/sh/sh.md (*extendqisi2_compact_reg, *extendhisi2_compact_reg,
+	movsi_i, movsi_ie, movsi_i_lowpart, *movqi_reg_reg, *movhi_reg_reg):
+	Remove T_REG alternatives.
+	(*negtstsi): New insn.
+
+2012-07-23  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53511
+	* config/sh/sh.md (mulsf3_ie): Delete.
+	(mulsf3_i4): Rename to mulsf3_i.
+	(mulsf3): Emit mulsf3_i insn.
+
+2012-07-23  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md (addc1, subc1): Delete.
+	(adddi3_compact): Use addc instead of addc1.
+	(subdi3_compact): Use subc instead of subc1.
+
+2012-07-23  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386-protos.c (ix86_lea_outperforms): Remove prototype.
+	* config/i386/i386.c (ix86_lea_outperforms): Make static.  Make
+	split_cost argument signed.
+	(ix86_avoid_lea_for_add): Cleanup.
+	(ix86_use_lea_for_mov): Use INVALID_REGNUM instead of -1.
+	(ix86_avoid_lea_for_addr): Ditto.  Make split_cost signed.
+	Use gen_lowpart instead of gen_rtx_SUBREG.  Cleanup.
+
+2012-07-23  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* config/arm/arm.c (arm_reorg): Ensure all insns are split.
+
 2012-07-23  Uros Bizjak  <ubizjak@gmail.com>
 
 	PR target/53961
@@ -6,7 +224,7 @@
 	(ix86_decompose_address): Allow (zero_extend:DI (subreg:SI (...)))
 	addresses.  Prevent zero extensions of CONST_INT operands.
 
-2012-07-22  Steven Bosscher  <steven@gcc.gnu.org>
+2012-07-23  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* sbitmap.h (struct int_list): Remove.
 	(sbitmap_intersect_of_predsucc, sbitmap_union_of_predsucc):
@@ -38,7 +256,7 @@
 	* tree-ssa-alias.c (dump_alias_info): Walk over local decls
 	instead of referenced vars.
 
-2012-07-22  Steven Bosscher  <steven@gcc.gnu.org>
+2012-07-23  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* coverage.c: Refer to "notes file" instead of "graph file"
 	in all comments.  Explain history of bbg prefix.
