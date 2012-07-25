@@ -1509,6 +1509,85 @@ struct processor_costs btver1_cost = {
   1,					/* cond_not_taken_branch_cost.  */
 };
 
+struct processor_costs btver2_cost = {
+  COSTS_N_INSNS (1),			/* cost of an add instruction */
+  COSTS_N_INSNS (2),			/* cost of a lea instruction */
+  COSTS_N_INSNS (1),			/* variable shift costs */
+  COSTS_N_INSNS (1),			/* constant shift costs */
+  {COSTS_N_INSNS (3),			/* cost of starting multiply for QI */
+   COSTS_N_INSNS (4),			/*				 HI */
+   COSTS_N_INSNS (3),			/*				 SI */
+   COSTS_N_INSNS (4),			/*				 DI */
+   COSTS_N_INSNS (5)},			/*			      other */
+  0,					/* cost of multiply per each bit set */
+  {COSTS_N_INSNS (19),			/* cost of a divide/mod for QI */
+   COSTS_N_INSNS (35),			/*			    HI */
+   COSTS_N_INSNS (51),			/*			    SI */
+   COSTS_N_INSNS (83),			/*			    DI */
+   COSTS_N_INSNS (83)},			/*			    other */
+  COSTS_N_INSNS (1),			/* cost of movsx */
+  COSTS_N_INSNS (1),			/* cost of movzx */
+  8,					/* "large" insn */
+  9,					/* MOVE_RATIO */
+  4,				     /* cost for loading QImode using movzbl */
+  {3, 4, 3},				/* cost of loading integer registers
+					   in QImode, HImode and SImode.
+					   Relative to reg-reg move (2).  */
+  {3, 4, 3},				/* cost of storing integer registers */
+  4,					/* cost of reg,reg fld/fst */
+  {4, 4, 12},				/* cost of loading fp registers
+					   in SFmode, DFmode and XFmode */
+  {6, 6, 8},				/* cost of storing fp registers
+					   in SFmode, DFmode and XFmode */
+  2,					/* cost of moving MMX register */
+  {3, 3},				/* cost of loading MMX registers
+					   in SImode and DImode */
+  {4, 4},				/* cost of storing MMX registers
+					   in SImode and DImode */
+  2,					/* cost of moving SSE register */
+  {4, 4, 3},				/* cost of loading SSE registers
+					   in SImode, DImode and TImode */
+  {4, 4, 5},				/* cost of storing SSE registers
+					   in SImode, DImode and TImode */
+  3,					/* MMX or SSE register to integer */
+					/* On K8:
+					   MOVD reg64, xmmreg Double FSTORE 4
+					   MOVD reg32, xmmreg Double FSTORE 4
+					   On AMDFAM10:
+					   MOVD reg64, xmmreg Double FADD 3
+							       1/1  1/1
+					    MOVD reg32, xmmreg Double FADD 3
+							       1/1  1/1 */
+  32,					/* size of l1 cache.  */
+  2048,					/* size of l2 cache.  */
+  64,					/* size of prefetch block */
+  100,					/* number of parallel prefetches */
+  2,					/* Branch cost */
+  COSTS_N_INSNS (4),			/* cost of FADD and FSUB insns.  */
+  COSTS_N_INSNS (4),			/* cost of FMUL instruction.  */
+  COSTS_N_INSNS (19),			/* cost of FDIV instruction.  */
+  COSTS_N_INSNS (2),			/* cost of FABS instruction.  */
+  COSTS_N_INSNS (2),			/* cost of FCHS instruction.  */
+  COSTS_N_INSNS (35),			/* cost of FSQRT instruction.  */
+
+  {{libcall, {{6, loop}, {14, unrolled_loop}, {-1, rep_prefix_4_byte}}},
+   {libcall, {{16, loop}, {8192, rep_prefix_8_byte}, {-1, libcall}}}},
+  {{libcall, {{8, loop}, {24, unrolled_loop},
+	      {2048, rep_prefix_4_byte}, {-1, libcall}}},
+   {libcall, {{48, unrolled_loop}, {8192, rep_prefix_8_byte}, {-1, libcall}}}},
+  4,					/* scalar_stmt_cost.  */
+  2,					/* scalar load_cost.  */
+  2,					/* scalar_store_cost.  */
+  6,					/* vec_stmt_cost.  */
+  0,					/* vec_to_scalar_cost.  */
+  2,					/* scalar_to_vec_cost.  */
+  2,					/* vec_align_load_cost.  */
+  2,					/* vec_unalign_load_cost.  */
+  2,					/* vec_store_cost.  */
+  2,					/* cond_taken_branch_cost.  */
+  1,					/* cond_not_taken_branch_cost.  */
+};
+
 static const
 struct processor_costs pentium4_cost = {
   COSTS_N_INSNS (1),			/* cost of an add instruction */
@@ -1909,8 +1988,10 @@ const struct processor_costs *ix86_cost = &pentium_cost;
 #define m_BDVER1 (1<<PROCESSOR_BDVER1)
 #define m_BDVER2 (1<<PROCESSOR_BDVER2)
 #define m_BDVER	(m_BDVER1 | m_BDVER2)
+#define m_BTVER (m_BTVER1 | m_BTVER2)
 #define m_BTVER1 (1<<PROCESSOR_BTVER1)
-#define m_AMD_MULTIPLE (m_ATHLON_K8 | m_AMDFAM10 | m_BDVER | m_BTVER1)
+#define m_BTVER2 (1<<PROCESSOR_BTVER2)
+#define m_AMD_MULTIPLE (m_ATHLON_K8 | m_AMDFAM10 | m_BDVER | m_BTVER)
 
 #define m_GENERIC32 (1<<PROCESSOR_GENERIC32)
 #define m_GENERIC64 (1<<PROCESSOR_GENERIC64)
@@ -1950,7 +2031,7 @@ static unsigned int initial_ix86_tune_features[X86_TUNE_LAST] = {
   ~m_386,
 
   /* X86_TUNE_USE_SAHF */
-  m_PPRO | m_P4_NOCONA | m_CORE2I7 | m_ATOM | m_K6_GEODE | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER1 | m_GENERIC,
+  m_PPRO | m_P4_NOCONA | m_CORE2I7 | m_ATOM | m_K6_GEODE | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER | m_GENERIC,
 
   /* X86_TUNE_MOVX: Enable to zero extend integer registers to avoid
      partial dependencies.  */
@@ -2056,7 +2137,7 @@ static unsigned int initial_ix86_tune_features[X86_TUNE_LAST] = {
   m_PPRO | m_P4_NOCONA | m_CORE2I7 | m_ATOM  | m_AMDFAM10 | m_BDVER | m_GENERIC,
 
   /* X86_TUNE_SSE_UNALIGNED_LOAD_OPTIMAL */
-  m_COREI7 | m_AMDFAM10 | m_BDVER | m_BTVER1,
+  m_COREI7 | m_AMDFAM10 | m_BDVER | m_BTVER,
 
   /* X86_TUNE_SSE_UNALIGNED_STORE_OPTIMAL */
   m_COREI7 | m_BDVER,
@@ -2131,11 +2212,11 @@ static unsigned int initial_ix86_tune_features[X86_TUNE_LAST] = {
 
   /* X86_TUNE_SLOW_IMUL_IMM32_MEM: Imul of 32-bit constant and memory is
      vector path on AMD machines.  */
-  m_CORE2I7_64 | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER1 | m_GENERIC64,
+  m_CORE2I7_64 | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER | m_GENERIC64,
 
   /* X86_TUNE_SLOW_IMUL_IMM8: Imul of 8-bit constant is vector path on AMD
      machines.  */
-  m_CORE2I7_64 | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER1 | m_GENERIC64,
+  m_CORE2I7_64 | m_K8 | m_AMDFAM10 | m_BDVER | m_BTVER | m_GENERIC64,
 
   /* X86_TUNE_MOVE_M1_VIA_OR: On pentiums, it is faster to load -1 via OR
      than a MOV.  */
@@ -2606,6 +2687,7 @@ static const struct ptt processor_target_table[PROCESSOR_max] =
   {&bdver1_cost, 32, 24, 32, 7, 32},
   {&bdver2_cost, 32, 24, 32, 7, 32},
   {&btver1_cost, 32, 24, 32, 7, 32},
+  {&btver2_cost, 32, 24, 32, 7, 32},
   {&atom_cost, 16, 15, 16, 7, 16}
 };
 
@@ -2636,7 +2718,8 @@ static const char *const cpu_names[TARGET_CPU_DEFAULT_max] =
   "amdfam10",
   "bdver1",
   "bdver2",
-  "btver1"
+  "btver1",
+  "btver2"
 };
 
 /* Return true if a red-zone is in use.  */
@@ -2665,7 +2748,7 @@ ix86_target_string (HOST_WIDE_INT isa, int flags, const char *arch,
      preceding options while match those first.  */
   static struct ix86_target_opts isa_opts[] =
   {
-    { "-mfma4",		OPTION_MASK_ISA_FMA4 },
+    { "-mfma4",	OPTION_MASK_ISA_FMA4 },
     { "-mfma",		OPTION_MASK_ISA_FMA },
     { "-mxop",		OPTION_MASK_ISA_XOP },
     { "-mlwp",		OPTION_MASK_ISA_LWP },
@@ -2673,17 +2756,18 @@ ix86_target_string (HOST_WIDE_INT isa, int flags, const char *arch,
     { "-msse4.2",	OPTION_MASK_ISA_SSE4_2 },
     { "-msse4.1",	OPTION_MASK_ISA_SSE4_1 },
     { "-mssse3",	OPTION_MASK_ISA_SSSE3 },
-    { "-msse3",		OPTION_MASK_ISA_SSE3 },
-    { "-msse2",		OPTION_MASK_ISA_SSE2 },
+    { "-msse3",	OPTION_MASK_ISA_SSE3 },
+    { "-msse2",	OPTION_MASK_ISA_SSE2 },
     { "-msse",		OPTION_MASK_ISA_SSE },
     { "-m3dnow",	OPTION_MASK_ISA_3DNOW },
     { "-m3dnowa",	OPTION_MASK_ISA_3DNOW_A },
     { "-mmmx",		OPTION_MASK_ISA_MMX },
     { "-mabm",		OPTION_MASK_ISA_ABM },
     { "-mbmi",		OPTION_MASK_ISA_BMI },
-    { "-mbmi2", 	OPTION_MASK_ISA_BMI2 },
+    { "-mbmi2",	OPTION_MASK_ISA_BMI2 },
     { "-mlzcnt",	OPTION_MASK_ISA_LZCNT },
     { "-mhle",		OPTION_MASK_ISA_HLE },
+    { "-mprfchw",	OPTION_MASK_ISA_PRFCHW },
     { "-mtbm",		OPTION_MASK_ISA_TBM },
     { "-mpopcnt",	OPTION_MASK_ISA_POPCNT },
     { "-mmovbe",	OPTION_MASK_ISA_MOVBE },
@@ -2692,7 +2776,7 @@ ix86_target_string (HOST_WIDE_INT isa, int flags, const char *arch,
     { "-mpclmul",	OPTION_MASK_ISA_PCLMUL },
     { "-mfsgsbase",	OPTION_MASK_ISA_FSGSBASE },
     { "-mrdrnd",	OPTION_MASK_ISA_RDRND },
-    { "-mf16c",		OPTION_MASK_ISA_F16C },
+    { "-mf16c",	OPTION_MASK_ISA_F16C },
     { "-mrtm",		OPTION_MASK_ISA_RTM },
   };
 
@@ -2959,7 +3043,8 @@ ix86_option_override_internal (bool main_args_p)
 #define PTA_AVX2		(HOST_WIDE_INT_1 << 30)
 #define PTA_BMI2	 	(HOST_WIDE_INT_1 << 31)
 #define PTA_RTM		 	(HOST_WIDE_INT_1 << 32)
-#define PTA_HLE	 		(HOST_WIDE_INT_1 << 33)
+#define PTA_HLE			(HOST_WIDE_INT_1 << 33)
+#define PTA_PRFCHW		(HOST_WIDE_INT_1 << 34)
 /* if this reaches 64, need to widen struct pta flags below */
 
   static struct pta
@@ -3082,6 +3167,11 @@ ix86_option_override_internal (bool main_args_p)
 	| PTA_SSSE3 | PTA_SSE4A |PTA_ABM | PTA_CX16},
       {"generic32", PROCESSOR_GENERIC32, CPU_PENTIUMPRO,
 	PTA_HLE /* flags are only used for -march switch.  */ },
+      {"btver2", PROCESSOR_BTVER2, CPU_GENERIC64,
+	PTA_64BIT | PTA_MMX |  PTA_SSE  | PTA_SSE2 | PTA_SSE3
+	| PTA_SSSE3 | PTA_SSE4A |PTA_ABM | PTA_CX16 | PTA_SSE4_1
+	| PTA_SSE4_2 | PTA_AES | PTA_PCLMUL | PTA_AVX
+	| PTA_BMI | PTA_F16C | PTA_MOVBE},
       {"generic64", PROCESSOR_GENERIC64, CPU_GENERIC64,
 	PTA_64BIT
 	| PTA_HLE /* flags are only used for -march switch.  */ },
@@ -3440,6 +3530,9 @@ ix86_option_override_internal (bool main_args_p)
 	if (processor_alias_table[i].flags & PTA_HLE
 	    && !(ix86_isa_flags_explicit & OPTION_MASK_ISA_HLE))
 	  ix86_isa_flags |= OPTION_MASK_ISA_HLE;
+	if (processor_alias_table[i].flags & PTA_PRFCHW
+	    && !(ix86_isa_flags_explicit & OPTION_MASK_ISA_PRFCHW))
+	  ix86_isa_flags |= OPTION_MASK_ISA_PRFCHW;
 	if (processor_alias_table[i].flags & (PTA_PREFETCH_SSE | PTA_SSE))
 	  x86_prefetch_sse = true;
 
@@ -3647,10 +3740,11 @@ ix86_option_override_internal (bool main_args_p)
 
   /* Turn on MMX builtins for -msse.  */
   if (TARGET_SSE)
-    {
-      ix86_isa_flags |= OPTION_MASK_ISA_MMX & ~ix86_isa_flags_explicit;
-      x86_prefetch_sse = true;
-    }
+    ix86_isa_flags |= OPTION_MASK_ISA_MMX & ~ix86_isa_flags_explicit;
+
+  /* Enable SSE prefetch.  */
+  if (TARGET_SSE || TARGET_PRFCHW)
+    x86_prefetch_sse = true;
 
   /* Turn on popcnt instruction for -msse4.2 or -mabm.  */
   if (TARGET_SSE4_2 || TARGET_ABM)
@@ -4260,6 +4354,7 @@ ix86_valid_target_attribute_inner_p (tree args, char *p_strings[],
     IX86_ATTR_ISA ("f16c",	OPT_mf16c),
     IX86_ATTR_ISA ("rtm",	OPT_mrtm),
     IX86_ATTR_ISA ("hle",	OPT_mhle),
+    IX86_ATTR_ISA ("prfchw",	OPT_mprfchw),
 
     /* enum options */
     IX86_ATTR_ENUM ("fpmath=",	OPT_mfpmath_),
@@ -23727,6 +23822,7 @@ ix86_issue_rate (void)
     case PROCESSOR_PENTIUM:
     case PROCESSOR_ATOM:
     case PROCESSOR_K6:
+    case PROCESSOR_BTVER2:
       return 2;
 
     case PROCESSOR_PENTIUMPRO:
@@ -23933,6 +24029,7 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
     case PROCESSOR_BDVER1:
     case PROCESSOR_BDVER2:
     case PROCESSOR_BTVER1:
+    case PROCESSOR_BTVER2:
     case PROCESSOR_ATOM:
     case PROCESSOR_GENERIC32:
     case PROCESSOR_GENERIC64:
@@ -40154,8 +40251,8 @@ ix86_autovectorize_vector_sizes (void)
 static void *
 ix86_init_cost (struct loop *loop_info ATTRIBUTE_UNUSED)
 {
-  unsigned *cost = XNEW (unsigned);
-  *cost = 0;
+  unsigned *cost = XNEWVEC (unsigned, 3);
+  cost[vect_prologue] = cost[vect_body] = cost[vect_epilogue] = 0;
   return cost;
 }
 
@@ -40163,24 +40260,25 @@ ix86_init_cost (struct loop *loop_info ATTRIBUTE_UNUSED)
 
 static unsigned
 ix86_add_stmt_cost (void *data, int count, enum vect_cost_for_stmt kind,
-		    struct _stmt_vec_info *stmt_info, int misalign)
+		    struct _stmt_vec_info *stmt_info, int misalign,
+		    enum vect_cost_model_location where)
 {
   unsigned *cost = (unsigned *) data;
   unsigned retval = 0;
 
   if (flag_vect_cost_model)
     {
-      tree vectype = stmt_vectype (stmt_info);
+      tree vectype = stmt_info ? stmt_vectype (stmt_info) : NULL_TREE;
       int stmt_cost = ix86_builtin_vectorization_cost (kind, vectype, misalign);
 
       /* Statements in an inner loop relative to the loop being
 	 vectorized are weighted more heavily.  The value here is
 	 arbitrary and could potentially be improved with analysis.  */
-      if (stmt_in_inner_loop_p (stmt_info))
+      if (where == vect_body && stmt_info && stmt_in_inner_loop_p (stmt_info))
 	count *= 50;  /* FIXME.  */
 
       retval = (unsigned) (count * stmt_cost);
-      *cost += retval;
+      cost[where] += retval;
     }
 
   return retval;
@@ -40188,10 +40286,14 @@ ix86_add_stmt_cost (void *data, int count, enum vect_cost_for_stmt kind,
 
 /* Implement targetm.vectorize.finish_cost.  */
 
-static unsigned
-ix86_finish_cost (void *data)
+static void
+ix86_finish_cost (void *data, unsigned *prologue_cost,
+		  unsigned *body_cost, unsigned *epilogue_cost)
 {
-  return *((unsigned *) data);
+  unsigned *cost = (unsigned *) data;
+  *prologue_cost = cost[vect_prologue];
+  *body_cost     = cost[vect_body];
+  *epilogue_cost = cost[vect_epilogue];
 }
 
 /* Implement targetm.vectorize.destroy_cost_data.  */

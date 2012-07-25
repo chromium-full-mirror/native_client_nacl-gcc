@@ -1,3 +1,228 @@
+2012-07-25  Siddhesh Poyarekar  <siddhesh@redhat.com>
+
+	* final.c [ASSEMBLER_DIALECT](do_assembler_dialects): New
+	function to implement assembler dialects.
+	(output_asm_insn): Use do_assembler_dialects.
+	(asm_fprintf): Likewise.
+
+2012-07-25  Richard Henderson  <rth@redhat.com>
+
+	PR bootstrap/54092
+	* libfuncs.h: Don't include optabs.h.
+	(struct libfunc_entry): Use "int" for op, mode1, mode2 members.
+	* optabs.c (hash_libfunc): Don't cast members to int.
+	* Makefile.in (LIBFUNCS_H): Don't include OPTABS_H.
+
+2012-07-25  Dodji Seketeli  <dodji@redhat.com>
+
+	* basic-block.c: Fix typo in comment.
+
+2012-07-25  Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Michael Zolotukhin  <michael.v.zolotukhin@intel.com>
+
+        * common/config/i386/i386-common.c (OPTION_MASK_ISA_PRFCHW_SET): New.
+        (OPTION_MASK_ISA_PRFCHW_UNSET): Likewise.
+        (ix86_handle_option): Handle mprfchw option.
+        * config.gcc (i[34567]86-*-*): Add prfchwintrin.h.
+        (x86_64-*-*): Likewise.
+        * config/i386/prfchwintrin.h: New header.
+        * config/i386/cpuid.h (bit_PRFCHW): New.
+        (bit_BMI): Formatting fix.
+        (bit_HLE): Likewise.
+        (bit_RTM): Likewise.
+        * config/i386/driver-i386.c (host_detect_local_cpu): Detect
+        PREFETCHW support.
+        * config/i386/i386-c.c: Define __PRFCHW__ if needed.
+        * config/i386/i386.c (ix86_target_string): Define
+        -mprfchw option. Formatting fixes.
+        (PTA_HLE): Formatting fix.
+        (PTA_PRFCHW): New.
+        (ix86_option_override_internal): Handle new option.
+        (ix86_valid_target_attribute_inner_p): Add OPT_mprfchw.
+        * config/i386/i386.h (TARGET_PRFCHW): New.
+        * config/i386/i386.md (prefetch): Enable for TARGET_PRFCHW.
+        * config/i386/i386.opt (mprfchw): New.
+        * config/i386/mm3dnow.h: Move _m_prefetchw from here to
+        prfchwintrin.h.
+        * config/i386/x86intrin.h: Include prfchwintrin.h.
+
+2012-07-25 Sergey Melnikov <sergey.melnikov@intel.com>
+
+	* config/i386/i386.md (stack_protect_set): Disable the pattern
+	for Android since Android libc (bionic) does not provide random
+	value for stack protection guard at gs:0x14. Guard value
+	will be provided from external symbol (default implementation).
+	(stack_protect_set_<mode>): Likewise.
+	(stack_protect_test): Likewise.
+	(stack_protect_test_<mode>): Likewise.
+	* gcc/defaults.h: Define macro TARGET_HAS_BIONIC to 0 - target does
+	not have Bionic by default
+	* config/linux.h: Redefine macro TARGET_HAS_BIONIC to (OPTION_BIONIC)
+	Macro OPTION_BIONIC is defined in this file and provides Bionic
+	accessibility status
+
+2012-07-25  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* gimple-pretty-print.c (gimple_dump_bb_buff): Call pp_flush.
+
+2012-07-25  Venkataramanan Kumar  <venkataramanan.kumar@amd.com>
+
+	btver2 Enablement
+	* config.gcc (i[34567]86-*-linux* | ...): Add btver2.
+	(case ${target}): Add btver2.
+	* config/i386/driver-i386.c (host_detect_local_cpu): Let
+	-march=native recognize btver2 processors.
+	* config/i386/i386-c.c (ix86_target_macros_internal): Add
+	btver2 def_and_undef
+	* config/i386/i386.c (struct processor_costs btver2_cost): New
+	btver2 cost table.
+	(m_BTVER2): New definition.
+	(m_AMD_MULTIPLE): Includes m_BTVER2.
+	(initial_ix86_tune_features): Add btver2 tune.
+	(processor_target_table): Add btver2 entry.
+	(static const char *const cpu_names): Add btver2 entry.
+	(software_prefetching_beneficial_p): Add btver2.
+	(ix86_option_override_internal): Add btver2 instruction sets.
+	(ix86_issue_rate): Add btver2.
+	(ix86_adjust_cost): Add btver2.
+	* config/i386/i386.h (TARGET_BTVER2): New definition.
+	(enum target_cpu_default): Add TARGET_CPU_DEFAULT_btver2.
+	(enum processor_type): Add PROCESSOR_BTVER2.
+	* config/i386/i386.md (define_attr "cpu"): Add btver2.
+
+2012-07-24  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* doc/tm.texi: Regenerate.
+	* targhooks.c (default_init_cost): Add prologue and epilogue costs.
+	(default_add_stmt_cost): Likewise; also handle NULL stmt_info.
+	(default_finish_cost): Add prologue and epilogue costs.
+	* targhooks.h (default_add_stmt_cost): Change parameter list.
+	(default_finish_cost): Likewise.
+	* target.def (init_cost): Change documentation string.
+	(add_stmt_cost): Change documentation string and parameter list.
+	(finish_cost): Likewise.
+	* target.h (vect_cost_model_location): New enum.
+	* tree-vectorizer.h (struct _slp_tree): Remove cost substruct.
+	(struct _slp_instance): Remove cost substruct; rename stmt_cost_vec
+	to body_cost_vec.
+	(SLP_INSTANCE_OUTSIDE_OF_LOOP_COST): Remove.
+	(SLP_INSTANCE_STMT_COST_VEC): Rename to SLP_INSTANCE_BODY_COST_VEC.
+	(SLP_TREE_OUTSIDE_OF_LOOP_COST): Remove.
+	(struct _vect_peel_extended_info): Rename stmt_cost_vec to
+	body_cost_vec.
+	(struct _stmt_vec_info): Remove cost substruct.
+	(STMT_VINFO_OUTSIDE_OF_LOOP_COST): Remove.
+	(stmt_vinfo_set_outside_of_loop_cost): Remove.
+	(builtin_vectorization_cost): New function.
+	(vect_get_stmt_cost): Change to use builtin_vectorization_cost.
+	(add_stmt_cost): Change parameter list.
+	(finish_cost): Likewise.
+	(vect_model_simple_cost): Likewise.
+	(vect_model_store_cost): Likewise.
+	(vect_model_load_cost): Likewise.
+	(record_stmt_cost): Likewise.
+	(vect_get_load_cost): Likewise.
+	(vect_get_known_peeling_cost): Likewise.
+	* tree-vect-loop.c (vect_get_known_peeling_cost): Change parameter
+	list; call record_stmt_cost for prologue and epilogue costs.
+	(vect_estimate_min_profitable_iters): Call add_stmt_cost for
+	prologue and epilogue costs; remove computation of vec_outside_cost;
+	return vec_prologue_cost and vec_epilogue_cost from finish_cost.
+	(vect_model_reduction_cost): Revise call to add_stmt_cost for body
+	costs; call add_stmt_cost for prologue and epilogue costs.
+	(vect_model_induction_cost): Revise call to add_stmt_cost for body
+	costs; call add_stmt_cost for prologue costs.
+	* tree-vect-data-refs.c (vect_get_data_access_cost): Change parameter
+	list for function and arguments for calls to vect_get_load_cost and
+	vect_get_store_cost.
+	(vect_peeling_hash_get_lowest_cost): Change argument list for calls to
+	vect_get_data_access_cost and vect_get_known_peeling_cost; use
+	temporary vectors prologue_cost_vec and epilogue_cost_vec for the
+	latter call and discard their results; rename stmt_cost_vec to
+	body_cost_vec; correct possible storage leak for body_cost_vec.
+	(vect_peeling_hash_choose_best_peeling): Rename stmt_cost_vec to
+	body_cost_vec.
+	(vect_enhance_data_refs_alignment): Rename stmt_cost_vec to
+	body_cost_vec; add extra dummy parameter on calls to
+	vect_get_data_access_cost; tolerate null si->stmt; add vect_body to
+	argument list on call to add_stmt_cost.
+	* tree-vect-stmts.c (record_stmt_cost): Change parameter list;
+	rename stmt_cost_vec to body_cost_vec; tolerate null stmt_info; call
+	builtin_vectorization_cost; add "where" parameter on call to
+	add_stmt_cost.
+	(vect_model_simple_cost): Change parameter list; call record_stmt_cost
+	for prologue costs; remove call to stmt_vinfo_set_outside_of_loop_cost;
+	rename stmt_cost_vec to body_cost_vec.
+	(vect_model_promotion_demotion_cost): Add vect_body argument to call
+	to add_stmt_cost; call add_stmt_cost for prologue costs; remove call
+	to stmt_vinfo_set_outside_of_loop_cost.
+	(vect_model_store_cost): Change parameter list; call record_stmt_cost
+	for prologue costs; add vect_body argument to call to record_stmt_cost;
+	rename stmt_cost_vec to body_cost_vec; remove call to
+	stmt_vinfo_set_outside_of_loop_cost.
+	(vect_get_store_cost): Rename stmt_cost_vec to body_cost_vec; add
+	vect_body argument to calls to record_stmt_cost.
+	(vect_model_load_cost): Change parameter list; rename stmt_cost_vec to
+	body_cost_vec; add vect_body argument to calls to record_stmt_cost;
+	remove call to stmt_vinfo_set_outside_of_loop_cost.
+	(vect_get_load_cost): Change parameter list; rename stmt_cost_vec to
+	body_cost_vec; add vect_body argument to calls to record_stmt_cost;
+	call record_stmt_cost for prologue costs.
+	(vectorizable_store): Change argument list for call to
+	vect_model_store_cost.
+	(vectorizable_load): Change argument list for call to
+	vect_model_load_cost.
+	(new_stmt_vec_info): Remove assignment to
+	STMT_VINFO_OUTSIDE_OF_LOOP_COST.
+	* config/spu/spu.c (spu_init_cost): Add prologue and epilogue costs.
+	(spu_add_stmt_cost): Likewise; also handle NULL stmt_info.
+	(spu_finish_cost): Add prologue and epilogue costs.
+	* config/i386/i386.c (i386_init_cost): Add prologue and epilogue costs.
+	(i386_add_stmt_cost): Likewise; also handle NULL stmt_info.
+	(i386_finish_cost): Add prologue and epilogue costs.
+	* config/rs6000/rs6000.c (rs6000_init_cost): Add prologue and epilogue
+	costs.
+	(rs6000_add_stmt_cost): Likewise; also handle NULL stmt_info.
+	(rs6000_finish_cost): Add prologue and epilogue costs.
+	* tree-vect-slp.c (vect_free_slp_instance): Rename
+	SLP_INSTANCE_STMT_COST_VEC to SLP_INSTANCE_BODY_COST_VEC.
+	(vect_create_new_slp_node): Remove assignment to
+	SLP_TREE_OUTSIDE_OF_LOOP_COST.
+	(vect_get_and_check_slp_defs): Change parameter list; change argument
+	lists to calls to vect_model_store_cost and vect_model_simple_cost.
+	(vect_build_slp_tree): Change parameter list; change argument lists
+	to calls to vect_model_load_cost, vect_get_and_check_slp_defs, and
+	recursive self-calls; remove setting of outside_cost from
+	SLP_TREE_OUTSIDE_OF_LOOP_COST; add vect_body argument to call to
+	record_stmt_cost.
+	(vect_analyze_slp_instance): Rename stmt_cost_vec to body_cost_vec;
+	rename SLP_INSTANCE_STMT_COST_VEC to SLP_INSTANCE_BODY_COST_VEC;
+	remove assignment to SLP_INSTANCE_OUTSIDE_OF_LOOP_COST; record SLP
+	prologue costs.
+	(vect_bb_vectorization_profitable_p): Rename stmt_cost_vec to
+	body_cost_vec; handle null ci->stmt; add vect_body argument to call
+	to add_stmt_cost; simplify calls to targetm.vectorize.
+	builtin_vectorization_cost; return vec_prologue_cost and
+	vec_epilogue_cost from finish_cost.
+	(vect_update_slp_costs_according_to_vf): Rename stmt_cost_vec to
+	body_cost_vec; add vect_body argument to call to add_stmt_cost.
+
+2012-07-24  Richard Henderson  <rth@redhat.com>
+
+	* system.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Poison.
+	* config/cris/cris.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* config/h8300/h8300.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* config/mn10300/mn10300.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* config/rs6000/rs6000.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove
+	comment reference.
+	* config/v850/v850.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* config/v850/v850.md (fixuns_truncsfsi2, fixuns_truncdfsi2): New.
+	(fix_truncsfsi2, fix_truncdfsi2): Avoid double FIX.
+	* config/vax/vax.h (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* config/vax/vax.md (fixuns_trunc<VAXfp><VAXint>): New.
+	* doc/tm.texi.in (FIXUNS_TRUNC_LIKE_FIX_TRUNC): Remove.
+	* doc/tm.texi: Rebuild.
+
 2012-07-24  Richard Henderson  <rth@redhat.com>
 
 	* optabs.def: New file.
@@ -587,6 +812,7 @@
 
 2012-07-20  Pat Haugen <pthaugen@us.ibm.com>
 	    Steven Bosscher  <steven@gcc.gnu.org>
+
 	* config/rs6000/power4.md (power4-store-update): Fix reservation.
 	(power4-three): Likewise.
 
