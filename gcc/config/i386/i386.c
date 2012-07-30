@@ -2767,6 +2767,7 @@ ix86_target_string (HOST_WIDE_INT isa, int flags, const char *arch,
     { "-mbmi2",	OPTION_MASK_ISA_BMI2 },
     { "-mlzcnt",	OPTION_MASK_ISA_LZCNT },
     { "-mhle",		OPTION_MASK_ISA_HLE },
+    { "-mrdseed",	OPTION_MASK_ISA_RDSEED },
     { "-mprfchw",	OPTION_MASK_ISA_PRFCHW },
     { "-mtbm",		OPTION_MASK_ISA_TBM },
     { "-mpopcnt",	OPTION_MASK_ISA_POPCNT },
@@ -3045,6 +3046,7 @@ ix86_option_override_internal (bool main_args_p)
 #define PTA_RTM		 	(HOST_WIDE_INT_1 << 32)
 #define PTA_HLE			(HOST_WIDE_INT_1 << 33)
 #define PTA_PRFCHW		(HOST_WIDE_INT_1 << 34)
+#define PTA_RDSEED		(HOST_WIDE_INT_1 << 35)
 /* if this reaches 64, need to widen struct pta flags below */
 
   static struct pta
@@ -3533,6 +3535,9 @@ ix86_option_override_internal (bool main_args_p)
 	if (processor_alias_table[i].flags & PTA_PRFCHW
 	    && !(ix86_isa_flags_explicit & OPTION_MASK_ISA_PRFCHW))
 	  ix86_isa_flags |= OPTION_MASK_ISA_PRFCHW;
+	if (processor_alias_table[i].flags & PTA_RDSEED
+	    && !(ix86_isa_flags_explicit & OPTION_MASK_ISA_RDSEED))
+	  ix86_isa_flags |= OPTION_MASK_ISA_RDSEED;
 	if (processor_alias_table[i].flags & (PTA_PREFETCH_SSE | PTA_SSE))
 	  x86_prefetch_sse = true;
 
@@ -4359,6 +4364,7 @@ ix86_valid_target_attribute_inner_p (tree args, char *p_strings[],
     IX86_ATTR_ISA ("rtm",	OPT_mrtm),
     IX86_ATTR_ISA ("hle",	OPT_mhle),
     IX86_ATTR_ISA ("prfchw",	OPT_mprfchw),
+    IX86_ATTR_ISA ("rdseed",	OPT_mrdseed),
 
     /* enum options */
     IX86_ATTR_ENUM ("fpmath=",	OPT_mfpmath_),
@@ -17141,11 +17147,6 @@ ix86_avoid_lea_for_addr (rtx insn, rtx operands[])
   struct ix86_address parts;
   int ok;
 
-  /* FIXME: Handle zero-extended addresses.  */
-  if (GET_CODE (operands[1]) == ZERO_EXTEND
-      || GET_CODE (operands[1]) == AND)
-    return false;
-
   /* Check we need to optimize.  */
   if (!TARGET_OPT_AGU || optimize_function_for_size_p (cfun))
     return false;
@@ -17156,6 +17157,11 @@ ix86_avoid_lea_for_addr (rtx insn, rtx operands[])
 
   ok = ix86_decompose_address (operands[1], &parts);
   gcc_assert (ok);
+
+  /* There should be at least two components in the address.  */
+  if ((parts.base != NULL_RTX) + (parts.index != NULL_RTX)
+      + (parts.disp != NULL_RTX) + (parts.scale > 1) < 2)
+    return false;
 
   /* We should not split into add if non legitimate pic
      operand is used as displacement. */
@@ -17229,7 +17235,7 @@ ix86_emit_binop (enum rtx_code code, enum machine_mode mode,
    It is assumed that it is allowed to clobber flags register
    at lea position.  */
 
-extern void
+void
 ix86_split_lea_for_addr (rtx operands[], enum machine_mode mode)
 {
   unsigned int regno0, regno1, regno2;
@@ -17240,7 +17246,7 @@ ix86_split_lea_for_addr (rtx operands[], enum machine_mode mode)
   ok = ix86_decompose_address (operands[1], &parts);
   gcc_assert (ok);
 
-  target = operands[0];
+  target = gen_lowpart (mode, operands[0]);
 
   regno0 = true_regnum (target);
   regno1 = INVALID_REGNUM;
@@ -17248,17 +17254,18 @@ ix86_split_lea_for_addr (rtx operands[], enum machine_mode mode)
 
   if (parts.base)
     {
-      if (GET_MODE (parts.base) != mode)
-	parts.base = gen_lowpart (mode, parts.base);
+      parts.base = gen_lowpart (mode, parts.base);
       regno1 = true_regnum (parts.base);
     }
 
   if (parts.index)
     {
-      if (GET_MODE (parts.index) != mode)
-	parts.index = gen_lowpart (mode, parts.index);
+      parts.index = gen_lowpart (mode, parts.index);
       regno2 = true_regnum (parts.index);
     }
+
+  if (parts.disp)
+    parts.disp = gen_lowpart (mode, parts.disp);
 
   if (parts.scale > 1)
     {
@@ -26234,6 +26241,11 @@ enum ix86_builtins
   IX86_BUILTIN_RDRAND32_STEP,
   IX86_BUILTIN_RDRAND64_STEP,
 
+  /* RDSEED instructions.  */
+  IX86_BUILTIN_RDSEED16_STEP,
+  IX86_BUILTIN_RDSEED32_STEP,
+  IX86_BUILTIN_RDSEED64_STEP,
+
   /* F16C instructions.  */
   IX86_BUILTIN_CVTPH2PS,
   IX86_BUILTIN_CVTPH2PS256,
@@ -28054,6 +28066,15 @@ ix86_init_mmx_sse_builtins (void)
 
   def_builtin_const (OPTION_MASK_ISA_SSE4_1, "__builtin_ia32_vec_set_v16qi",
 		     V16QI_FTYPE_V16QI_QI_INT, IX86_BUILTIN_VEC_SET_V16QI);
+
+  /* RDSEED */
+  def_builtin (OPTION_MASK_ISA_RDSEED, "__builtin_ia32_rdseed_hi_step",
+	       INT_FTYPE_PUSHORT, IX86_BUILTIN_RDSEED16_STEP);
+  def_builtin (OPTION_MASK_ISA_RDSEED, "__builtin_ia32_rdseed_si_step",
+	       INT_FTYPE_PUNSIGNED, IX86_BUILTIN_RDSEED32_STEP);
+  def_builtin (OPTION_MASK_ISA_RDSEED && OPTION_MASK_ISA_64BIT,
+	       "__builtin_ia32_rdseed_di_step",
+	       INT_FTYPE_PULONGLONG, IX86_BUILTIN_RDSEED64_STEP);
 
   /* Add FMA4 multi-arg argument instructions */
   for (i = 0, d = bdesc_multi_arg; i < ARRAY_SIZE (bdesc_multi_arg); i++, d++)
@@ -30377,6 +30398,46 @@ rdrand_step:
 			 const0_rtx);
       emit_insn (gen_rtx_SET (VOIDmode, target,
 			      gen_rtx_IF_THEN_ELSE (SImode, pat, op2, op1)));
+      return target;
+
+    case IX86_BUILTIN_RDSEED16_STEP:
+      icode = CODE_FOR_rdseedhi_1;
+      mode0 = HImode;
+      goto rdseed_step;
+
+    case IX86_BUILTIN_RDSEED32_STEP:
+      icode = CODE_FOR_rdseedsi_1;
+      mode0 = SImode;
+      goto rdseed_step;
+
+    case IX86_BUILTIN_RDSEED64_STEP:
+      icode = CODE_FOR_rdseeddi_1;
+      mode0 = DImode;
+
+rdseed_step:
+      op0 = gen_reg_rtx (mode0);
+      emit_insn (GEN_FCN (icode) (op0));
+
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      op1 = expand_normal (arg0);
+      if (!address_operand (op1, VOIDmode))
+	{
+	  op1 = convert_memory_address (Pmode, op1);
+	  op1 = copy_addr_to_reg (op1);
+	}
+      emit_move_insn (gen_rtx_MEM (mode0, op1), op0);
+
+      op2 = gen_reg_rtx (QImode);
+
+      pat = gen_rtx_LTU (QImode, gen_rtx_REG (CCCmode, FLAGS_REG),
+                         const0_rtx);
+      emit_insn (gen_rtx_SET (VOIDmode, op2, pat));
+
+      if (target == 0)
+        target = gen_reg_rtx (SImode);
+
+      emit_insn (gen_zero_extendqisi2 (target, op2));
+
       return target;
 
     case IX86_BUILTIN_GATHERSIV2DF:
