@@ -1,3 +1,154 @@
+2012-07-31  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sched-vis.c (print_exp): Handle FMA explicitly.  Simplify handling
+	of RTX_UNARY function-like operations.  Print unknown expression
+	RTX classes as pseudo-functions.
+	(print_pattern): Simplify return pattern printing.
+	(dump_insn_slim): Print the value of notes as a pattern for proper
+	printing of CFA notes.
+
+2012-07-31  Dehao Chen  <dehao@google.com>
+
+	* predict.c (tree_estimate_probability_driver): Normalize the
+	loop when initializing the loop optimizer.
+
+2012-07-31  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow.h (struct var_ann_d): Remove need_phi_state
+	and current_def members.
+	* tree-into-ssa.c (struct def_blocks_d): Remove var member.
+	(def_blocks): Remove.
+	(struct var_info_d): New.
+	(var_infos): New hashtable.
+	(struct ssa_name_info): Add def_blocks member.
+	(get_ssa_name_ann): Adjust.
+	(get_var_info): New function.
+	(get_phi_state, set_phi_state, get_current_def,
+	set_current_def, get_def_blocks_for, find_def_blocks_for): Adjust.
+	(insert_phi_nodes_compare_def_blocks): Rename to ...
+	(insert_phi_nodes_compare_var_infos): ... this and adjust.
+	(insert_phi_nodes): Adjust.
+	(dump_tree_ssa, dump_tree_ssa_stats): Adjust.
+	(def_blocks_hash, def_blocks_eq, def_blocks_free): Remove.
+	(debug_def_blocks_r): Rename to ...
+	(debug_var_infos_r): ... this and adjust.
+	(var_info_hash): New function.
+	(var_info_eq): Likewise.
+	(rewrite_blocks): Adjust.
+	(init_ssa_renamer): Likewise.
+	(fini_ssa_renamer): Likewise.
+	(delete_update_ssa): Likewise.
+	(update_ssa): Likewise.
+	* tree-ssanames.c (release_dead_ssa_names): Do not clear
+	current defs.
+
+2012-07-31  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR tree-optimization/53773
+	* tree-vectorizer.h (struct _loop_vec_info): Add operands_swapped.
+	(LOOP_VINFO_OPERANDS_SWAPPED): New macro.
+	* tree-vect-loop.c (new_loop_vec_info): Initialize
+	LOOP_VINFO_OPERANDS_SWAPPED field.
+	(destroy_loop_vec_info): Restore canonical form.
+	(vect_is_slp_reduction): Set LOOP_VINFO_OPERANDS_SWAPPED field.
+	(vect_is_simple_reduction_1): Likewise.
+
+2012-07-31  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sched-vis.c (dump_insn_slim): Print print_rtx_head at the
+	start of each new line.
+	* final.c (final_scan_insn): If the final dump is requested as
+	slim RTL, dump slim RTL to the assembly file also.
+
+2012-07-31  Andrey Belevantsev  <abel@ispras.ru>
+
+	PR target/53975
+	
+	* sel-sched-ir.c (has_dependence_note_reg_use): Clarify comment. 
+
+	Revert
+	2011-08-04  Sergey Grechanik  <mouseentity@ispras.ru>
+
+	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
+	only if producer writes to the register given by regno.
+
+2012-07-31  Nick Clifton  <nickc@redhat.com>
+
+	* config/stormy16/stormy16.c (xstormy16_expand_prologue): Add
+	support for reporting stack usage.
+
+	* config/frv/frv.c (QUAD): Fix typo.
+	(frv_expand_prologue): Report stack usage.
+
+2012-07-31  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR pch/53880
+	* gengtype.c (struct walk_type_data): Add have_this_obj field.
+	(walk_type): For functions that take a this_obj argument and
+	that process fields with a GTY((length)) argument, write the
+	test that write_types_local_process_field will write also at the
+	head of the loop, effectively unswitching the loop.
+	(write_func_for_structure, write_local_func_for_structure): Clear
+	have_this_obj before calling walk_type.
+	(write_local_func_for_structure): Set have_this_obj before walk_type.
+	(write_array): Set have_this_obj for output of local pointer walking
+	functions but not for marker functions.
+	(write_types_local_process_field): Assert have_this_obj is set.
+
+	* rtl.h (simplify_using_condition): Adjust prototype using bitmap
+	from coretypes.h.
+
+2012-07-30  Nathan Froyd  <froydnj@gcc.gnu.org>
+
+
+	* defaults.h (GO_IF_MODE_DEPENDENT_ADDRESS): Delete.
+	* targhooks.c (default_mode_dependent_address_p): Delete code
+	for GO_IF_MODE_DEPENDENT_ADDRESS.
+	* system.h (GO_IF_MODE_DEPENDENT_ADDRESS): Poison.
+	* doc/tm.texi.in (GO_IF_MODE_DEPENDENT_ADDRESS): Delete documention.
+	* doc/tm.texi: Regenerate.
+	* config/alpha.h (GO_IF_MODE_DEPENDENT_ADDRESS): Move code to...
+	* config/alpha.c (alpha_mode_dependent_address_p): ...here.  New
+	function.
+	(TARGET_MODE_DEPENDENT_ADDRESS_P): Define.
+	* config/cr16/cr16.h (GO_IF_MODE_DEPENDENT_ADDRESS): Delete.
+	* config/mep/mep.h (GO_IF_MODE_DEPENDENT_ADDRESS): Delete.
+	* config/vax/vax-protos.h (vax_mode_dependent_address_p): Delete.
+	* config/vax/vax.h (GO_IF_MODE_DEPENDENT_ADDRESS): Delete.
+	* config/vax/vax.c (vax_mode_dependent_address_p): Make static.
+	Take a const_rtx.
+	(TARGET_MODE_DEPENDENT_ADDRESS_P): Define.
+
+2012-07-30  Nathan Froyd  <froydnj@gcc.gnu.org>
+
+	* expmed.h (NUM_MODE_VECTOR_INT): Define.
+	(struct expmed_op_cheap, struct expmed_op_costs): New structures.
+	(struct target_expmed): Convert x_mul_highpart_cost and
+	x_mul_widen_cost fields to be indexed by integer modes.
+	Convert x_sdiv_pow2_cheap and x_smod_pow2_cheap fields to be
+	of type struct expmed_op_cheap.  Convert other cost fields to be
+	of type struct_expmed_op_costs.
+	(mul_widen_cost_ptr, mul_highpart_cost_ptr): Adjust for new
+	indexing of respective fields.
+	(expmed_op_cheap_ptr): New function.
+	(sdiv_pow2_cheap_ptr, smod_pow2_cheap_ptr): Call it.
+	(expmed_op_cost_ptr): New function.
+	(add_cost_ptr, neg_cost_ptr, shift_cost_ptr, shiftadd_cost_ptr,
+	shiftsub0_cost_ptr, shiftsub1_cost_ptr, mul_cost_ptr,
+	sdiv_cost_ptr, udiv_cost_ptr): Call it.
+
+2012-07-30  Sandra Loosemore  <sandra@codesourcery.com>
+	    Julian Brown  <julian@codesourcery.com>
+
+	* doc/invoke.texi (MIPS Options): Document -mno-float.
+	* config/mips/mips.h (MIPS_ARCH_FLOAT_SPEC): Make it know
+	about -mno-float.
+
+2012-07-30  Joseph Myers  <joseph@codesourcery.com>
+
+	* doc/sourcebuild.texi (Subdirectories): Document common
+	subdirectory.
+
 2012-07-30  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	PR middle-end/53823

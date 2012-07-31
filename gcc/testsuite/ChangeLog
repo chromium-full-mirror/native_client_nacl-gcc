@@ -1,3 +1,43 @@
+2012-07-31  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/42418
+	* gfortran.dg/proc_decl_29.f90: New.
+
+2012-07-31  Dehao Chen  <dehao@google.com>
+
+	* gcc.dg/predict-7.c: New test.
+
+2012-07-31  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/54134
+	* gfortran.dg/typebound_override_3.f90: New.
+
+2012-07-31  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR tree-optimization/53773
+	* testsuite/gcc.dg/vect/pr53773.c: New test.
+
+2012-07-31  Nick Clifton  <nickc@redhat.com>
+
+	* gcc.dg/stack-usage-1.c (SIZE): Define for FRV,
+	and for XStormy16.
+
+2012-07-31  Tobias Burnus  <burnus@net-b.de>
+
+	* gfortran.dg/c_funloc_tests_6.f90: New.
+	* gfortran.dg/c_funloc_tests_7.f90: New.
+	* gfortran.dg/c_funloc_tests_5.f03: Compile with -std=f2003.
+
+2012-07-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/53624
+	* g++.dg/cpp0x/temp_default5.C: New.
+
+2012-07-30  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/51081
+	* gfortran.dg/proc_ptr_37.f90: New.
+
 2012-07-30  Ulrich Weigand  <ulrich.weigand@linaro.org>
 
 	* lib/target-supports.exp
