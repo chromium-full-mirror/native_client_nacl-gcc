@@ -1,3 +1,244 @@
+2012-08-01  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow-inline.h (referenced_var): Remove.
+	* tree-ssa-coalesce.c (create_outofssa_var_map): Remove duplicate
+	checking code.
+	* tree-sra.c (candidates): New global hashtable.
+	(candidate): New function.
+	(sra_initialize): Initialize candidates.
+	(sra_deinitialize): Free candidates.
+	(disqualify_candidate): Remove candidate from candidates.
+	(maybe_add_sra_candidate): New function.
+	(find_var_candidates): Walk over all local decls and parameters,
+	add candidates to candidates hashtable.
+	(find_param_candidates): Add candidates to candidates hashtable.
+	(analyze_all_variable_accesses): Use candidate instead of
+	referenced_var.
+
+2012-08-01  Tom de Vries  <tom@codesourcery.com>
+
+	* tree-vrp.c (find_case_label_ranges): New function.
+	(vrp_visit_switch_stmt, simplify_switch_using_ranges): Use
+	find_case_label_ranges instead of find_case_label_range.  Handle second
+	range.
+
+2012-08-01  Michael Matz  <matz@suse.de>
+
+	* tree-complex.c (init_parameter_lattice_values): Don't call var_ann.
+	* tree-dfa.c (struct dfa_stats_d): Remove num_var_anns member.
+	(dump_dfa_stats): Don't dump stats about var anns.
+	(collect_dfa_stats): Don't collect them.
+	(add_referenced_var_1): Don't set var annotation pointers.
+	(remove_referenced_var): Ditto, and only remove it it's in the
+	hash table.
+
+	* tree-flow-inline.h (var_ann): Remove.
+	* tree-flow.h (struct var_ann_d, var_ann_t): Remove.
+
+	* tree-inline.c (remapped_type): Remove.
+	(can_be_nonlocal): Most variable will be considered live here,
+	return false earlier.
+	(remap_decls): Don't call var_ann, all variables will be considered
+	referenced here.
+	(copy_debug_stmt): Ditto, and use is_global_var.
+
+	* tree-into-ssa.c (rewrite_debug_stmt_uses): Use get_current_def to
+	determine if a variable was referred to, not var_ann.
+	* tree-ssa-live.c (remove_unused_scope_block_p): Don't check var_ann.
+	(remove_unused_locals): Ditto.
+	* tree-ssa.c (delete_tree_ssa): Don't free/clear var ann pointers.
+	* tree-tailcall.c (arg_needs_copy_p): Don't check var_ann.
+	* tree.c (copy_node_stat): Don't clear var ann pointer.
+	* tree.h (tree_result_decl, tree_parm_decl, tree_var_decl): Remove
+	ann member.
+	(DECL_VAR_ANN_PTR): Remove.
+
+2012-08-01  Michael Matz  <matz@suse.de>
+
+	* tree-flow.h (struct var_ann_d): Rename used member.
+	(set_is_used): Don't declare.
+	* tree-flow-inline.h (clear_is_used): Remove.
+	(set_is_used, is_used_p): Move to ...
+	* tree-ssa-live.c (set_is_used, is_used_p): ... here, and use
+	on the side bitmap.
+	(usedvars): New bitmap.
+	(dump_scope_block): Don't dump unusedness.
+	(remove_unused_locals): Allocate and free usedvars.
+	* tree-nrv.c (tree_nrv): Don't clear used flags here.
+
+2012-08-01  Michael Matz  <matz@suse.de>
+
+	* tree-flow.h (struct var_ann_d): Remove base_var_processed and
+	base_index members.
+	* tree-ssa-live.h (struct _var_map): Remove basevars member.
+	(VAR_ANN_BASE_INDEX): Remove.
+	* tree-ssa-live.c (var_map_base_init): Use a hash table instead
+	of var annotation to compress index space.  Don't deal with above
+	removed members.
+	(var_map_base_fini): Don't free basevars.
+	(init_var_map): Don't clear basevars.
+
+2012-08-01  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* gimple-ssa-strength-reduction.c (struct slsr_cand_d): Change
+	base_name to base_expr.
+	(struct cand_chain_d): Likewise.
+	(base_cand_hash): Likewise.
+	(base_cand_eq): Likewise.
+	(record_potential_basis): Likewise.
+	(alloc_cand_and_find_basis): Likewise.
+	(create_mul_ssa_cand): Likewise.
+	(create_mul_imm_cand): Likewise.
+	(create_add_ssa_cand): Likewise.
+	(create_add_imm_cand): Likewise.
+	(slsr_process_cast): Likewise.
+	(slsr_process_copy): Likewise.
+	(dump_candidate): Likewise.
+	(base_cand_dump_callback): Likewise.
+	(unconditional_cands_with_known_stride_p): Likewise.
+	(cand_increment): Likewise.
+
+2012-08-01  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR tree-optimization/46556
+	* gimple-ssa-strength-reduction.c (enum cand_kind): Add CAND_REF.
+	(base_cand_map): Change to hash table.
+	(base_cand_hash): New function.
+	(base_cand_free): Likewise.
+	(base_cand_eq): Likewise.
+	(lookup_cand): Change base_cand_map to hash table.
+	(find_basis_for_candidate): Likewise.
+	(base_cand_from_table): Exclude CAND_REF.
+	(restructure_reference): New function.
+	(slsr_process_ref): Likewise.
+	(find_candidates_in_block): Call slsr_process_ref.
+	(dump_candidate): Handle CAND_REF.
+	(base_cand_dump_callback): New function.
+	(dump_cand_chains): Change base_cand_map to hash table.
+	(replace_ref): New function.
+	(replace_refs): Likewise.
+	(analyze_candidates_and_replace): Call replace_refs.
+	(execute_strength_reduction): Change base_cand_map to hash table.
+
+2012-08-01  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (ix86_address_subreg_operand): Reject
+	stack pointer.
+	(ix86_print_operand_address): Assert that parts.base and parts.index
+	are non-NULL after call to simplify_subreg.
+
+2012-08-01  Richard Guenther  <rguenther@suse.de>
+
+	* doc/tree-ssa.texi: Remove pieces mentioning mark_sym_for_renaming.
+
+2012-08-01  Richard Guenther  <rguenther@suse.de>
+
+	* graphite-clast-to-gimple.c (translate_clast_user): Rename
+	virtual operands.
+	* sese.c (graphite_copy_stmts_from_block): Do not rename virtual
+	operands here.
+	* tree-call-cdce.c (tree_call_cdce): Use
+	mark_virtual_operands_for_renaming.
+	* tree-eh.c (sink_clobbers): Simplify.
+	* tree-flow.h (mark_sym_for_renaming): Remove.
+	(mark_virtual_operands_for_renaming): New function.
+	* tree-if-conv.c (tree_if_conversion): Use
+	mark_virtual_operands_for_renaming.
+	* tree-inline.c (update_ssa_across_abnormal_edges): Likewise.
+	* tree-into-ssa.c (mark_sym_for_renaming): Remove.
+	(mark_virtual_operands_for_renaming): New function.
+	* tree-loop-distribution.c (tree_loop_distribution): Use
+	mark_virtual_operands_for_renaming.
+	* tree-ssa-dce.c (mark_virtual_operand_for_renaming): Do not
+	update stmts, use mark_virtual_operands_for_renaming.
+	* tree-ssa-tail-merge.c (release_last_vdef): Remove.
+	(replace_block_by): Adjust.
+	(tail_merge_optimize): Use mark_virtual_operands_for_renaming.
+	* tree-tailcall.c (tree_optimize_tail_calls_1): Use
+	mark_virtual_operands_for_renaming.
+	* tree-vect-slp.c (vect_slp_transform_bb): Likewise.
+	* tree-vectorizer.c (vectorize_loops): Likewise.
+
+2012-08-01  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow.h (struct gimple_df): Remove syms_to_rename member,
+	add ssa_renaming_needed and rename_vops flags.
+	(SYMS_TO_RENAME): Remove.
+	(symbol_marked_for_renaming): Likewise.
+	(mark_virtual_ops_for_renaming): Likewise.
+	* tree-into-ssa.c (symbols_to_rename_set, symbols_to_rename):
+	New globals.
+	(mark_for_renaming, marked_for_renaming): New functions.
+	(symbol_marked_for_renaming): Remove.
+	(dump_currdefs): Adjust.
+	(maybe_replace_use): Likewise.
+	(maybe_replace_use_in_debug_stmt): Likewise.
+	(maybe_register_def): Likewise.
+	(rewrite_update_phi_arguments): Likewise.
+	(rewrite_update_enter_block): Likewise.
+	(fini_ssa_renamer): Clear update SSA status here ...
+	(delete_update_ssa): ... not here.  Free rename set.
+	(prepare_block_for_update): Compute which decls need renaming.
+	(dump_update_ssa): Adjust.
+	(mark_sym_for_renaming): Adjust update SSA status for virtuals.
+	(need_ssa_update_p): Adjust.
+	(insert_updated_phi_nodes_for): Likewise.
+	(update_ssa): Likewise.
+	* tree-ssa-operands.c (finalize_ssa_defs): Adjust update SSA status
+	for virtual and real operands.
+	(finalize_ssa_uses): Likewise.
+	* tree-ssanames.c (init_ssanames): Adjust.
+	* tree-ssa.c (maybe_rewrite_mem_ref_base, maybe_optimize_var,
+	execute_update_addresses_taken): Add bitmap to keep track of which
+	candidates are suitable for rewriting and later renaming by SSA update.
+	* matrix-reorg.c (transform_access_sites): Do not rename all defs.
+	* tree-dfa.c (make_rename_temp): Do not mark real operands for
+	renaming.
+	* cgraphunit.c (assemble_thunk): Likewise.
+	* gimplify.c (gimple_regimplify_operands): Likewise.
+	(force_gimple_operand_1): Likewise.
+	* ipa-prop.c (ipa_modify_formal_parameters): Likewise.
+	* tree-inline.c (declare_return_variable): Likewise.
+	* tree-parloops.c (separate_decls_in_region_stmt): Do not call
+	mark_virtual_ops_for_renaming.
+	(create_stores_for_reduction): Likewise.
+	(create_loads_and_stores_for_name): Likewise.
+	* tree-predcom.c (mark_virtual_ops_for_renaming): Remove.
+	(initialize_root_vars_lm): Do not call mark_virtual_ops_for_renaming.
+	(execute_load_motion): Likewise.
+	(remove_stmt): Likewise.
+	(execute_pred_commoning_chain): Likewise.
+	* tree-sra.c (create_access_replacement): Do not rename real operands.
+	(get_unrenamed_access_replacement): Unify with ...
+	(get_access_replacement): ... this.
+	(get_repl_default_def_ssa_name): Adjust.
+	* tree-ssa-loop-im.c (move_computations_stmt): Manually update
+	virtual SSA form.
+	(rewrite_mem_ref_loc): Do not call mark_virtual_ops_for_renaming.
+	* tree-ssa-loop-prefetch.c (emit_mfence_after_loop): Likewise.
+
+2012-07-31  DJ Delorie  <dj@redhat.com>
+
+	* config/s390/s390.c (s390_option_override): Disable DWARF 3/4
+	extensions for TPF, unless specifically selected.
+
+2012-08-01  Alan Modra  <amodra@gmail.com>
+
+	PR target/54131
+	* config/rs6000/rs6000.c (mem_operand_gpr): Don't limit range
+	of lo_sum offsets.  Comment.  Assert mode at least word size
+	rather than bypassing powerpc64 word offset check.
+
+2012-07-31  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	* config/rs6000/rs6000.c (rs6000_builtin_vectorization_cost): Revise
+	costs for vec_perm and vec_promote_demote down to more natural values.
+	(struct _rs6000_cost_data): New data structure.
+	(rs6000_density_test): New function.
+	(rs6000_init_cost): Change to use rs6000_cost_data.
+	(rs6000_add_stmt_cost): Likewise.
+	(rs6000_finish_cost): Perform density test when vectorizing a loop.
+
 2012-07-31  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* sched-vis.c (print_exp): Handle FMA explicitly.  Simplify handling
@@ -39,8 +280,7 @@
 	(fini_ssa_renamer): Likewise.
 	(delete_update_ssa): Likewise.
 	(update_ssa): Likewise.
-	* tree-ssanames.c (release_dead_ssa_names): Do not clear
-	current defs.
+	* tree-ssanames.c (release_dead_ssa_names): Do not clear current defs.
 
 2012-07-31  Bill Schmidt  <wschmidt@linux.ibm.com>
 
@@ -63,8 +303,8 @@
 2012-07-31  Andrey Belevantsev  <abel@ispras.ru>
 
 	PR target/53975
-	
-	* sel-sched-ir.c (has_dependence_note_reg_use): Clarify comment. 
+
+	* sel-sched-ir.c (has_dependence_note_reg_use): Clarify comment.
 
 	Revert
 	2011-08-04  Sergey Grechanik  <mouseentity@ispras.ru>
@@ -146,8 +386,7 @@
 
 2012-07-30  Joseph Myers  <joseph@codesourcery.com>
 
-	* doc/sourcebuild.texi (Subdirectories): Document common
-	subdirectory.
+	* doc/sourcebuild.texi (Subdirectories): Document common subdirectory.
 
 2012-07-30  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
@@ -186,8 +425,7 @@
 	* config/i386/driver-i386.c (host_detect_local_cpu): Detect
 	RDSEED support.
 	* config/i386/i386-c.c: Define __RDSEED__ if needed.
-	* config/i386/i386.c (ix86_target_string): Define
-	-mrdseed option.
+	* config/i386/i386.c (ix86_target_string): Define -mrdseed option.
 	(PTA_RDSEED): New.
 	(ix86_option_override_internal): Handle new option.
 	(ix86_valid_target_attribute_inner_p): Add OPT_mrdseed.
@@ -211,7 +449,8 @@
 2012-07-30  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/39423
-	* config/gcc/sh/sh.md (*movsi_index_disp, *movhi_index_disp): New insns.
+	* config/gcc/sh/sh.md (*movsi_index_disp, *movhi_index_disp): New
+	insns.
 
 2012-07-30  Oleg Endo  <olegendo@gcc.gnu.org>
 
@@ -231,16 +470,14 @@
 	    Steven Bosscher  <steven@gcc.gnu.org>
 
 	* gengtype.c (adjust_field_type): Diagnose duplicate "length"
-	option applications and option being applied to arrays of atomic
-	types.
+	option applications and option being applied to arrays of atomic types.
 	(walk_type): Allow "atomic" option on strings too.
 	* dwarf2out.h (struct dw_vec_struct): Use the "atomic" GTY option
 	for the array field.
 	* vec.h: Describe the atomic object "A" type of the macros in
 	the header comment.
 	(VEC_T_GTY_ATOMIC, DEF_VEC_A, DEF_VEC_ALLOC_A): Define.
-	* emit-rtl.c (locations_locators_vals): use the atomic object
-	vector.
+	* emit-rtl.c (locations_locators_vals): use the atomic object vector.
 	* doc/gty.texi: Clarify that GTY option "length" is only for
 	arrays of non-atomic objects.  Fix typo in the description of the
 	"atomic" option.
