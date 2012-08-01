@@ -12430,6 +12430,7 @@ get_label_padding (rtx label)
   HOST_WIDE_INT align, min_insn_size;
 
   align = 1 << label_to_alignment (label);
+  align = MAX (align, align_labels);
   min_insn_size = TARGET_THUMB ? 2 : 4;
   return align > min_insn_size ? align - min_insn_size : 0;
 }

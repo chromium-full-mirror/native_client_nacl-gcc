@@ -1,3 +1,7 @@
+2012-08-01  Roland McGrath  <mcgrathr@google.com>
+
+	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
+
 2012-08-01  Catherine Moore  <clm@codesourcery.com>
 	    Sandra Loosemore  <sandra@codesourcery.com>
 
