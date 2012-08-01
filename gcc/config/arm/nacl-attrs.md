@@ -38,6 +38,12 @@
                 (const_int 12)
                 (const_int 4)))
 
+;; Same, but for a sequence of three instructions where one of them is "%*bx".
+(define_attr "length_sfi_bx_plus_2" ""
+  (if_then_else (match_test "TARGET_SFI_NACL1")
+                (const_int 20)          ; 12 + 8
+                (const_int 12)))
+
 ;; The "length" attribute for a "%*bl" instruction.  This is two
 ;; instructions (not bundle-locked) followed by alignment to the end
 ;; of the bundle.  Hence the worst case is that it starts in the
