@@ -1,3 +1,79 @@
+2012-08-06  Cary Coutant  <ccoutant@google.com>
+
+	* g++.dg/debug/dwarf2/non-virtual-thunk.C: New test case.
+
+2012-08-06  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/35831
+	* gfortran.dg/dummy_procedure_5.f90: Modified.
+	* gfortran.dg/dummy_procedure_8.f90: New.
+	* gfortran.dg/interface_26.f90: Modified.
+	* gfortran.dg/proc_ptr_11.f90: Modified.
+	* gfortran.dg/proc_ptr_15.f90: Modified.
+	* gfortran.dg/proc_ptr_result_5.f90: Modified.
+	* gfortran.dg/typebound_override_1.f90: Modified.
+	* gfortran.dg/typebound_proc_6.f03: Modified.
+
+2012-08-06  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR tree-optimization/51938
+	PR tree-optimization/52005
+	* gcc.dg/tree-ssa/ssa-ifcombine-8.c: New testcase.
+	* gcc.dg/tree-ssa/ssa-ifcombine-9.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-ifcombine-10.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-ifcombine-11.c: Likewise.
+
+2012-08-06  Dodji Seketeli  <dodji@redhat.com>
+
+	Avoid crashing on erroneous static_assert usage
+	* g++.dg/cpp0x/static_assert8.C: New test.
+
+2012-08-06  Jason Merrill  <jason@redhat.com>
+
+	* g++.dg/cpp0x/sfinae38.C: New.
+
+2012-08-06  Marc Glisse  <marc.glisse@inria.fr>
+	    Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54165
+	* g++.dg/conversion/void2.C: New.
+
+2012-08-06  Tom de Vries  <tom@codesourcery.com>
+
+	* gcc.dg/tree-ssa/vrp78.c: New test.
+
+2012-08-04  Sandra Loosemore  <sandra@codesourcery.com>
+	    Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* g++.dg/opt/enum2.C: Require fpic target.
+	* g++.dg/lto/20090303_0.C: Likewise.
+
+2012-08-04  Sandra Loosemore  <sandra@codesourcery.com>
+	    Catherine Moore  <clm@codesourcery.com>
+
+	* gcc.target/mips/clear-cache-1.c: Test for alternate cache
+	flush function names too.
+	* gcc.target/mips/clear-cache-1.c: Likewise.
+
+2012-08-03  Bill Schmidt  <wschmidt@linux.ibm.com>
+
+	PR target/54156
+	* testsuite/gcc.dg/vect/pr53773.c: Change to use optimized dump.
+
+2012-08-03  Mikael Morin  <mikael@gcc.gnu.org>
+
+	PR fortran/54166
+	* gfortran.dg/array_5.f90: New test.
+
+2012-08-03 Marc Glisse <marc.glisse@inria.fr>
+
+	PR tree-optimization/30318
+	* gcc.dg/tree-ssa/vrp77.c: New testcase.
+
+2012-08-03  Marc Glisse  <marc.glisse@inria.fr>
+
+	* g++.dg/ext/vector17.C: New testcase.
+
 2012-08-02  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	PR target/51931
