@@ -3930,6 +3930,14 @@ verify_gimple_assign_single (gimple stmt)
       return true;
     }
 
+  if (gimple_clobber_p (stmt)
+      && !DECL_P (lhs))
+    {
+      error ("non-decl LHS in clobber statement");
+      debug_generic_expr (lhs);
+      return true;
+    }
+
   if (handled_component_p (lhs))
     res |= verify_types_in_gimple_reference (lhs, true);
 
@@ -5010,8 +5018,7 @@ gimple_make_forwarder_block (edge fallthru)
       phi = gsi_stmt (gsi);
       var = gimple_phi_result (phi);
       new_phi = create_phi_node (var, bb);
-      SSA_NAME_DEF_STMT (var) = new_phi;
-      gimple_phi_set_result (phi, make_ssa_name (SSA_NAME_VAR (var), phi));
+      gimple_phi_set_result (phi, copy_ssa_name (var, phi));
       add_phi_arg (new_phi, gimple_phi_result (phi), fallthru,
 		   UNKNOWN_LOCATION);
     }
@@ -5370,8 +5377,8 @@ gimple_duplicate_bb (basic_block bb)
   for (gsi = gsi_start (phis); !gsi_end_p (gsi); gsi_next (&gsi))
     {
       phi = gsi_stmt (gsi);
-      copy = create_phi_node (gimple_phi_result (phi), new_bb);
-      create_new_def_for (gimple_phi_result (copy), copy,
+      copy = create_phi_node (NULL_TREE, new_bb);
+      create_new_def_for (gimple_phi_result (phi), copy,
 			  gimple_phi_result_ptr (copy));
     }
 

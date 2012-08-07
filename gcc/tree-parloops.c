@@ -1013,7 +1013,6 @@ create_phi_for_local_result (void **slot, void *data)
 		     NULL);
   locus = gimple_location (reduc->reduc_stmt);
   new_phi = create_phi_node (local_res, store_bb);
-  SSA_NAME_DEF_STMT (local_res) = new_phi;
   add_phi_arg (new_phi, reduc->init, e, locus);
   add_phi_arg (new_phi, gimple_assign_lhs (reduc->reduc_stmt),
 	       FALLTHRU_EDGE (loop->latch), locus);
@@ -1486,10 +1485,9 @@ transform_to_exit_first_loop (struct loop *loop, htab_t reduction_list, tree nit
     {
       phi = gsi_stmt (gsi);
       res = PHI_RESULT (phi);
-      t = make_ssa_name (SSA_NAME_VAR (res), phi);
+      t = copy_ssa_name (res, phi);
       SET_PHI_RESULT (phi, t);
       nphi = create_phi_node (res, orig_header);
-      SSA_NAME_DEF_STMT (res) = nphi;
       add_phi_arg (nphi, t, hpred, UNKNOWN_LOCATION);
 
       if (res == control)
@@ -1625,7 +1623,7 @@ create_parallel_loop (struct loop *loop, tree loop_fn, tree data,
   cvar_base = SSA_NAME_VAR (cvar);
   phi = SSA_NAME_DEF_STMT (cvar);
   cvar_init = PHI_ARG_DEF_FROM_EDGE (phi, loop_preheader_edge (loop));
-  initvar = make_ssa_name (cvar_base, NULL);
+  initvar = copy_ssa_name (cvar, NULL);
   SET_USE (PHI_ARG_DEF_PTR_FROM_EDGE (phi, loop_preheader_edge (loop)),
 	   initvar);
   cvar_next = PHI_ARG_DEF_FROM_EDGE (phi, loop_latch_edge (loop));

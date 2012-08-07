@@ -2,6 +2,132 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-08-07  Richard Henderson  <rth@redhat.com>
+
+	* config/s390/s390.c (s390_emit_compare_and_swap): Update for
+	atomic_compare_and_swapsi_internal name change.
+	(s390_expand_insv): Try RISBG last, not requiring operands in
+	registers but forcing them there.  Try a limited form of ICM.
+	(s390_two_part_insv): New.
+	(s390_expand_cs_hqi): Use it.  Update for atomic optabs.
+	* config/s390/s390.md (UNSPEC_MOVA): New.
+	(TDSI): Remove mode iterator.
+	(DGPR, DINT, TDI): New mode iterators.
+	(td): New mode attribute.
+	(mem_signal_fence): New.
+	(mem_thread_fence): Rename from memory_barrier; update for model arg.
+	(mem_thread_fence_1): Rename from *memory_barrier.
+	(atomic_load<DINT>, atomic_store<DINT>): New expanders.
+	(atomic_loaddi_1, atomic_loadti_1): New.
+	(atomic_storedi_1, atomic_storeti_1): New.
+	(sync_compare_and_swap<TDSI>, sync_compare_and_swap<HQI>): Remove.
+	(atomic_compare_and_swap<DGPR>, atomic_compare_and_swap<HQI>): New.
+	(atomic_compare_and_swap<DGPR>_internal): New.
+	(*sync_compare_and_swap<DW>, *sync_compare_and_swap<GPR>): Remove.
+	(*atomic_compare_and_swap<TDI>_1): New.
+	(*atomic_compare_and_swapdi_2, *atomic_compare_and_swapsi_3): New.
+	(sync_<ATOMIC_Z196><GPR>, sync_old_<ATOMIC_Z196><GPR>): Remove.
+	(atomic_fetch_<ATOMIC_Z196><GPR>): New.
+	(atomic_fetch_<ATOMC_Z196><GPR>_iaf): New.
+	(sync_<ATOMIC><HQI>, sync_old_<ATOMIC><HQI>): Remove.
+	(sync_new_<ATOMIC><HQI>): Remove.
+	(atomic_<ATOMIC><HQI>, atomic_fetch_<ATOMIC><HQI>): New.
+	(atomic_<ATOMIC>_fetch<HQI>): New.
+	(sync_lock_test_and_set<HQI>): Remove.
+	(atomic_exchange<HQI>): New.
+
+2012-08-07  Paul Brook  <paul@codesourcery.com>
+	    Sandra Loosemore  <sandra@codesourcery.com>
+
+	* except.c (switch_to_exception_section): Place tables for
+	DECL_ONE_ONLY functions in comdat groups.
+
+2012-08-07  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow.h (copy_ssa_name_fn): New function.
+	(duplicate_ssa_name_fn): Likewise.
+	* tree-flow-inline.h (copy_ssa_name): New function.
+	(duplicate_ssa_name): Likewise.
+	* tree-ssanames.c (copy_ssa_name_fn): New function.
+	(duplicate_ssa_name): Rename to ...
+	(duplicate_ssa_name_fn): ... this and adjust.
+	* tree-tailcall.c (update_accumulator_with_ops): Use copy_ssa_name.
+	* tree-vect-loop-manip.c (slpeel_update_phi_nodes_for_guard1): Likewise.
+	(slpeel_update_phi_nodes_for_guard2): Likewise.
+	(slpeel_tree_peel_loop_to_edge): Likewise.
+	(vect_loop_versioning): Likewise.
+	* tree-parloops.c (transform_to_exit_first_loop): Likewise.
+	(create_parallel_loop): Likewise.
+	* ipa-split.c (split_function): Likewise.
+	* tree-vect-loop.c (vect_is_simple_reduction_1): Likewise.
+	(vect_create_epilog_for_reduction): Likewise.
+	* tree-vect-data-refs.c (bump_vector_ptr): Likewise.
+	(vect_setup_realignment): Likewise.
+	* tree-vect-stmts.c (vectorizable_load): Likewise.
+	* tree-switch-conversion.c (build_one_array): Likewise.
+	(gen_def_assigns): Likewise.
+	* tree-cfg.c (gimple_make_forwarder_block): Likewise.
+	* graphite-sese-to-poly.c (rewrite_close_phi_out_of_ssa): Call
+	create_zero_dim_array with the SSA name.
+	(rewrite_phi_out_of_ssa): Likewise.
+	(rewrite_cross_bb_scalar_dependence): Likewise.  Use copy_ssa_name.
+
+2012-08-07  Richard Guenther  <rguenther@suse.de>
+
+	* tree-dfa.c (set_ssa_default_def): Clear the SSA_NAME_DEFAULT_DEF
+	bit of the old name when we clear the slot.
+	* tree-ssa-live.c (remove_unused_locals): Release any default
+	def associated with an unused var.
+	* tree-ssa-copy.c (may_propagate_copy_into_asm): Always return true.
+
+2012-08-07  Richard Guenther  <rguenther@suse.de>
+
+	* tree-into-ssa.c (rewrite_stmt): Remove clobbers for variables
+	we rewrite into SSA form.
+	(rewrite_enter_block): Adjust.
+	* gimple-iterator.c (gsi_replace): Also allow replacement with
+	a stmt without a lhs.
+	* tree-ssa-live.c (remove_unused_locals): Remove code handling
+	clobbers of SSA names.
+	* tree-nested.c (convert_local_reference_stmt): Remove clobbers
+	for variables we access through the local chain.
+	* tree-cfg.c (verify_gimple_assign_single): Verify clobbers
+	clobber full decls only.
+
+2012-08-07  Richard Guenther  <rguenther@suse.de>
+
+	* gimple.h (gimple_phi_set_result): Adjust SSA_NAME_DEF_STMT.
+	* tree-phinodes.c (make_phi_node): Allow a NULL var.
+	* tree-into-ssa.c (insert_phi_nodes_for): Simplify.
+	* tree-complex.c (update_phi_components): Likewise.
+	* tree-ssa-loop-manip.c (create_iv): Likewise.
+	(add_exit_phis_edge): Likewise.
+	(split_loop_exit_edge): Likewise.
+	(tree_transform_and_unroll_loop): Likewise.
+	* value-prof.c (gimple_ic): Likewise.
+	(gimple_stringop_fixed_value): Likewise.
+	* tree-tailcall.c (tree_optimize_tail_calls_1): Likewise.
+	* omp-low.c (expand_parallel_call): Likewise.
+	(expand_omp_for_static_chunk): Likewise.
+	(expand_omp_atomic_pipeline): Likewise.
+	* tree-parloops.c (create_phi_for_local_result): Likewise.
+	(transform_to_exit_first_loop): Likewise.
+	* tree-vect-data-refs.c (vect_setup_realignment): Likewise.
+	* graphite-scop-detection.c (canonicalize_loop_closed_ssa): Likewise.
+	* tree-predcom.c (initialize_root_vars): Likewise.
+	(initialize_root_vars_lm): Likewise.
+	* sese.c (sese_add_exit_phis_edge): Likewise.
+	* gimple-streamer-in.c (input_phi): Likewise.
+	* tree-inline.c (copy_phis_for_bb): Likewise.
+	* tree-ssa-phiprop.c (phiprop_insert_phi): Likewise.
+	* tree-cfg.c (gimple_make_forwarder_block): Likewise.
+	(gimple_duplicate_bb): Likewise.
+
+2012-08-07  Nick Clifton  <nickc@redhat.com>
+
+	* config/mn10300/mn10300.c (mn10300_expand_prologue): Report
+	stack usage if requested.
+
 2012-08-06  Cary Coutant  <ccoutant@google.com>
 
 	* cgraphunit.c (assemble_thunk): Add source line info.
