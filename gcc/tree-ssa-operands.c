@@ -126,17 +126,6 @@ static void get_expr_operands (gimple, tree *, int);
 /* Number of functions with initialized ssa_operands.  */
 static int n_initialized = 0;
 
-/* Return the DECL_UID of the base variable of T.  */
-
-static inline unsigned
-get_name_decl (const_tree t)
-{
-  if (TREE_CODE (t) != SSA_NAME)
-    return DECL_UID (t);
-  else
-    return DECL_UID (SSA_NAME_VAR (t));
-}
-
 
 /*  Return true if the SSA operands cache is active.  */
 
@@ -1431,6 +1420,24 @@ debug_immediate_uses_for (tree var)
   dump_immediate_uses_for (stderr, var);
 }
 
+
+/* Return true if OP, an SSA name or a DECL is a virtual operand.  */
+
+bool
+virtual_operand_p (tree op)
+{
+  if (TREE_CODE (op) == SSA_NAME)
+    {
+      op = SSA_NAME_VAR (op);
+      if (!op)
+	return false;
+    }
+
+  if (TREE_CODE (op) == VAR_DECL)
+    return VAR_DECL_IS_VIRTUAL_OPERAND (op);
+
+  return false;
+}
 
 /* Unlink STMTs virtual definition from the IL by propagating its use.  */
 
