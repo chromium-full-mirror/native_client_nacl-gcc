@@ -452,7 +452,7 @@ take_address_of (tree obj, tree type, edge entry, htab_t decl_address,
   int uid;
   void **dslot;
   struct int_tree_map ielt, *nielt;
-  tree *var_p, name, bvar, addr;
+  tree *var_p, name, addr;
   gimple stmt;
   gimple_seq stmts;
 
@@ -479,12 +479,10 @@ take_address_of (tree obj, tree type, edge entry, htab_t decl_address,
       if (gsi == NULL)
 	return NULL;
       addr = TREE_OPERAND (*var_p, 0);
-      bvar = create_tmp_var (TREE_TYPE (addr),
-			     get_name (TREE_OPERAND
-				         (TREE_OPERAND (*var_p, 0), 0)));
-      stmt = gimple_build_assign (bvar, addr);
-      name = make_ssa_name (bvar, stmt);
-      gimple_assign_set_lhs (stmt, name);
+      name = make_temp_ssa_name (TREE_TYPE (addr), NULL,
+				 get_name (TREE_OPERAND
+					   (TREE_OPERAND (*var_p, 0), 0)));
+      stmt = gimple_build_assign (name, addr);
       gsi_insert_on_edge_immediate (entry, stmt);
 
       nielt = XNEW (struct int_tree_map);
@@ -795,7 +793,25 @@ separate_decls_in_region_name (tree name,
   if (slot && *slot)
     return ((struct name_to_copy_elt *) *slot)->new_name;
 
+  if (copy_name_p)
+    {
+      copy = duplicate_ssa_name (name, NULL);
+      nelt = XNEW (struct name_to_copy_elt);
+      nelt->version = idx;
+      nelt->new_name = copy;
+      nelt->field = NULL_TREE;
+      *slot = nelt;
+    }
+  else
+    {
+      gcc_assert (!slot);
+      copy = name;
+    }
+
   var = SSA_NAME_VAR (name);
+  if (!var)
+    return copy;
+
   uid = DECL_UID (var);
   ielt.uid = uid;
   dslot = htab_find_slot_with_hash (decl_copies, &ielt, uid, INSERT);
@@ -821,21 +837,6 @@ separate_decls_in_region_name (tree name,
     }
   else
     var_copy = ((struct int_tree_map *) *dslot)->to;
-
-  if (copy_name_p)
-    {
-      copy = duplicate_ssa_name (name, NULL);
-      nelt = XNEW (struct name_to_copy_elt);
-      nelt->version = idx;
-      nelt->new_name = copy;
-      nelt->field = NULL_TREE;
-      *slot = nelt;
-    }
-  else
-    {
-      gcc_assert (!slot);
-      copy = name;
-    }
 
   replace_ssa_name_symbol (copy, var_copy);
   return copy;
@@ -966,9 +967,9 @@ add_field_for_name (void **slot, void *data)
   struct name_to_copy_elt *const elt = (struct name_to_copy_elt *) *slot;
   tree type = (tree) data;
   tree name = ssa_name (elt->version);
-  tree var = SSA_NAME_VAR (name);
-  tree field = build_decl (DECL_SOURCE_LOCATION (var),
-			   FIELD_DECL, DECL_NAME (var), TREE_TYPE (var));
+  tree field = build_decl (UNKNOWN_LOCATION,
+			   FIELD_DECL, SSA_NAME_IDENTIFIER (name),
+			   TREE_TYPE (name));
 
   insert_field_into_struct (type, field);
   elt->field = field;
@@ -1516,7 +1517,7 @@ transform_to_exit_first_loop (struct loop *loop, htab_t reduction_list, tree nit
     {
       phi = gsi_stmt (gsi);
       res = PHI_RESULT (phi);
-      if (!is_gimple_reg (res))
+      if (virtual_operand_p (res))
 	{
 	  gsi_next (&gsi);
 	  continue;
@@ -1952,7 +1953,7 @@ gather_scalar_reductions (loop_p loop, htab_t reduction_list)
       tree res = PHI_RESULT (phi);
       bool double_reduc;
 
-      if (!is_gimple_reg (res))
+      if (virtual_operand_p (res))
 	continue;
 
       if (!simple_iv (loop, loop, res, &iv, true)
@@ -2018,7 +2019,7 @@ try_create_reduction_list (loop_p loop, htab_t reduction_list)
       gimple reduc_phi;
       tree val = PHI_ARG_DEF_FROM_EDGE (phi, exit);
 
-      if (is_gimple_reg (val))
+      if (!virtual_operand_p (val))
 	{
 	  if (dump_file && (dump_flags & TDF_DETAILS))
 	    {
@@ -2073,7 +2074,7 @@ try_create_reduction_list (loop_p loop, htab_t reduction_list)
       tree def = PHI_RESULT (phi);
       affine_iv iv;
 
-      if (is_gimple_reg (def) && !simple_iv (loop, loop, def, &iv, true))
+      if (!virtual_operand_p (def) && !simple_iv (loop, loop, def, &iv, true))
 	{
 	  struct reduction_info *red;
 

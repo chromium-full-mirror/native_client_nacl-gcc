@@ -545,7 +545,7 @@ slpeel_update_phi_nodes_for_guard1 (edge guard_edge, struct loop *loop,
 
       /** 2. Handle loop-closed-ssa-form phis  **/
 
-      if (!is_gimple_reg (PHI_RESULT (orig_phi)))
+      if (virtual_operand_p (PHI_RESULT (orig_phi)))
 	continue;
 
       /* 2.1. Generate new phi node in NEW_EXIT_BB:  */
@@ -1176,12 +1176,12 @@ slpeel_tree_peel_loop_to_edge (struct loop *loop,
      in the same form).  Doing this early simplifies the checking what
      uses should be renamed.  */
   for (gsi = gsi_start_phis (loop->header); !gsi_end_p (gsi); gsi_next (&gsi))
-    if (!is_gimple_reg (gimple_phi_result (gsi_stmt (gsi))))
+    if (virtual_operand_p (gimple_phi_result (gsi_stmt (gsi))))
       {
 	gimple phi = gsi_stmt (gsi);
 	for (gsi = gsi_start_phis (exit_e->dest);
 	     !gsi_end_p (gsi); gsi_next (&gsi))
-	  if (!is_gimple_reg (gimple_phi_result (gsi_stmt (gsi))))
+	  if (virtual_operand_p (gimple_phi_result (gsi_stmt (gsi))))
 	    break;
 	if (gsi_end_p (gsi))
 	  {
@@ -1659,7 +1659,7 @@ vect_can_advance_ivs_p (loop_vec_info loop_vinfo)
       /* Skip virtual phi's. The data dependences that are associated with
          virtual defs/uses (i.e., memory accesses) are analyzed elsewhere.  */
 
-      if (!is_gimple_reg (PHI_RESULT (phi)))
+      if (virtual_operand_p (PHI_RESULT (phi)))
 	{
 	  if (vect_print_dump_info (REPORT_DETAILS))
 	    fprintf (vect_dump, "virtual phi. skip.");
@@ -1789,7 +1789,7 @@ vect_update_ivs_after_vectorizer (loop_vec_info loop_vinfo, tree niters,
         }
 
       /* Skip virtual phi's.  */
-      if (!is_gimple_reg (PHI_RESULT (phi)))
+      if (virtual_operand_p (PHI_RESULT (phi)))
 	{
 	  if (vect_print_dump_info (REPORT_DETAILS))
 	    fprintf (vect_dump, "virtual phi. skip.");
@@ -2207,7 +2207,7 @@ vect_create_cond_for_align_checks (loop_vec_info loop_vinfo,
   tree int_ptrsize_type;
   char tmp_name[20];
   tree or_tmp_name = NULL_TREE;
-  tree and_tmp, and_tmp_name;
+  tree and_tmp_name;
   gimple and_stmt;
   tree ptrsize_zero;
   tree part_cond_expr;
@@ -2225,8 +2225,8 @@ vect_create_cond_for_align_checks (loop_vec_info loop_vinfo,
     {
       gimple_seq new_stmt_list = NULL;
       tree addr_base;
-      tree addr_tmp, addr_tmp_name;
-      tree or_tmp, new_or_tmp_name;
+      tree addr_tmp_name;
+      tree new_or_tmp_name;
       gimple addr_stmt, or_stmt;
       stmt_vec_info stmt_vinfo = vinfo_for_stmt (ref_stmt);
       tree vectype = STMT_VINFO_VECTYPE (stmt_vinfo);
@@ -2242,12 +2242,10 @@ vect_create_cond_for_align_checks (loop_vec_info loop_vinfo,
       if (new_stmt_list != NULL)
 	gimple_seq_add_seq (cond_expr_stmt_list, new_stmt_list);
 
-      sprintf (tmp_name, "%s%d", "addr2int", i);
-      addr_tmp = create_tmp_reg (int_ptrsize_type, tmp_name);
-      addr_tmp_name = make_ssa_name (addr_tmp, NULL);
+      sprintf (tmp_name, "addr2int%d", i);
+      addr_tmp_name = make_temp_ssa_name (int_ptrsize_type, NULL, tmp_name);
       addr_stmt = gimple_build_assign_with_ops (NOP_EXPR, addr_tmp_name,
 						addr_base, NULL_TREE);
-      SSA_NAME_DEF_STMT (addr_tmp_name) = addr_stmt;
       gimple_seq_add_stmt (cond_expr_stmt_list, addr_stmt);
 
       /* The addresses are OR together.  */
@@ -2255,13 +2253,11 @@ vect_create_cond_for_align_checks (loop_vec_info loop_vinfo,
       if (or_tmp_name != NULL_TREE)
         {
           /* create: or_tmp = or_tmp | addr_tmp */
-          sprintf (tmp_name, "%s%d", "orptrs", i);
-          or_tmp = create_tmp_reg (int_ptrsize_type, tmp_name);
-	  new_or_tmp_name = make_ssa_name (or_tmp, NULL);
+          sprintf (tmp_name, "orptrs%d", i);
+	  new_or_tmp_name = make_temp_ssa_name (int_ptrsize_type, NULL, tmp_name);
 	  or_stmt = gimple_build_assign_with_ops (BIT_IOR_EXPR,
 						  new_or_tmp_name,
 						  or_tmp_name, addr_tmp_name);
-          SSA_NAME_DEF_STMT (new_or_tmp_name) = or_stmt;
 	  gimple_seq_add_stmt (cond_expr_stmt_list, or_stmt);
           or_tmp_name = new_or_tmp_name;
         }
@@ -2273,12 +2269,10 @@ vect_create_cond_for_align_checks (loop_vec_info loop_vinfo,
   mask_cst = build_int_cst (int_ptrsize_type, mask);
 
   /* create: and_tmp = or_tmp & mask  */
-  and_tmp = create_tmp_reg (int_ptrsize_type, "andmask" );
-  and_tmp_name = make_ssa_name (and_tmp, NULL);
+  and_tmp_name = make_temp_ssa_name (int_ptrsize_type, NULL, "andmask");
 
   and_stmt = gimple_build_assign_with_ops (BIT_AND_EXPR, and_tmp_name,
 					   or_tmp_name, mask_cst);
-  SSA_NAME_DEF_STMT (and_tmp_name) = and_stmt;
   gimple_seq_add_stmt (cond_expr_stmt_list, and_stmt);
 
   /* Make and_tmp the left operand of the conditional test against zero.

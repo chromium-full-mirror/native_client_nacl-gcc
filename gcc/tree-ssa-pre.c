@@ -249,7 +249,8 @@ alloc_expression_id (pre_expr expr)
       /* VEC_safe_grow_cleared allocates no headroom.  Avoid frequent
 	 re-allocations by using VEC_reserve upfront.  There is no
 	 VEC_quick_grow_cleared unfortunately.  */
-      VEC_reserve (unsigned, heap, name_to_id, num_ssa_names);
+      unsigned old_len = VEC_length (unsigned, name_to_id);
+      VEC_reserve (unsigned, heap, name_to_id, num_ssa_names - old_len);
       VEC_safe_grow_cleared (unsigned, heap, name_to_id, num_ssa_names);
       gcc_assert (VEC_index (unsigned, name_to_id, version) == 0);
       VEC_replace (unsigned, name_to_id, version, expr->id);
@@ -471,14 +472,6 @@ static unsigned int get_expr_value_id (pre_expr);
 
 static alloc_pool bitmap_set_pool;
 static bitmap_obstack grand_bitmap_obstack;
-
-/* To avoid adding 300 temporary variables when we only need one, we
-   only create one temporary variable, on demand, and build ssa names
-   off that.  We do have to change the variable if the types don't
-   match the current variable's type.  */
-static tree pretemp;
-static tree storetemp;
-static tree prephitemp;
 
 /* Set of blocks with statements that have had their EH properties changed.  */
 static bitmap need_eh_cleanup;
@@ -1366,7 +1359,6 @@ get_expr_type (const pre_expr e)
 static tree
 get_representative_for (const pre_expr e)
 {
-  tree exprtype;
   tree name;
   unsigned int value_id = get_expr_value_id (e);
 
@@ -1406,14 +1398,9 @@ get_representative_for (const pre_expr e)
       fprintf (dump_file, "\n");
     }
 
-  exprtype = get_expr_type (e);
-
   /* Build and insert the assignment of the end result to the temporary
      that we will return.  */
-  if (!pretemp || exprtype != TREE_TYPE (pretemp))
-    pretemp = create_tmp_reg (exprtype, "pretmp");
-
-  name = make_ssa_name (pretemp, gimple_build_nop ());
+  name = make_temp_ssa_name (get_expr_type (e), gimple_build_nop (), "pretmp");
   VN_INFO_GET (name)->value_id = value_id;
   if (e->kind == CONSTANT)
     VN_INFO (name)->valnum = PRE_EXPR_CONSTANT (e);
@@ -2602,11 +2589,6 @@ can_PRE_operation (tree op)
    that didn't turn out to be necessary.   */
 static bitmap inserted_exprs;
 
-/* Pool allocated fake store expressions are placed onto this
-   worklist, which, after performing dead code elimination, is walked
-   to see which expressions need to be put into GC'able memory  */
-static VEC(gimple, heap) *need_creation;
-
 /* The actual worker for create_component_ref_by_pieces.  */
 
 static tree
@@ -2983,7 +2965,7 @@ static tree
 create_expression_by_pieces (basic_block block, pre_expr expr,
 			     gimple_seq *stmts, gimple domstmt, tree type)
 {
-  tree temp, name;
+  tree name;
   tree folded;
   gimple_seq forced_stmts = NULL;
   unsigned int value_id;
@@ -3101,16 +3083,8 @@ create_expression_by_pieces (basic_block block, pre_expr expr,
       gimple_seq_add_seq (stmts, forced_stmts);
     }
 
-  /* Build and insert the assignment of the end result to the temporary
-     that we will return.  */
-  if (!pretemp || exprtype != TREE_TYPE (pretemp))
-    pretemp = create_tmp_reg (exprtype, "pretmp");
-
-  temp = pretemp;
-
-  newstmt = gimple_build_assign (temp, folded);
-  name = make_ssa_name (temp, newstmt);
-  gimple_assign_set_lhs (newstmt, name);
+  name = make_temp_ssa_name (exprtype, NULL, "pretmp");
+  newstmt = gimple_build_assign (name, folded);
   gimple_set_plf (newstmt, NECESSARY, false);
 
   gimple_seq_add_stmt (stmts, newstmt);
@@ -3214,7 +3188,7 @@ inhibit_phi_insertion (basic_block bb, pre_expr expr)
 
 static bool
 insert_into_preds_of_block (basic_block block, unsigned int exprnum,
-			    pre_expr *avail)
+			    VEC(pre_expr, heap) *avail)
 {
   pre_expr expr = expression_for_id (exprnum);
   pre_expr newphi;
@@ -3230,7 +3204,7 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
   gimple phi;
 
   /* Make sure we aren't creating an induction variable.  */
-  if (block->loop_depth > 0 && EDGE_COUNT (block->preds) == 2)
+  if (bb_loop_depth (block) > 0 && EDGE_COUNT (block->preds) == 2)
     {
       bool firstinsideloop = false;
       bool secondinsideloop = false;
@@ -3255,7 +3229,7 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
       gimple_seq stmts = NULL;
       tree builtexpr;
       bprime = pred->src;
-      eprime = avail[bprime->index];
+      eprime = VEC_index (pre_expr, avail, pred->dest_idx);
 
       if (eprime->kind != NAME && eprime->kind != CONSTANT)
 	{
@@ -3265,14 +3239,14 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
 						   type);
 	  gcc_assert (!(pred->flags & EDGE_ABNORMAL));
 	  gsi_insert_seq_on_edge (pred, stmts);
-	  avail[bprime->index] = get_or_alloc_expr_for_name (builtexpr);
+	  VEC_replace (pre_expr, avail, pred->dest_idx,
+		       get_or_alloc_expr_for_name (builtexpr));
 	  insertions = true;
 	}
       else if (eprime->kind == CONSTANT)
 	{
 	  /* Constants may not have the right type, fold_convert
-	     should give us back a constant with the right type.
-	  */
+	     should give us back a constant with the right type.  */
 	  tree constant = PRE_EXPR_CONSTANT (eprime);
 	  if (!useless_type_conversion_p (type, TREE_TYPE (constant)))
 	    {
@@ -3304,11 +3278,13 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
 			    }
 			  gsi_insert_seq_on_edge (pred, stmts);
 			}
-		      avail[bprime->index] = get_or_alloc_expr_for_name (forcedexpr);
+		      VEC_replace (pre_expr, avail, pred->dest_idx,
+				   get_or_alloc_expr_for_name (forcedexpr));
 		    }
 		}
 	      else
-		avail[bprime->index] = get_or_alloc_expr_for_constant (builtexpr);
+		VEC_replace (pre_expr, avail, pred->dest_idx,
+			     get_or_alloc_expr_for_constant (builtexpr));
 	    }
 	}
       else if (eprime->kind == NAME)
@@ -3347,7 +3323,8 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
 		    }
 		  gsi_insert_seq_on_edge (pred, stmts);
 		}
-	      avail[bprime->index] = get_or_alloc_expr_for_name (forcedexpr);
+	      VEC_replace (pre_expr, avail, pred->dest_idx,
+			   get_or_alloc_expr_for_name (forcedexpr));
 	    }
 	}
     }
@@ -3361,14 +3338,7 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
     return false;
 
   /* Now build a phi for the new variable.  */
-  if (!prephitemp || TREE_TYPE (prephitemp) != type)
-    prephitemp = create_tmp_var (type, "prephitmp");
-
-  temp = prephitemp;
-
-  if (TREE_CODE (type) == COMPLEX_TYPE
-      || TREE_CODE (type) == VECTOR_TYPE)
-    DECL_GIMPLE_REG_P (temp) = 1;
+  temp = make_temp_ssa_name (type, NULL, "prephitmp");
   phi = create_phi_node (temp, block);
 
   gimple_set_plf (phi, NECESSARY, false);
@@ -3377,14 +3347,13 @@ insert_into_preds_of_block (basic_block block, unsigned int exprnum,
   bitmap_set_bit (inserted_exprs, SSA_NAME_VERSION (gimple_phi_result (phi)));
   FOR_EACH_EDGE (pred, ei, block->preds)
     {
-      pre_expr ae = avail[pred->src->index];
+      pre_expr ae = VEC_index (pre_expr, avail, pred->dest_idx);
       gcc_assert (get_expr_type (ae) == type
 		  || useless_type_conversion_p (type, get_expr_type (ae)));
       if (ae->kind == CONSTANT)
 	add_phi_arg (phi, PRE_EXPR_CONSTANT (ae), pred, UNKNOWN_LOCATION);
       else
-	add_phi_arg (phi, PRE_EXPR_NAME (avail[pred->src->index]), pred,
-		     UNKNOWN_LOCATION);
+	add_phi_arg (phi, PRE_EXPR_NAME (ae), pred, UNKNOWN_LOCATION);
     }
 
   newphi = get_or_alloc_expr_for_name (gimple_phi_result (phi));
@@ -3444,15 +3413,18 @@ static bool
 do_regular_insertion (basic_block block, basic_block dom)
 {
   bool new_stuff = false;
-  VEC (pre_expr, heap) *exprs = sorted_array_from_bitmap_set (ANTIC_IN (block));
+  VEC (pre_expr, heap) *exprs;
   pre_expr expr;
+  VEC (pre_expr, heap) *avail = NULL;
   int i;
+
+  exprs = sorted_array_from_bitmap_set (ANTIC_IN (block));
+  VEC_safe_grow (pre_expr, heap, avail, EDGE_COUNT (block->preds));
 
   FOR_EACH_VEC_ELT (pre_expr, exprs, i, expr)
     {
       if (expr->kind != NAME)
 	{
-	  pre_expr *avail;
 	  unsigned int val;
 	  bool by_some = false;
 	  bool cant_insert = false;
@@ -3475,7 +3447,6 @@ do_regular_insertion (basic_block block, basic_block dom)
 	      continue;
 	    }
 
-	  avail = XCNEWVEC (pre_expr, last_basic_block);
 	  FOR_EACH_EDGE (pred, ei, block->preds)
 	    {
 	      unsigned int vprime;
@@ -3498,6 +3469,7 @@ do_regular_insertion (basic_block block, basic_block dom)
 		 rest of the results are.  */
 	      if (eprime == NULL)
 		{
+		  VEC_replace (pre_expr, avail, pred->dest_idx, NULL);
 		  cant_insert = true;
 		  break;
 		}
@@ -3508,12 +3480,12 @@ do_regular_insertion (basic_block block, basic_block dom)
 						 vprime, NULL);
 	      if (edoubleprime == NULL)
 		{
-		  avail[bprime->index] = eprime;
+		  VEC_replace (pre_expr, avail, pred->dest_idx, eprime);
 		  all_same = false;
 		}
 	      else
 		{
-		  avail[bprime->index] = edoubleprime;
+		  VEC_replace (pre_expr, avail, pred->dest_idx, edoubleprime);
 		  by_some = true;
 		  /* We want to perform insertions to remove a redundancy on
 		     a path in the CFG we want to optimize for speed.  */
@@ -3592,11 +3564,11 @@ do_regular_insertion (basic_block block, basic_block dom)
 		    }
 		}
 	    }
-	  free (avail);
 	}
     }
 
   VEC_free (pre_expr, heap, exprs);
+  VEC_free (pre_expr, heap, avail);
   return new_stuff;
 }
 
@@ -3612,15 +3584,18 @@ static bool
 do_partial_partial_insertion (basic_block block, basic_block dom)
 {
   bool new_stuff = false;
-  VEC (pre_expr, heap) *exprs = sorted_array_from_bitmap_set (PA_IN (block));
+  VEC (pre_expr, heap) *exprs;
   pre_expr expr;
+  VEC (pre_expr, heap) *avail = NULL;
   int i;
+
+  exprs = sorted_array_from_bitmap_set (PA_IN (block));
+  VEC_safe_grow (pre_expr, heap, avail, EDGE_COUNT (block->preds));
 
   FOR_EACH_VEC_ELT (pre_expr, exprs, i, expr)
     {
       if (expr->kind != NAME)
 	{
-	  pre_expr *avail;
 	  unsigned int val;
 	  bool by_all = true;
 	  bool cant_insert = false;
@@ -3635,7 +3610,6 @@ do_partial_partial_insertion (basic_block block, basic_block dom)
 	  if (bitmap_set_contains_value (AVAIL_OUT (dom), val))
 	    continue;
 
-	  avail = XCNEWVEC (pre_expr, last_basic_block);
 	  FOR_EACH_EDGE (pred, ei, block->preds)
 	    {
 	      unsigned int vprime;
@@ -3660,6 +3634,7 @@ do_partial_partial_insertion (basic_block block, basic_block dom)
 		 rest of the results are.  */
 	      if (eprime == NULL)
 		{
+		  VEC_replace (pre_expr, avail, pred->dest_idx, NULL);
 		  cant_insert = true;
 		  break;
 		}
@@ -3668,13 +3643,12 @@ do_partial_partial_insertion (basic_block block, basic_block dom)
 	      vprime = get_expr_value_id (eprime);
 	      edoubleprime = bitmap_find_leader (AVAIL_OUT (bprime),
 						 vprime, NULL);
+	      VEC_replace (pre_expr, avail, pred->dest_idx, edoubleprime);
 	      if (edoubleprime == NULL)
 		{
 		  by_all = false;
 		  break;
 		}
-	      else
-		avail[bprime->index] = edoubleprime;
 	    }
 
 	  /* If we can insert it, it's not the same value
@@ -3728,11 +3702,11 @@ do_partial_partial_insertion (basic_block block, basic_block dom)
 		    new_stuff = true;
 		}	   
 	    } 
-	  free (avail);
 	}
     }
 
   VEC_free (pre_expr, heap, exprs);
+  VEC_free (pre_expr, heap, avail);
   return new_stuff;
 }
 
@@ -3829,7 +3803,7 @@ make_values_for_phi (gimple phi, basic_block block)
 
   /* We have no need for virtual phis, as they don't represent
      actual computations.  */
-  if (is_gimple_reg (result))
+  if (!virtual_operand_p (result))
     {
       pre_expr e = get_or_alloc_expr_for_name (result);
       add_to_value (get_expr_value_id (e), e);
@@ -3879,7 +3853,7 @@ compute_avail (void)
       if (!name
 	  || !SSA_NAME_IS_DEFAULT_DEF (name)
 	  || has_zero_uses (name)
-	  || !is_gimple_reg (name))
+	  || virtual_operand_p (name))
 	continue;
 
       e = get_or_alloc_expr_for_name (name);
@@ -4482,7 +4456,7 @@ eliminate (void)
 	     replacing the PHI with a single copy if possible.
 	     Do not touch inserted, single-argument or virtual PHIs.  */
 	  if (gimple_phi_num_args (phi) == 1
-	      || !is_gimple_reg (res))
+	      || virtual_operand_p (res))
 	    {
 	      gsi_next (&gsi);
 	      continue;
@@ -4809,10 +4783,6 @@ init_pre (bool do_fre)
   in_fre = do_fre;
 
   inserted_exprs = BITMAP_ALLOC (NULL);
-  need_creation = NULL;
-  pretemp = NULL_TREE;
-  storetemp = NULL_TREE;
-  prephitemp = NULL_TREE;
 
   connect_infinite_loops_to_exit ();
   memset (&pre_stats, 0, sizeof (pre_stats));
@@ -4860,7 +4830,6 @@ fini_pre (bool do_fre)
   free (postorder);
   VEC_free (bitmap_set_t, heap, value_expressions);
   BITMAP_FREE (inserted_exprs);
-  VEC_free (gimple, heap, need_creation);
   bitmap_obstack_release (&grand_bitmap_obstack);
   free_alloc_pool (bitmap_set_pool);
   free_alloc_pool (pre_expr_pool);

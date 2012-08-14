@@ -61,11 +61,11 @@ var_map_base_init (var_map map)
 {
   int x, num_part;
   tree var;
-  htab_t decl_to_index;
+  htab_t tree_to_index;
   struct tree_int_map *m, *mapstorage;
 
   num_part = num_var_partitions (map);
-  decl_to_index = htab_create (num_part, tree_decl_map_hash,
+  tree_to_index = htab_create (num_part, tree_map_base_hash,
 			       tree_int_map_eq, NULL);
   /* We can have at most num_part entries in the hash tables, so it's
      enough to allocate so many map elements once, saving some malloc
@@ -82,10 +82,18 @@ var_map_base_init (var_map map)
       struct tree_int_map **slot;
       unsigned baseindex;
       var = partition_to_var (map, x);
-      var = SSA_NAME_VAR (var);
+      if (SSA_NAME_VAR (var))
+	m->base.from = SSA_NAME_VAR (var);
+      else
+	/* This restricts what anonymous SSA names we can coalesce
+	   as it restricts the sets we compute conflicts for.
+	   Using TREE_TYPE to generate sets is the easies as
+	   type equivalency also holds for SSA names with the same
+	   underlying decl.  */
+	m->base.from = TREE_TYPE (var);
       /* If base variable hasn't been seen, set it up.  */
-      m->base.from = var;
-      slot = (struct tree_int_map **) htab_find_slot (decl_to_index, m, INSERT);
+      slot = (struct tree_int_map **) htab_find_slot (tree_to_index,
+						      m, INSERT);
       if (!*slot)
 	{
 	  baseindex = m - mapstorage;
@@ -101,7 +109,7 @@ var_map_base_init (var_map map)
   map->num_basevars = m - mapstorage;
 
   free (mapstorage);
-  htab_delete (decl_to_index);
+  htab_delete (tree_to_index);
 }
 
 
@@ -232,7 +240,7 @@ partition_view_init (var_map map)
   for (x = 0; x < map->partition_size; x++)
     {
       tmp = partition_find (map->var_partition, x);
-      if (ssa_name (tmp) != NULL_TREE && is_gimple_reg (ssa_name (tmp))
+      if (ssa_name (tmp) != NULL_TREE && !virtual_operand_p (ssa_name (tmp))
 	  && (!has_zero_uses (ssa_name (tmp))
 	      || !SSA_NAME_IS_DEFAULT_DEF (ssa_name (tmp))))
 	bitmap_set_bit (used, tmp);
@@ -360,7 +368,12 @@ mark_all_vars_used_1 (tree *tp, int *walk_subtrees, void *data ATTRIBUTE_UNUSED)
   tree b;
 
   if (TREE_CODE (t) == SSA_NAME)
-    t = SSA_NAME_VAR (t);
+    {
+      *walk_subtrees = 0;
+      t = SSA_NAME_VAR (t);
+      if (!t)
+	return NULL;
+    }
 
   if (IS_EXPR_CODE_CLASS (c)
       && (b = TREE_BLOCK (t)) != NULL)
@@ -737,7 +750,7 @@ remove_unused_locals (void)
 	  tree def;
 	  gimple phi = gsi_stmt (gsi);
 
-	  if (!is_gimple_reg (gimple_phi_result (phi)))
+	  if (virtual_operand_p (gimple_phi_result (phi)))
 	    continue;
 
 	  def = gimple_phi_result (phi);
@@ -1203,7 +1216,7 @@ void
 register_ssa_partition_check (tree ssa_var)
 {
   gcc_assert (TREE_CODE (ssa_var) == SSA_NAME);
-  if (!is_gimple_reg (ssa_var))
+  if (virtual_operand_p (ssa_var))
     {
       fprintf (stderr, "Illegally registering a virtual SSA name :");
       print_generic_expr (stderr, ssa_var, TDF_SLIM);
@@ -1240,12 +1253,13 @@ verify_live_on_entry (tree_live_info_p live)
       for (i = 0; i < (unsigned)num_var_partitions (map); i++)
 	{
 	  basic_block tmp;
-	  tree d;
+	  tree d = NULL_TREE;
 	  bitmap loe;
 	  var = partition_to_var (map, i);
 	  stmt = SSA_NAME_DEF_STMT (var);
 	  tmp = gimple_bb (stmt);
-	  d = ssa_default_def (cfun, SSA_NAME_VAR (var));
+	  if (SSA_NAME_VAR (var))
+	    d = ssa_default_def (cfun, SSA_NAME_VAR (var));
 
 	  loe = live_on_entry (live, e->dest);
 	  if (loe && bitmap_bit_p (loe, i))

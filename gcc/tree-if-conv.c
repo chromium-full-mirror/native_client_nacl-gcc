@@ -221,25 +221,10 @@ reset_bb_predicate (basic_block bb)
 static tree
 ifc_temp_var (tree type, tree expr, gimple_stmt_iterator *gsi)
 {
-  const char *name = "_ifc_";
-  tree var, new_name;
-  gimple stmt;
-
-  /* Create new temporary variable.  */
-  var = create_tmp_var (type, name);
-
-  /* Build new statement to assign EXPR to new variable.  */
-  stmt = gimple_build_assign (var, expr);
-
-  /* Get SSA name for the new variable and set make new statement
-     its definition statement.  */
-  new_name = make_ssa_name (var, stmt);
-  gimple_assign_set_lhs (stmt, new_name);
-  SSA_NAME_DEF_STMT (new_name) = stmt;
-  update_stmt (stmt);
-
+  tree new_name = make_temp_ssa_name (type, NULL, "_ifc_");
+  gimple stmt = gimple_build_assign (new_name, expr);
   gsi_insert_before (gsi, stmt, GSI_SAME_STMT);
-  return gimple_assign_lhs (stmt);
+  return new_name;
 }
 
 /* Return true when COND is a true predicate.  */
@@ -425,7 +410,7 @@ if_convertible_phi_p (struct loop *loop, basic_block bb, gimple phi)
   /* When the flag_tree_loop_if_convert_stores is not set, check
      that there are no memory writes in the branches of the loop to be
      if-converted.  */
-  if (!is_gimple_reg (gimple_phi_result (phi)))
+  if (virtual_operand_p (gimple_phi_result (phi)))
     {
       imm_use_iterator imm_iter;
       use_operand_p use_p;
@@ -1277,7 +1262,7 @@ predicate_scalar_phi (gimple phi, tree cond,
 
   res = gimple_phi_result (phi);
   /* Do not handle virtual phi nodes.  */
-  if (!is_gimple_reg (res))
+  if (virtual_operand_p (res))
     return;
 
   bb = gimple_bb (phi);
