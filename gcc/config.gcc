@@ -675,6 +675,7 @@ case ${target} in
   use_gcc_tgmath=no
   use_gcc_stdint=wrap
 #  native_system_header_dir=/include
+  extra_options="$extra_options gnu-user.opt"
 #  extra_options="$extra_options nacl.opt"
   ;;
 *-*-netbsd*)

@@ -22,6 +22,15 @@ a copy of the GCC Runtime Library Exception along with this program;
 see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 <http://www.gnu.org/licenses/>.  */
 
+/* Use %(subtarget_cpp_spec), which is set by config/nacl.h for common
+   definitions across all NaCl targets.  */
+#undef	SUBTARGET_EXTRA_SPECS
+#define SUBTARGET_EXTRA_SPECS \
+  { "subtarget_cpp_spec",	SUBTARGET_CPP_SPEC },
+
+#undef  CPP_SPEC
+#define CPP_SPEC "%(subtarget_cpp_spec)"
+
 /* Instruction bundles have this size and at least this alignment.  */
 #define NACL_X86_BUNDLE_ALIGN           32
 

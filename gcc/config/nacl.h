@@ -35,6 +35,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 		    : "__LITTLE_ENDIAN__");             \
   } while (0)
 
+/* This is the value for %(subtarget_cpp_spec).  It goes with gnu-user.opt.  */
+#undef  SUBTARGET_CPP_SPEC
+#define SUBTARGET_CPP_SPEC  "%{posix:-D_POSIX_SOURCE} %{pthread:-D_REENTRANT}"
+
 /* Since non-instructions can never go into code sections,
    this is always false for Native Client targets.  */
 #undef  JUMP_TABLES_IN_TEXT_SECTION
