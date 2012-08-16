@@ -38,7 +38,6 @@ along with GCC; see the file COPYING3.  If not see
 #include "flags.h"
 #include "diagnostic-core.h"
 #include "tree-inline.h"
-#include "gmp.h"
 
 #define SWAP(X, Y) do { affine_iv *tmp = (X); (X) = (Y); (Y) = tmp; } while (0)
 
@@ -2287,7 +2286,10 @@ find_loop_niter_by_eval (struct loop *loop, edge *exit)
   /* Loops with multiple exits are expensive to handle and less important.  */
   if (!flag_expensive_optimizations
       && VEC_length (edge, exits) > 1)
-    return chrec_dont_know;
+    {
+      VEC_free (edge, heap, exits);
+      return chrec_dont_know;
+    }
 
   FOR_EACH_VEC_ELT (edge, exits, i, ex)
     {

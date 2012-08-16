@@ -1249,7 +1249,7 @@ build_sese_conditions_before (struct dom_walk_data *dw_data,
       if (e->flags & EDGE_TRUE_VALUE)
 	VEC_safe_push (gimple, heap, *cases, stmt);
       else
-	VEC_safe_push (gimple, heap, *cases, NULL);
+	VEC_safe_push (gimple, heap, *cases, (gimple) NULL);
     }
 
   gbb = gbb_from_bb (bb);
@@ -3122,6 +3122,7 @@ scop_ivs_can_be_represented (scop_p scop)
   loop_iterator li;
   loop_p loop;
   gimple_stmt_iterator psi;
+  bool result = true;
 
   FOR_EACH_LOOP (li, loop, 0)
     {
@@ -3137,11 +3138,16 @@ scop_ivs_can_be_represented (scop_p scop)
 
 	  if (TYPE_UNSIGNED (type)
 	      && TYPE_PRECISION (type) >= TYPE_PRECISION (long_long_integer_type_node))
-	    return false;
+	    {
+	      result = false;
+	      break;
+	    }
 	}
+      if (!result)
+	FOR_EACH_LOOP_BREAK (li);
     }
 
-  return true;
+  return result;
 }
 
 /* Builds the polyhedral representation for a SESE region.  */
