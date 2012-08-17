@@ -752,11 +752,12 @@
 ;;  (plus (reg rN) (reg sp)) into (reg rN).  In this case reload will
 ;; put the duplicated register first, and not try the commutative version.
 (define_insn_and_split "*arm_addsi3"
-  [(set (match_operand:SI          0 "s_register_operand" "=r, k,r,r, k, r, k,k,r, k, r")
-	(plus:SI (match_operand:SI 1 "s_register_operand" "%rk,k,r,rk,k, rk,k,r,rk,k, rk")
-		 (match_operand:SI 2 "reg_or_int_operand" "rI,rI,k,Pj,Pj,L, L,L,PJ,PJ,?n")))]
+  [(set (match_operand:SI          0 "s_register_operand" "=rk, r,k, r,r, k, r, k,k,r, k, r")
+	(plus:SI (match_operand:SI 1 "s_register_operand" "%0, rk,k, r,rk,k, rk,k,r,rk,k, rk")
+		 (match_operand:SI 2 "reg_or_int_operand" "rk, rI,rI,k,Pj,Pj,L, L,L,PJ,PJ,?n")))]
   "TARGET_32BIT"
   "@
+   %j0add%?\\t%0, %0, %2
    %j0add%?\\t%0, %1, %2
    %j0add%?\\t%0, %1, %2
    %j0add%?\\t%0, %2, %1
@@ -779,11 +780,11 @@
 		      operands[1], 0);
   DONE;
   "
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "10")
+  [(set (attr "length") (if_then_else (eq_attr "alternative" "11")
 				      (attr "length_sp_op0_by_4")
 				      (attr "length_sp_op0")))
    (set_attr "predicable" "yes")
-   (set_attr "arch" "*,*,*,t2,t2,*,*,a,t2,t2,*")]
+   (set_attr "arch" "t2,*,*,*,t2,t2,*,*,a,t2,t2,*")]
 )
 
 (define_insn_and_split "*thumb1_addsi3"

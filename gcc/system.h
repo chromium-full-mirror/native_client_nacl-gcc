@@ -808,7 +808,7 @@ extern void fancy_abort (const char *, int, const char *) ATTRIBUTE_NORETURN;
 	CAN_DEBUG_WITHOUT_FP UNLIKELY_EXECUTED_TEXT_SECTION_NAME	\
 	HOT_TEXT_SECTION_NAME LEGITIMATE_CONSTANT_P ALWAYS_STRIP_DOTDOT	\
 	OUTPUT_ADDR_CONST_EXTRA SMALL_REGISTER_CLASSES ASM_OUTPUT_IDENT	\
-	ASM_BYTE_OP
+	ASM_BYTE_OP MEMBER_TYPE_FORCES_BLK
 
 /* Target macros only used for code built for the target, that have
    moved to libgcc-tm.h or have never been present elsewhere.  */
@@ -1035,10 +1035,6 @@ helper_const_non_const_cast (const char *p)
 #else
 #define DEBUG_FUNCTION
 #define DEBUG_VARIABLE
-#endif
-
-#ifndef GENERATOR_FILE
-#include <gmp.h>
 #endif
 
 #endif /* ! GCC_SYSTEM_H */
