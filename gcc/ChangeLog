@@ -2,6 +2,141 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-08-20  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR tree-ssa/54295
+	* tree-ssa-math-opts.c (is_widening_mult_rhs_p): Delete rhs_code
+	declaration and setter.
+
+2012-08-20  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR tree-ssa/54295
+	* tree-ssa-math-opts.c (widening_mult_conversion_strippable_p):
+	New function.
+	(is_widening_mult_rhs_p): Use it.
+
+2012-08-20  Joseph Myers  <joseph@codesourcery.com>
+
+	* configure.ac (ffs): Check for declaration.
+	* configure, config.in: Regenerate.
+
+2012-08-20  Richard Guenther  <rguenther@suse.de>
+
+	* tree-flow.h (register_new_name_mapping): Remove.
+	* tree-into-ssa.c (register_new_name_mapping): Likewise.
+	(add_new_name_mapping): Do not push/pop timevar here.
+	(create_new_def_for): Instead do it here.  Initialize
+	update-ssa here, handle a NULL def.
+	* tree-vrp.c (build_assert_expr_for): Use create_new_def_for.
+
+2012-08-20  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54327
+	* gimple-fold.c (get_maxval_strlen): Do not walk use-def chains
+	if the use is registered for SSA update.
+
+2012-08-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54321
+	* tree-ssa-forwprop.c (simplify_builtin_call): Pass 0 instead of 1
+	as second argument to tree_low_cst call on val2.
+
+2012-08-20  Richard Guenther  <rguenther@suse.de>
+
+	* gimple.h (gimple_statement_base): Annotate with GTY chain_next.
+
+2012-08-20  Richard Guenther  <rguenther@suse.de>
+
+	PR bootstrap/54326
+	* genoutput.c (note_constraint): Properly use CONST_CAST.
+
+2012-08-19  Nick Clifton  <nickc@redhat.com>
+
+	PR target/54306
+	* config/arm/mmintrin.h: Remove spurious #endif.
+
+2012-08-18  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
+	* config/avr/avr-log.c (avr_log_vadump): Properly use
+	int-promoted enum values.
+	* config/avr/avr.h (struct mcu_type_s): Change `arch' from
+	int to enum avr_arch.
+	* config/avr/gen-avr-mmcu-texi.c (main): Use correct initializer.
+
+2012-08-18  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/45375
+	* ipa-inline.c (want_inline_small_function_p): Bypass
+	inline limits for hinted functions.
+	(edge_badness): Dump hints; decrease badness for hinted funcitons.
+	* ipa-inline.h (enum inline_hints_vals): New enum.
+	(inline_hints): New type.
+	(edge_growth_cache_entry): Add hints.
+	(dump_inline_summary): Update.
+	(dump_inline_hints): Declare.
+	(do_estimate_edge_hints): Declare.
+	(estimate_edge_hints): New inline function.
+	(reset_edge_growth_cache): Update.
+	* predict.c (cgraph_maybe_hot_edge_p): Do not ice on indirect edges.
+	* ipa-inline-analysis.c (dump_inline_hints): New function.
+	(estimate_edge_devirt_benefit): Return true when function should be
+	hinted.
+	(estimate_calls_size_and_time): New hints argument; set it when
+	devritualization happens.
+	(estimate_node_size_and_time): New hints argument.
+	(do_estimate_edge_time): Cache hints.
+	(do_estimate_edge_growth): Update.	
+	(do_estimate_edge_hints): New function
+
+2012-08-18  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR middle-end/53823
+	* expmed.c (expand_mult): Skip synth_mult for negative coefficients
+	if the mode is larger than a wide int and it is too costly to multiply
+	by a positive multiplier and negate the result.
+
+2012-08-18  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sparseset.c (sparseset_alloc): Use non-clearing allocation.  Tell
+	valgrind not to worry about reading from unitialized memory.
+
+2012-08-18  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR middle-end/54313
+	* dse.c (dse_step7): Don't free kill_on_calls bitmap, it is
+	freed when its obstack is release.
+
+2012-08-18  Andrew Pinski  <pinskia@gmail.com>
+
+	* alloc-pool.c (pool_alloc): Add valgrind markers.
+	(pool_free): Likewise.
+
+2012-08-17  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/feedback.h (FEEDBACK_ENTER_EXPLICIT): Define.
+	(FEEDBACK_ENTER): Define.
+	(FEEDBACK_REENTER): Define.
+	(FEEDBACK_ENTRY): Define.
+	* config/tilepro/feedback.h: (FEEDBACK_ENTER_EXPLICIT): Define.
+	(FEEDBACK_ENTER): Define.
+	(FEEDBACK_REENTER): Define.
+	(FEEDBACK_ENTRY): Define.
+
+2012-08-17  H.J. Lu  <hongjiu.lu@intel.com>
+	    Gary Funck <gary@intrepid.com>
+
+	PR target/20020
+	* config/i386/i386.c (ix86_member_type_forces_blk): New function.
+	(TARGET_MEMBER_TYPE_FORCES_BLK): New macro.
+
+	* config/i386/i386.h (MAX_FIXED_MODE_SIZE): New macro.
+
+2012-08-17  Marc Glisse  <marc.glisse@inria.fr>
+
+	* simplify-rtx.c (simplify_binary_operation_1): Optimize shuffle of
+	a concatenation.
+
+
 2012-08-17  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* stor-layout.c (compute_record_mode): Replace
