@@ -2,6 +2,125 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-08-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR middle-end/54332
+	* df-scan.c (df_bb_verify): Restore df_free_collection_rec call
+	inside the insn traversal loop.
+
+	* vec.h (vec_reserve): Remove the stack allocation check.
+
+2012-08-21  Marc Glisse  <marc.glisse@inria.fr>
+
+	* fold-const.c (fold_ternary_loc): Detect identity permutations.
+	Canonicalize permutations more.
+	* tree-ssa-forwprop.c (is_combined_permutation_identity): New function.
+	(simplify_permutation): Likewise.
+	(ssa_forward_propagate_and_combine): Call it.
+
+2012-08-21  Richard Guenther  <rguenther@suse.de>
+
+	* tree-ssa-loop-im.c (tree_ssa_lim_finalize): Properly free
+	the affine expansion cache.
+	* tree-ssa-dom.c (free_expr_hash_elt_contents): New function,
+	split out from ...
+	(free_expr_hash_elt): ... this one.
+	(record_cond): Properly free a not needed hashtable element.
+	(lookup_avail_expr): Likewise.
+	* tree-into-ssa.c (init_ssa_renamer): Specify a free function
+	for the var_infos hashtable.
+	(update_ssa): Likewise.
+
+2012-08-21  Richard Guenther  <rguenther@suse.de>
+
+	* alloc-pool.c (pool_alloc): Fix valgrind annotation.
+	* tree.h: Fix typo and complete flags documentation.
+
+2012-08-21  Richard Guenther  <rguenther@suse.de>
+
+	* tree.h (struct tree_base): Add union to make it possible to
+	re-use the upper 4 bytes for tree codes that do not need as
+	many flags as others.  Move visited and default_def_flag to
+	common bits section in exchange for saturating_flag and
+	unsigned_flag.  Add SSA name version and tree vec length
+	fields here.
+	(struct tree_vec): Remove length field here.
+	(struct tree_ssa_name): Remove version field here.
+
+2012-08-20  Jan Hubicka  <jh@suse.cz>
+
+	PR fortran/48636
+	* ipa-inline.c (want_inline_small_function_p): Take loop_iterations
+	hint.
+	(edge_badness): Likewise.
+	* ipa-inline.h (inline_hints_vals): Add INLINE_HINT_loop_iterations.
+	(inline_summary): Add loop_iterations.
+	* ipa-inline-analysis.c: Include tree-scalar-evolution.h.
+	(dump_inline_hints): Dump loop_iterations.
+	(reset_inline_summary): Free loop_iterations.
+	(inline_node_duplication_hook): Update loop_iterations.
+	(dump_inline_summary): Dump loop_iterations.
+	(will_be_nonconstant_expr_predicate): New function.
+	(estimate_function_body_sizes): Analyze loops.
+	(estimate_node_size_and_time): Set hint loop_iterations.
+	(inline_merge_summary): Merge loop iterations.
+	(inline_read_section): Stream in loop_iterations.
+	(inline_write_summary): Stream out loop_iterations.
+
+2012-08-20  Florian Weimer  <fweimer@redhat.com>
+
+	PR c++/19351
+	* call.c (build_operator_new_call): Add size_check argument and
+	evaluate it.
+	* cp-tree.h (build_operator_new_call): Adjust declaration.
+	* init.c (build_new_1): Compute array size check and apply it.
+
+2012-08-20  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/54089
+	* config/sh/sh.md (rotcr, *rotcr, shar, shlr): New insns and splits.
+	(ashrdi3_k, lshrdi3_k): Rewrite as insn_and_split.
+	* config/sh/sh.c (sh_lshrsi_clobbers_t_reg_p): New function.
+	* config/sh/sh-protos.h (sh_lshrsi_clobbers_t_reg_p): Declare it.
+
+2012-08-20  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51244
+	* config/sh/sh.md (*cset_zero): New insns.
+
+2012-08-20  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf2out.h (enum dw_val_class): Add dw_val_class_high_pc.
+	* dwarf2out.c (dw_val_equal_p): Handle dw_val_class_high_pc.
+	(add_AT_low_high_pc): New function.
+	(AT_lbl): Handle dw_val_class_high_pc.
+	(print_die): Likewise.
+	(attr_checksum): Likewise.
+	(attr_checksum_ordered): Likewise.
+	(same_dw_val_p): Likewise.
+	(size_of_die): Likewise.
+	(value_format): Likewise.
+	(output_die): Likewise.
+	(gen_subprogram_die): Use add_AT_low_high_pc.
+	(add_high_low_attributes): Likewise.
+	(dwarf2out_finish): Likewise.
+
+2012-08-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/54294
+	* fwprop.c (all_uses_available_at): Ignore debug insns in between
+	def_insn and target_insn when checking whether the shortcut is
+	possible.
+
+2012-08-20  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/sparc/sparc.h (MAX_FIXED_MODE_SIZE): Define.
+
+2012-08-20  Patrick Marlier  <patrick.marlier@gmail.com>
+
+	PR middle-end/53992
+	* omp-low.c (lower_omp_1): Handle GIMPLE_TRANSACTION.
+
 2012-08-20  Richard Earnshaw  <rearnsha@arm.com>
 
 	PR tree-ssa/54295
@@ -136,7 +255,6 @@
 	* simplify-rtx.c (simplify_binary_operation_1): Optimize shuffle of
 	a concatenation.
 
-
 2012-08-17  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* stor-layout.c (compute_record_mode): Replace
@@ -178,8 +296,7 @@
 	* configure.ac: Add libintl.h to AC_CHECK_HEADERS list.
 	* config.in: Regenerate.
 	* configure: Regenerate.
-	* intl.h: Always include libintl.h if HAVE_LIBINTL_H is
-	set.
+	* intl.h: Always include libintl.h if HAVE_LIBINTL_H is set.
 
 2012-08-17  Richard Guenther  <rguenther@suse.de>
 
@@ -636,7 +753,6 @@
 	    Julian Brown  <julian@codesourcery.com>
 	    MIPS Technologies, Inc.
 
-	gcc/
 	* config/mips/mips.md (dspmac, dspmacsat, accext, accmod, dspalu)
 	(dspalusat): Add insn types.
 	* config/mips/mips-dsp.md (add<DSPV:mode>3)
