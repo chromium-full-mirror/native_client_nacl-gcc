@@ -29,9 +29,6 @@
     }                                           \
   while (0)
 
-#undef  TARGET_DEFAULT_FLOAT_ABI
-#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_HARD
-
 /* For NaCl we use DWARF2 unwind information, not ARM's flavor.  */
 #undef  ARM_UNWIND_INFO
 #define ARM_UNWIND_INFO 0
