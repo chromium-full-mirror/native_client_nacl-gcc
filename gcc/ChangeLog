@@ -2,6 +2,170 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-08-22  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vectorizer.c (vectorize_loops): Do not call
+	mark_virtual_operands_for_renaming.
+	* tree-vect-slp.c (vect_slp_transform_bb): Likewise.
+	Do not update SSA form here.
+
+2012-08-22  Dodji Seketeli  <dodji@redhat.com>
+
+	* tree.h (TREE_NOTHROW): Use the base.nothrow_flag.
+
+2012-08-22  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/46590
+	* tree-ssa-alias.h (get_continuation_for_phi): Add alias query
+	counter output argument.
+	(walk_non_aliased_vuses): Add alias query counter argument
+	to the walker callback.
+	* tree-ssa-alias.c (maybe_skip_until): Add alias query counter
+	output argument and count alias queries.
+	(get_continuation_for_phi_1): Likewise.
+	(get_continuation_for_phi): Likewise.
+	(walk_non_aliased_vuses): Add alias query counter argument
+	to the walker callback and allow it to abort the walk by
+	returning -1.
+	* tree-ssa-pre.c (translate_vuse_through_block): Adjust.
+	* tree-ssa-sccvn.c (vn_reference_lookup_2): Add alias query
+	counter parmeter, abort walk if that is bigger than
+	--param sccvn-max-alias-queries-per-access.
+	* params.def (sccvn-max-alias-queries-per-access): New param.
+	* doc/invoke.texi (sccvn-max-alias-queries-per-access): Document.
+
+2012-08-22  Richard Guenther  <rguenther@suse.de>
+
+	* tree-ssa-loop-ch.c (copy_loop_headers): Remove redundant checking.
+	* tree-into-ssa.c (initialize_flags_in_bb): Use gcc_checking_assert
+	instead of gcc_assert.
+	(mark_block_for_update): Likewise.
+	(add_new_name_mapping): Likewise.
+	(mark_def_sites): Likewise.
+	(insert_phi_nodes_for): Likewise.
+	(rewrite_debug_stmt_uses): Likewise.
+	(rewrite_stmt): Likewise.
+	(maybe_register_def): Likewise.
+	(rewrite_update_phi_arguments): Likewise.
+	(rewrite_update_enter_block): Likewise.
+	(mark_def_interesting): Likewise.
+	(prepare_def_site_for): Likewise.
+	(insert_updated_phi_nodes_for): Likewise.
+
+2012-08-22  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-vect-loop.c (vect_transform_loop): Initialize
+	check_profitability to false.
+
+	* tree-predcom.c (try_combine_chains): Free the worklist vector
+	at the end.
+
+2012-08-22  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR tree-optimization/54317
+	* tree-vrp.c (extract_range_from_binary_expr_1): Test for
+	double_int overflow.
+	Remove dead tests.
+
+2012-08-22  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-vrp.c (find_assert_locations): Skip also edges
+	from the entry block.
+
+	* tree-vect-loop-manip.c (slpeel_make_loop_iterate_ntimes): Call
+	free_stmt_vec_info on orig_cond after gsi_removing it.
+	* tree-vect-data-refs.c (vect_enhance_data_refs_alignment): Always
+	free body_cost_vec vector.
+	(vect_analyze_data_refs): If gather is unsuccessful,
+	free_data_ref (dr).
+	* tree-inline.c (tree_function_versioning): Free
+	old_transforms_to_apply vector.
+
+2012-08-22  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* tree-ssa-coalesce.c (struct ssa_conflicts_d): Make contents
+	of this a VEC and add a bitmap obstack.
+	(ssa_conflicts_new): Allocate the obstack and grow the VEC cleared
+	to the right size.
+	(ssa_conflicts_delete): Free the VEC and release the obstack.
+	(ssa_conflicts_test_p, ssa_conflicts_test_p, ssa_conflicts_add_one,
+	ssa_conflicts_merge, ssa_conflicts_dump): Update for above changes.
+	(truct live_track_d): Add another bitmap obstack here.
+	(new_live_track): Initialize it and use it for all bitmaps.
+	(delete_live_track): Don't free the bitmaps one at a time, just
+	release the obstack.
+	(create_outofssa_var_map): Fix to conform to GCC code style rules.
+
+2012-08-21  Nathan Froyd  <froydnj@gcc.gnu.org>
+
+	* config/m32c/constraints.md: New file.
+	* config/m32c/t-m32c (MD_FILES): Add constraints.
+	* config/m32c/m32c-protos.h (m32c_const_ok_for_constraint_p): Delete.
+	(m32c_extra_address_constraint, m32c_extra_memory_constraint): Delete.
+	(m32c_reg_class_from_constraint): Delete.
+	(m32c_extra_constraint_p, m32c_extra_constraint_p2): Delete.
+	(m32c_matches_constraint_p): Declare.
+	* config/m32c/m32c.h (CONSTRAINT_LEN): Delete.
+	(REG_CLASS_FROM_CONSTRAINT): Delete.
+	(CONST_OK_FOR_CONSTRAINT_P): Delete.
+	(CONST_DOUBLE_OK_FOR_CONSTRAINT_P): Delete.
+	(EXTRA_CONSTRAINT_STR): Delete.
+	(EXTRA_MEMORY_CONSTRAINT, EXTRA_ADDRESS_CONSTRAINT): Delete.
+	* config/m32c/m32c.c: Include tm-constrs.h
+	(m32c_reg_class_from_constraint): Delete.
+	(m32c_const_ok_for_constraint_p): Delete.
+	(m32c_extra_constraint_p2): Rename to...
+	(m32c_matches_constraint_p): ...this.  Make it return bool.  Tweak
+	formatting.
+	(m32c_extra_constraint_p): Delete.
+	(m32c_extra_address_constraint, m32c_extra_memory_constraint): Delete.
+	(m32c_split_move): Use satisfies_constraint_Ss.
+	* config/m32c/predicates.md (memsym_operand): Use 
+	satisfies_constraint_Si.
+	(memimmed_operand): Use satisfies_constraint_Sp.
+	(m32c_psi_scale, m32c_1bit8_operand): Use satisfies_constraint_Ilb.
+	(m32c_1bit16_operand): Use satisfies_constraint_Ilw.
+	(m32c_1mask8_operand): Use satisfies_constraint_ImB.
+	(m32c_1mask16_operand): Use satisfies_constraint_Imw.
+
+2012-08-21  Nathan Froyd  <froydnj@gcc.gnu.org>
+
+	* config/mep/mep.h (REG_CLASS_FROM_CONSTRAINT): Delete.
+	(CONST_OK_FOR_LETTER_P, CONST_DOUBLE_OK_FOR_LETTER_P): Delete.
+	(CONSTRAINT_LEN, EXTRA_CONSTRAINT): Delete.
+	* config/mep/mep.c (mep_reg_class_from_constraint): Delete.
+	(mep_const_ok_for_letter_p, mep_extra_constraint): Delete.
+	* config/mep/mep-protos.h (mep_reg_class_from_constraint): Delete.
+	(mep_const_ok_for_letter_p, mep_extra_constraint): Delete.
+
+2012-08-21  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md (cmpeqdi_t, cmpgtdi_t, cmpgedi_t, cmpgeudi_t,
+	cmpgtudi_t, *movsicc_t_false, *movsicc_t_true, divsi_inv20, negsi_cond,
+	truncdihi2, ic_invalidate_line_i, ic_invalidate_line_sh4a,
+	ic_invalidate_line_media, movdf_i4, calli_pcrel, call_valuei,
+	call_valuei_pcrel, sibcalli_pcrel, sibcall_compact,
+	sibcall_valuei_pcrel, sibcall_value_compact, casesi_worker_1,
+	casesi_worker_2, bandreg_m2a, borreg_m2a, bxorreg_m2a, sp_switch_1,
+	sp_switch_2, stack_protect_set_si, stack_protect_set_si_media,
+	stack_protect_set_di_media, stack_protect_test_si,
+	stack_protect_test_si_media, stack_protect_test_di_media): Convert to
+	multi-line asm output strings.
+	(divsi_inv_qitable, divsi_inv_hitable): Use single-alternative asm
+	output.
+	(*andsi3_bclr, rotldi3_mextr, rotrdi3_mextr, calli, call_valuei_tbr_rel,
+	movml_push_banked, movml_pop_banked, bclr_m2a, bclrmem_m2a, bset_m2a,
+	bsetmem_m2a, bst_m2a, bld_m2a, bldsign_m2a, bld_reg, *bld_regqi,
+	band_m2a, bor_m2a, bxor_m2a, mextr_rl, *mextr_lr, ): Use tab char
+	instead of '\\t'.
+	(iordi3): Use braced string.
+	(*movsi_pop): Use tab chars instead of spaces.
+
+2012-08-21  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/39423
+	* config/sh/sh.md (*movhi_index_disp): Add support for SH2A movu.w insn.
+
 2012-08-21  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR middle-end/54332
