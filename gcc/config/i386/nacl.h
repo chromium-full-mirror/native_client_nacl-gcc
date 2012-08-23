@@ -43,6 +43,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
     target_flags &= ~MASK_TLS_DIRECT_SEG_REFS;                          \
     target_flags |= MASK_SFI_CFLOW_NACL1;                               \
     target_flags |= MASK_ALIGN_DOUBLE;                                  \
+    target_flags |= MASK_LONG_DOUBLE_64;                                \
     NACL_MIN_ALIGN (TARGET_SFI_CFLOW_NACL1, NACL_X86_BUNDLE_ALIGN);     \
   } while (0)
 
