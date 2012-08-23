@@ -1,3 +1,33 @@
+2012-08-23  Julian Brown  <julian@codesourcery.com>
+	    Sandra Loosemore  <sandra@codesourcery.com>
+
+	* gcc.target/mips/code-readable-1.c: Add -O to options.
+
+2012-08-23  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/20420
+	* g++.dg/lookup/using53.C: New.
+
+2012-08-23  Georg-Johann Lay  <avr@gjlay.de>
+
+	* gcc.dg/fixed-point/convert.c: Split into manageable parts:
+	* gcc.dg/fixed-point/convert-1.c: New.
+	* gcc.dg/fixed-point/convert-2.c: New.
+	* gcc.dg/fixed-point/convert-3.c: New.
+	* gcc.dg/fixed-point/convert-4.c: New.
+	* gcc.dg/fixed-point/convert-float-1.c: New.
+	* gcc.dg/fixed-point/convert-float-2.c: New.
+	* gcc.dg/fixed-point/convert-float-3.c: New.
+	* gcc.dg/fixed-point/convert-float-4.c: New.
+	* gcc.dg/fixed-point/convert-accum-neg.c: New.
+	* gcc.dg/fixed-point/convert-sat.c: New.
+	* gcc.dg/fixed-point/convert.h: New.
+
+2012-08-22  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/54089
+	* gcc.target/sh/pr54089-2.c: New.
+
 2012-08-22  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* gcc.target/i386/long-double-64-1.c: New file.
