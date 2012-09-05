@@ -21240,7 +21240,9 @@ cp_parser_template_declaration_after_export (cp_parser* parser, bool member_p)
 
 	  decl = finish_member_template_decl (decl);
 	}
-      else if (friend_p && decl && TREE_CODE (decl) == TYPE_DECL)
+      else if (friend_p && decl
+	       && (TREE_CODE (decl) == TYPE_DECL
+		   || DECL_TYPE_TEMPLATE_P (decl)))
 	make_friend_class (current_class_type, TREE_TYPE (decl),
 			   /*complain=*/true);
     }
@@ -21308,8 +21310,8 @@ cp_parser_perform_template_parameter_access_checks (VEC (deferred_access_check,g
 }
 
 /* Parse a `decl-specifier-seq [opt] init-declarator [opt] ;' or
-   `function-definition' sequence.  MEMBER_P is true, this declaration
-   appears in a class scope.
+   `function-definition' sequence that follows a template header.
+   If MEMBER_P is true, this declaration appears in a class scope.
 
    Returns the DECL for the declared entity.  If FRIEND_P is non-NULL,
    *FRIEND_P is set to TRUE iff the declaration is a friend.  */
@@ -21429,6 +21431,9 @@ cp_parser_single_declaration (cp_parser* parser,
 		  "explicit template specialization cannot have a storage class");
         decl = error_mark_node;
       }
+
+    if (decl && TREE_CODE (decl) == VAR_DECL)
+      check_template_variable (decl);
     }
 
   /* Look for a trailing `;' after the declaration.  */
@@ -26603,6 +26608,8 @@ cp_parser_omp_for_loop (cp_parser *parser, tree clauses, tree *par_clauses)
 	    incr = cp_parser_omp_for_incr (parser, real_decl);
 	  else
 	    incr = cp_parser_expression (parser, false, NULL);
+	  if (CAN_HAVE_LOCATION_P (incr) && !EXPR_HAS_LOCATION (incr))
+	    SET_EXPR_LOCATION (incr, input_location);
 	}
 
       if (!cp_parser_require (parser, CPP_CLOSE_PAREN, RT_CLOSE_PAREN))

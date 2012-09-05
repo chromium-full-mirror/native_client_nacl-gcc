@@ -517,6 +517,9 @@ struct mips_cpu_info {
       if (TARGET_OCTEON)						\
 	builtin_define ("__OCTEON__");					\
 									\
+      if (TARGET_SYNCI)							\
+	builtin_define ("__mips_synci");				\
+									\
       /* Macros dependent on the C dialect.  */				\
       if (preprocessing_asm_p ())					\
 	{								\
@@ -2336,12 +2339,13 @@ typedef struct mips_args {
 
 #define JUMP_TABLES_IN_TEXT_SECTION TARGET_MIPS16_SHORT_JUMP_TABLES
 
-#define CASE_VECTOR_MODE SImode
+#define CASE_VECTOR_MODE (TARGET_MIPS16_SHORT_JUMP_TABLES ? SImode : ptr_mode)
 
 /* Only use short offsets if their range will not overflow.  */
 #define CASE_VECTOR_SHORTEN_MODE(MIN, MAX, BODY) \
-  (TARGET_MIPS16_SHORT_JUMP_TABLES && ((MIN) >= -32768 && (MAX) < 32768) \
-   ? HImode : SImode)
+  (!TARGET_MIPS16_SHORT_JUMP_TABLES ? ptr_mode \
+   : ((MIN) >= -32768 && (MAX) < 32768) ? HImode \
+   : SImode)
 
 #define CASE_VECTOR_PC_RELATIVE TARGET_MIPS16_SHORT_JUMP_TABLES
 
@@ -2394,12 +2398,8 @@ typedef struct mips_args {
 #define FUNCTION_MODE SImode
 
 
-
-/* Define if copies to/from condition code registers should be avoided.
-
-   This is needed for the MIPS because reload_outcc is not complete;
-   it needs to handle cases where the source is a general or another
-   condition code register.  */
+/* We allocate $fcc registers by hand and can't cope with moves of
+   CCmode registers to and from pseudos (or memory).  */
 #define AVOID_CCMODE_COPIES
 
 /* A C expression for the cost of a branch instruction.  A value of
@@ -2796,7 +2796,6 @@ while (0)
 #define STORE_BY_PIECES_P(SIZE, ALIGN) \
   mips_store_by_pieces_p (SIZE, ALIGN)
 
-#ifndef __mips16
 /* Since the bits of the _init and _fini function is spread across
    many object files, each potentially with its own GP, we must assume
    we need to load our GP.  We don't preserve $gp or $ra, since each
@@ -2805,26 +2804,31 @@ while (0)
 #if (defined _ABIO32 && _MIPS_SIM == _ABIO32)
 #define CRT_CALL_STATIC_FUNCTION(SECTION_OP, FUNC)	\
    asm (SECTION_OP "\n\
+	.set push\n\
+	.set nomips16\n\
 	.set noreorder\n\
 	bal 1f\n\
 	nop\n\
 1:	.cpload $31\n\
 	.set reorder\n\
 	jal " USER_LABEL_PREFIX #FUNC "\n\
+	.set pop\n\
 	" TEXT_SECTION_ASM_OP);
 #endif /* Switch to #elif when we're no longer limited by K&R C.  */
 #if (defined _ABIN32 && _MIPS_SIM == _ABIN32) \
    || (defined _ABI64 && _MIPS_SIM == _ABI64)
 #define CRT_CALL_STATIC_FUNCTION(SECTION_OP, FUNC)	\
    asm (SECTION_OP "\n\
+	.set push\n\
+	.set nomips16\n\
 	.set noreorder\n\
 	bal 1f\n\
 	nop\n\
 1:	.set reorder\n\
 	.cpsetup $31, $2, 1b\n\
 	jal " USER_LABEL_PREFIX #FUNC "\n\
+	.set pop\n\
 	" TEXT_SECTION_ASM_OP);
-#endif
 #endif
 
 #ifndef HAVE_AS_TLS

@@ -770,9 +770,7 @@ dump_gimple_switch (pretty_printer *buffer, gimple gs, int spc, int flags)
   for (i = 0; i < gimple_switch_num_labels (gs); i++)
     {
       tree case_label = gimple_switch_label (gs, i);
-      if (case_label == NULL_TREE)
-	continue;
-
+      gcc_checking_assert (case_label != NULL_TREE);
       dump_generic_node (buffer, case_label, spc, flags, false);
       pp_character (buffer, ' ');
       dump_generic_node (buffer, CASE_LABEL (case_label), spc, flags, false);
@@ -1817,7 +1815,8 @@ dump_gimple_mem_ops (pretty_printer *buffer, gimple gs, int spc, int flags)
   tree vdef = gimple_vdef (gs);
   tree vuse = gimple_vuse (gs);
 
-  if (!ssa_operands_active () || !gimple_references_memory_p (gs))
+  if (!ssa_operands_active (DECL_STRUCT_FUNCTION (current_function_decl))
+      || !gimple_references_memory_p (gs))
     return;
 
   if (vdef != NULL_TREE)
@@ -2256,7 +2255,9 @@ gimple_dump_bb_buff (pretty_printer *buffer, basic_block bb, int indent,
       INDENT (curr_indent);
       dump_gimple_stmt (buffer, stmt, curr_indent, flags);
       pp_newline_and_flush (buffer);
-      dump_histograms_for_stmt (cfun, buffer->buffer->stream, stmt);
+      gcc_checking_assert (DECL_STRUCT_FUNCTION (current_function_decl));
+      dump_histograms_for_stmt (DECL_STRUCT_FUNCTION (current_function_decl),
+				buffer->buffer->stream, stmt);
     }
 
   dump_implicit_edges (buffer, bb, indent, flags);

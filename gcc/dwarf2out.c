@@ -11253,6 +11253,8 @@ mem_loc_descriptor (rtx rtl, enum machine_mode mode,
     case REG:
       if (GET_MODE_CLASS (mode) != MODE_INT
 	  || (GET_MODE_SIZE (mode) > DWARF2_ADDR_SIZE
+	      && rtl != arg_pointer_rtx
+	      && rtl != frame_pointer_rtx
 #ifdef POINTERS_EXTEND_UNSIGNED
 	      && (mode != Pmode || mem_mode == VOIDmode)
 #endif
@@ -11525,7 +11527,9 @@ mem_loc_descriptor (rtx rtl, enum machine_mode mode,
     case PLUS:
     plus:
       if (is_based_loc (rtl)
-	  && GET_MODE_SIZE (mode) <= DWARF2_ADDR_SIZE
+	  && (GET_MODE_SIZE (mode) <= DWARF2_ADDR_SIZE
+	      || XEXP (rtl, 0) == arg_pointer_rtx
+	      || XEXP (rtl, 0) == frame_pointer_rtx)
 	  && GET_MODE_CLASS (mode) == MODE_INT)
 	mem_loc_result = based_loc_descr (XEXP (rtl, 0),
 					  INTVAL (XEXP (rtl, 1)),
@@ -18138,6 +18142,9 @@ gen_producer_string (void)
 	/* Ignore these.  */
 	continue;
       default:
+        if (cl_options[save_decoded_options[j].opt_index].flags
+	    & CL_NO_DWARF_RECORD)
+	  continue;
         gcc_checking_assert (save_decoded_options[j].canonical_option[0][0]
 			     == '-');
         switch (save_decoded_options[j].canonical_option[0][1])

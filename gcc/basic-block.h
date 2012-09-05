@@ -31,6 +31,7 @@ along with GCC; see the file COPYING3.  If not see
    flow graph is manipulated by various optimizations.  A signed type
    makes those easy to detect.  */
 typedef HOST_WIDEST_INT gcov_type;
+typedef unsigned HOST_WIDEST_INT gcov_type_unsigned;
 
 /* Control flow edge information.  */
 struct GTY((user)) edge_def {
@@ -90,6 +91,16 @@ enum cfg_edge_flags {
 /* Counter summary from the last set of coverage counts read by
    profile.c.  */
 extern const struct gcov_ctr_summary *profile_info;
+
+/* Working set size statistics for a given percentage of the entire
+   profile (sum_all from the counter summary).  */
+typedef struct gcov_working_set_info
+{
+  /* Number of hot counters included in this working set.  */
+  unsigned num_counters;
+  /* Smallest counter included in this working set.  */
+  gcov_type min_counter;
+} gcov_working_set_t;
 
 /* Declared in cfgloop.h.  */
 struct loop;
@@ -693,9 +704,9 @@ extern struct edge_list *pre_edge_rev_lcm (int, sbitmap *,
 extern void compute_available (sbitmap *, sbitmap *, sbitmap *, sbitmap *);
 
 /* In predict.c */
-extern bool maybe_hot_bb_p (const_basic_block);
+extern bool maybe_hot_bb_p (struct function *, const_basic_block);
 extern bool maybe_hot_edge_p (edge);
-extern bool probably_never_executed_bb_p (const_basic_block);
+extern bool probably_never_executed_bb_p (struct function *, const_basic_block);
 extern bool optimize_bb_for_size_p (const_basic_block);
 extern bool optimize_bb_for_speed_p (const_basic_block);
 extern bool optimize_edge_for_size_p (edge);
@@ -896,5 +907,8 @@ extern bool mfb_keep_just (edge);
 extern void rtl_profile_for_bb (basic_block);
 extern void rtl_profile_for_edge (edge);
 extern void default_rtl_profile (void);
+
+/* In profile.c.  */
+extern gcov_working_set_t *find_working_set(unsigned pct_times_10);
 
 #endif /* GCC_BASIC_BLOCK_H */
