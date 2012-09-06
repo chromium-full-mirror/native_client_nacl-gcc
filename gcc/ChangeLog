@@ -2,6 +2,77 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-06  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.c: Use CONST_INT_P, CONST_DOUBLE_P, REG_P, MEM_P,
+	LABEL_P, JUMP_P, CALL_P, NOTE_P, BARRIER_P consistently.
+	* config/arm/arm.h: Use REG_P, MEM_P consistently.
+	* config/arm/arm.md: Use CONST_INT_P, REG_P, MEM_P, CONST_DOUBLE_P
+	consistently.
+	* config/arm/neon.md: Use REG_P consistently.
+	* config/arm/predicates.md: Use CONST_INT_P, REG_P, MEM_P
+	consistently.
+	* config/arm/thumb2.md: Use CONST_INT_P, REG_P consistently.
+	* config/arm/vec-common.md: Use REG_P consistently.
+
+2012-09-06  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54498
+	* tree-ssa-alias.h (get_continuation_for_phi): Add flag to
+	abort when reaching an already visited region.
+	* tree-ssa-alias.c (maybe_skip_until): Likewise.  And do it.
+	(get_continuation_for_phi_1): Likewise.
+	(walk_non_aliased_vuses): When we translated the reference,
+	abort when we re-visit a region.
+	* tree-ssa-pre.c (translate_vuse_through_block): Adjust.
+
+2012-09-06  David Edelsohn  <dje.gcc@gmail.com>
+
+	* config/rs6000/rs6000.c (rs6000_xcoff_asm_named_section): Add TLS
+	section.
+	* config/rs6000/rs6000.c (rs6000_debug_address_cost): Add new
+	arguments to TARGET_ADDRESS_COST call.
+
+2012-09-06  Richard Guenther  <rguenther@suse.de>
+
+	* tree.h (MOVE_NONTEMPORAL): Remove.
+	* tree-pretty-print.c (dump_generic_node): Remove
+	MOVE_NONTEMPORAL handling.
+	* expr.c (expand_expr_real_1): Likewise.
+
+2012-09-06  Richard Guenther  <rguenther@suse.de>
+
+	* passes.c (execute_function_todo): Call compute_may_aliases
+	only if flag_tree_pta is set.
+
+2012-09-06  Andrew Pinski  <apinski@cavium.com>
+
+	PR tree-opt/54494
+	* tree-inline.c (remap_gimple_op_r): Copy TREE_SIDE_EFFECTS also.
+
+2012-09-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/54455
+	* sel-sched-ir.c (maybe_tidy_empty_bb): Give up if previous fallthru
+	bb ends up with asm goto referencing bb's label.
+
+2012-09-06  Chen Liqin  <liqin.gcc@gmail.com>
+
+	* config/score/score.c: Remove TARGET_LEGITIMIZE_ADDRESS define
+	and score_legitimize_address function, use compiler default code instead.
+
+2012-09-05  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (want_inline_small_function_p): Use INLINE_HINT_loop_iterations
+	hint.
+
+2012-09-05  Andrew Pinski  <apinski@cavium.com>
+
+ 	* optabs.c (emit_conditional_add): Correct comment about the arguments.
+	Remove code which might swap op2 and op3 since they cannot be swapped.
+	* doc/md.texi (add@var{mode}cc): Fix document about how the arguments
+	are used.
+
 2012-09-05  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	* hooks.c (hook_int_rtx_mode_as_bool_0): New function.

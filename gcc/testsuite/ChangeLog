@@ -1,3 +1,25 @@
+2012-09-06  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54341
+	PR c++/54253
+	* g++.dg/cpp0x/constexpr-virtual2.C: New.
+	* g++.dg/cpp0x/constexpr-virtual3.C: New.
+
+2012-09-06  Andrew Pinski  <apinski@cavium.com>
+
+	PR tree-opt/54494
+	* gcc.dg/tree-ssa/strlen-1.c: New testcase.
+
+2012-09-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/54455
+	* gcc.dg/54455.c: New test.
+
+2012-09-06  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/54463
+	* gfortran.dg/promotion_2.f90: New.
+
 2012-09-05  Jakub Jelinek  <jakub@redhat.com>
 
 	PR middle-end/54486
