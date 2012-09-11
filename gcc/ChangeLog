@@ -2,6 +2,421 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-11  Marc Glisse  <marc.glisse@inria.fr>
+
+        * tree-ssa-forwprop.c (simplify_vector_constructor): New function.
+        (ssa_forward_propagate_and_combine): Call it.
+
+2012-09-11  Diego Novillo  <dnovillo@google.com>
+
+	* var-tracking.c (vt_add_function_parameter): Adjust for VEC
+	changes.
+
+2012-09-11  Dominique Dhumieres  <dominiq@lps.ens.fr>
+
+	* config/darwin.c (darwin_asm_named_section): Adjust for
+	VEC changes.
+	(darwin_asm_dwarf_section): Likewise.
+
+2012-09-11  Martin Jambor  <mjambor@suse.cz>
+
+	* dwarf2out.c (dwarf2out_abstract_function): Do not change cfun.
+	(premark_used_types): New parameter fun, use it instead of cfun.
+	(gen_subprogram_die): Use DECL_STRUCT_FUNCTION (decl) instead of cfun,
+	also pass it to premark_used_types.
+
+2012-09-11  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* doc/sourcebuild.texi (arm_neon_v2_ok): Adjust command line.
+
+2012-09-11  Tobias Burnus  <burnus@net-b.de>
+
+	* doc/sourcebuild.texi (arm_neon_v2_ok): Fix @anchor.
+
+2012-09-11  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+            Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* config/arm/neon.md (fma<VCVTF:mode>4): New pattern.
+	(*fmsub<VCVTF:mode>4): Likewise.
+	* doc/sourcebuild.texi (arm_neon_v2_ok, arm_neon_v2_hw):  Document it.
+
+2012-09-11  Aldy Hernandez  <aldyh@redhat.com>
+
+	PR middle-end/54149
+	* tree-ssa-loop-im.c (execute_sm_if_changed_flag_set): Only set
+	flag for writes.
+
+2012-09-11  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	PR tree-optimization/55492
+	* doc/invoke.texi (max-slsr-cand-scan): New description.
+	* gimple-ssa-strength-reduction.c (find_basis_for_candidate): Limit
+	the time spent searching for a basis.
+	* params.def (PARAM_MAX_SLSR_CANDIDATE_SCAN): New param.
+
+2012-09-11  Richard Guenther  <rguenther@suse.de>
+
+	* gimple.h (gimple_register_type): Remove.
+	(print_gimple_types_stats): Adjust prototype.
+	* lto-streamer.h (print_lto_report): Likewise.
+	* lto-streamer.c (print_lto_report): Adjust.
+	* gimple.c (gimple_types, type_hash_cache, enum gtc_mode,
+	struct type_pair_d, lookup_type_pair, struct sccs,
+	next_dfs_num, gtc_next_dfs_num, struct gimple_type_leader_entry_s,
+	gimple_type_leader, gimple_lookup_type_leader, compare_type_names_p,
+	gtc_visit, gimple_types_compatible_p_1, gimple_types_compatible_p,
+	visit, iterative_hash_name, struct type_hash_pair,
+	type_hash_pair_compare, iterative_hash_gimple_type, gimple_type_hash,
+	gimple_type_eq, gimple_register_type_1, gimple_register_type):
+	Move to lto/lto.c.
+	(print_gimple_types_stats): Adjust.
+	(free_gimple_type_tables): Likewise.
+
+2012-09-11  Richard Guenther  <rguenther@suse.de>
+
+	* graphite-scop-detection.c (move_sd_regions): Adjust for VEC
+	changes.
+	(scopdet_basic_block_info): Likewise.
+	(build_scops_1): Likewise.
+	(limit_scops): Likewise.
+ 
+2012-09-11  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/54515
+	* gimple.c (get_base_address): Do not return NULL_TREE apart
+	from for WITH_SIZE_EXPR.
+	* gimple-fold.c (canonicalize_constructor_val): Do not call
+	get_base_address when not necessary.
+
+2012-09-10  Andrew Pinski  <apinski@cavium.com>
+
+	PR tree-opt/54362
+	* trans-mem.c (thread_private_new_memory): Handle COND_EXPR also.
+
+2012-09-10  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* config/m68k/m68k.c (m68k_sched_dfa_post_advance_cycle): Support
+	starting scheduling from a pre-existing state.
+
+2012-09-10  Diego Novillo  <dnovillo@google.com>
+
+	* vec.h (vec_t::quick_push): Remove overload that accepts 'T *'.
+	Update all users.
+	(vec_t::safe_push): Likewise.
+	(vec_t::quick_insert): Likewise.
+	(vec_t::lower_bound): Likewise.
+	(vec_t::safe_insert): Likewise.
+	(vec_t::replace): Change second argument to 'T &'.
+
+2012-09-10  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* config/rs6000/rs6000.md: Move a splitter next to its insn.
+
+2012-09-10  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/54089
+	* config/sh/sh.h (SH_DYNAMIC_SHIFT_COST): Set always to 1 if
+	dynamic shifts are available.
+	(SHIFT_COUNT_TRUNCATED): Always define to 0.  Correct comment.
+	* config/sh/sh.c (ashl_lshr_seq, ext_ashl_lshr_seq): Add comments.
+	* config/sh/predicates.md (shift_count_operand): Allow
+	arith_reg_operand even if TARGET_DYNSHIFT is false.
+	* config/sh/sh.md (ashlsi3, lshrsi3): Expand library call patterns
+	if needed.
+	(ashlsi3_d_call, lshrsi3_d_call): New insns.
+
+2012-09-10  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ira.c (setup_pressure_classes): Handle synonymous classes.
+
+2012-09-10  Marc Glisse  <marc.glisse@inria.fr>
+
+	* tree-ssa-forwprop.c (simplify_bitfield_ref): New function.
+	(ssa_forward_propagate_and_combine): Call it.
+
+2012-09-10  Steve Ellcey  <sellcey@mips.com>
+
+	* config.gcc: Add mips*-mti-linux* target
+	Handle with_synci like other options.
+	* config/mips/gnu-user64.h (LINUX64_DRIVER_SELF_SPECS): New.
+	(DRIVER_SELF_SPECS): Define in terms of LINUX64_DRIVER_SELF_SPECS.
+	* config/mips/mips.h (MIPS_ISA_SYNCI_SPEC): New.
+	* config/mips/mti-linux.h: New file.
+	* config/mips/t-mti-linux: New file.
+
+2012-09-10  Marc Glisse  <marc.glisse@inria.fr>
+
+        * tree-ssa-forwprop.c (simplify_permutation): Handle CONSTRUCTOR.
+
+2012-09-10  Martin Jambor  <mjambor@suse.cz>
+
+	* params.def (PARAM_IPA_MAX_AGG_ITEMS): New parameter.
+	* ipa-prop.c: Include params.h.
+	(IPA_MAX_AFF_JF_ITEMS): Removed.
+	(determine_known_aggregate_parts): Use param value of
+	PARAM_IPA_MAX_AGG_ITEMS instead of IPA_MAX_AFF_JF_ITEMS.
+	* Makefile.in (ipa-prop.o): Add PARAMS_H dependency.
+
+2012-09-10  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54520
+	* tree-ssa-threadupdate.c (def_split_header_continue_p):
+	Properly consider sub-loops.
+
+2012-09-10  Richard Henderson  <rth@redhat.com>
+
+	* config/alpha/predicates.md (small_symbolic_operand): Disallow
+	large offsets.
+
+2012-09-10  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54536
+	* config/avr/avr-mcus.def (at90usb1287): Set LIBRARY_NAME to "usb1287".
+
+2012-09-10  Jan Hubicka  <jh@suse.cz>
+
+	* lto-cgraph.c (compute_ltrans_boundary): Do not care about aliases.
+	* symtab.c (symtab_make_decl_local): Remove user defined visibility
+	when making symbol local.
+
+2012-09-09  Mark Kettenis  <kettenis@gnu.org>
+
+	* config/openbsd-stdint.h (INTMAX_TYPE, UINTMAX_TYPE): Define.
+			
+2012-09-09  Jan Hubicka  <jh@suse.cz>
+
+	* passes.c (ipa_write_summaries_1): Set state;
+	do not call compute_ltrans_boundary.
+	(ipa_write_optimization_summaries): Likewise.
+	(ipa_write_summaries): compute_ltrans_boundary here.
+	* lto-streamer.h (lto_symtab_encoder_d): NODES are allocated in heap.
+	(compute_ltrans_boundary): Update prototype.
+
+2012-09-09  Ulrich Drepper  <drepper@gmail.com>
+
+	* config/i386/cpuid.h: Define signature_*_e[bcd]x macros for
+	matching results of level 0 calls to __cpuid to processor
+	manufacturers.
+	* config/i386/driver-i386.c (vendor_signatures): Removed.
+	(processor_signatures): Removed.
+	(host_detect_local_cpu): Replace uses of now-removed SIG_*
+	constants with the new signature_*_ebx constants.
+
+2012-09-08  Jan Hubicka  <jh@suse.cz>
+
+	Replace cgraph_node_set and varpool_node_set by symtab_node_encoder
+	in partitioning.
+	* tree-pass.h (cgraph_node_set_def, varpool_node_set_def): Remove
+	forward declaration.
+	(lto_symtab_encoder_d): Forward declare.
+	(ipa_write_optimization_summaries): Update.
+	* lto-cgraph.c (lto_symtab_encoder_new): Do not initialize
+	body, initializer and in_partition.
+	(lto_symtab_encoder_delete): Update.
+	(lto_symtab_encoder_encode): Update.
+	(lto_symtab_encoder_lookup): Move inline.
+	(lto_symtab_encoder_delete_node): New function.
+	(lto_symtab_encoder_encode_body_p, lto_set_symtab_encoder_encode_body,
+	lto_symtab_encoder_encode_initializer_p,
+	lto_set_symtab_encoder_encode_initializer, lto_symtab_encoder_in_partition_p,
+	lto_symtab_encoder_in_partition_p): Update.
+	(compute_ltrans_boundary): Take encoder as an input.
+	* passes.c (ipa_write_summaries_1): Update.
+	(ipa_write_summaries_1): Update.
+	(ipa_write_summaries): Update.
+	(ipa_write_optimization_summaries): Update.
+	* lto-streamer.c (print_lto_report): Report number of cgraph nodes.
+	* lto-streamer.h (lto_stats_d): Replace num_output_cgraph_nodes by
+	num_output_symtab_nodes.
+	(lto_encoder_entry): New structure.
+	(struct lto_symtab_encoder_d): Reorg.
+	(lto_symtab_encoder_delete_node): Declare.
+	(lto_symtab_encoder_lookup): Bring inline.
+	(compute_ltrans_boundary): Update.
+	(lto_symtab_encoder_size): Update.
+	(lsei_node, lsei_cgraph_node, lsei_varpool_node): Update.
+	(lto_symtab_encoder_deref): Update.
+
+2012-09-08  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* config/pa/pa.c (hppa_rtx_costs): Update costs for large integer modes.
+
+2012-09-08  Andi Kleen  <ak@linux.intel.com>
+
+	* gcc/lto/lto.c (do_whole_program_analysis): 
+	Fix last broken patch
+
+2012-09-08  Andi Kleen  <ak@linux.intel.com>
+
+	* gcc/common.opt (-fmem-report-wpa): Add
+	* gcc/doc/invoke.texi (-fmem-report-wpa): Document.
+	* gcc/lto/lto.c (do_whole_program_analysis): Run mem_report
+	when mem_report_wpa is set.
+
+2012-09-07  Anthony Green  <green@moxielogic.com>
+
+	* config/moxie/moxie.c (moxie_expand_prologue): Optimize prologue
+	for functions with large static stack requirements.
+	(moxie_expand_epilogue): Use $r12 instead of $r5 for pulling saved
+	values off of the stack.
+
+2012-09-07  Nick Clifton  <nickc@redhat.com>
+
+	* config/v850/v850.h (DBX_DEBUGGING_INFO): Define.
+	(ASM_GENERATE_INTERNAL_LABEL): Define if not already provided.
+	* config/v850/v850.c (compute_register_save_size): Always include
+	the link pointer.
+	(increment_stack): New function - emits insns to increment or
+	decrement the stack pointer.
+	(expand_prologue, expand_epilogue): Use it.
+	(expand_prologue): Set the function stack size, if requested.
+	(v850_debug_unwind_info): New function.
+	(TARGET_DEBUG_UNWIND_INFO): Define.
+
+2012-09-07  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR tree-ssa/54295
+	* tree-ssa-math-opts.c (widening_mult_conversion_strippable_p):
+	Sign-extension of a zero-extended value can be simplified to
+	just zero-extension.
+
+2012-09-07  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53667
+	* tree-ssa-structalias.c (handle_rhs_call): Properly clobber
+	EAF_NOESCAPED arguments.  Transitively close non-EAF_DIRECT
+	arguments separately.
+
+2012-09-07  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* bitmap.c (bitmap_last_set_bit): Rewrite to return the correct bit.
+
+	* graphite.c (print_global_statistics): Use EDGE_COUNT instead
+	of VEC_length.
+	(print_graphite_scop_statistics): Likewise.
+	* graphite-scop-detection.c (get_bb_type): Use single_succ_p.
+	(print_graphite_scop_statistics): Use EDGE_COUNT, not VEC_length.
+	(canonicalize_loop_closed_ssa): Use single_pred_p.
+
+	* alias.c (reg_seen): Make this an sbitmap.
+	(record_set, init_alias_analysis): Update.
+
+	* tree-ssa-coalesce.c (ssa_conflicts_dump): Fix dumping.
+
+2012-09-07  Tom de Vries  <tom@codesourcery.com>
+
+	PR tree-optimization/53986
+	* tree-vrp.c (extract_range_from_multiplicative_op_1): Allow
+	LSHIFT_EXPR.
+	(extract_range_from_binary_expr_1): Handle LSHIFT with constant range as
+	shift amount.
+
+2012-09-07  Segher Boessenkool  <segher@kernel.crashing.org>
+
+	* config/rs6000/aix43.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/aix51.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/aix52.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/aix53.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/aix61.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/freebsd64.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/linux64.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/rs6000.c (print_operand) ['.']: Delete.
+	* config/rs6000/rs6000.h (RS6000_CALL_GLUE): Delete.
+	* config/rs6000/rs6000.md (tls_gd_aix<TLSmode:tls_abi_suffix>):
+	Replace %. with nop.
+	(tls_gd_call_aix<TLSmode:tls_abi_suffix>): Ditto.
+	(tls_ld_aix<TLSmode:tls_abi_suffix>): Ditto.
+	(tls_ld_call_aix<TLSmode:tls_abi_suffix>): Ditto.
+	(call_nonlocal_aix32): Ditto.
+	(call_nonlocal_aix64): Ditto.
+	(call_value_nonlocal_aix32): Ditto.
+	(call_value_nonlocal_aix64): Ditto.
+
+2012-09-06  Andi Kleen <ak@linux.intel.com>
+
+	* doc/invoke.texi (-ffat-lto-objects): Clarify that gcc-ar
+	et.al. should be used.
+
+2012-09-06  Andi Kleen  <ak@linux.intel.com>
+
+	* gcc/lto-streamer.h (res_pair): Add.
+	(lto_file_decl_data): Replace resolutions with respairs.
+	Add max_index.
+	* gcc/lto/lto.c (lto_resolution_read): Remove max_index.  Add rp.
+	Initialize respairs.
+	(lto_file_finalize): Set up resolutions vector lazily from respairs.
+
+2012-09-06  Lawrence Crowl  <crowl@google.com>
+
+	* double-int.h (double_int::operator &=): New.
+	(double_int::operator ^=): New.
+	(double_int::operator |=): New.
+	(double_int::mul_with_sign): Modify overflow parameter to bool*.
+	(double_int::add_with_sign): New.
+	(double_int::ule): New.
+	(double_int::sle): New.
+	(binary double_int::operator *): Remove parameter name.
+	(binary double_int::operator +): Likewise.
+	(binary double_int::operator -): Likewise.
+	(binary double_int::operator &): Likewise.
+	(double_int::operator |): Likewise.
+	(double_int::operator ^): Likewise.
+	(double_int::and_not): Likewise.
+	(double_int::from_shwi): Tidy formatting.
+	(double_int::from_uhwi): Likewise.
+	(double_int::from_uhwi): Likewise.
+	* double-int.c (double_int::mul_with_sign): Modify overflow parameter
+	to bool*.
+	(double_int::add_with_sign): New.
+	(double_int::ule): New.
+	(double_int::sle): New.
+	* builtins.c: Modify to use the new double_int interface.
+	* cgraph.c: Likewise.
+	* combine.c: Likewise.
+	* dwarf2out.c: Likewise.
+	* emit-rtl.c: Likewise.
+	* expmed.c: Likewise.
+	* expr.c: Likewise.
+	* fixed-value.c: Likewise.
+	* fold-const.c: Likewise.
+	* gimple-fold.c: Likewise.
+	* gimple-ssa-strength-reduction.c: Likewise.
+	* gimplify-rtx.c: Likewise.
+	* ipa-prop.c: Likewise.
+	* loop-iv.c: Likewise.
+	* optabs.c: Likewise.
+	* stor-layout.c: Likewise.
+	* tree-affine.c: Likewise.
+	* tree-cfg.c: Likewise.
+	* tree-dfa.c: Likewise.
+	* tree-flow-inline.h: Likewise.
+	* tree-object-size.c: Likewise.
+	* tree-predcom.c: Likewise.
+	* tree-pretty-print.c: Likewise.
+	* tree-sra.c: Likewise.
+	* tree-ssa-address.c: Likewise.
+	* tree-ssa-alias.c: Likewise.
+	* tree-ssa-ccp.c: Likewise.
+	* tree-ssa-forwprop.c: Likewise.
+	* tree-ssa-loop-ivopts.c: Likewise.
+	* tree-ssa-loop-niter.c: Likewise.
+	* tree-ssa-phiopt.c: Likewise.
+	* tree-ssa-pre.c: Likewise.
+	* tree-ssa-sccvn: Likewise.
+	* tree-ssa-structalias.c: Likewise.
+	* tree-ssa.c: Likewise.
+	* tree-switch-conversion.c: Likewise.
+	* tree-vect-loop-manip.c: Likewise.
+	* tree-vrp.c: Likewise.
+	* tree.h: Likewise.
+	* tree.c: Likewise.
+	* varasm.c: Likewise.
+
+2012-09-06  Uros Bizjak  <ubizjak@gmail.com>
+
+	* configure.ac (hle prefixes): Remove .code64.
+	* configure: Regenerated.
+
 2012-09-06  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* config/arm/arm.c: Use CONST_INT_P, CONST_DOUBLE_P, REG_P, MEM_P,
@@ -10,8 +425,7 @@
 	* config/arm/arm.md: Use CONST_INT_P, REG_P, MEM_P, CONST_DOUBLE_P
 	consistently.
 	* config/arm/neon.md: Use REG_P consistently.
-	* config/arm/predicates.md: Use CONST_INT_P, REG_P, MEM_P
-	consistently.
+	* config/arm/predicates.md: Use CONST_INT_P, REG_P, MEM_P consistently.
 	* config/arm/thumb2.md: Use CONST_INT_P, REG_P consistently.
 	* config/arm/vec-common.md: Use REG_P consistently.
 
@@ -58,13 +472,13 @@
 
 2012-09-06  Chen Liqin  <liqin.gcc@gmail.com>
 
-	* config/score/score.c: Remove TARGET_LEGITIMIZE_ADDRESS define
-	and score_legitimize_address function, use compiler default code instead.
+	* config/score/score.c: Remove TARGET_LEGITIMIZE_ADDRESS define and
+	score_legitimize_address function, use compiler default code instead.
 
 2012-09-05  Jan Hubicka  <jh@suse.cz>
 
-	* ipa-inline.c (want_inline_small_function_p): Use INLINE_HINT_loop_iterations
-	hint.
+	* ipa-inline.c (want_inline_small_function_p): Use
+	INLINE_HINT_loop_iterations hint.
 
 2012-09-05  Andrew Pinski  <apinski@cavium.com>
 
@@ -141,8 +555,7 @@
 2012-09-05   Diego Novillo  <dnovillo@google.com>
 
 	PR bootstrap/54484
-	* vec.h (vec_t::lower_bound): Fix spelling of LESSTHAN
-	argument.
+	* vec.h (vec_t::lower_bound): Fix spelling of LESSTHAN argument.
 
 2012-09-05  Jakub Jelinek  <jakub@redhat.com>
 

@@ -1600,11 +1600,9 @@ phi_translate_1 (pre_expr expr, bitmap_set_t set1, bitmap_set_t set2,
 		&& TREE_CODE (op[2]) == INTEGER_CST)
 	      {
 		double_int off = tree_to_double_int (op[0]);
-		off = double_int_add (off,
-				      double_int_neg
-				        (tree_to_double_int (op[1])));
-		off = double_int_mul (off, tree_to_double_int (op[2]));
-		if (double_int_fits_in_shwi_p (off))
+		off += -tree_to_double_int (op[1]);
+		off *= tree_to_double_int (op[2]);
+		if (off.fits_shwi ())
 		  newop.off = off.low;
 	      }
 	    VEC_replace (vn_reference_op_s, newoperands, j, newop);
@@ -4775,7 +4773,7 @@ init_pre (bool do_fre)
 
   next_expression_id = 1;
   expressions = NULL;
-  VEC_safe_push (pre_expr, heap, expressions, (pre_expr)NULL);
+  VEC_safe_push (pre_expr, heap, expressions, NULL);
   value_expressions = VEC_alloc (bitmap, heap, get_max_value_id () + 1);
   VEC_safe_grow_cleared (bitmap, heap, value_expressions,
 			 get_max_value_id() + 1);

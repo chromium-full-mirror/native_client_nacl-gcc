@@ -14628,12 +14628,6 @@ print_operand (FILE *file, rtx x, int code)
 
   switch (code)
     {
-    case '.':
-      /* Write out an instruction after the call which may be replaced
-	 with glue code by the loader.  This depends on the AIX version.  */
-      asm_fprintf (file, RS6000_CALL_GLUE);
-      return;
-
       /* %a is output_address.  */
 
     case 'A':
@@ -24907,11 +24901,8 @@ static void
 add_compiler_branch_island (tree label_name, tree function_name,
 			    int line_number)
 {
-  branch_island *bi = VEC_safe_push (branch_island, gc, branch_islands, NULL);
-
-  bi->function_name = function_name;
-  bi->label_name = label_name;
-  bi->line_number = line_number;
+  branch_island bi = {function_name, label_name, line_number};
+  VEC_safe_push (branch_island, gc, branch_islands, bi);
 }
 
 /* Generate far-jump branch islands for everything recorded in
