@@ -1,3 +1,16 @@
+2012-09-13  Jason Merrill  <jason@redhat.com>
+
+	PR c++/53839
+	* semantics.c (cxx_eval_indirect_ref): If we aren't looking for an
+	address, make sure the value is constant.
+
+	PR c++/54511
+	* pt.c (tsubst_decl) [VAR_DECL]: Handle DECL_ANON_UNION_VAR_P.
+
+	PR c++/53836
+	* pt.c (value_dependent_expression_p): A TREE_LIST initializer must
+	be dependent.
+
 2012-09-10  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/54541
