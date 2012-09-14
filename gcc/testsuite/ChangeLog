@@ -1,3 +1,76 @@
+2012-09-14  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/54427
+	* g++.dg/other/vector-compare.C: New testcase.
+	* gcc/testsuite/c-c++-common/vector-compare-3.c: New testcase.
+	* gcc.dg/vector-shift.c: Move ...
+	* c-c++-common/vector-shift.c: ... here.
+	* gcc.dg/vector-shift1.c: Move ...
+	* c-c++-common/vector-shift1.c: ... here.
+	* gcc.dg/vector-shift3.c: Move ...
+	* c-c++-common/vector-shift3.c: ... here.
+	* gcc.dg/vector-compare-1.c: Move ...
+	* c-c++-common/vector-compare-1.c: ... here.
+	* gcc.dg/vector-compare-2.c: Move ...
+	* c-c++-common/vector-compare-2.c: ... here.
+	* gcc.c-torture/execute/vector-compare-1.c: Move ...
+	* c-c++-common/torture/vector-compare-1.c: ... here.
+	* gcc.c-torture/execute/vector-compare-2.x: Delete.
+	* gcc.c-torture/execute/vector-compare-2.c: Move ...
+	* c-c++-common/torture/vector-compare-2.c: ... here.
+	* gcc.c-torture/execute/vector-shift.c: Move ...
+	* c-c++-common/torture/vector-shift.c: ... here.
+	* gcc.c-torture/execute/vector-shift2.c: Move ...
+	* c-c++-common/torture/vector-shift2.c: ... here.
+	* gcc.c-torture/execute/vector-subscript-1.c: Move ...
+	* c-c++-common/torture/vector-subscript-1.c: ... here.
+	* gcc.c-torture/execute/vector-subscript-2.c: Move ...
+	* c-c++-common/torture/vector-subscript-2.c: ... here.
+	* gcc.c-torture/execute/vector-subscript-3.c: Move ...
+	* c-c++-common/torture/vector-subscript-3.c: ... here.
+
+2012-09-14  Joseph Myers  <joseph@codesourcery.com>
+
+	PR c/54103
+	* gcc.c-torture/compile/pr54103-1.c,
+	gcc.c-torture/compile/pr54103-2.c,
+	gcc.c-torture/compile/pr54103-3.c,
+	gcc.c-torture/compile/pr54103-4.c,
+	gcc.c-torture/compile/pr54103-5.c,
+	gcc.c-torture/compile/pr54103-6.c: New tests.
+	* gcc.dg/c90-const-expr-8.c: Update expected column number.
+
+2012-09-14  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/pr44194-1.c: Check that there are no memory accesses left.
+
+2012-09-14  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54564
+	* config/i386/fmaintrin.h (_mm_fnmadd_sd, _mm_fnmadd_ss,
+	_mm_fnmsub_sd, _mm_fnmsub_ss): Negate the second argument instead
+	of the first.
+
+2012-09-14  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54565
+	* gcc.dg/tree-ssa/ssa-ccp-17.c: Adjust.
+	* gcc.dg/tree-ssa/forwprop-6.c: Likewise.  Remove XFAIL.
+
+2012-09-14  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* gcc.target/arm/combine-movs.c: Add missing space.
+
+2012-09-14  Richard Guenther  <rguenther@suse.de>
+
+	* g++.dg/torture/builtin-location.C: New testcase.
+
+2012-09-13  Paolo Carlini  <paolo.carlini@oracle.com>
+	    Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c++/53210
+	* g++.dg/warn/Wuninitialized-self.C: New.
+
 2012-09-13  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c/54559

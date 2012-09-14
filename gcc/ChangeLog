@@ -2,6 +2,148 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-14  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/54427
+	* fold-const.c (fold_unary_loc): Disable for VECTOR_TYPE.
+	(fold_binary_loc): Likewise.
+	* gimple-fold.c (and_comparisons_1): Handle VECTOR_TYPE.
+	(or_comparisons_1): Likewise.
+
+2012-09-14  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/54516
+	PR rtl-optimization/54540
+	* reload.c (find_dummy_reload): Don't use OUT as a reload reg
+	for IN if it overlaps a fixed register.
+
+2012-09-14  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/44194
+	* calls.c (expand_call): In the PARALLEL case, copy the return value
+	into pseudos instead of spilling it onto the stack.
+	* emit-rtl.c (adjust_address_1): Rename ADJUST into ADJUST_ADDRESS and
+	add new ADJUST_OBJECT parameter.
+	If ADJUST_OBJECT is set, drop the underlying object if it cannot be
+	proved that the adjusted memory access is still within its bounds.
+	(adjust_automodify_address_1): Adjust call to adjust_address_1.
+	(widen_memory_access): Likewise.
+	* expmed.c (store_bit_field_1): Call adjust_bitfield_address instead
+	of adjust_address.  Do not drop the underlying object of a MEM.
+	(store_fixed_bit_field): Likewise.
+	(extract_bit_field_1): Likewise.  Fix oversight in recursion.
+	(extract_fixed_bit_field): Likewise.
+	* expr.h (adjust_address_1): Adjust prototype.
+	(adjust_address): Adjust call to adjust_address_1.
+	(adjust_address_nv): Likewise.
+	(adjust_bitfield_address): New macro.
+	(adjust_bitfield_address_nv): Likewise.
+	* expr.c (expand_assignment): Handle a PARALLEL in more cases.
+	(store_expr): Likewise.
+	(store_field): Likewise.
+
+	* dse.c: Fix typos in the head comment.
+
+2012-09-14  Christian Bruel  <christian.bruel@st.com>
+
+	PR target/54546
+	* config/sh/sh-protos.h (sh_need_epilogue): Delete.
+	(sh_can_use_simple_return_p): Declare.
+	* config/sh/sh.c (sh_can_use_simple_return_p): Define.
+	(sh_need_epilogue, sh_need_epilogue_known): Delete.
+	(sh_output_function_epilogue): Remove sh_need_epilogue_known.
+	* config/sh/sh.md (simple_return, return): Define.
+	(epilogue): Use inline return rtl.
+	(sh_expand_epilogue): Cleanup parameters boolean type.
+	* config/sh/iterators.md (any_return): New iterator.
+
+2012-09-14  Christian Bruel  <christian.bruel@st.com>
+
+	* config/sh/predicates.md (t_reg_operand): Check REG_P for SUBREG.
+	* config/sh/sh.c (sequence_insn_p: Check INSNP_P for SEQUENCE.
+
+2012-09-14  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54564
+	* config/i386/sse.md (fmai_vmfmadd_<mode>): Use (match_dup 1)
+	instead of (match_dup 0) as second argument to vec_merge.
+	(*fmai_fmadd_<mode>, *fmai_fmsub_<mode>): Likewise.
+	Remove third alternative.
+	(*fmai_fnmadd_<mode>, *fmai_fnmsub_<mode>): Likewise.  Negate
+	operand 2 instead of operand 1, but put it as first argument
+	of fma.
+
+2012-09-14  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54565
+	* passes.c (init_optimization_passes): Adjust comments.
+	(execute_function_todo): Do not execute execute_update_addresses_taken
+	before processing TODO_rebuild_alias.
+	* tree-ssa-ccp.c (do_ssa_ccp): Schedule TODO_update_address_taken.
+
+2012-09-14  Richard Guenther  <rguenther@suse.de>
+
+	* tree-vrp.c (register_new_assert_for): Simplify for backward
+	walk.
+	(find_assert_locations_1): Walk the basic-block backwards,
+	properly add/prune from live.  Use live for asserts derived
+	from stmts.
+
+2012-09-14  Marc Glisse  <marc.glisse@inria.fr>
+
+	* tree-ssa-forwprop.c (simplify_bitfield_ref): Call
+	get_prop_source_stmt.
+	(simplify_permutation): Likewise.
+	(simplify_vector_constructor): Likewise.
+
+2012-09-14  Richard Guenther  <rguenther@suse.de>
+
+	* builtin-types.def (BT_FN_CONST_STRING): Add.
+	* builtins.def (BUILT_IN_FILE, BUILT_IN_FUNCTION,
+	BUILT_IN_LINE): New builtins.
+	* gimplify.c (gimplify_call_expr): Expand them.
+	* doc/extend.texi (__builtin_LINE, __builtin_FUNCTION,
+	__builtin_FILE): Document.
+
+2012-09-13  Anthony Green  <green@moxielogic.com>
+
+	* config/moxie/moxie.h (LINK_SPEC): Add bi-endian support.
+	(MULTILIB_DEFAULTS): Define.
+	(ASM_SPEC): Define.
+	(BYTES_BIG_ENDIAN, WORDS_BIG_ENDIAN): Add bi-endian support.
+	(TARGET_CPU_CPP_BUILTINS): Add __MOXIE_LITTLE_ENDIAN__ and
+	__MOXIE_BIG_ENDIAN__.
+	* config/moxie/t-moxie (MULTILIB_DIRNAMES, MULTILIB_OPTIONS):
+	Define.
+	* config/moxie/moxie.opt: New file.
+	* doc/invoke.texi (Moxie Options): Add section documenting -mel
+	and -meb.
+
+2012-09-13  Paolo Carlini  <paolo.carlini@oracle.com>
+	    Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c++/53210
+	* doc/invoke.texi ([Winit-self]): Document as enabled by -Wall
+	in C++.
+
+2012-09-13  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/sparc/predicates.md (input_operand): Do not consider TImode
+	constants as 1-instruction integer constants.
+	Use register_or_zero_operand instead of register_operand and tidy up.
+	* config/sparc/sparc.md (movti): New expander.
+	(movti_insn_sp64): New instruction.
+	(movti_insn_sp64_hq): Likewise.
+	(TImode splitters): New splitters.
+	* config/sparc/sparc.c (sparc_expand_move) <TImode>: New case.
+	(sparc_legitimate_address_p): Return 0 for REG+REG in TImode.
+
+	* config/sparc/sparc-protos.h (arith_double_4096_operand): Delete.
+	(arith_4096_operand): Likewise.
+	(zero_operand): Likewise.
+	(fp_zero_operand): Likewise.
+	(reg_or_0_operand): Likewise.
+
 2012-09-13  Jakub Jelinek  <jakub@redhat.com>
 
 	* configure.ac (CXXFLAGS): Remove -O2 when not bootstrapping.
