@@ -6330,6 +6330,14 @@ arm_load_tp (rtx target)
       /* It's simply in a fixed register, so just copy it.  */
       emit_move_insn (target, gen_rtx_REG (SImode, 9));
     }
+  else if (TARGET_R9_INDIRECT0_TP || TARGET_R9_INDIRECT4_TP)
+    {
+      /* It's indirect from a fixed register.  */
+      rtx addr = gen_rtx_REG (Pmode, 9);
+      if (TARGET_R9_INDIRECT4_TP)
+        addr = plus_constant (Pmode, addr, 4);
+      emit_move_insn (target, gen_rtx_MEM (SImode, addr));
+    }
   else
     {
       /* Always returned in r0.  Immediately copy the result into a pseudo,
@@ -17139,7 +17147,7 @@ arm_sfi_breg_operand (rtx x)
       gcc_unreachable ();
     }
 
-  return (regno != SP_REGNUM && regno != PC_REGNUM) ? regno : -1;
+  return (regno != SP_REGNUM && regno != PC_REGNUM && regno != 9) ? regno : -1;
 }
 
 /* If CODE is 'd', then the X is a condition operand and the instruction
