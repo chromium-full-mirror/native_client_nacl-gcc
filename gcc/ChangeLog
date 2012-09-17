@@ -2,6 +2,156 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-17  Richard Guenther  <rguenther@suse.de>
+
+	PR lto/54598
+	* tree-streamer-in.c (unpack_ts_real_cst_value_fields): Use ggc'ed
+	FIXED_VALUE_TYPE instead of struct fixed_value.
+
+2012-09-17  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/avr.c (CONST_FIXED_P): Remove define.
+	* config/avr/avr.md (add<mode>3): Use CONST_FIXED_P.
+
+2012-09-17  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54607
+	* config.gcc (tm_file,avr): Add avr/avr-arch.h.
+	* config/avr/t-avr (gen-avr-mmcu-texi): Use CC_FOR_BUILD to
+	compile.  Don't depend on TM_H.  Use CFLAGS_FOR_BUILD.
+	* config/avr/avr.h (avr_arch, base_arch_s, mcu_type_s): Source out
+	to...
+	* config/avr/avr-arch.h: ...this new file.
+	* config/avr/gen-avr-mmcu-texi.c: Include avr-arch.h, stdio.h,
+	stdlib.h.
+	* comparator: Make letters smaller than digits.
+	* config/avr/avr-devices.c: Don't include headers if used in
+	gen-avr-mmcu-texi.c.
+	* doc/avr-mmcu.texi: Regenerate.
+
+2012-09-17  Georg-Johann Lay  <avr@gjlay.de>
+
+	* rtl.h (CONST_FIXED_P): New predicate macro.
+
+2012-09-17  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* tree-cfgcleanup. (cleanup_control_expr_graph) <GIMPLE_COND>: Remove
+	code doing propagation from degenerate PHI nodes.
+	* tree-ssa-loop-ivcanon.c (propagate_into_all_uses): New function.
+	(propagate_constants_for_unrolling): Likewise.
+	(tree_unroll_loops_completely): If the current loop has been unrolled
+	and its father isn't the entire function, propagate constants within
+	the new basic blocks by means of propagate_constants_for_unrolling.
+
+2012-09-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54563
+	* tree-ssa-math-opts.c (execute_cse_sincos): Call
+	gimple_purge_dead_eh_edges if last call has been changed.
+
+2012-09-17  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54222
+	* config/avr/avr.c (avr_out_plus_symbol): Fix typo if PLUS and PSImode.
+	(avr_out_plus_1): Remove log comments from assembler output.
+
+2012-09-17  Ruben Buchatskiy  <ruben@ispras.ru>
+
+	* config/arm/vfp.md (*thumb2_movdf_vfp): Require one of the operands
+	to be a register.
+
+2012-09-16  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* calls.c (expand_call): Use emit_group_move for PARALLEL->PARALLEL
+	moves.
+
+2012-09-15  Tom de Vries  <tom@codesourcery.com>
+
+	* tree-vrp.c (extract_range_from_binary_expr_1): Fix bug in handling of
+	LSHIFT_EXPR with shift range.  Handle more LSHIFT_EXPR cases with shift
+	range.
+
+2012-09-15  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54222
+	* config/avr/avr-fixed.md (ALL2S, ALL4S, ALL24S, ALL124S,
+	ALL124U): New mode iterators.
+	(<code_stdname><mode>3): New insns for SS_PLUS, SS_MINUS.
+	(<code_stdname><mode>3): New insns for US_PLUS, US_MINUS.
+	(usneg<mode>2): New insns.
+	(<code_stdname><mode>2): New expanders for SS_NEG, SS_ABS.
+	(*<code_stdname><mode>2): New insns for SS_NEG, SS_ABS.
+	* config/avr/avr-dimode.md (ALL8U, ALL8S): New mode iterators.
+	(avr_out_plus64, avr_out_minus64): Use avr_out_plus instead.
+	(<code_stdname><mode>3): New expanders for SS_PLUS, SS_MINUS.
+	(<code_stdname><mode>3): New expanders for US_PLUS, US_MINUS.
+	(<code_stdname><mode>3_insn): New insns.
+	(<code_stdname><mode>3_const_insn): New insns.
+	* config/avr/avr.md (cc): Add: plus. Remove: out_plus,
+	out_plus_noclobber, minus.
+	(length): Add: plus.  Remove: out_plus, out_plus_noclobber,
+	plus64, minus, minus64.
+	(abelian): New code_attr.
+	(code_stdname): Handle: ss_plus, ss_minus, ss_neg, ss_abs,
+	us_plus, us_minus, us_neg.
+	(*add<mode>3, add<mode>3_clobber, add<mode>3, addpsi3, sub<mode>3):
+	Use avr_out_plus to output.
+	* config/avr/avr-protos.h (avr_out_plus): Change prototype.
+	(avr_out_plus_noclobber, avr_out_minus): Remove.
+	(avr_out_plus64, avr_out_minus64): Remove.
+	* config/avr/avr.c (avr_out_plus_1): Add new default arguments
+	code_sat, sign.  Saturate after operation if code_sat != UNKNOWN.
+	(avr_out_plus_symbol): New static function.
+	(avr_out_plus): Rewrite.
+	(adjust_insn_length): Handle: ADJUST_LEN_PLUS.  Remove handling
+	of: ADJUST_LEN_OUT_PLUS, ADJUST_LEN_PLUS64, ADJUST_LEN_MINUS, 
+	ADJUST_LEN_MINUS64, ADJUST_LEN_OUT_PLUS_NOCLOBBER.
+	(notice_update_cc): Handle: CC_PLUS.  Remove handling of: CC_MINUS,
+	CC_OUT_PLUS, CC_OUT_PLUS_NOCLOBBER
+	(avr_out_plus_noclobber, avr_out_minus): Remove.
+	(avr_out_plus64, avr_out_minus64): Remove.
+	(avr_print_operand): Print raw REGNO if 'r' is used with REG.
+
+2012-09-15  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.c (sh_rtx_costs): Add handling of MEM, SIGN_EXTEND,
+	ZERO_EXTEND and PARALLEL cases.
+	(sh_address_cost): Correct rtx parsing and tweak cost estimations.
+
+2012-09-14  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* doc/tm.texi.in (Stack Arguments): Update obsolete references
+	to current_function_outgoing_args_size.
+	(Function Entry): Likewise for current_function_pops_args,
+	current_function_pretend_args_size,
+	current_function_outgoing_args_size, and
+	current_function_epilogue_delay_list.
+	(Misc): Fix garbled sentence referencing nonexistent
+	current_function_leaf_function.
+	* doc/tm.texi: Regenerated.
+
+2012-09-14  Dehao Chen  <dehao@google.com>
+
+	 * tree-eh.c (goto_queue_node): New field.
+	(record_in_goto_queue): New parameter.
+	(record_in_goto_queue_label): New parameter.
+	(lower_try_finally_dup_block): New parameter.
+	(maybe_record_in_goto_queue): Update source location.
+	(lower_try_finally_copy): Likewise.
+	(honor_protect_cleanup_actions): Likewise.
+	* gimplify.c (gimplify_expr): Reset the location to unknown.
+
+2012-09-14  David Edelsohn  <dje.gcc@gmail.com>
+
+	* configure: Regenerated.
+
+2012-09-14  Walter Lee  <walt@tilera.com>
+
+	* doc/invoke.texi (Option Summary): fix typesetting for -mcpu
+	option for TILEPro and TILE-Gx.
+	(TILE-Gx Options): Fix grammar and spellings in documentation for
+	-mcmodel.
+
 2012-09-14  Marc Glisse  <marc.glisse@inria.fr>
 
 	PR c++/54427
@@ -72,6 +222,9 @@
 	(*fmai_fnmadd_<mode>, *fmai_fnmsub_<mode>): Likewise.  Negate
 	operand 2 instead of operand 1, but put it as first argument
 	of fma.
+	* config/i386/fmaintrin.h (_mm_fnmadd_sd, _mm_fnmadd_ss,
+	_mm_fnmsub_sd, _mm_fnmsub_ss): Negate the second argument instead
+	of the first.
 
 2012-09-14  Richard Guenther  <rguenther@suse.de>
 

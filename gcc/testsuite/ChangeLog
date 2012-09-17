@@ -1,3 +1,94 @@
+2012-09-14  Jason Merrill  <jason@redhat.com>
+
+	PR c++/53661
+	* g++.dg/init/aggr9.C: New.
+
+2012-09-17  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/loop_optimization12.ad[sb]: New test.
+
+2012-09-17  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/54285
+	* gfortran.dg/proc_ptr_result_7.f90: New.
+
+2012-09-17  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/54603
+	* gfortran.dg/structure_constructor_11.f90: New.
+
+2012-09-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54563
+	* g++.dg/torture/pr54563.C: New test.
+
+2012-09-16  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/54594
+	* gfortran.dg/typebound_generic_14.f03: New.
+
+2012-09-16  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/54387
+	* gfortran.dg/proc_ptr_38.f90: New.
+
+2012-09-16  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR debug/54460
+	* g++.dg/debug/dwarf2/nested-3.C: Add hppa assembler comment character
+	to scary regexp.
+
+	PR testsuite/54007
+	* gnat.dg/lto15.adb: Require lto.
+
+	* gfortran.dg/bind_c_array_params_2.f90: Adjust scan-assembler-times
+	"myBindC" for hppa*-*-hpux*.
+
+2012-09-16  Mikael Morin  <mikael@gcc.gnu.org>
+
+	* gfortran.dg/namelist_75.f90: New test.
+
+2012-09-15  Tom de Vries  <tom@codesourcery.com>
+
+	* gcc.dg/tree-ssa/vrp82.c: New test.
+	* gcc.dg/tree-ssa/vrp83.c: Same.
+	* gcc.dg/tree-ssa/vrp84.c: Same.
+
+2012-09-15  Tom de Vries  <tom@codesourcery.com>
+
+	* gcc.dg/tree-ssa/vrp80-2.c: Rename to ...
+	* gcc.dg/tree-ssa/vrp81.c: ... this.
+
+2012-09-15  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54222
+	* gcc.target/avr/torture/fix-types.h: New.
+	* gcc.target/avr/torture/vals-hr.def: New.
+	* gcc.target/avr/torture/vals-r.def: New.
+	* gcc.target/avr/torture/vals-k.def: New.
+	* gcc.target/avr/torture/vals-ur.def: New.
+	* gcc.target/avr/torture/vals-uk.def: New.
+	* gcc.target/avr/torture/vals-uhr.def: New.
+	* gcc.target/avr/torture/vals-llk.def: New.
+	* gcc.target/avr/torture/vals-ullk.def: New.
+	* gcc.target/avr/torture/sat-hr-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-r-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-k-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-ur-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-uk-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-uhr-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-llk-plus-minus.c: New.
+	* gcc.target/avr/torture/sat-ullk-plus-minus.c: New.
+
+2012-09-14  Dehao Chen  <dehao@google.com>
+
+	* g++.dg/debug/dwarf2/deallocator.C: New test.
+
+2012-09-14  Joseph Myers  <joseph@codesourcery.com>
+
+	PR c/54552
+	* gcc.c-torture/compile/pr54552-1.c: New test.
+
 2012-09-14  Marc Glisse  <marc.glisse@inria.fr>
 
 	PR c++/54427
@@ -43,13 +134,6 @@
 2012-09-14  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* gcc.dg/pr44194-1.c: Check that there are no memory accesses left.
-
-2012-09-14  Jakub Jelinek  <jakub@redhat.com>
-
-	PR target/54564
-	* config/i386/fmaintrin.h (_mm_fnmadd_sd, _mm_fnmadd_ss,
-	_mm_fnmsub_sd, _mm_fnmsub_ss): Negate the second argument instead
-	of the first.
 
 2012-09-14  Richard Guenther  <rguenther@suse.de>
 
