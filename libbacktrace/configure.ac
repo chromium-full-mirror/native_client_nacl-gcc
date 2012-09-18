@@ -37,6 +37,8 @@ AC_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 target_alias=${target_alias-$host_alias}
 
+AC_USE_SYSTEM_EXTENSIONS
+
 libtool_VERSION=1:0:0
 AC_SUBST(libtool_VERSION)
 
@@ -198,6 +200,8 @@ if test "$ALLOC_FILE" = "alloc.lo"; then
   BACKTRACE_USES_MALLOC=1
 fi
 AC_SUBST(BACKTRACE_USES_MALLOC)
+
+AC_CHECK_DECLS(strnlen)
 
 AC_CACHE_CHECK([whether tests can run],
   [libbacktrace_cv_sys_native],

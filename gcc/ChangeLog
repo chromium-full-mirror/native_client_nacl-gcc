@@ -2,6 +2,62 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-18  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/avr.md: Tidy up empty "".  Fix C code indentation.
+	* config/avr/avr-fixed.md: Ditto.
+
+2012-09-18  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* config/rs6000/rs6000.c (print_operand) <'c'>: Remove.
+	* config/rs6000/spe.md: Remove a leftover comment.
+
+2012-09-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54592
+	* config/i386/i386.c (ix86_rtx_costs): Limit > UNITS_PER_WORD
+	AND/IOR/XOR cost calculation to MODE_INT class modes.
+
+2012-09-18 Thomas Quinot  <quinot@adacore.com>       
+
+	* doc/invoke.texi: Document -fada-spec-parent.
+
+2012-09-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54610
+	* tree-ssa-forwprop.c: Include optabs.h.  Don't include
+	tree-vectorizer.h.
+	(simplify_vector_constructor): Don't use vect_gen_perm_mask,
+	instead create the mask constant here.
+	* Makefile.in (tree-ssa-forwprop.o): Depend on $(OPTABS_H).
+	Don't depend on $(TREE_VECTORIZER_H).
+
+2012-09-18  Florian Weimer  <fweimer@redhat.com>
+
+	* Makefile.in (BASIC_BLOCK_H): Add cfg-flags.def.
+
+2012-09-18  Richard Guenther  <rguenther@suse.de>
+
+	* statistics.h (CXX_MEM_STAT_INFO): New define.
+	* gimple.h (gimple_build_assign_with_ops_stat,
+	gimple_build_assign_with_ops, gimple_build_assign_with_ops3):
+	Turn into an overload of the function gimple_build_assign_with_ops.
+	* gimple.c (gimple_build_assign_with_ops_stat): Rename to ...
+	(gimple_build_assign_with_ops): ... this.
+	* tree-ssa-loop-im.c (move_computations_stmt): Adjust.
+	* tree-ssa-math-opts.c (convert_mult_to_fma): Likewise.
+	* tree-vect-data-refs.c (vect_permute_store_chain): Likewise.
+	(vect_permute_load_chain): Likewise.
+	* tree-vect-generic.c (expand_vector_divmod): Likewise.
+	* tree-vect-patterns.c (vect_recog_dot_prod_pattern): Likewise.
+	(vect_recog_divmod_pattern): Likewise.
+	(vect_recog_mixed_size_cond_pattern): Likewise.
+	(adjust_bool_pattern): Likewise.
+	* tree-vect-slp.c (vect_create_mask_and_perm): Likewise.
+	* tree-vect-stmts.c (vectorizable_operation): Likewise.
+	(permute_vec_elements): Likewise.
+	(vectorizable_load): Likewise.
+
 2012-09-17  Paul Koning  <ni1d@arrl.net>
 
 	* doc/invoke.text (-feliminate-unused-debug-types): Update to
