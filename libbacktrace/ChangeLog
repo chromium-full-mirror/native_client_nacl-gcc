@@ -1,3 +1,27 @@
+2012-09-19  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+	    Ian Lance Taylor  <iant@google.com>
+
+        * configure.ac (GCC_HEADER_STDINT): Invoke.
+        * backtrace.h: If we can't find <stdint.h>, use "gstdint.h".
+        * btest.c: Don't include <stdint.h>.
+        * dwarf.c: Likewise.
+        * configure, aclocal.m4, Makefile.in, config.h.in: Rebuild.
+
+2012-09-18  Ian Lance Taylor  <iant@google.com>
+
+	PR bootstrap/54623
+	* Makefile.am (AM_CPPFLAGS): Define.
+	(AM_CFLAGS): Remove -I options.
+	* Makefile.in: Rebuild.
+
+2012-09-18  Ian Lance Taylor  <iant@google.com>
+
+	* posix.c (O_BINARY): Define if not defined.
+	(backtrace_open): Pass O_BINARY to open.  Only call fcntl if
+	HAVE_FCNTL is defined.
+	* configure.ac: Test for the fcntl function.
+	* configure, config.h.in: Rebuild.
+
 2012-09-18  Ian Lance Taylor  <iant@google.com>
 
 	* btest.c (test1, test2, test3, test4): Add the unused attribute.

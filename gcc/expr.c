@@ -6452,16 +6452,33 @@ store_field (rtx target, HOST_WIDE_INT bitsize, HOST_WIDE_INT bitpos,
 
       /* Handle calls that return values in multiple non-contiguous locations.
 	 The Irix 6 ABI has examples of this.  */
-      if (bitpos == 0
-	  && bitsize == GET_MODE_BITSIZE (mode)
-	  && GET_CODE (temp) == PARALLEL)
-	emit_group_store (target, temp, TREE_TYPE (exp),
-			  int_size_in_bytes (TREE_TYPE (exp)));
-      else
-	/* Store the value in the bitfield.  */
-	store_bit_field (target, bitsize, bitpos,
-		         bitregion_start, bitregion_end,
-		         mode, temp);
+      if (GET_CODE (temp) == PARALLEL)
+	{
+	  rtx temp_target;
+
+	  /* We are not supposed to have a true bitfield in this case.  */
+	  gcc_assert (bitsize == GET_MODE_BITSIZE (mode));
+
+	  /* If we don't store at bit 0, we need an intermediate pseudo
+	     since emit_group_store only stores at bit 0.  */
+	  if (bitpos != 0)
+	    temp_target = gen_reg_rtx (mode);
+	  else
+	    temp_target = target;
+
+	  emit_group_store (temp_target, temp, TREE_TYPE (exp),
+			    int_size_in_bytes (TREE_TYPE (exp)));
+
+	  if (temp_target == target)
+	    return const0_rtx;
+
+	  temp = temp_target;
+	}
+
+      /* Store the value in the bitfield.  */
+      store_bit_field (target, bitsize, bitpos,
+		       bitregion_start, bitregion_end,
+		       mode, temp);
 
       return const0_rtx;
     }
@@ -7822,19 +7839,14 @@ expand_expr_real (tree exp, rtx target, enum machine_mode tmode,
   if (cfun && EXPR_HAS_LOCATION (exp))
     {
       location_t saved_location = input_location;
-      location_t saved_curr_loc = get_curr_insn_source_location ();
-      tree saved_block = get_curr_insn_block ();
+      location_t saved_curr_loc = curr_insn_location ();
       input_location = EXPR_LOCATION (exp);
-      set_curr_insn_source_location (input_location);
-
-      /* Record where the insns produced belong.  */
-      set_curr_insn_block (TREE_BLOCK (exp));
+      set_curr_insn_location (input_location);
 
       ret = expand_expr_real_1 (exp, target, tmode, modifier, alt_rtl);
 
       input_location = saved_location;
-      set_curr_insn_block (saved_block);
-      set_curr_insn_source_location (saved_curr_loc);
+      set_curr_insn_location (saved_curr_loc);
     }
   else
     {

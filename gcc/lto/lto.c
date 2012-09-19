@@ -198,7 +198,7 @@ lto_materialize_function (struct cgraph_node *node)
      and also functions that are needed to produce virtual clones.  */
   if (cgraph_function_with_gimple_body_p (node) || has_analyzed_clone_p (node))
     {
-      /* Clones and thunks don't need to be read.  */
+      /* Clones don't need to be read.  */
       if (node->clone_of)
 	return;
 
@@ -2734,7 +2734,6 @@ lto_fixup_prevailing_decls (tree t)
   else if (EXPR_P (t))
     {
       int i;
-      LTO_NO_PREVAIL (t->exp.block);
       for (i = TREE_OPERAND_LENGTH (t) - 1; i >= 0; --i)
 	LTO_SET_PREVAIL (TREE_OPERAND (t, i));
     }
@@ -3006,7 +3005,6 @@ read_cgraph_and_symbols (unsigned nfiles, const char **fnames)
       VEC_safe_push (ipa_opt_pass, heap,
 		     node->ipa_transforms_to_apply,
 		     (ipa_opt_pass)&pass_ipa_inline);
-  lto_symtab_free ();
 
   timevar_pop (TV_IPA_LTO_CGRAPH_MERGE);
 
@@ -3034,7 +3032,6 @@ materialize_cgraph (void)
   if (!quiet_flag)
     fprintf (stderr,
 	     flag_wpa ? "Materializing decls:" : "Reading function bodies:");
-
 
   /* Now that we have input the cgraph, we need to clear all of the aux
      nodes and read the functions if we are not running in WPA mode.  */
