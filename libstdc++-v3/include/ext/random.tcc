@@ -773,12 +773,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       const typename __ios_base::fmtflags __flags = __is.flags();
       __is.flags(__ios_base::dec | __ios_base::skipws);
 
-      _RealType __nu, __sigma;
-      __is >> __nu >> __sigma;
+      _RealType __nu_val, __sigma_val;
+      __is >> __nu_val >> __sigma_val;
       __is >> __x._M_ndx;
       __is >> __x._M_ndy;
       __x.param(typename rice_distribution<_RealType>::
-		param_type(__nu, __sigma));
+		param_type(__nu_val, __sigma_val));
 
       __is.flags(__flags);
       return __is;
@@ -838,11 +838,75 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       const typename __ios_base::fmtflags __flags = __is.flags();
       __is.flags(__ios_base::dec | __ios_base::skipws);
 
-      _RealType __mu, __omega;
-      __is >> __mu >> __omega;
+      _RealType __mu_val, __omega_val;
+      __is >> __mu_val >> __omega_val;
       __is >> __x._M_gd;
       __x.param(typename nakagami_distribution<_RealType>::
-		param_type(__mu, __omega));
+		param_type(__mu_val, __omega_val));
+
+      __is.flags(__flags);
+      return __is;
+    }
+
+
+  template<typename _RealType>
+    template<typename _OutputIterator,
+	     typename _UniformRandomNumberGenerator>
+      void
+      pareto_distribution<_RealType>::
+      __generate_impl(_OutputIterator __f, _OutputIterator __t,
+		      _UniformRandomNumberGenerator& __urng,
+		      const param_type& __p)
+      {
+	__glibcxx_function_requires(_OutputIteratorConcept<_OutputIterator>)
+
+	result_type __mu_val = __p.mu();
+	result_type __malphinv = -result_type(1) / __p.alpha();
+	while (__f != __t)
+	  *__f++ = __mu_val * std::pow(this->_M_ud(__urng), __malphinv);
+      }
+
+  template<typename _RealType, typename _CharT, typename _Traits>
+    std::basic_ostream<_CharT, _Traits>&
+    operator<<(std::basic_ostream<_CharT, _Traits>& __os,
+	       const pareto_distribution<_RealType>& __x)
+    {
+      typedef std::basic_ostream<_CharT, _Traits>  __ostream_type;
+      typedef typename __ostream_type::ios_base    __ios_base;
+
+      const typename __ios_base::fmtflags __flags = __os.flags();
+      const _CharT __fill = __os.fill();
+      const std::streamsize __precision = __os.precision();
+      const _CharT __space = __os.widen(' ');
+      __os.flags(__ios_base::scientific | __ios_base::left);
+      __os.fill(__space);
+      __os.precision(std::numeric_limits<_RealType>::max_digits10);
+
+      __os << __x.alpha() << __space << __x.mu();
+      __os << __space << __x._M_ud;
+
+      __os.flags(__flags);
+      __os.fill(__fill);
+      __os.precision(__precision);
+      return __os;
+    }
+
+  template<typename _RealType, typename _CharT, typename _Traits>
+    std::basic_istream<_CharT, _Traits>&
+    operator>>(std::basic_istream<_CharT, _Traits>& __is,
+	       pareto_distribution<_RealType>& __x)
+    {
+      typedef std::basic_istream<_CharT, _Traits>  __istream_type;
+      typedef typename __istream_type::ios_base    __ios_base;
+
+      const typename __ios_base::fmtflags __flags = __is.flags();
+      __is.flags(__ios_base::dec | __ios_base::skipws);
+
+      _RealType __alpha_val, __mu_val;
+      __is >> __alpha_val >> __mu_val;
+      __is >> __x._M_ud;
+      __x.param(typename pareto_distribution<_RealType>::
+		param_type(__alpha_val, __mu_val));
 
       __is.flags(__flags);
       return __is;

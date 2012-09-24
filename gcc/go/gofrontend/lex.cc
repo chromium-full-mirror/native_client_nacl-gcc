@@ -726,7 +726,7 @@ Lex::next_token()
 								&issued_error);
 
 		// Ignore byte order mark at start of file.
-		if (ci == 0xfeff && this->lineno_ == 1 && this->lineoff_ == 0)
+		if (ci == 0xfeff)
 		  {
 		    p = pnext;
 		    break;
@@ -840,6 +840,14 @@ Lex::advance_one_utf8_char(const char* p, unsigned int* value,
       *issued_error = true;
       return p + 1;
     }
+
+  // Warn about byte order mark, except at start of file.
+  if (*value == 0xfeff && (this->lineno_ != 1 || this->lineoff_ != 0))
+    {
+      error_at(this->location(), "Unicode (UTF-8) BOM in middle of file");
+      *issued_error = true;
+    }
+
   return p + adv;
 }
 
@@ -1302,6 +1310,12 @@ Lex::append_char(unsigned int v, bool is_character, std::string* str,
 	  warning_at(location, 0,
 		     "unicode code point 0x%x out of range in string", v);
 	  // Turn it into the "replacement character".
+	  v = 0xfffd;
+	}
+      if (v >= 0xd800 && v < 0xe000)
+	{
+	  warning_at(location, 0,
+		     "unicode code point 0x%x is invalid surrogate pair", v);
 	  v = 0xfffd;
 	}
       if (v <= 0xffff)
