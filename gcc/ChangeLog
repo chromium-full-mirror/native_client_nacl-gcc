@@ -2,6 +2,63 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-25  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR other/54701
+	* config/avr/avr-log.c (avr_double_int_pop_digit): Rewrite using
+	double_int::udivmod.
+
+2012-09-25  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/avr.c (avr_set_current_function): Check cfun->machine
+	to be non-NULL.
+
+2012-09-25  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54641
+	* config/avr/t-avr: Use ALL_COMPILERFLAGS instead of ALL_CFLAGS
+	for sources compiled with COMPILER.
+	
+2012-09-25  Richard Guenther  <rguenther@suse.de>
+
+	PR lto/54625
+	* lto-symtab.c (lto_symtab_merge_cgraph_nodes_1): Do not merge
+	cgraph nodes for builtins.
+
+2012-09-25  Dehao Chen  <dehao@google.com>
+
+	PR middle-end/54645
+	* c-family/c-pch.c (c_common_read_pch): Rebuild the location_adhoc_data
+	map when read in the pch.
+
+2012-09-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54676
+	* tree-vrp.c (set_and_canonicalize_value_range): Handle
+	one bit precision properly.
+
+	PR other/54692
+	* configure.ac (CFLAGS, CXXFLAGS): Remove -Ofast or -Og
+	properly.
+	* configure: Regenerated.
+
+2012-09-25  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR other/54701
+	* config/avr/avr.c (avr_map_decompose): Use double_int::from_uhwi
+	instead of uhwi_to_double_int.
+
+2012-09-25  Richard Guenther  <rguenther@suse.de>
+
+	* lto-symtab.c (lto_symtab_merge_decls_1): Properly merge
+	all of the chain.
+
+2012-09-25  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53663
+	* tree-ssa-sccvn.c (vn_reference_lookup_3): Conditional
+	native encode/interpret translation on VN_WALKREWRITE.
+
 2012-09-24  Dehao Chen  <dehao@google.com>
 
 	* tree-cfg.c (move_stmt_op): Reset the expr block only

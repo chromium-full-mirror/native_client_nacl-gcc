@@ -566,12 +566,12 @@ lto_symtab_merge_decls_1 (symtab_node first)
 
   /* Merge the chain to the single prevailing decl and diagnose
      mismatches.  */
-  lto_symtab_merge_decls_2 (first, diagnosed_p);
+  lto_symtab_merge_decls_2 (prevailing, diagnosed_p);
 
   if (cgraph_dump_file)
     {
       fprintf (cgraph_dump_file, "After resolution:\n");
-      for (e = first; e; e = e->symbol.next_sharing_asm_name)
+      for (e = prevailing; e; e = e->symbol.next_sharing_asm_name)
 	dump_symtab_node (cgraph_dump_file, e);
     }
 
@@ -629,7 +629,8 @@ lto_symtab_merge_cgraph_nodes_1 (symtab_node prevailing)
 
       if (!symtab_real_symbol_p (e))
 	continue;
-      if (symtab_function_p (e))
+      if (symtab_function_p (e)
+	  && !DECL_BUILT_IN (e->symbol.decl))
 	lto_cgraph_replace_node (cgraph (e), cgraph (prevailing));
       if (symtab_variable_p (e))
 	lto_varpool_replace_node (varpool (e), varpool (prevailing));

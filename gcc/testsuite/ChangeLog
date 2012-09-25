@@ -1,3 +1,49 @@
+2012-09-25  Richard Guenther  <rguenther@suse.de>
+
+	PR lto/54625
+	* gcc.dg/lto/pr54702_0.c: New testcase.
+	* gcc.dg/lto/pr54702_1.c: Likewise.
+	* gcc.dg/lto/pr54625-1_0.c: Likewise.
+	* gcc.dg/lto/pr54625-1_1.C: Likewise.
+	* gcc.dg/lto/pr54625-2_0.c: Likewise.
+	* gcc.dg/lto/pr54625-2_1.C: Likewise.
+
+2012-09-25  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54526
+	* g++.dg/cpp0x/parse2.C: New.
+	* g++.dg/parse/error11.C: Adjust.
+	* g++.dg/parse/error12.C: Likewise.
+
+2012-09-25  Igor Zamyatin  <igor.zamyatin@intel.com>
+
+	* gcc.target/i386/20030217-1.c: Added check for
+	large_long_double effective target.
+	* gcc.target/i386/387-3.c: Likewise.
+	* gcc.target/i386/387-4.c: Likewise.
+	* gcc.target/i386/pr36578-1.c: Likewise.
+	* gcc.target/i386/excess-precision-1.c: Added new code for the case
+	when long double size is equal double size.
+	* gcc.target/i386/excess-precision-1.c: Likewise.
+	* gcc.target/i386/pr36578-2.c: Likewise.
+	* gcc.target/i386/20030217-2.c: New testcase.
+
+2012-09-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54676
+	* gcc.dg/pr54676.c: New test.
+
+2012-09-25  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/53663
+	* gcc.dg/torture/pr53663-1.c: New testcase.
+	* gcc.dg/torture/pr53663-2.c: Likewise.
+	* gcc.dg/torture/pr53663-3.c: Likewise.
+
+2012-09-25  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.target/i386/pr50725.c: Change 'long' to 'long long'.
+
 2012-09-24  Janis Johnson  <janisjo@codesourcery.com>
 
 	* lib/target-supports-dg.exp (dg-require-effective-target,
@@ -498,7 +544,7 @@
 
 2012-09-10  Marc Glisse  <marc.glisse@inria.fr>
 
-        * gcc.dg/tree-ssa/forwprop-20.c: New testcase.
+	* gcc.dg/tree-ssa/forwprop-20.c: New testcase.
 
 2012-09-10  Richard Guenther  <rguenther@suse.de>
 

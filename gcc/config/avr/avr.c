@@ -550,6 +550,7 @@ avr_set_current_function (tree decl)
   if (decl == NULL_TREE
       || current_function_decl == NULL_TREE
       || current_function_decl == error_mark_node
+      || ! cfun->machine
       || cfun->machine->attributes_checked_p)
     return;
 
@@ -10952,7 +10953,7 @@ avr_map_decompose (double_int f, const avr_map_op_t *g, bool val_const_p)
   int i;
   bool val_used_p = 0 != avr_map_metric (f, MAP_MASK_PREIMAGE_F);
   avr_map_op_t f_ginv = *g;
-  double_int ginv = uhwi_to_double_int (g->ginv);
+  double_int ginv = double_int::from_uhwi (g->ginv);
 
   f_ginv.cost = -1;
   
