@@ -1,6 +1,16 @@
 2012-09-25  Roland McGrath  <mcgrathr@google.com>
 
 	Backport from mainline
+	2012-07-03  Roland McGrath  <mcgrathr@google.com>
+
+	* configure.ac (HAVE_AS_IX86_REP_LOCK_PREFIX): Also require that the
+	assembler accept 'rep bsf ...', 'rep bsr ...', 'rep ret' and 'rep nop'.
+	* configure: Regenerated.
+	* config/i386/i386.md (simple_return_internal_long): Use %;
+	(ctz<mode>2): Likewise.
+	(*pause): Likewise.
+
+	Backport from mainline
 	2012-06-11  Roland McGrath  <mcgrathr@google.com>
 
 	* dwarf2out.c (const_ok_for_output_1): Detect a TLS UNSPEC using
@@ -1344,7 +1354,7 @@
 	* config/sh/sh.c (shiftcosts): Return MAX_COST when the first
 	operand is CONST_INT.  Take COSTS_N_INSNS into account.
 	(sh_rtx_costs): Don't apply COSTS_N_INSNS to the return value of
-	shiftcosts.	
+	shiftcosts.
 
 2012-05-31  Georg-Johann Lay  <avr@gjlay.de>
 
