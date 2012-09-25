@@ -1,7 +1,7 @@
 /* Definitions of target machine for GNU compiler.
    For ARM with ELF obj format.
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2004, 2005, 2007,
-   2008, 2009, 2011 Free Software Foundation, Inc.
+   2008, 2009, 2011, 2012 Free Software Foundation, Inc.
    Contributed by Philip Blundell <philb@gnu.org> and
    Catherine Moore <clm@cygnus.com>
    
@@ -99,8 +99,10 @@
 /* We put ARM and Thumb-2 jump tables in the text section, because it makes
    the code more efficient, but for Thumb-1 it's better to put them out of
    band unless we are generating compressed tables.  */
+#ifndef JUMP_TABLES_IN_TEXT_SECTION
 #define JUMP_TABLES_IN_TEXT_SECTION					\
    (TARGET_32BIT || (TARGET_THUMB && (optimize_size || flag_pic)))
+#endif
 
 #ifndef LINK_SPEC
 #define LINK_SPEC "%{mbig-endian:-EB} %{mlittle-endian:-EL} -X"
@@ -157,4 +159,3 @@
 #undef L_floatundidf
 #undef L_floatundisf
 #endif
-

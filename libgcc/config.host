@@ -193,7 +193,7 @@ case ${host} in
       ;;
   esac
   ;;
-*-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-knetbsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu)
+*-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-knetbsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-nacl*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-linux"
   extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o"
   ;;
@@ -337,6 +337,11 @@ arm*-*-linux*)			# ARM GNU/Linux with ELF
  	  ;;
 	esac
 	tmake_file="$tmake_file t-softfp-sfdf t-softfp-excl arm/t-softfp t-softfp"
+	;;
+arm*-*-nacl*)			# ARM Native Client
+	tmake_file="${tmake_file} arm/t-arm t-fixedpoint-gnu-prefix"
+	tmake_file="${tmake_file} arm/t-elf arm/t-bpabi t-eh-dw2-dip arm/t-nacl arm/t-slibgcc-libgcc"
+	tm_file="$tm_file arm/bpabi-lib.h"
 	;;
 arm*-*-uclinux*)		# ARM ucLinux
 	tmake_file="${tmake_file} t-fixedpoint-gnu-prefix"
@@ -562,6 +567,10 @@ x86_64-*-kfreebsd*-gnu | x86_64-*-knetbsd*-gnu)
 i[34567]86-pc-msdosdjgpp*)
 	;;
 i[34567]86-*-lynxos*)
+	;;
+i[34567]86-*-nacl*)
+	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
+	tmake_file="${tmake_file} i386/t-crtpc i386/t-crtfm i386/t-crtstuff"
 	;;
 i[34567]86-*-nto-qnx*)
 	tmake_file="$tmake_file i386/t-nto t-libgcc-pic"

@@ -40,7 +40,7 @@ extern HOST_WIDE_INT thumb_compute_initial_elimination_offset (unsigned int,
 							       unsigned int);
 extern unsigned int arm_dbx_register_number (unsigned int);
 extern void arm_output_fn_unwind (FILE *, bool);
-  
+
 
 #ifdef RTX_CODE
 extern bool arm_vector_mode_supported_p (enum machine_mode);
@@ -246,5 +246,9 @@ extern int vfp3_const_double_for_fract_bits (rtx);
 
 extern void arm_expand_vec_perm (rtx target, rtx op0, rtx op1, rtx sel);
 extern bool arm_expand_vec_perm_const (rtx target, rtx op0, rtx op1, rtx sel);
+
+extern int arm_sfi_breg_operand (rtx x);
+
+extern int get_attr_length_arm_multireg_pop (rtx *operands);
 
 #endif /* ! GCC_ARM_PROTOS_H */

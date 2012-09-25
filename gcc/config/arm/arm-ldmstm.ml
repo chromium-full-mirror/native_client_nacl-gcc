@@ -1,5 +1,5 @@
 (* Auto-generate ARM ldm/stm patterns
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010, 2012 Free Software Foundation, Inc.
    Contributed by CodeSourcery.
 
    This file is part of GCC.
@@ -174,8 +174,8 @@ let write_pattern_1 name ls addrmode nregs write_set_fn update thumb =
   Printf.printf ")]\n  \"%s && XVECLEN (operands[0], 0) == %d\"\n"
     (target addrmode thumb)
     (if update then nregs + 1 else nregs);
-  Printf.printf "  \"%s%%(%s%%)\\t%%%d%s, {"
-    name astr (nregs + 1) (if update then "!" else "");
+  Printf.printf "  \"%%b%d%s%%(%s%%)\\t%%%d%s, {"
+    (nregs + 1) name astr (nregs + 1) (if update then "!" else "");
   for n = 1 to nregs; do
     Printf.printf "%%%d%s" n (if n < nregs then ", " else "")
   done;
@@ -184,6 +184,8 @@ let write_pattern_1 name ls addrmode nregs write_set_fn update thumb =
   begin if not thumb then
     Printf.printf "\n   (set_attr \"predicable\" \"yes\")";
   end;
+  Printf.printf "\n   (set (attr \"length\") (attr \"length_breg_op%d\"))"
+    (nregs + 1);
   Printf.printf "])\n\n"
 
 let write_ldm_pattern addrmode nregs update =
@@ -309,7 +311,7 @@ let _ =
 "/* ARM ldm/stm instruction patterns.  This file was automatically generated";
 "   using arm-ldmstm.ml.  Please do not edit manually.";
 "";
-"   Copyright (C) 2010 Free Software Foundation, Inc.";
+"   Copyright (C) 2012 Free Software Foundation, Inc.";
 "   Contributed by CodeSourcery.";
 "";
 "   This file is part of GCC.";

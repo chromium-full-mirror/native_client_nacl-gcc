@@ -3744,7 +3744,11 @@ ix86_option_override_internal (bool main_args_p)
 
   /* If using typedef char *va_list, signal that __builtin_va_start (&ap, 0)
      can be optimized to ap = __builtin_next_arg (0).  */
-  if (!TARGET_64BIT && !flag_split_stack)
+  if (!TARGET_64BIT && !flag_split_stack
+#ifdef VA_LIST_TYPE_SIZE
+      && VA_LIST_TYPE_SIZE == POINTER_SIZE
+#endif
+      )
     targetm.expand_builtin_va_start = NULL;
 
   if (TARGET_64BIT)
@@ -7467,13 +7471,19 @@ ix86_build_builtin_va_list_abi (enum calling_abi abi)
   tree f_gpr, f_fpr, f_ovf, f_sav, record, type_decl;
 
   /* For i386 we use plain pointer to argument area.  */
-  if (!TARGET_64BIT || abi == MS_ABI)
+  if ((!TARGET_64BIT || abi == MS_ABI)
+#ifdef VA_LIST_TYPE_SIZE
+      && VA_LIST_TYPE_SIZE == POINTER_SIZE
+#endif
+      )
     return build_pointer_type (char_type_node);
 
   record = lang_hooks.types.make_type (RECORD_TYPE);
   type_decl = build_decl (BUILTINS_LOCATION,
 			  TYPE_DECL, get_identifier ("__va_list_tag"), record);
 
+  if (TARGET_64BIT)
+    {
   f_gpr = build_decl (BUILTINS_LOCATION,
 		      FIELD_DECL, get_identifier ("gp_offset"),
 		      unsigned_type_node);
@@ -7501,8 +7511,57 @@ ix86_build_builtin_va_list_abi (enum calling_abi abi)
   DECL_CHAIN (f_gpr) = f_fpr;
   DECL_CHAIN (f_fpr) = f_ovf;
   DECL_CHAIN (f_ovf) = f_sav;
+    }
+#ifdef VA_LIST_TYPE_SIZE
+  else
+    {
+      /* Certain variant ABIs require that va_list be padded out to
+         a larger exact size.  Hence we have to make it a struct.  */
+
+      tree ap_field, *next_field;
+      unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE / BITS_PER_UNIT - 4) / 4;
+      unsigned int i;
+
+      gcc_assert (VA_LIST_TYPE_SIZE % (4 * BITS_PER_UNIT) == 0);
+
+      ap_field = build_decl (BUILTINS_LOCATION,
+                             FIELD_DECL,
+                             get_identifier ("__ap"),
+                             ptr_type_node);
+      DECL_ARTIFICIAL (ap_field) = 1;
+      DECL_FIELD_CONTEXT (ap_field) = record;
+
+      next_field = &DECL_CHAIN (ap_field);
+      for (i = 0; i < num_pad_fields; ++i)
+        {
+          char pad_field_name[10];
+          tree pad_field;
+          sprintf (pad_field_name, "__pad%u", i);
+          pad_field = build_decl (BUILTINS_LOCATION,
+                                  FIELD_DECL,
+                                  get_identifier (pad_field_name),
+                                  ptr_type_node);
+          DECL_ARTIFICIAL (pad_field) = 1;
+          DECL_FIELD_CONTEXT (pad_field) = record;
+          *next_field = pad_field;
+          next_field = &DECL_CHAIN (pad_field);
+        }
+
+      TYPE_STUB_DECL (record) = type_decl;
+      TYPE_NAME (record) = type_decl;
+      TYPE_FIELDS (record) = ap_field;
+    }
+#endif
 
   layout_type (record);
+
+#ifdef VA_LIST_TYPE_SIZE
+  /* This assertion is just here as a sanity check on the code above.
+     But under -lang-asm we get called even though the basics like
+     setting up ptr_type_node haven't been done.  */
+  if (TREE_INT_CST_LOW (TYPE_SIZE (ptr_type_node)) == POINTER_SIZE)
+    gcc_assert (TREE_INT_CST_LOW (TYPE_SIZE (record)) == VA_LIST_TYPE_SIZE);
+#endif
 
   /* The correct type is an array type of one element.  */
   return build_array_type (record, build_index_type (size_zero_node));
@@ -7700,6 +7759,11 @@ is_va_list_char_pointer (tree type)
 {
   tree canonic;
 
+#ifdef VA_LIST_TYPE_SIZE
+  if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
+    return false;
+#endif
+
   /* For 32-bit it is always true.  */
   if (!TARGET_64BIT)
     return true;
@@ -7754,6 +7818,20 @@ ix86_va_start (tree valist, rtx nextarg)
   /* Only 64bit target needs something special.  */
   if (!TARGET_64BIT || is_va_list_char_pointer (TREE_TYPE (valist)))
     {
+#ifdef VA_LIST_TYPE_SIZE
+      if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
+        {
+          /* We're using a structure type to give it some padding.
+             But all we need is the first field, a simple pointer.  */
+          tree va_list_type = TREE_TYPE (va_list_type_node);
+          tree f_ap = TYPE_FIELDS (va_list_type);
+          valist = build_simple_mem_ref_loc (EXPR_LOCATION (valist), valist);
+          TREE_TYPE (valist) = va_list_type;
+          valist = build3 (COMPONENT_REF, TREE_TYPE (f_ap),
+                           valist, f_ap, NULL_TREE);
+        }
+#endif
+
       if (cfun->machine->split_stack_varargs_pointer == NULL_RTX)
 	std_expand_builtin_va_start (valist, nextarg);
       else
@@ -7857,7 +7935,19 @@ ix86_gimplify_va_arg (tree valist, tree type, gimple_seq *pre_p,
 
   /* Only 64bit target needs something special.  */
   if (!TARGET_64BIT || is_va_list_char_pointer (TREE_TYPE (valist)))
+    {
+#ifdef VA_LIST_TYPE_SIZE
+      if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
+        {
+          /* We're using a structure type to give it some padding.
+             But all we need is the first field, a simple pointer.  */
+          tree fld = TYPE_FIELDS (TREE_TYPE (va_list_type_node));
+          valist = build3 (COMPONENT_REF, TREE_TYPE (fld),
+                           build_va_arg_indirect_ref (valist), fld, NULL_TREE);
+        }
+#endif
     return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
+    }
 
   f_gpr = TYPE_FIELDS (TREE_TYPE (sysv_va_list_type_node));
   f_fpr = DECL_CHAIN (f_gpr);
@@ -8559,8 +8649,13 @@ ix86_code_end (void)
 
       xops[0] = gen_rtx_REG (Pmode, regno);
       xops[1] = gen_rtx_MEM (Pmode, stack_pointer_rtx);
+      if (TARGET_SFI_CFLOW_NACL1)
+	output_asm_insn ("naclret\t%0", xops);
+      else
+	{
       output_asm_insn ("mov%z0\t{%1, %0|%0, %1}", xops);
       fputs ("\tret\n", asm_out_file);
+	}
       final_end_function ();
       init_insn_lengths ();
       free_after_compilation (cfun);
@@ -8623,6 +8718,9 @@ output_set_got (rtx dest, rtx label ATTRIBUTE_UNUSED)
 
       xops[2] = gen_rtx_SYMBOL_REF (Pmode, ggc_strdup (name));
       xops[2] = gen_rtx_MEM (QImode, xops[2]);
+      if (TARGET_SFI_CFLOW_NACL1)
+	output_asm_insn ("nacl_direct_call\t%X2", xops);
+      else
       output_asm_insn ("call\t%X2", xops);
       /* Output the Mach-O "canonical" label name ("Lxx$pb") here too.  This
          is what will be referenced by the Mach-O PIC subsystem.  */
@@ -13904,6 +14002,7 @@ ix86_print_operand (FILE *file, rtx x, int code)
 	  switch (ASSEMBLER_DIALECT)
 	    {
 	    case ASM_ATT:
+	      if (!TARGET_SFI_CFLOW_NACL1)
 	      putc ('*', file);
 	      break;
 
@@ -23205,6 +23304,8 @@ ix86_output_call_insn (rtx insn, rtx call_op)
     {
       if (direct_p)
 	xasm = "jmp\t%P0";
+      else if (TARGET_SFI_CFLOW_NACL1)
+	xasm = "nacljmp\t%A0";
       /* SEH epilogue detection requires the indirect branch case
 	 to include REX.W.  */
       else if (TARGET_SEH)
@@ -23213,6 +23314,24 @@ ix86_output_call_insn (rtx insn, rtx call_op)
 	xasm = "jmp\t%A0";
 
       output_asm_insn (xasm, &call_op);
+      return "";
+    }
+
+  if (TARGET_SFI_CFLOW_NACL1)
+    {
+      if (direct_p)
+	output_asm_insn ("nacl_direct_call\t%P0", &call_op);
+      else
+	{
+	  if (REG_P (call_op))
+	    output_asm_insn ("naclcall\t%A0", &call_op);
+	  else
+	    {
+	      gcc_assert (MEM_P (call_op));
+	      /* TODO(mcgrathr): This clobbers %ecx.  */
+	      output_asm_insn ("nacl_indirect_call\t%0", &call_op);
+	    }
+	}
       return "";
     }
 
@@ -32731,7 +32850,7 @@ ix86_reorg (void)
     {
       if (TARGET_PAD_SHORT_FUNCTION)
 	ix86_pad_short_function ();
-      else if (TARGET_PAD_RETURNS)
+      else if (TARGET_PAD_RETURNS && !TARGET_SFI_CFLOW_NACL1)
 	ix86_pad_returns ();
 #ifdef ASM_OUTPUT_MAX_SKIP_PAD
       if (TARGET_FOUR_JUMP_LIMIT)

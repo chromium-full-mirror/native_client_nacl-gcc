@@ -1,6 +1,6 @@
 ; Options for the ARM port of the compiler.
 
-; Copyright (C) 2005, 2007, 2008, 2009, 2011 Free Software Foundation, Inc.
+; Copyright (C) 2005, 2007, 2008, 2009, 2011, 2012 Free Software Foundation, Inc.
 ;
 ; This file is part of GCC.
 ;
@@ -226,6 +226,15 @@ Enum(arm_tp_type) String(auto) Value(TP_AUTO)
 EnumValue
 Enum(arm_tp_type) String(cp15) Value(TP_CP15)
 
+EnumValue
+Enum(arm_tp_type) String(r9) Value(TP_R9)
+
+EnumValue
+Enum(arm_tp_type) String(r9-indirect0) Value(TP_R9_INDIRECT0)
+
+EnumValue
+Enum(arm_tp_type) String(r9-indirect4) Value(TP_R9_INDIRECT4)
+
 mtpcs-frame
 Target Report Mask(TPCS_FRAME)
 Thumb: Generate (non-leaf) stack frames even if not needed
@@ -267,3 +276,7 @@ that may trigger Cortex-M3 errata.
 munaligned-access
 Target Report Var(unaligned_access) Init(2)
 Enable unaligned word and halfword accesses to packed data.
+
+msfi-nacl1
+Target Report Mask(SFI_NACL1)
+Generate code for Native Client software fault isolation

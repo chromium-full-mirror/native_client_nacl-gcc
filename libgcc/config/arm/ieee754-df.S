@@ -1,6 +1,7 @@
 /* ieee754-df.S double-precision floating point support for ARM
 
-   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2012
+	Free Software Foundation, Inc.
    Contributed by Nicolas Pitre (nico@cam.org)
 
    This file is free software; you can redistribute it and/or modify it
@@ -1129,7 +1130,7 @@ ARM_FUNC_ALIAS eqdf2 cmpdf2
 
 	@ Test for equality.
 	@ Note that 0.0 is equal to -0.0.
-2:	add	sp, sp, #4
+2:	ADD_SP	#4
 	orrs	ip, xl, xh, lsl #1	@ if x == 0.0 or -0.0
 	do_it	eq, e
 	COND(orr,s,eq)	ip, yl, yh, lsl #1	@ and y == 0.0 or -0.0

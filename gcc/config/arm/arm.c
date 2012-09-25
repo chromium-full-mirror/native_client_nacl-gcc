@@ -1445,6 +1445,32 @@ arm_build_builtin_va_list (void)
   DECL_ARTIFICIAL (ap_field) = 1;
   DECL_FIELD_CONTEXT (ap_field) = va_list_type;
   TYPE_FIELDS (va_list_type) = ap_field;
+
+#ifdef VA_LIST_TYPE_SIZE
+  /* Certain variant ABIs require that the struct be padded out to
+     a larger exact size.  */
+  gcc_assert (VA_LIST_TYPE_SIZE % (4 * BITS_PER_UNIT) == 0);
+  {
+    unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE / BITS_PER_UNIT - 4) / 4;
+    unsigned int i;
+    tree *next_field = &DECL_CHAIN (ap_field);
+    for (i = 0; i < num_pad_fields; ++i)
+      {
+        char pad_field_name[10];
+        tree pad_field;
+        sprintf (pad_field_name, "__pad%u", i);
+        pad_field = build_decl (BUILTINS_LOCATION,
+                                FIELD_DECL,
+                                get_identifier (pad_field_name),
+                                ptr_type_node);
+        DECL_ARTIFICIAL (pad_field) = 1;
+        DECL_FIELD_CONTEXT (pad_field) = va_list_type;
+        *next_field = pad_field;
+        next_field = &DECL_CHAIN (pad_field);
+      }
+  }
+#endif
+
   /* Compute its layout.  */
   layout_type (va_list_type);
 
@@ -1866,7 +1892,9 @@ arm_option_override (void)
   /* Use the cp15 method if it is available.  */
   if (target_thread_pointer == TP_AUTO)
     {
-      if (arm_arch6k && !TARGET_THUMB1)
+      if (TARGET_SFI_NACL1)
+	target_thread_pointer = TP_R9;
+      else if (arm_arch6k && !TARGET_THUMB1)
 	target_thread_pointer = TP_CP15;
       else
 	target_thread_pointer = TP_SOFT;
@@ -1874,6 +1902,9 @@ arm_option_override (void)
 
   if (TARGET_HARD_TP && TARGET_THUMB1)
     error ("can not use -mtp=cp15 with 16-bit Thumb");
+
+  if (TARGET_HARD_TP && TARGET_SFI_NACL1)
+    error ("can not use -mtp=cp15 with Native Client SFI");
 
   /* Override the default structure alignment for AAPCS ABI.  */
   if (!global_options_set.x_arm_structure_size_boundary)
@@ -2076,6 +2107,9 @@ arm_isr_value (tree argument)
 {
   const isr_attribute_arg * ptr;
   const char *              arg;
+
+  if (TARGET_SFI_NACL1)
+    return ARM_FT_UNKNOWN;
 
   if (!arm_arch_notm)
     return ARM_FT_NORMAL | ARM_FT_STACKALIGN;
@@ -5845,6 +5879,11 @@ arm_legitimate_index_p (enum machine_mode mode, rtx index, RTX_CODE outer,
   HOST_WIDE_INT range;
   enum rtx_code code = GET_CODE (index);
 
+  /* This may be overly drastic, since it also disables post-increment by
+     register addressing.  */
+  if (TARGET_SFI_NACL1 && code != CONST_INT)
+    return 0;
+
   /* Standard coprocessor addressing modes.  */
   if (TARGET_HARD_FLOAT
       && (TARGET_VFP || TARGET_FPA || TARGET_MAVERICK)
@@ -6253,6 +6292,19 @@ arm_load_tp (rtx target)
       /* Can return in any reg.  */
       emit_insn (gen_load_tp_hard (target));
     }
+  else if (TARGET_R9_TP)
+    {
+      /* It's simply in a fixed register, so just copy it.  */
+      emit_move_insn (target, gen_rtx_REG (SImode, 9));
+    }
+  else if (TARGET_R9_INDIRECT0_TP || TARGET_R9_INDIRECT4_TP)
+    {
+      /* It's indirect from a fixed register.  */
+      rtx addr = gen_rtx_REG (Pmode, 9);
+      if (TARGET_R9_INDIRECT4_TP)
+        addr = plus_constant (addr, 4);
+      emit_move_insn (target, gen_rtx_MEM (SImode, addr));
+    }
   else
     {
       /* Always returned in r0.  Immediately copy the result into a pseudo,
@@ -6405,7 +6457,9 @@ legitimize_tls_address (rtx x, rtx reg)
 			    UNSPEC_TLS);
       reg = load_tls_operand (sum, reg);
 
-      if (TARGET_ARM)
+      if (TARGET_SFI_NACL1)
+	emit_insn (gen_tls_load_dot_plus_eight_nacl (reg, reg, labelno));
+      else if (TARGET_ARM)
 	emit_insn (gen_tls_load_dot_plus_eight (reg, reg, labelno));
       else if (TARGET_THUMB2)
 	emit_insn (gen_tls_load_dot_plus_four (reg, NULL, reg, labelno));
@@ -7635,7 +7689,7 @@ arm_rtx_costs_1 (rtx x, enum rtx_code outer, int* total, bool speed)
 
     case SET:
       return false;
-      
+
     case UNSPEC:
       /* We cost this as high as our memory costs to allow this to
 	 be hoisted from loops.  */
@@ -10924,7 +10978,7 @@ gen_const_stm_seq (rtx *operands, int nops)
    unaligned copies on processors which support unaligned semantics for those
    instructions.  INTERLEAVE_FACTOR can be used to attempt to hide load latency
    (using more registers) by doing e.g. load/load/store/store for a factor of 2.
-   An interleave factor of 1 (the minimum) will perform no interleaving. 
+   An interleave factor of 1 (the minimum) will perform no interleaving.
    Load/store multiple are used for aligned addresses where possible.  */
 
 static void
@@ -10944,9 +10998,9 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
   HOST_WIDE_INT srcoffset, dstoffset;
   HOST_WIDE_INT src_autoinc, dst_autoinc;
   rtx mem, addr;
-  
+
   gcc_assert (1 <= interleave_factor && interleave_factor <= 4);
-  
+
   /* Use hard registers if we have aligned source or destination so we can use
      load/store multiple with contiguous registers.  */
   if (dst_aligned || src_aligned)
@@ -10960,7 +11014,7 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
   src = copy_addr_to_reg (XEXP (srcbase, 0));
 
   srcoffset = dstoffset = 0;
-  
+
   /* Calls to arm_gen_load_multiple and arm_gen_store_multiple update SRC/DST.
      For copying the last bytes we want to subtract this offset again.  */
   src_autoinc = dst_autoinc = 0;
@@ -11014,14 +11068,14 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
 
       remaining -= block_size_bytes;
     }
-  
+
   /* Copy any whole words left (note these aren't interleaved with any
      subsequent halfword/byte load/stores in the interests of simplicity).  */
-  
+
   words = remaining / UNITS_PER_WORD;
 
   gcc_assert (words < interleave_factor);
-  
+
   if (src_aligned && words > 1)
     {
       emit_insn (arm_gen_load_multiple (regnos, words, src, TRUE, srcbase,
@@ -11061,11 +11115,11 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
     }
 
   remaining -= words * UNITS_PER_WORD;
-  
+
   gcc_assert (remaining < 4);
-  
+
   /* Copy a halfword if necessary.  */
-  
+
   if (remaining >= 2)
     {
       halfword_tmp = gen_reg_rtx (SImode);
@@ -11089,11 +11143,11 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       remaining -= 2;
       srcoffset += 2;
     }
-  
+
   gcc_assert (remaining < 2);
-  
+
   /* Copy last byte.  */
-  
+
   if ((remaining & 1) != 0)
     {
       byte_tmp = gen_reg_rtx (SImode);
@@ -11114,9 +11168,9 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       remaining--;
       srcoffset++;
     }
-  
+
   /* Store last halfword if we haven't done so already.  */
-  
+
   if (halfword_tmp)
     {
       addr = plus_constant (dst, dstoffset - dst_autoinc);
@@ -11135,7 +11189,7 @@ arm_block_move_unaligned_straight (rtx dstbase, rtx srcbase,
       emit_move_insn (mem, gen_lowpart (QImode, byte_tmp));
       dstoffset++;
     }
-  
+
   gcc_assert (remaining == 0 && srcoffset == dstoffset);
 }
 
@@ -11154,7 +11208,7 @@ arm_adjust_block_mem (rtx mem, HOST_WIDE_INT length, rtx *loop_reg,
 		      rtx *loop_mem)
 {
   *loop_reg = copy_addr_to_reg (XEXP (mem, 0));
-  
+
   /* Although the new mem does not refer to a known location,
      it does keep up to LENGTH bytes of alignment.  */
   *loop_mem = change_address (mem, BLKmode, *loop_reg);
@@ -11174,14 +11228,14 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
 {
   rtx label, src_reg, dest_reg, final_src, test;
   HOST_WIDE_INT leftover;
-  
+
   leftover = length % bytes_per_iter;
   length -= leftover;
-  
+
   /* Create registers and memory references for use within the loop.  */
   arm_adjust_block_mem (src, bytes_per_iter, &src_reg, &src);
   arm_adjust_block_mem (dest, bytes_per_iter, &dest_reg, &dest);
-  
+
   /* Calculate the value that SRC_REG should have after the last iteration of
      the loop.  */
   final_src = expand_simple_binop (Pmode, PLUS, src_reg, GEN_INT (length),
@@ -11190,7 +11244,7 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
   /* Emit the start of the loop.  */
   label = gen_label_rtx ();
   emit_label (label);
-  
+
   /* Emit the loop body.  */
   arm_block_move_unaligned_straight (dest, src, bytes_per_iter,
 				     interleave_factor);
@@ -11198,11 +11252,11 @@ arm_block_move_unaligned_loop (rtx dest, rtx src, HOST_WIDE_INT length,
   /* Move on to the next block.  */
   emit_move_insn (src_reg, plus_constant (src_reg, bytes_per_iter));
   emit_move_insn (dest_reg, plus_constant (dest_reg, bytes_per_iter));
-  
+
   /* Emit the loop condition.  */
   test = gen_rtx_NE (VOIDmode, src_reg, final_src);
   emit_jump_insn (gen_cbranchsi4 (test, src_reg, final_src, label));
-  
+
   /* Mop up any left-over bytes.  */
   if (leftover)
     arm_block_move_unaligned_straight (dest, src, leftover, interleave_factor);
@@ -11216,7 +11270,7 @@ static int
 arm_movmemqi_unaligned (rtx *operands)
 {
   HOST_WIDE_INT length = INTVAL (operands[2]);
-  
+
   if (optimize_size)
     {
       bool src_aligned = MEM_ALIGN (operands[1]) >= BITS_PER_WORD;
@@ -11227,7 +11281,7 @@ arm_movmemqi_unaligned (rtx *operands)
 	 resulting code can be smaller.  */
       unsigned int interleave_factor = (src_aligned || dst_aligned) ? 2 : 1;
       HOST_WIDE_INT bytes_per_iter = (src_aligned || dst_aligned) ? 8 : 4;
-      
+
       if (length > 12)
 	arm_block_move_unaligned_loop (operands[0], operands[1], length,
 				       interleave_factor, bytes_per_iter);
@@ -11245,7 +11299,7 @@ arm_movmemqi_unaligned (rtx *operands)
       else
 	arm_block_move_unaligned_straight (operands[0], operands[1], length, 4);
     }
-  
+
   return 1;
 }
 
@@ -12386,8 +12440,80 @@ get_label_padding (rtx label)
   HOST_WIDE_INT align, min_insn_size;
 
   align = 1 << label_to_alignment (label);
+  align = MAX (align, align_labels);
   min_insn_size = TARGET_THUMB ? 2 : 4;
   return align > min_insn_size ? align - min_insn_size : 0;
+}
+
+static Mnode *
+set_minipool_offset (Mnode *mp, HOST_WIDE_INT offset)
+{
+  if (TARGET_SFI_NACL1 && mp->refcount > 0)
+    {
+      if (mp->value == NULL_RTX)
+        {
+          /* This is a barrier we created before.  If things have
+             been shuffled around such that it's no longer doing its
+             job, then drop it.  */
+          Mnode *next;
+          for (next = mp->next; next != NULL; next = next->next)
+            {
+              if (next->value == NULL_RTX)
+                next->refcount = 0;
+              if (next->refcount > 0)
+                break;
+            }
+          if (offset % 16 != 0
+              || next == NULL
+              || (mp->fix_size < 8) != (next->fix_size < 8))
+            mp->refcount = 0;
+        }
+      else if (offset % 16 == 0)
+        {
+          /* This entry would sit at a bundle boundary.
+             Insert a barrier entry before it.  */
+
+          Mnode *barrier = XNEW (Mnode);
+          barrier->fix_size = 4;
+          barrier->mode = SImode;
+          barrier->value = NULL_RTX;
+          barrier->refcount = 1;
+
+          /* These don't actually matter for the barrier, since
+             nothing refers to it.  The generic logic will wind
+             up adjusting them based on the neighbors.  */
+          barrier->min_address = HOST_WIDE_INT_MIN;
+          barrier->max_address = HOST_WIDE_INT_MAX;
+
+          /* If the next item wants 8-byte alignment, then make this
+             barrier 8 bytes long so we don't break the alignment.
+             TODO(mcgrathr): Should fiddle placement so that one 4-byte
+             item is placed after each barrier to recover the alignment
+             without wasting a word of space.  */
+          if (ARM_DOUBLEWORD_ALIGN && mp->fix_size >= 8)
+            {
+              barrier->fix_size = 8;
+              gcc_assert (mp->fix_size == 8);
+            }
+
+          barrier->next = mp;
+          barrier->prev = mp->prev;
+          if (barrier->prev == NULL)
+            minipool_vector_head = barrier;
+          else
+            barrier->prev->next = barrier;
+          mp->prev = barrier;
+
+          mp = barrier;
+        }
+
+      if (mp->refcount > 0)
+        gcc_assert ((offset % 16 == 0) == (mp->value == NULL_RTX));
+    }
+
+  mp->offset = offset;
+
+  return mp;
 }
 
 /* Move a minipool fix MP from its current location to before MAX_MP.
@@ -12472,7 +12598,8 @@ add_minipool_forward_ref (Mfix *fix)
      exist.  */
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      if (GET_CODE (fix->value) == GET_CODE (mp->value)
+      if (mp->value != NULL_RTX
+          && GET_CODE (fix->value) == GET_CODE (mp->value)
 	  && fix->mode == mp->mode
 	  && (GET_CODE (fix->value) != CODE_LABEL
 	      || (CODE_LABEL_NUMBER (fix->value)
@@ -12606,7 +12733,7 @@ move_minipool_fix_backward_ref (Mnode *mp, Mnode *min_mp,
   offset = 0;
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      mp->offset = offset;
+      mp = set_minipool_offset (mp, offset);
       if (mp->refcount > 0)
 	offset += mp->fix_size;
 
@@ -12649,7 +12776,8 @@ add_minipool_backward_ref (Mfix *fix)
      exist.  */
   for (mp = minipool_vector_tail; mp != NULL; mp = mp->prev)
     {
-      if (GET_CODE (fix->value) == GET_CODE (mp->value)
+      if (mp->value != NULL_RTX
+          && GET_CODE (fix->value) == GET_CODE (mp->value)
 	  && fix->mode == mp->mode
 	  && (GET_CODE (fix->value) != CODE_LABEL
 	      || (CODE_LABEL_NUMBER (fix->value)
@@ -12752,7 +12880,7 @@ add_minipool_backward_ref (Mfix *fix)
   if (mp->prev)
     mp = mp->prev;
   else
-    mp->offset = 0;
+    mp = set_minipool_offset (mp, 0);
 
   /* Scan over the following entries and adjust their offsets.  */
   while (mp->next != NULL)
@@ -12761,9 +12889,9 @@ add_minipool_backward_ref (Mfix *fix)
 	mp->next->min_address = mp->min_address + mp->fix_size;
 
       if (mp->refcount)
-	mp->next->offset = mp->offset + mp->fix_size;
+	mp->next = set_minipool_offset (mp->next, mp->offset + mp->fix_size);
       else
-	mp->next->offset = mp->offset;
+	mp->next = set_minipool_offset (mp->next, mp->offset);
 
       mp = mp->next;
     }
@@ -12781,7 +12909,7 @@ assign_minipool_offsets (Mfix *barrier)
 
   for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
     {
-      mp->offset = offset;
+      mp = set_minipool_offset (mp, offset);
 
       if (mp->refcount > 0)
 	offset += mp->fix_size;
@@ -12795,6 +12923,8 @@ dump_minipool (rtx scan)
   Mnode * mp;
   Mnode * nmp;
   int align64 = 0;
+  HOST_WIDE_INT offset;
+  HOST_WIDE_INT last_sfi_barrier;
 
   if (ARM_DOUBLEWORD_ALIGN)
     for (mp = minipool_vector_head; mp != NULL; mp = mp->next)
@@ -12810,12 +12940,57 @@ dump_minipool (rtx scan)
 	     INSN_UID (scan), (unsigned long) minipool_barrier->address, align64 ? 8 : 4);
 
   scan = emit_label_after (gen_label_rtx (), scan);
-  scan = emit_insn_after (align64 ? gen_align_8 () : gen_align_4 (), scan);
+  scan = emit_insn_after (TARGET_SFI_NACL1 ? gen_align_16 ()
+                          : align64 ? gen_align_8 () : gen_align_4 (), scan);
   scan = emit_label_after (minipool_vector_label, scan);
 
+  offset = 0;
+  last_sfi_barrier = 0;
   for (mp = minipool_vector_head; mp != NULL; mp = nmp)
     {
-      if (mp->refcount > 0)
+      if (mp->refcount > 0 && mp->value == NULL_RTX)
+        {
+          /* This is a special marker created by set_minipool_offset.
+             It indicates we're at a multiple of the bundle size, so
+             we must insert a special barrier before the actual
+             non-instruction words in the instruction stream.  */
+
+          Mnode *next;
+
+          gcc_assert (TARGET_SFI_NACL1);
+          gcc_assert (mp->fix_size == 4 || mp->fix_size == 8);
+
+          /* Determine if this barrier has become useless.  That is,
+             if it's the last thing in the minipool or it's followed
+             immediately by another barrier.  We must not consider
+             any abandoned entries (refcount == 0) while looking at
+             the logically "next" entry.
+
+             TODO(mcgrathr): Figure out if this can really ever
+             happen, and if so, maybe make something else smarter so
+             it doesn't.  */
+          next = mp->next;
+          while (next != NULL && next->refcount == 0)
+            next = next->next;
+
+          if (next == NULL || next->value == NULL_RTX)
+            /* This barrier has become useless.  */
+            mp->refcount = 0;
+          else
+            {
+              if (dump_file)
+                fprintf (dump_file,
+                         ";;  Offset %u SFI barrier for length %d\n",
+                         (unsigned) mp->offset, mp->fix_size);
+              last_sfi_barrier = mp->offset;
+              gcc_assert (mp->offset % 16 == 0);
+              scan = emit_insn_after (mp->fix_size == 4
+                                      ? gen_consttable_sfi_barrier_4 ()
+                                      : gen_consttable_sfi_barrier_8 (),
+                                      scan);
+            }
+        }
+      else if (mp->refcount > 0)
 	{
 	  if (dump_file)
 	    {
@@ -12826,6 +13001,18 @@ dump_minipool (rtx scan)
 	      arm_print_value (dump_file, mp->value);
 	      fputc ('\n', dump_file);
 	    }
+
+          if (TARGET_SFI_NACL1)
+            {
+              /* Do some sanity checks:
+                 1. Every 16-byte boundary must be a barrier, not a real entry.
+                 2. No entry can span a 16-byte alignment boundary.
+                 3. The last barrier emitted must be < 16 bytes before here.  */
+              gcc_assert (mp->offset % 16 != 0);
+              gcc_assert (mp->offset / 16
+                          == (mp->offset + mp->fix_size - 1) / 16);
+              gcc_assert (mp->offset - last_sfi_barrier < 16);
+            }
 
 	  switch (mp->fix_size)
 	    {
@@ -12863,6 +13050,14 @@ dump_minipool (rtx scan)
 	      gcc_unreachable ();
 	    }
 	}
+
+      if (mp->refcount > 0)
+        {
+          /* Purely a sanity check that the recorded offsets match
+             the sequence in which we are emitting the entries.  */
+          gcc_assert (offset == mp->offset);
+          offset += mp->fix_size;
+        }
 
       nmp = mp->next;
       free (mp);
@@ -13939,6 +14134,25 @@ output_mov_double_arm_from_fpa (rtx *operands)
   return "";
 }
 
+/* Adjust *COUNT for an instruction being emitted with a %b<n>
+   prefix, where OPERAND is %<n>.  */
+static void
+count_sfi_breg (int *count, rtx operand)
+{
+  if (count && arm_sfi_breg_operand (operand))
+    *count += 2;
+}
+
+/* Adjust *COUNT for an instruction being emitted with a %j<n>
+   prefix, where OPERAND is %<n>.  */
+static void
+count_sfi_sp (int *count, rtx operand)
+{
+  gcc_assert (GET_CODE (operand) == REG);
+  if (count && TARGET_SFI_NACL1 && REGNO (operand) == SP_REGNUM)
+    *count += 2;
+}
+
 /* Output a move between double words.  It must be REG<-MEM
    or MEM<-REG.  */
 const char *
@@ -13976,42 +14190,47 @@ output_move_double (rtx *operands, bool emit, int *count)
 	    {
 	      if (TARGET_LDRD
 		  && !(fix_cm3_ldrd && reg0 == REGNO(XEXP (operands[1], 0))))
-		output_asm_insn ("ldr%(d%)\t%0, [%m1]", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1]", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%m1, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%m1, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("ldr%(d%)\t%0, [%m1, #8]!", operands);
+	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1, #8]!", operands);
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_DEC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%m1, #-8]!", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1, #-8]!", operands);
 	      else
-		output_asm_insn ("ldm%(db%)\t%m1!, %M0", operands);
+		output_asm_insn ("%b1ldm%(db%)\t%m1!, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case POST_INC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%m1], #8", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%m1], #8", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%m1!, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%m1!, %M0", operands);
 	    }
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("ldr%(d%)\t%0, [%m1], #-8", operands);
+	    output_asm_insn ("%b1ldr%(d%)\t%0, [%m1], #-8", operands);
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	case PRE_MODIFY:
@@ -14031,11 +14250,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 		  /* Registers overlap so split out the increment.  */
 		  if (emit)
 		    {
-		      output_asm_insn ("add%?\t%1, %1, %2", otherops);
-		      output_asm_insn ("ldr%(d%)\t%0, [%1] @split", otherops);
+		      output_asm_insn ("%j1add%?\t%1, %1, %2", otherops);
+		      output_asm_insn ("%b1ldr%(d%)\t%0, [%1] @split",
+                                       otherops);
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_sp (count, otherops[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	      else
 		{
@@ -14048,18 +14270,22 @@ output_move_double (rtx *operands, bool emit, int *count)
 			  && INTVAL (otherops[2]) < 256))
 		    {
 		      if (emit)
-			output_asm_insn ("ldr%(d%)\t%0, [%1, %2]!", otherops);
+			output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]!",
+                                         otherops);
+                      count_sfi_breg (count, otherops[1]);
 		    }
 		  else
 		    {
 		      if (emit)
 			{
-			  output_asm_insn ("ldr%?\t%0, [%1, %2]!", otherops);
-			  output_asm_insn ("ldr%?\t%H0, [%1, #4]", otherops);
+			  output_asm_insn ("%b1ldr%?\t%0, [%1, %2]!",
+                                           otherops);
+			  output_asm_insn ("%b1ldr%?\t%H0, [%1, #4]", otherops);
 			}
 		      if (count)
 			*count = 2;
-
+                      count_sfi_breg (count, otherops[1]);
+                      count_sfi_breg (count, otherops[1]);
 		    }
 		}
 	    }
@@ -14074,17 +14300,20 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      && INTVAL (otherops[2]) < 256))
 		{
 		  if (emit)
-		    output_asm_insn ("ldr%(d%)\t%0, [%1], %2", otherops);
+		    output_asm_insn ("%b1ldr%(d%)\t%0, [%1], %2", otherops);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	      else
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%H0, [%1, #4]", otherops);
-		      output_asm_insn ("ldr%?\t%0, [%1], %2", otherops);
+		      output_asm_insn ("%b1ldr%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, [%1], %2", otherops);
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_breg (count, otherops[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	    }
 	  break;
@@ -14103,13 +14332,14 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("ldr%(d%)\t%0, [%1]", operands);
+		output_asm_insn ("%b1ldr%(d%)\t%0, [%1]", operands);
 	      else
-		output_asm_insn ("ldm%(ia%)\t%1, %M0", operands);
+		output_asm_insn ("%b1ldm%(ia%)\t%1, %M0", operands);
 	    }
 
 	  if (count)
 	    *count = 2;
+          count_sfi_breg (count, operands[1]);
 	  break;
 
 	  /* ??? This needs checking for thumb2.  */
@@ -14129,19 +14359,22 @@ output_move_double (rtx *operands, bool emit, int *count)
 			{
 			case -8:
 			  if (emit)
-			    output_asm_insn ("ldm%(db%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(db%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			case -4:
 			  if (TARGET_THUMB2)
 			    break;
 			  if (emit)
-			    output_asm_insn ("ldm%(da%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(da%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			case 4:
 			  if (TARGET_THUMB2)
 			    break;
 			  if (emit)
-			    output_asm_insn ("ldm%(ib%)\t%1, %M0", otherops);
+			    output_asm_insn ("%b0ldm%(ib%)\t%1, %M0", otherops);
+                          count_sfi_breg (count, otherops[0]);
 			  return "";
 			}
 		    }
@@ -14171,17 +14404,23 @@ output_move_double (rtx *operands, bool emit, int *count)
 			{
 			  if (emit)
 			    {
-			      output_asm_insn ("add%?\t%0, %1, %2", otherops);
-			      output_asm_insn ("ldr%(d%)\t%0, [%1]", operands);
+			      output_asm_insn ("%j0add%?\t%0, %1, %2",
+                                               otherops);
+			      output_asm_insn ("%b1ldr%(d%)\t%0, [%1]",
+                                               operands);
 			    }
 			  if (count)
 			    *count = 2;
+                          count_sfi_sp (count, otherops[0]);
+                          count_sfi_breg (count, otherops[1]);
 			}
 		      else
 			{
 			  otherops[0] = operands[0];
 			  if (emit)
-			    output_asm_insn ("ldr%(d%)\t%0, [%1, %2]", otherops);
+			    output_asm_insn ("%b1ldr%(d%)\t%0, [%1, %2]",
+                                             otherops);
+                          count_sfi_breg (count, otherops[1]);
 			}
 		      return "";
 		    }
@@ -14191,30 +14430,34 @@ output_move_double (rtx *operands, bool emit, int *count)
 		      if (emit)
 			{
 			  if (!(const_ok_for_arm (INTVAL (otherops[2]))))
-			    output_asm_insn ("sub%?\t%0, %1, #%n2", otherops);
+			    output_asm_insn ("%j0sub%?\t%0, %1, #%n2",
+                                             otherops);
 			  else
-			    output_asm_insn ("add%?\t%0, %1, %2", otherops);
+			    output_asm_insn ("%j0add%?\t%0, %1, %2", otherops);
 			}
 		    }
 		  else
 		    {
 		      if (emit)
-			output_asm_insn ("add%?\t%0, %1, %2", otherops);
+			output_asm_insn ("%j0add%?\t%0, %1, %2", otherops);
 		    }
+                  count_sfi_sp (count, otherops[0]);
 		}
 	      else
 		{
 		  if (emit)
-		    output_asm_insn ("sub%?\t%0, %1, %2", otherops);
+		    output_asm_insn ("%j0sub%?\t%0, %1, %2", otherops);
+                  count_sfi_sp (count, otherops[0]);
 		}
 
 	      if (count)
 		*count = 2;
+              count_sfi_breg (count, operands[1]);
 
 	      if (TARGET_LDRD)
-		return "ldr%(d%)\t%0, [%1]";
+		return "%b1ldr%(d%)\t%0, [%1]";
 
-	      return "ldm%(ia%)\t%1, %M0";
+	      return "%b1ldm%(ia%)\t%1, %M0";
 	    }
 	  else
 	    {
@@ -14224,22 +14467,25 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%0, %1", otherops);
-		      output_asm_insn ("ldr%?\t%0, %1", operands);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", operands);
 		    }
 		  if (count)
 		    *count = 2;
-
+                  count_sfi_breg (count, otherops[1]);
+                  count_sfi_breg (count, operands[1]);
 		}
 	      else
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("ldr%?\t%0, %1", operands);
-		      output_asm_insn ("ldr%?\t%0, %1", otherops);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", operands);
+		      output_asm_insn ("%b1ldr%?\t%0, %1", otherops);
 		    }
 		  if (count)
 		    *count = 2;
+                  count_sfi_breg (count, operands[1]);
+                  count_sfi_breg (count, otherops[1]);
 		}
 	    }
 	}
@@ -14256,42 +14502,47 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0]", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0]", operands);
 	      else
-		output_asm_insn ("stm%(ia%)\t%m0, %M1", operands);
+		output_asm_insn ("%b0stm%(ia%)\t%m0, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case PRE_INC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("str%(d%)\t%1, [%m0, #8]!", operands);
+	    output_asm_insn ("%b0str%(d%)\t%1, [%m0, #8]!", operands);
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case PRE_DEC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0, #-8]!", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0, #-8]!", operands);
 	      else
-		output_asm_insn ("stm%(db%)\t%m0!, %M1", operands);
+		output_asm_insn ("%b0stm%(db%)\t%m0!, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case POST_INC:
 	  if (emit)
 	    {
 	      if (TARGET_LDRD)
-		output_asm_insn ("str%(d%)\t%1, [%m0], #8", operands);
+		output_asm_insn ("%b0str%(d%)\t%1, [%m0], #8", operands);
 	      else
-		output_asm_insn ("stm%(ia%)\t%m0!, %M1", operands);
+		output_asm_insn ("%b0stm%(ia%)\t%m0!, %M1", operands);
 	    }
+          count_sfi_breg (count, operands[0]);
 	  break;
 
         case POST_DEC:
 	  gcc_assert (TARGET_LDRD);
 	  if (emit)
-	    output_asm_insn ("str%(d%)\t%1, [%m0], #-8", operands);
+	    output_asm_insn ("%b0str%(d%)\t%1, [%m0], #-8", operands);
+          count_sfi_breg (count, operands[0]);
 	  break;
 
 	case PRE_MODIFY:
@@ -14311,8 +14562,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("str%?\t%0, [%1, %2]!", otherops);
-		      output_asm_insn ("str%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1str%?\t%0, [%1, %2]!", otherops);
+		      output_asm_insn ("%b1str%?\t%H0, [%1, #4]", otherops);
 		    }
 		  if (count)
 		    *count = 2;
@@ -14321,22 +14572,26 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		  if (emit)
 		    {
-		      output_asm_insn ("str%?\t%H0, [%1, #4]", otherops);
-		      output_asm_insn ("str%?\t%0, [%1], %2", otherops);
+		      output_asm_insn ("%b1str%?\t%H0, [%1, #4]", otherops);
+		      output_asm_insn ("%b1str%?\t%0, [%1], %2", otherops);
 		    }
 		  if (count)
 		    *count = 2;
 		}
+              count_sfi_breg (count, otherops[1]);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  else if (GET_CODE (XEXP (operands[0], 0)) == PRE_MODIFY)
 	    {
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1, %2]!", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]!", otherops);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  else
 	    {
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1], %2", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1], %2", otherops);
+              count_sfi_breg (count, otherops[1]);
 	    }
 	  break;
 
@@ -14348,21 +14603,24 @@ output_move_double (rtx *operands, bool emit, int *count)
 		{
 		case -8:
 		  if (emit)
-		    output_asm_insn ("stm%(db%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(db%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 
 		case -4:
 		  if (TARGET_THUMB2)
 		    break;
 		  if (emit)
-		    output_asm_insn ("stm%(da%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(da%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 
 		case 4:
 		  if (TARGET_THUMB2)
 		    break;
 		  if (emit)
-		    output_asm_insn ("stm%(ib%)\t%m0, %M1", operands);
+		    output_asm_insn ("%b0stm%(ib%)\t%m0, %M1", operands);
+                  count_sfi_breg (count, operands[0]);
 		  return "";
 		}
 	    }
@@ -14376,7 +14634,8 @@ output_move_double (rtx *operands, bool emit, int *count)
 	      otherops[0] = operands[1];
 	      otherops[1] = XEXP (XEXP (operands[0], 0), 0);
 	      if (emit)
-		output_asm_insn ("str%(d%)\t%0, [%1, %2]", otherops);
+		output_asm_insn ("%b1str%(d%)\t%0, [%1, %2]", otherops);
+              count_sfi_breg (count, otherops[1]);
 	      return "";
 	    }
 	  /* Fall through */
@@ -14386,11 +14645,13 @@ output_move_double (rtx *operands, bool emit, int *count)
 	  otherops[1] = operands[1];
 	  if (emit)
 	    {
-	      output_asm_insn ("str%?\t%1, %0", operands);
-	      output_asm_insn ("str%?\t%H1, %0", otherops);
+	      output_asm_insn ("%b0str%?\t%1, %0", operands);
+	      output_asm_insn ("%b0str%?\t%H1, %0", otherops);
 	    }
 	  if (count)
 	    *count = 2;
+          count_sfi_breg (count, operands[0]);
+          count_sfi_breg (count, otherops[0]);
 	}
     }
 
@@ -14412,13 +14673,13 @@ output_move_quad (rtx *operands)
           switch (GET_CODE (XEXP (operands[1], 0)))
             {
             case REG:
-              output_asm_insn ("ldm%(ia%)\t%m1, %M0", operands);
+              output_asm_insn ("%b1ldm%(ia%)\t%m1, %M0", operands);
               break;
 
             case LABEL_REF:
             case CONST:
               output_asm_insn ("adr%?\t%0, %1", operands);
-              output_asm_insn ("ldm%(ia%)\t%0, %M0", operands);
+              output_asm_insn ("%b0ldm%(ia%)\t%0, %M0", operands);
               break;
 
             default:
@@ -14462,7 +14723,7 @@ output_move_quad (rtx *operands)
       switch (GET_CODE (XEXP (operands[0], 0)))
         {
         case REG:
-          output_asm_insn ("stm%(ia%)\t%m0, %M1", operands);
+          output_asm_insn ("%b0stm%(ia%)\t%m0, %M1", operands);
           break;
 
         default:
@@ -14505,19 +14766,19 @@ output_move_vfp (rtx *operands)
   switch (GET_CODE (addr))
     {
     case PRE_DEC:
-      templ = "f%smdb%c%%?\t%%0!, {%%%s1}%s";
+      templ = "%%j1%%b0f%smdb%c%%?\t%%0!, {%%%s1}%s";
       ops[0] = XEXP (addr, 0);
       ops[1] = reg;
       break;
 
     case POST_INC:
-      templ = "f%smia%c%%?\t%%0!, {%%%s1}%s";
+      templ = "%%j1%%b0f%smia%c%%?\t%%0!, {%%%s1}%s";
       ops[0] = XEXP (addr, 0);
       ops[1] = reg;
       break;
 
     default:
-      templ = "f%s%c%%?\t%%%s0, %%1%s";
+      templ = "%%j0%%b1f%s%c%%?\t%%%s0, %%1%s";
       ops[0] = reg;
       ops[1] = mem;
       break;
@@ -14739,11 +15000,13 @@ output_add_immediate (rtx *operands)
     {
       if (n < 0)
 	output_multi_immediate (operands,
-				"sub%?\t%0, %1, %2", "sub%?\t%0, %0, %2", 2,
+				"%j0sub%?\t%0, %1, %2",
+                                "%j0sub%?\t%0, %0, %2", 2,
 				-n);
       else
 	output_multi_immediate (operands,
-				"add%?\t%0, %1, %2", "add%?\t%0, %0, %2", 2,
+				"%j0add%?\t%0, %1, %2",
+                                "%j0add%?\t%0, %0, %2", 2,
 				n);
     }
 
@@ -15342,7 +15605,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	  ops[1] = gen_rtx_SYMBOL_REF (Pmode, NEED_PLT_RELOC ? "abort(PLT)"
 				       : "abort");
 	  assemble_external_libcall (ops[1]);
-	  output_asm_insn (reverse ? "bl%D0\t%a1" : "bl%d0\t%a1", ops);
+	  output_asm_insn (reverse ? "%*bl%D0\t%a1" : "%*bl%d0\t%a1", ops);
 	}
 
       return "";
@@ -15362,9 +15625,10 @@ output_return_instruction (rtx operand, int really_return, int reverse)
       const char * return_reg;
 
       /* If we do not have any special requirements for function exit
-	 (e.g. interworking) then we can load the return address
+	 (e.g. interworking, nacl) then we can load the return address
 	 directly into the PC.  Otherwise we must load it into LR.  */
       if (really_return
+	  && !TARGET_SFI_NACL1
 	  && (IS_INTERRUPT (func_type) || !TARGET_INTERWORK))
 	return_reg = reg_names[PC_REGNUM];
       else
@@ -15475,11 +15739,21 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	    strcpy (p, "}");
 	}
 
+      if (TARGET_SFI_NACL1 && (live_regs_mask & (1 << SP_REGNUM)))
+        {
+          char orig_instr[sizeof instr];
+          strcpy (orig_instr, instr);
+          strcpy (stpcpy (instr, "sfi_sp "), orig_instr);
+        }
+
       output_asm_insn (instr, & operand);
 
       /* See if we need to generate an extra instruction to
 	 perform the actual function return.  */
+      /* TODO(sehr): surely there's a better way than repeating this condition
+         here and above. */
       if (really_return
+	  && !TARGET_SFI_NACL1
 	  && func_type != ARM_FT_INTERWORKED
 	  && (live_regs_mask & (1 << LR_REGNUM)) != 0)
 	{
@@ -15500,7 +15774,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	  break;
 
 	case ARM_FT_INTERWORKED:
-	  sprintf (instr, "bx%s\t%%|lr", conditional);
+	  sprintf (instr, "%%*bx%s\t%%|lr", conditional);
 	  break;
 
 	case ARM_FT_EXCEPTION:
@@ -15511,7 +15785,7 @@ output_return_instruction (rtx operand, int really_return, int reverse)
 	default:
 	  /* Use bx if it's available.  */
 	  if (arm_arch5 || arm_arch4t)
-	    sprintf (instr, "bx%s\t%%|lr", conditional);
+	    sprintf (instr, "%%*bx%s\t%%|lr", conditional);
 	  else
 	    sprintf (instr, "mov%s\t%%|pc, %%|lr", conditional);
 	  break;
@@ -17148,6 +17422,59 @@ arm_print_condition (FILE *stream)
     }
 }
 
+/* If X is an operand for which %b<n> will expand to the "sfi_breg" prefix,
+   return the register number.  Otherwise return -1.  */
+int
+arm_sfi_breg_operand (rtx x)
+{
+  int regno;
+
+  switch (GET_CODE (x))
+    {
+    case REG:
+      regno = REGNO (x);
+      break;
+
+    case MEM:
+      {
+        rtx addr = XEXP (x, 0);
+        while (GET_CODE (addr) != REG)
+          {
+            switch (GET_CODE (addr))
+              {
+              case LABEL_REF:
+              case SYMBOL_REF:
+                return -1;
+
+              default:
+                /* It might be (plus (reg...) ...) or suchlike.  */
+                addr = XEXP (addr, 0);
+                continue;
+              }
+            break;
+          }
+        if (addr != NULL)
+          {
+            gcc_assert (GET_CODE (addr) == REG);
+            regno = REGNO (addr);
+          }
+      }
+      break;
+
+    case CONST:
+    case CONST_INT:
+    case CONST_DOUBLE:
+    case CONST_VECTOR:
+    case CONST_STRING:
+    case SYMBOL_REF:
+      return -1;
+
+    default:
+      gcc_unreachable ();
+    }
+
+  return (regno != SP_REGNUM && regno != PC_REGNUM && regno != 9) ? regno : -1;
+}
 
 /* If CODE is 'd', then the X is a condition operand and the instruction
    should only be executed if the condition is true.
@@ -17807,6 +18134,46 @@ arm_print_operand (FILE *stream, rtx x, int code)
       }
       return;
 
+    case '*':
+      /* Used to prefix a "bl", "blx", or "bx".  */
+      if (TARGET_SFI_NACL1)
+	fprintf (stream, "sfi_");
+      return;
+
+    case 'b':
+      /* Used to prefix a load or store instruction, repeating the memory
+	 operand.  It can also be used with a plain register operand, when
+	 that is being used as the base register in a load or store
+	 instruction.  Normally, produces no output.  Under -msfi-nacl1,
+	 produces "sfi_breg REG, " unless REG is SP or PC.  */
+      if (GET_CODE (x) != MEM && GET_CODE (x) != REG)
+	{
+	  output_operand_lossage ("invalid operand for code '%c'", code);
+	  return;
+	}
+
+      if (TARGET_SFI_NACL1)
+        {
+          int regno = arm_sfi_breg_operand (x);
+          if (regno != -1)
+            fprintf (stream, "sfi_breg %s, ", reg_names[regno]);
+        }
+      return;
+
+    case 'j':
+      /* Used to prefix an instruction, repeating the output (register)
+         operand.  Normally, produces no output.  Under -msfi-nacl1,
+         produces "sfi_sp " if the output operand is the SP.  */
+      if (GET_CODE (x) != REG)
+	{
+	  output_operand_lossage ("invalid operand for code '%c'", code);
+	  return;
+	}
+
+      if (TARGET_SFI_NACL1 && REGNO (x) == SP_REGNUM)
+        fputs ("sfi_sp ", stream);
+      return;
+
     default:
       if (x == 0)
 	{
@@ -17980,7 +18347,7 @@ static bool
 arm_print_operand_punct_valid_p (unsigned char code)
 {
   return (code == '@' || code == '|' || code == '.'
-	  || code == '(' || code == ')' || code == '#'
+	  || code == '(' || code == ')' || code == '#' || code == '*'
 	  || (TARGET_32BIT && (code == '?'))
 	  || (TARGET_THUMB2 && (code == '!'))
 	  || (TARGET_THUMB && (code == '_')));
@@ -19958,7 +20325,7 @@ struct builtin_description
   const enum rtx_code      comparison;
   const unsigned int       flag;
 };
-  
+
 static const struct builtin_description bdesc_2arg[] =
 {
 #define IWMMXT_BUILTIN(code, string, builtin) \
@@ -23752,7 +24119,7 @@ arm_dbx_register_number (unsigned int regno)
   if (IS_FPA_REGNUM (regno))
     return (TARGET_AAPCS_BASED ? 96 : 16) + regno - FIRST_FPA_REGNUM;
 
-  if (IS_VFP_REGNUM (regno))
+  if (regno >= FIRST_VFP_REGNUM && regno <= LAST_HI_VFP_REGNUM)
     {
       /* See comment in arm_dwarf_register_span.  */
       if (VFP_REGNO_OK_FOR_SINGLE (regno))
@@ -23766,6 +24133,13 @@ arm_dbx_register_number (unsigned int regno)
 
   if (IS_IWMMXT_REGNUM (regno))
     return 112 + regno - FIRST_IWMMXT_REGNUM;
+
+  if (regno == CC_REGNUM || regno == VFPCC_REGNUM)
+    /* These are not really registers.  */
+    return -1;
+
+  if (regno == CC_REGNUM + 2 /* sfp */ || regno == CC_REGNUM + 3 /* afp */)
+    return 11;                          /* r11 = fp */
 
   gcc_unreachable ();
 }
@@ -24656,6 +25030,9 @@ arm_conditional_register_usage (void)
 	global_regs[ARM_HARD_FRAME_POINTER_REGNUM] = 1;
     }
   SUBTARGET_CONDITIONAL_REGISTER_USAGE
+
+  if (TARGET_R9_TP && !fixed_regs[9])
+    error ("can not use -mtp=r9 when r9 is not a fixed register");
 }
 
 static reg_class_t
@@ -24717,10 +25094,10 @@ int
 vfp3_const_double_for_fract_bits (rtx operand)
 {
   REAL_VALUE_TYPE r0;
-  
+
   if (GET_CODE (operand) != CONST_DOUBLE)
     return 0;
-  
+
   REAL_VALUE_FROM_CONST_DOUBLE (r0, operand);
   if (exact_real_inverse (DFmode, &r0))
     {

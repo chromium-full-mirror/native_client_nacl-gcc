@@ -2,7 +2,7 @@
 @ Division routines, written by Richard Earnshaw, (rearnsha@armltd.co.uk)
 
 /* Copyright 1995, 1996, 1998, 1999, 2000, 2003, 2004, 2005, 2007, 2008,
-   2009, 2010 Free Software Foundation, Inc.
+   2009, 2010, 2012 Free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -24,10 +24,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 <http://www.gnu.org/licenses/>.  */
 
 /* An executable stack is *not* required for these functions.  */
-#if defined(__ELF__) && defined(__linux__)
+#if defined(__ELF__) && (defined(__linux__) || defined(__native_client__))
 .section .note.GNU-stack,"",%progbits
 .previous
-#endif  /* __ELF__ and __linux__ */
+#endif  /* __ELF__ and (__linux__ or __native_client__) */
 
 #ifdef __ARM_EABI__
 /* Some attributes that are common to all routines in this file.  */
@@ -125,12 +125,28 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # define __prefer_thumb__
 #endif
 
+/* Under Native Client, we must use the nacl-arm-macros.s wrappers
+   on certain instructions.  */
+#ifdef __native_client__
+# define SFI(insn)	CONCAT2 (sfi_, insn)
+# define ADD_SP		sfi_sp add sp, sp,
+# define SUB_SP		sfi_sp sub sp, sp,
+# define PC_IN_POP	lr
+# define RET_TO_POP	sfi_bx	lr
+#else
+# define SFI(insn)	insn
+# define ADD_SP		add sp, sp,
+# define SUB_SP		sub sp, sp,
+# define PC_IN_POP	pc
+# define RET_TO_POP	/* We loaded directly into the pc.  */
+#endif
+
 /* How to return from a function call depends on the architecture variant.  */
 
 #if (__ARM_ARCH__ > 4) || defined(__ARM_ARCH_4T__)
 
-# define RET		bx	lr
-# define RETc(x)	bx##x	lr
+# define RET		SFI(bx)		lr
+# define RETc(x)	SFI(bx##x)	lr
 
 /* Special precautions for interworking on armv4t.  */
 # if (__ARM_ARCH__ == 4)
@@ -230,17 +246,19 @@ LSYM(Lend_fde):
 	/* Mark LR as restored.  */
 97:	cfi_pop 97b - \unwind, 0xe, 0x0
 	.endif
-	bx\cond	lr
+	SFI(bx\cond)	lr
 #else
 	/* Caller is responsible for providing IT instruction.  */
 	.ifc "\regs",""
-	ldr\cond	pc, [sp], #8
+	ldr\cond	PC_IN_POP, [sp], #8
+	RET_TO_POP
 	.else
 # if defined(__thumb2__)
-	pop\cond	{\regs, pc}
+	pop\cond	{\regs, PC_IN_POP}
 # else
-	ldm\cond\dirn	sp!, {\regs, pc}
+	ldm\cond\dirn	sp!, {\regs, PC_IN_POP}
 # endif
+	RET_TO_POP
 	.endif
 #endif
 .endm
@@ -293,7 +311,7 @@ LSYM(Lend_fde):
 .macro ARM_LDIV0 name signed
 	str	lr, [sp, #-8]!
 98:	cfi_push 98b - __\name, 0xe, -0x8, 0x8
-	bl	SYM (__div0) __PLT__
+	SFI(bl)	SYM (__div0) __PLT__
 	mov	r0, #0			@ About as wrong as it could be.
 	RETLDM	unwind=98b
 .endm
@@ -365,7 +383,7 @@ LSYM(Lend_fde):
 .macro THUMB_LDIV0 name signed
 	push	{ r1, lr }
 98:	cfi_push 98b - __\name, 0xe, -0x4, 0x8
-	bl	SYM (__div0)
+	SFI(bl)	SYM (__div0)
 	mov	r0, #0			@ About as wrong as it could be.
 #if defined (__INTERWORKING__)
 	pop	{ r1, r2 }
@@ -438,7 +456,7 @@ SYM (__\name):
 .endm
 #define EQUIV .thumb_set
 .macro  ARM_CALL name
-	bl	__\name
+	SFI(bl)	__\name
 .endm
 
 #elif defined(__INTERWORKING_STUBS__)
@@ -456,7 +474,7 @@ _L__\name:
 /* Branch directly to a function declared with ARM_FUNC_START.
    Must be called in arm mode.  */
 .macro  ARM_CALL name
-	bl	_L__\name
+	SFI(bl)	_L__\name
 .endm
 
 #else /* !(__INTERWORKING_STUBS__ || __thumb2__) */
@@ -474,7 +492,7 @@ SYM (__\name):
 .endm
 #define EQUIV .set
 .macro  ARM_CALL name
-	bl	__\name
+	SFI(bl)	__\name
 .endm
 #endif
 
@@ -566,13 +584,29 @@ pc		.req	r15
 	clz	\result, \divisor
 	sub	\curbit, \result, \curbit
 	rsbs	\curbit, \curbit, #31
+# ifdef __native_client__
+	/* Native Client does not support loading directly into pc.
+	   Its indirect branch targets must be aligned to 16 bytes.
+	   So we must pad each unrolled iteration (below) up to be four
+	   instructions, and use a temporary register for the computed pc.  */
+	adr	\result, 1f
+	addne	\curbit, \result, \curbit, lsl #4
+	mov	\result, #0
+	sfi_bx	\curbit
+.p2align 4
+1:
+# else
 	addne	\curbit, \curbit, \curbit, lsl #1
 	mov	\result, #0
 	addne	pc, pc, \curbit, lsl #2
 	nop
+# endif
 	.set	shift, 32
 	.rept	32
 	.set	shift, shift - 1
+# ifdef __native_client__
+.p2align 4
+# endif
 	cmp	\dividend, \divisor, lsl #shift
 	adc	\result, \result, \result
 	subcs	\dividend, \dividend, \divisor, lsl #shift
@@ -688,11 +722,25 @@ pc		.req	r15
 	clz	\spare, \dividend
 	sub	\order, \order, \spare
 	rsbs	\order, \order, #31
+# ifdef __native_client__
+	/* Native Client does not support loading directly into pc.
+	   Its indirect branch targets must be aligned to 16 bytes.
+	   So we must pad each unrolled iteration (below) up to be four
+	   instructions, and use a temporary register for the computed pc.  */
+	adr	\spare, 1f
+	addne	\spare, \spare, \order, lsl #4
+.p2align 4
+1:
+# else
 	addne	pc, pc, \order, lsl #3
 	nop
+# endif
 	.set	shift, 32
 	.rept	32
 	.set	shift, shift - 1
+# ifdef __native_client__
+.p2align 4
+# endif
 	cmp	\dividend, \divisor, lsl #shift
 	subcs	\dividend, \dividend, \divisor, lsl #shift
 	.endr
@@ -1003,7 +1051,7 @@ FUNC_START aeabi_uidivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	push	{r0, r1, lr}
-	bl	LSYM(udivsi3_skip_div0_test)
+	SFI(bl)	LSYM(udivsi3_skip_div0_test)
 	POP	{r1, r2, r3}
 	mul	r2, r0
 	sub	r1, r1, r2
@@ -1021,7 +1069,7 @@ ARM_FUNC_START aeabi_uidivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	stmfd	sp!, { r0, r1, lr }
-	bl	LSYM(udivsi3_skip_div0_test)
+	SFI(bl)	LSYM(udivsi3_skip_div0_test)
 	ldmfd	sp!, { r1, r2, lr }
 	mul	r3, r2, r0
 	sub	r1, r1, r3
@@ -1189,7 +1237,7 @@ FUNC_START aeabi_idivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	push	{r0, r1, lr}
-	bl	LSYM(divsi3_skip_div0_test)
+	SFI(bl)	LSYM(divsi3_skip_div0_test)
 	POP	{r1, r2, r3}
 	mul	r2, r0
 	sub	r1, r1, r2
@@ -1207,7 +1255,7 @@ ARM_FUNC_START aeabi_idivmod
 	cmp	r1, #0
 	beq	LSYM(Ldiv0)
 	stmfd	sp!, { r0, r1, lr }
-	bl	LSYM(divsi3_skip_div0_test)
+	SFI(bl)	LSYM(divsi3_skip_div0_test)
 	ldmfd	sp!, { r1, r2, lr }
 	mul	r3, r2, r0
 	sub	r1, r1, r3
@@ -1325,7 +1373,7 @@ LSYM(Lover12):
 
 	do_push	{r1, lr}
 	mov	r0, #SIGFPE
-	bl	SYM(raise) __PLT__
+	SFI(bl)	SYM(raise) __PLT__
 	RETLDM	r1
 
 #ifdef __ARM_EABI__
@@ -1559,18 +1607,18 @@ ARM_FUNC_START clzdi2
 	bne	1f
 # ifdef __ARMEB__
 	mov	r0, xxl
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 	add	r0, r0, #32
 	b 2f
 1:
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 # else
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 	add	r0, r0, #32
 	b 2f
 1:
 	mov	r0, xxh
-	bl	__clzsi2
+	SFI(bl)	__clzsi2
 # endif
 2:
 # if defined(__ARM_ARCH_6M__)

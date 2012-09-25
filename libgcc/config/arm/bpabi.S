@@ -1,6 +1,6 @@
 /* Miscellaneous BPABI functions.
 
-   Copyright (C) 2003, 2004, 2007, 2008, 2009, 2010
+   Copyright (C) 2003, 2004, 2007, 2008, 2009, 2010, 2012
    Free Software Foundation, Inc.
    Contributed by CodeSourcery, LLC.
 
@@ -126,16 +126,16 @@ ARM_FUNC_START aeabi_ulcmp
 ARM_FUNC_START aeabi_ldivmod
 	test_div_by_zero signed
 
-	sub sp, sp, #8
+	SUB_SP #8
 #if defined(__thumb2__)
 	mov ip, sp
 	push {ip, lr}
 #else
 	do_push {sp, lr}
 #endif
-	bl SYM(__gnu_ldivmod_helper) __PLT__
+	SFI(bl) SYM(__gnu_ldivmod_helper) __PLT__
 	ldr lr, [sp, #4]
-	add sp, sp, #8
+	ADD_SP #8
 	do_pop {r2, r3}
 	RET
 	
@@ -146,18 +146,17 @@ ARM_FUNC_START aeabi_ldivmod
 ARM_FUNC_START aeabi_uldivmod
 	test_div_by_zero unsigned
 
-	sub sp, sp, #8
+	SUB_SP #8
 #if defined(__thumb2__)
 	mov ip, sp
 	push {ip, lr}
 #else
 	do_push {sp, lr}
 #endif
-	bl SYM(__gnu_uldivmod_helper) __PLT__
+	SFI(bl) SYM(__gnu_uldivmod_helper) __PLT__
 	ldr lr, [sp, #4]
-	add sp, sp, #8
+	ADD_SP #8
 	do_pop {r2, r3}
 	RET
 	
 #endif /* L_aeabi_divmod */
-	

@@ -1,5 +1,5 @@
 ;; ARM VFP instruction patterns
-;; Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010
+;; Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010, 2012
 ;; Free Software Foundation, Inc.
 ;; Written by CodeSourcery.
 ;;
@@ -60,15 +60,15 @@
   switch (which_alternative)
     {
     case 0: case 1:
-      return \"mov%?\\t%0, %1\";
+      return \"%j0mov%?\\t%0, %1\";
     case 2:
-      return \"mvn%?\\t%0, #%B1\";
+      return \"%j0mvn%?\\t%0, #%B1\";
     case 3:
-      return \"movw%?\\t%0, %1\";
+      return \"%j0movw%?\\t%0, %1\";
     case 4:
-      return \"ldr%?\\t%0, %1\";
+      return \"%j0%b1ldr%?\\t%0, %1\";
     case 5:
-      return \"str%?\\t%1, %0\";
+      return \"%j1%b0str%?\\t%1, %0\";
     case 6:
       return \"fmsr%?\\t%0, %1\\t%@ int\";
     case 7:
@@ -85,7 +85,14 @@
    (set_attr "type" "*,*,*,*,load1,store1,r_2_f,f_2_r,fcpys,f_loads,f_stores")
    (set_attr "insn" "mov,mov,mvn,mov,*,*,*,*,*,*,*")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
-   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")]
+   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")
+   (set (attr "length") (cond [(eq_attr "alternative" "0,1,2,3")
+			       (attr "length_sp_op0")
+			       (eq_attr "alternative" "4,9")
+			       (attr "length_breg_op1_sp_op0")
+			       (eq_attr "alternative" "5,10")
+			       (attr "length_breg_op0_sp_op1")]
+			      (const_int 4)))]
 )
 
 ;; See thumb2.md:thumb2_movsi_insn for an explanation of the split
@@ -142,7 +149,7 @@
   "*
   switch (which_alternative)
     {
-    case 0: 
+    case 0:
     case 1:
     case 2:
     case 3:
@@ -168,15 +175,21 @@
   "
   [(set_attr "type" "*,*,*,*,load2,load2,store2,r_2_f,f_2_r,ffarithd,f_loadd,f_stored")
    (set_attr "neon_type" "*,*,*,*,*,*,*,neon_mcr_2_mcrr,neon_mrrc,neon_vmov,*,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "1,4,5,6") (const_int 8)
+   (set (attr "length") (cond [(eq_attr "alternative" "1") (const_int 8)
                               (eq_attr "alternative" "2") (const_int 12)
                               (eq_attr "alternative" "3") (const_int 16)
+			       (eq_attr "alternative" "4,5")
+			       (attr "length_breg_op1_plus_1")
+			       (eq_attr "alternative" "6")
+			       (attr "length_breg_op0_plus_1")
                               (eq_attr "alternative" "9")
                                (if_then_else
                                  (match_test "TARGET_VFP_SINGLE")
                                  (const_int 8)
-                                 (const_int 4))]
-                              (const_int 4)))
+				(const_int 4))
+			       (eq_attr "alternative" "10")
+			       (attr "length_breg_op1")]
+                              (attr "length_breg_op0")))
    (set_attr "pool_range"     "*,*,*,*,1020,4096,*,*,*,*,1020,*")
    (set_attr "neg_pool_range" "*,*,*,*,1004,0,*,*,*,*,1004,*")
    (set_attr "arch"           "t2,any,any,any,a,t2,any,any,any,any,any,any")]
@@ -191,7 +204,7 @@
   "*
   switch (which_alternative)
     {
-    case 0: 
+    case 0:
     case 1:
     case 2:
     case 3:
@@ -216,15 +229,17 @@
    (set (attr "length") (cond [(eq_attr "alternative" "1") (const_int 8)
                                (eq_attr "alternative" "2") (const_int 12)
                                (eq_attr "alternative" "3") (const_int 16)
-                               (eq_attr "alternative" "4,5,6") 
-			       (symbol_ref 
+                               (eq_attr "alternative" "4,5,6")
+			       (symbol_ref
 				"arm_count_output_move_double_insns (operands) \
-                                 * 4")]
-                              (const_int 4)))
+                                 * 4")
+			       (eq_attr "alternative" "10")
+			       (attr "length_breg_op1")]
+                              (attr "length_breg_op0")))
    (set_attr "predicable"    "yes")
    (set_attr "pool_range"     "*,*,*,*,1020,4096,*,*,*,*,1020,*")
    (set_attr "neg_pool_range" "*,*,*,*,1004,0,*,*,*,*,1004,*")
-   (set (attr "ce_count") 
+   (set (attr "ce_count")
 	(symbol_ref "get_attr_length (insn) / 4"))
    (set_attr "arch"           "t2,any,any,any,a,t2,any,any,any,any,any,any")]
  )
@@ -244,9 +259,9 @@
     case 1:     /* memory from S register */
       return \"vst1.16\\t{%z1}, %A0\";
     case 2:     /* ARM register from memory */
-      return \"ldrh\\t%0, %1\\t%@ __fp16\";
+      return \"%b1ldrh\\t%0, %1\\t%@ __fp16\";
     case 3:     /* memory from ARM register */
-      return \"strh\\t%1, %0\\t%@ __fp16\";
+      return \"%b0strh\\t%1, %0\\t%@ __fp16\";
     case 4:	/* S register from S register */
       return \"fcpys\\t%0, %1\";
     case 5:	/* ARM register from ARM register */
@@ -281,7 +296,13 @@
   [(set_attr "conds" "unconditional")
    (set_attr "type" "*,*,load1,store1,fcpys,*,r_2_f,f_2_r,*")
    (set_attr "neon_type" "neon_vld1_1_2_regs,neon_vst1_1_2_regs_vst2_2_regs,*,*,*,*,*,*,*")
-   (set_attr "length" "4,4,4,4,4,4,4,4,8")]
+   (set (attr "length") (cond [(eq_attr "alternative" "2")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "3")
+			       (attr "length_breg_op0")
+			       (eq_attr "alternative" "8")
+			       (const_int 8)]
+			      (const_int 4)))]
 )
 
 ;; FP16 without element load/store instructions.
@@ -295,9 +316,9 @@
   switch (which_alternative)
     {
     case 0:     /* ARM register from memory */
-      return \"ldrh\\t%0, %1\\t%@ __fp16\";
+      return \"%b1ldrh\\t%0, %1\\t%@ __fp16\";
     case 1:     /* memory from ARM register */
-      return \"strh\\t%1, %0\\t%@ __fp16\";
+      return \"%b0strh\\t%1, %0\\t%@ __fp16\";
     case 2:	/* S register from S register */
       return \"fcpys\\t%0, %1\";
     case 3:	/* ARM register from ARM register */
@@ -331,7 +352,13 @@
   "
   [(set_attr "conds" "unconditional")
    (set_attr "type" "load1,store1,fcpys,*,r_2_f,f_2_r,*")
-   (set_attr "length" "4,4,4,4,4,4,8")]
+   (set (attr "length") (cond [(eq_attr "alternative" "0")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "1")
+			       (attr "length_breg_op0")
+			       (eq_attr "alternative" "6")
+			       (const_int 8)]
+			      (const_int 4)))]
 )
 
 
@@ -357,9 +384,9 @@
     case 3: case 4:
       return output_move_vfp (operands);
     case 5:
-      return \"ldr%?\\t%0, %1\\t%@ float\";
+      return \"%b1ldr%?\\t%0, %1\\t%@ float\";
     case 6:
-      return \"str%?\\t%1, %0\\t%@ float\";
+      return \"%b0str%?\\t%1, %0\\t%@ float\";
     case 7:
       return \"fcpys%?\\t%0, %1\";
     case 8:
@@ -373,7 +400,12 @@
      "r_2_f,f_2_r,fconsts,f_loads,f_stores,load1,store1,fcpys,*")
    (set_attr "insn" "*,*,*,*,*,*,*,*,mov")
    (set_attr "pool_range" "*,*,*,1020,*,4096,*,*,*")
-   (set_attr "neg_pool_range" "*,*,*,1008,*,4080,*,*,*")]
+   (set_attr "neg_pool_range" "*,*,*,1008,*,4080,*,*,*")
+   (set (attr "length") (cond [(eq_attr "alternative" "3,5")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "4,6")
+			       (attr "length_breg_op0")]
+			      (const_string "*")))]
 )
 
 (define_insn "*thumb2_movsf_vfp"
@@ -458,6 +490,17 @@
 				 (const_int 8)
 				 (const_int 4))]
 			      (const_int 4)))
+   (set (attr "length") (cond [(eq_attr "alternative" "3")
+			       (attr "length_breg_op1")
+			       (eq_attr "alternative" "4")
+			       (attr "length_breg_op0")
+			       (eq_attr "alternative" "5,6,8") (const_int 8)
+ 			       (eq_attr "alternative" "7")
+			       (if_then_else
+				(match_test "TARGET_VFP_SINGLE")
+				(const_int 8)
+				(const_int 4))]
+ 			      (const_int 4)))
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,*,*,1020,*,1020,*,*,*")
    (set_attr "neg_pool_range" "*,*,*,1004,*,1004,*,*,*")]
@@ -1144,14 +1187,14 @@
    (set_attr "type" "fcmpd")]
 )
 
-;; Fixed point to floating point conversions. 
+;; Fixed point to floating point conversions.
 (define_code_iterator FCVT [unsigned_float float])
 (define_code_attr FCVTI32typename [(unsigned_float "u32") (float "s32")])
 
 (define_insn "*combine_vcvt_f32_<FCVTI32typename>"
   [(set (match_operand:SF 0 "s_register_operand" "=t")
 	(mult:SF (FCVT:SF (match_operand:SI 1 "s_register_operand" "0"))
-		 (match_operand 2 
+		 (match_operand 2
 			"const_double_vcvt_power_of_two_reciprocal" "Dt")))]
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math"
   "vcvt.f32.<FCVTI32typename>\\t%0, %1, %v2"
@@ -1164,9 +1207,9 @@
 (define_insn "*combine_vcvt_f64_<FCVTI32typename>"
   [(set (match_operand:DF 0 "s_register_operand" "=x,x,w")
 	(mult:DF (FCVT:DF (match_operand:SI 1 "s_register_operand" "r,t,r"))
-		 (match_operand 2 
+		 (match_operand 2
 		     "const_double_vcvt_power_of_two_reciprocal" "Dt,Dt,Dt")))]
-  "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math 
+  "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math
   && !TARGET_VFP_SINGLE"
   "@
   vmov.f32\\t%0, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2

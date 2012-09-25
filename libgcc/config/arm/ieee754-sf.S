@@ -1,6 +1,7 @@
 /* ieee754-sf.S single-precision floating point support for ARM
 
-   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2012
+	Free Software Foundation, Inc.
    Contributed by Nicolas Pitre (nico@cam.org)
 
    This file is free software; you can redistribute it and/or modify it
@@ -834,7 +835,7 @@ ARM_FUNC_ALIAS eqsf2 cmpsf2
 
 	@ Compare values.
 	@ Note that 0.0 is equal to -0.0.
-2:	add	sp, sp, #4
+2:	ADD_SP	#4
 	orrs	ip, r2, r3, lsr #1	@ test if both are 0, clear C flag
 	do_it	ne
 	teqne	r0, r1			@ if not 0 compare sign
