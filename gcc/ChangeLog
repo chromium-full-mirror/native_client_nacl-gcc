@@ -1,3 +1,13 @@
+2012-09-25  Roland McGrath  <mcgrathr@google.com>
+
+	Backport from mainline
+	2012-06-11  Roland McGrath  <mcgrathr@google.com>
+
+	* dwarf2out.c (const_ok_for_output_1): Detect a TLS UNSPEC using
+	SYMBOL_REF_TLS_MODEL rather than DECL_THREAD_LOCAL_P, in case it's
+	not a VAR_DECL.  Also don't limit it to UNSPECs with exactly one
+	operand.
+
 2012-09-24  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* tree-streamer-in.c (unpack_ts_type_common_value_fields): Stream in
