@@ -2,6 +2,186 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-09-27  Dehao Chen  <dehao@google.com>
+
+	* tree.h (tree_constructor): Remove IS_UNKNOWN_LOCATION.
+	(extern void protected_set_expr_location): Likewise.
+	(function_args_iter_next): Likewise.
+	(inlined_function_outer_scope_p): Likewise.
+	* input.h (IS_UNKNOWN_LOCATION): Likewise.
+	* fold-const.c (expr_location_or): Likewise.
+	* lto-cgraph.c (output_node_opt_summary): Likewise.
+	* dwarf2out.c (add_src_coords_attributes): Likewise.
+	* tree-eh.c (lower_try_finally_dup_block): Likewise.
+	* profile.c (branch_prob):
+	* cfgexpand.c (expand_gimple_cond): Likewise.
+	(expand_gimple_basic_block): Likewise.
+	(construct_exit_block): Likewise.
+	(gimple_expand_cfg): Likewise.
+	* cfgcleanup.c (try_forward_edges): Likewise.
+	* tree-ssa-live.c (remove_unused_scope_block_p): Likewise.
+	(dump_scope_block): Likewise.
+	* ipa-prop.c (ipa_write_jump_function): Likewise.
+	* rtl.h (extern void rtl_check_failed_flag): Likewise.
+	* gimple.h (gimple_set_location): Likewise.
+	(gimple_has_location): Likewise.
+	* cfgrtl.c (unique_locus_on_edge_between_p): Likewise.
+	(force_nonfallthru_and_redirect): Likewise.
+	(fixup_reorder_chain): Likewise.
+	(cfg_layout_merge_blocks): Likewise.
+
+2012-09-27  Meador Inge  <meadori@codesourcery.com>
+
+	* gcc-ar.c (main): Handle the returning of the sub-process error
+	code correctly.
+
+2012-09-27  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* lower-subreg.c (enum classify_move_insn): Rename
+	SIMPLE_PSEUDO_REG_MOVE to DECOMPOSABLE_SIMPLE_MOVE.
+	(find_decomposable_subregs): Update.
+	(decompose_multiword_subregs): Add DECOMPOSE_COPIES parameter.
+	Only mark pseudo-to-pseudo copies as DECOMPOSABLE_SIMPLE_MOVE
+	if that parameter is true.
+	(rest_of_handle_lower_subreg): Call decompose_multiword_subregs
+	with DECOMPOSE_COPIES false.
+	(rest_of_handle_lower_subreg2): Call decompose_multiword_subregs
+	with DECOMPOSE_COPIES true.
+
+2012-09-27  Marek Polacek  <polacek@redhat.com>
+
+	* doc/gcov.texi (Gcov Data Files): Fix a typo.
+
+2012-09-27  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54703
+	* simplify-rtx.c (simplify_binary_operation_1): Perform
+	(x - (x & y)) -> (x & ~y) optimization only for integral
+	modes.
+
+2012-09-27  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c/53024
+	PR c++/54427
+	* doc/extend.texi (Vector Extensions): C++ improvements.
+	Power of 2 size requirement.
+
+2012-09-27  Richard Guenther  <rguenther@suse.de>
+
+	PR lto/54709
+	* lto-symtab.c (resolution_guessed_p): Remove.
+	(set_resolution_guessed): Likewise.
+	(lto_symtab_register_decl): Remove assert.
+	(lto_symtab_resolve_symbols): Do not alter symbol resolutions
+	and return the prevailing symbol, checking for multiple prevailing
+	symbols here.
+	(lto_symtab_merge_decls_1): Use the result from
+	lto_symtab_resolve_symbols.  Do not alter symbol resolutions.
+
+2012-09-26  Steve Ellcey  <sellcey@mips.com>
+
+	PR web/54711
+	* doc/install.texi: Fix example.
+
+2012-09-26  Dehao Chen  <dehao@google.com>
+
+	 * tree-ssa-live.c (clear_unused_block_pointer): Use explicitit (void)
+	for function parameter.
+	(remove_unused_locals): Don't use LOCATION_BLOCK if it is NULL.
+
+2012-09-26  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* doc/extend.texi (bswap Builtins): Change signed types to unsigned
+	types.
+
+2012-09-26  Ian Lance Taylor  <iant@google.com>
+
+	* diagnostic.c (bt_callback): Cast pc when calling fprintf.
+
+2012-09-26  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	PR tree-optimization/54674
+	* gimple-ssa-strength-reduction.c (analyze_increments): Don't
+	introduce a multiplication with a pointer operand.
+
+2012-09-26  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR middle-end/54635
+	* doc/tm.texi.in (TARGET_MODE_DEPENDENT_ADDRESS_P): Document new
+	parameter addrspace.
+	* doc/tm.texi: Regenerate.
+	* target.def (mode_dependent_address_p): Add addr_space_t parameter.
+	* targhooks.h (default_mode_dependent_address_p): Ditto.
+	* targhooks.c (default_mode_dependent_address_p): Ditto.
+	* expr.c (convert_move): Pass address space to mode_dependent_address_p.
+	* combine.c (combine_simplify_rtx): Ditto.
+	(make_extraction): Ditto.
+	(simplify_shift_const_1): Ditto.
+	(gen_lowpart_for_combine): Ditto.
+	* lower-subreg.c (simple_move_operand): Ditto.
+	* recog.c (simplify_while_replacing): Ditto.
+	(offsettable_address_addr_space_p): Ditto.
+	(mode_dependent_address_p): Ditto.
+	* simplify-rtx.c (simplify_unary_operation_1): Ditto.
+	(simplify_subreg): Ditto.
+	* config/m68k/m68k.md: Ditto.
+	* config/vax/vax.md: Ditto.
+	* config/vax/constraints.md (Q): Ditto.
+	* config/vax/predicates.md (indexed_memory_operand): Ditto.
+	* config/alpha/alpha.c (alpha_mode_dependent_address_p): Add
+	unused addr_space_t parameter.
+	* config/avr/avr.c (avr_mode_dependent_address_p): Ditto.
+	* config/h8300/h8300.c (h8300_mode_dependent_address_p): Ditto.
+	* config/m32r/m32r.c (m32r_mode_dependent_address_p): Ditto.
+	* config/rs6000/rs6000.c (rs6000_mode_dependent_address_p): Ditto.
+	* config/rx/rx.c (rx_mode_dependent_address_p): Ditto.
+	* config/sparc/sparc.c (sparc_mode_dependent_address_p): Ditto.
+	* config/stormy16/stormy16.c (xstormy16_mode_dependent_address_p):
+	Ditto.
+	* config/vax/vax.c (vax_mode_dependent_address_p): Ditto.
+	* config/xtensa/xtensa.c (xtensa_mode_dependent_address_p): Ditto.
+
+2012-09-26  Christophe Lyon <christophe.lyon@linaro.org>
+
+	* tree-ssa-math-opts.c (bswap_stats): Add found_16bit field.
+	(execute_optimize_bswap): Add support for builtin_bswap16.
+
+2012-09-26  Richard Guenther  <rguenther@suse.de>
+
+	* tree.h (DECL_IS_BUILTIN): Compare LOCATION_LOCUS.
+
+2012-09-26  Ian Lance Taylor  <iant@google.com>
+
+	* diagnostic.c: Include "demangle.h" and "backtrace.h".
+	(bt_stop): New static array.
+	(bt_callback, bt_err_callback): New static functions.
+	(diagnostic_action_after_output): Call backtrace_full for DK_ICE.
+	* Makefile.in (BACKTRACE): New variable.
+	(BACKTRACEINC, LIBBACKTRACE): New variables.
+	(BACKTRACE_H): New variable.
+	(LIBDEPS, LIBS): Add $(LIBBACKTRACE).
+	(INCLUDES): Add $(BACKTRACEINC).
+	(diagnostic.o): Depend upon $(DEMANGLE_H) and $(BACKTRACE_H).
+
+2012-09-25  Segher Boessenkool  <segher@kernel.crashing.org>
+
+	PR target/51274
+	PR target/53087
+	* config/rs6000/rs6000.md (ne0si): Remove unnecessary
+	earlyclobber.  Merge with...
+	(ne0di): ... to...
+	(ne0_<mode>): New.
+	(plus_ne0si): Merge with...
+	(plus_ne0di): ... to...
+	(plus_ne0_<mode>): New.
+	(compare_plus_ne0si): Merge with...
+	(compare_plus_ne0di)... to...
+	(compare_plus_ne0_<mode>): New.
+	(compare_plus_ne0_<mode>_1): New.
+	(plus_ne0si_compare): Merge with...
+	(plus_ne0di_compare)... to...
+	(plus_ne0_<mode>_compare): New.
+
 2012-09-25  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/54089
@@ -42,12 +222,6 @@
 	PR lto/54625
 	* lto-symtab.c (lto_symtab_merge_cgraph_nodes_1): Do not merge
 	cgraph nodes for builtins.
-
-2012-09-25  Dehao Chen  <dehao@google.com>
-
-	PR middle-end/54645
-	* c-family/c-pch.c (c_common_read_pch): Rebuild the location_adhoc_data
-	map when read in the pch.
 
 2012-09-25  Jakub Jelinek  <jakub@redhat.com>
 
