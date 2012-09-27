@@ -8681,7 +8681,7 @@
     return output_return_instruction (const_true_rtx, true, false, false);
   }"
   [(set_attr "type" "load1")
-   (set_attr "length" "12")
+   (set (attr "length") (attr "length_sfi_bx_plus_2"))
    (set_attr "predicable" "yes")]
 )
 
@@ -8702,7 +8702,7 @@
     return output_return_instruction (operands[0], true, false, false);
   }"
   [(set_attr "conds" "use")
-   (set_attr "length" "12")
+   (set (attr "length") (attr "length_sfi_bx_plus_2"))
    (set_attr "type" "load1")]
 )
 
