@@ -873,6 +873,7 @@ simplify_unary_operation_1 (enum rtx_code code, enum machine_mode mode, rtx op)
       /* A truncate of a memory is just loading the low part of the memory
 	 if we are not changing the meaning of the address. */
       if (GET_CODE (op) == MEM
+	  && !VECTOR_MODE_P (mode)
 	  && !MEM_VOLATILE_P (op)
 	  && !mode_dependent_address_p (XEXP (op, 0), MEM_ADDR_SPACE (op)))
 	return rtl_hooks.gen_lowpart_no_emit (mode, op);
@@ -3246,6 +3247,23 @@ simplify_binary_operation_1 (enum rtx_code code, enum machine_mode mode,
 	      return gen_rtx_CONST_VECTOR (mode, v);
 	    }
 
+	  /* Recognize the identity.  */
+	  if (GET_MODE (trueop0) == mode)
+	    {
+	      bool maybe_ident = true;
+	      for (int i = 0; i < XVECLEN (trueop1, 0); i++)
+		{
+		  rtx j = XVECEXP (trueop1, 0, i);
+		  if (!CONST_INT_P (j) || INTVAL (j) != i)
+		    {
+		      maybe_ident = false;
+		      break;
+		    }
+		}
+	      if (maybe_ident)
+		return trueop0;
+	    }
+
 	  /* If we build {a,b} then permute it, build the result directly.  */
 	  if (XVECLEN (trueop1, 0) == 2
 	      && CONST_INT_P (XVECEXP (trueop1, 0, 0))
@@ -3370,6 +3388,24 @@ simplify_binary_operation_1 (enum rtx_code code, enum machine_mode mode,
 	      }
 
 	    return gen_rtx_CONST_VECTOR (mode, v);
+	  }
+
+	/* Try to merge VEC_SELECTs from the same vector into a single one.  */
+	if (GET_CODE (trueop0) == VEC_SELECT
+	    && GET_CODE (trueop1) == VEC_SELECT
+	    && rtx_equal_p (XEXP (trueop0, 0), XEXP (trueop1, 0)))
+	  {
+	    rtx par0 = XEXP (trueop0, 1);
+	    rtx par1 = XEXP (trueop1, 1);
+	    int len0 = XVECLEN (par0, 0);
+	    int len1 = XVECLEN (par1, 0);
+	    rtvec vec = rtvec_alloc (len0 + len1);
+	    for (int i = 0; i < len0; i++)
+	      RTVEC_ELT (vec, i) = XVECEXP (par0, 0, i);
+	    for (int i = 0; i < len1; i++)
+	      RTVEC_ELT (vec, len0 + i) = XVECEXP (par1, 0, i);
+	    return simplify_gen_binary (VEC_SELECT, mode, XEXP (trueop0, 0),
+					gen_rtx_PARALLEL (VOIDmode, vec));
 	  }
       }
       return 0;
@@ -5687,6 +5723,28 @@ simplify_subreg (enum machine_mode outermode, rtx op,
       if (GET_CODE (op) == ZERO_EXTEND
 	  && bitpos >= GET_MODE_PRECISION (GET_MODE (XEXP (op, 0))))
 	return CONST0_RTX (outermode);
+    }
+
+  /* Simplify (subreg:SI (op:DI ((x:DI) (y:DI)), 0)
+     to (op:SI (subreg:SI (x:DI) 0) (subreg:SI (x:DI) 0)), where
+     the outer subreg is effectively a truncation to the original mode.  */
+  if ((GET_CODE (op) == PLUS
+       || GET_CODE (op) == MINUS
+       || GET_CODE (op) == MULT)
+      && SCALAR_INT_MODE_P (outermode)
+      && SCALAR_INT_MODE_P (innermode)
+      && GET_MODE_PRECISION (outermode) < GET_MODE_PRECISION (innermode)
+      && byte == subreg_lowpart_offset (outermode, innermode))
+    {
+      rtx op0 = simplify_gen_subreg (outermode, XEXP (op, 0),
+                                     innermode, byte);
+      if (op0)
+        {
+          rtx op1 = simplify_gen_subreg (outermode, XEXP (op, 1),
+                                         innermode, byte);
+          if (op1)
+            return simplify_gen_binary (GET_CODE (op), outermode, op0, op1);
+        }
     }
 
   /* Simplify (subreg:QI (lshiftrt:SI (sign_extend:SI (x:QI)) C), 0) into

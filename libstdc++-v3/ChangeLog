@@ -1,3 +1,110 @@
+2012-10-02  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	PR other/53889
+	* include/std/mutex (__recursive_mutex_base::~__recursive_mutex_base):
+	Use __gthread_recursive_mutex_destroy.
+	(__recursive_mutex_base::_S_destroy): Remove.
+	(__recursive_mutex_base::_S_destroy_win32): Likewise.
+	* include/ext/concurrence.h (__recursive_mutex::~__recursive_mutex):
+	Use __gthread_recursive_mutex_destroy.
+	(__recursive_mutex::_S_destroy): Remove.
+	(__recursive_mutex::_S_destroy_win32): Likewise.
+
+2012-10-01  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* config/abi/pre/gnu-versioned-namespace.ver: Add more
+	typeinfo/vtable exports.
+
+2012-10-01  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR libstdc++/54757
+	* include/ext/random (rice_distribution<>::operator()): Use std::hypot
+	only if _GLIBCXX_USE_C99_MATH_TR1.
+	* include/ext/random.tcc (rice_distribution<>::__generate_impl):
+	Likewise.
+
+2012-10-01  Daniel Krugler  <daniel.kruegler@googlemail.com>
+
+	* include/std/type_traits (result_of): Provide "SFINAE-friendly"
+	(see N3436) implementation.
+	* testsuite/20_util/result_of/sfinae_friendly_1.cc: New.
+	* testsuite/20_util/result_of/sfinae_friendly_2.cc: Likewise.
+	* testsuite/20_util/make_signed/requirements/typedefs_neg.cc: Tweak
+	dg-error line numbers.
+	* testsuite/20_util/make_unsigned/requirements/typedefs_neg.cc:
+	Likewise.
+	* testsuite/20_util/declval/requirements/1_neg.cc: Likewise.
+
+2012-09-30  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* doc/doxygen/user.cfg.in: Update to doxygen 1.8.2.
+
+2012-09-30  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	* include/ext/ropeimpl.h (__uninitialized_fill_n_a): Fix using
+	declaration.
+	* testsuite/ext/rope/5.cc: New.
+
+2012-09-30  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	PR libstdc++/54577
+	* doc/xml/manual/status_cxx2011.xml: N2350 changes are missing from
+	sequence containers.
+	* doc/html/*: Regenerate.
+
+2012-09-29  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	PR libstdc++/34106
+	* include/parallel/compatibility.h: Remove non-GCC code.
+
+2012-09-28  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* fragment.am (CONFIG_CXXFLAGS): Remove EXTRA_CXX_FLAGS.
+	* libsupc++/Makefile.am (LTCXXCOMPILE): Add EXTRA_CXX_FLAGS here.
+	* src/Makefile.am: Same.
+	* src/c++98/Makefile.am: Same.
+	* src/c++11/Makefile.am: Same.
+	* Makefile.in: Regenerated.
+	* src/Makefile.am: Same.
+	* src/c++11/Makefile.in: Same.
+	* src/c++98/Makefile.in: Same.
+	* include/Makefile.in: Same.
+	* po/Makefile.in: Same.
+	* python/Makefile.in: Same.
+	* testsuite/Makefile.in: Same.
+
+2012-09-28  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* src/c++98/Makefile.am: Fixup PARALLEL_FLAGS.
+
+2012-09-28  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* acinclude.m4 (GLIBCXX_ENABLE_PARALLEL): Remove ENABLE_PARALLEL.
+	* include/Makefile.am: Same.
+	* src/c++98/Makefile.am: Same.
+	* src/Makefile.am: Same.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Same.
+	* configure: Same.
+	* doc/Makefile.in: Same.
+	* include/Makefile.in: Same.
+	* libsupc++/Makefile.in: Same.
+	* po/Makefile.in: Same.
+	* python/Makefile.in: Same.
+	* src/Makefile.in: Same.
+	* testsuite/Makefile.in: Same.
+	* src/c++11/Makefile.in: Same.
+	* src/c++98/Makefile.in: Same.
+
+	* src/c++98/compatibility-debug_list-2.cc: Update comments.
+	* src/c++98/compatibility-debug_list.cc: Same.
+	* src/c++98/compatibility-list-2.cc: Renamed to src/c++98/list-aux-2.cc
+	* src/c++98/compatibility-list.cc: Renamed to src/c++98/list-aux.cc
+	* src/c++98/compatibility-parallel_list-2.cc: Renamed to
+	src/c++98/list_associated-2.cc.
+	* src/c++98/compatibility-parallel_list.cc: Renamed to
+	src/c++98/list_associated.cc.
+
 2012-09-27  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR libstdc++/54727

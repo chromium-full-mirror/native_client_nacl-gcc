@@ -556,7 +556,7 @@ forward_propagate_into_cond (gimple_stmt_iterator *gsi_p)
   /* We can do tree combining on SSA_NAME and comparison expressions.  */
   if (COMPARISON_CLASS_P (cond))
     tmp = forward_propagate_into_comparison_1 (stmt, TREE_CODE (cond),
-					       boolean_type_node,
+					       TREE_TYPE (cond),
 					       TREE_OPERAND (cond, 0),
 					       TREE_OPERAND (cond, 1));
   else if (TREE_CODE (cond) == SSA_NAME)
@@ -571,7 +571,7 @@ forward_propagate_into_cond (gimple_stmt_iterator *gsi_p)
       if (TREE_CODE_CLASS (code) == tcc_comparison)
 	tmp = fold_build2_loc (gimple_location (def_stmt),
 			       code,
-			       boolean_type_node,
+			       TREE_TYPE (cond),
 			       gimple_assign_rhs1 (def_stmt),
 			       gimple_assign_rhs2 (def_stmt));
       else if ((code == BIT_NOT_EXPR
