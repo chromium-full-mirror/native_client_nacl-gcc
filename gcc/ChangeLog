@@ -2,6 +2,39 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-03  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51244
+	* config/sh/sh.md (*mov_t_msb_neg): New insn and two accompanying
+	unnamed split patterns.
+
+2012-10-03  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/50457
+	* config/sh/sh.c (parse_validate_atomic_model_option): Handle name
+	strings in sh_atomic_model.
+	* config/sh/sh.h (TARGET_CPU_CPP_BUILTINS): Move macro implementation
+	to ...
+	* config/sh/sh-c.c (sh_cpu_cpp_builtins): ... this new function.
+	Add __SH1__ and __SH2__ defines.  Add __SH_ATOMIC_MODEL_*__ define.
+	* config/sh/sh-protos.h (sh_atomic_model): Add name and cdef_name
+	variables.
+	(sh_cpu_cpp_builtins): Declare new function.
+
+2012-10-03  Dehao Chen  <dehao@google.com>
+
+	PR middle-end/54782
+	* tree-cfg.c (move_block_to_fn): Update lexical block for phi_args.
+
+2012-10-03  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* reginfo.c (max_regno_since_last_resize): New.
+	(reg_preferred_class, reg_alternate_class): Add assert.
+	(allocate_reg_info): Initialize allocated reg info.
+	(resize_reg_info): Make bigger reg_info and initialize new memory.
+	(reginfo_init): Initialize max_regno_since_last_resize.
+	(setup_reg_classes): Change assert.
+
 2012-10-03  Andrew W. Nosenko <andrew.w.nosenko@gmail.com>
 
 	*  config/i386/driver-i386.c (host_detect_local_cpu): Fix logic
