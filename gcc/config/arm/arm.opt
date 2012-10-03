@@ -227,9 +227,6 @@ EnumValue
 Enum(arm_tp_type) String(cp15) Value(TP_CP15)
 
 EnumValue
-Enum(arm_tp_type) String(r9) Value(TP_R9)
-
-EnumValue
 Enum(arm_tp_type) String(r9-indirect0) Value(TP_R9_INDIRECT0)
 
 EnumValue

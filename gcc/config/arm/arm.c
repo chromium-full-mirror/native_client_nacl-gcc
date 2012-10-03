@@ -1893,7 +1893,7 @@ arm_option_override (void)
   if (target_thread_pointer == TP_AUTO)
     {
       if (TARGET_SFI_NACL1)
-	target_thread_pointer = TP_R9;
+	target_thread_pointer = TP_R9_INDIRECT0;
       else if (arm_arch6k && !TARGET_THUMB1)
 	target_thread_pointer = TP_CP15;
       else
@@ -6291,11 +6291,6 @@ arm_load_tp (rtx target)
     {
       /* Can return in any reg.  */
       emit_insn (gen_load_tp_hard (target));
-    }
-  else if (TARGET_R9_TP)
-    {
-      /* It's simply in a fixed register, so just copy it.  */
-      emit_move_insn (target, gen_rtx_REG (SImode, 9));
     }
   else if (TARGET_R9_INDIRECT0_TP || TARGET_R9_INDIRECT4_TP)
     {
@@ -25046,8 +25041,9 @@ arm_conditional_register_usage (void)
     }
   SUBTARGET_CONDITIONAL_REGISTER_USAGE
 
-  if (TARGET_R9_TP && !fixed_regs[9])
-    error ("can not use -mtp=r9 when r9 is not a fixed register");
+  if ((TARGET_R9_INDIRECT0_TP || TARGET_R9_INDIRECT4_TP) && !fixed_regs[9])
+    error ("\
+r9 must be a fixed register to use -mtp=r9-indirect0 or -mtp=r9-indirect4");
 }
 
 static reg_class_t
