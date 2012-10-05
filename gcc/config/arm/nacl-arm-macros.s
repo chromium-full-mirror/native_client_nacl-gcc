@@ -199,6 +199,22 @@ _sfi_condify sfi_bx
 	.bundle_unlock
 .endm
 
+@ Macro to start a naturally aligned 16-byte constant pool fragment.
+@ NB: GCC output uses this.
+.macro sfi_constant_barrier
+	bkpt 0x5be0
+.endm
+
+@ Macro to do a guaranteed safely nonresumable trap.
+@ There is no assembler mnemonic for the UDF instruction.
+@ This word is chosen so that in ARM it is a UDF instruction
+@ and in (little-endian) Thumb-2 it is a UDF followed by a branch-to-self
+@ (and vice versa in big-endian Thumb-2).
+@ NB: GCC output uses this.
+.macro sfi_trap
+	.word 0xe7f6def0
+.endm
+
 @ TODO(mcgrathr): examples don't belong here
 .if 0
 @ Example uses of all the macros (nops just to ease reading of disassembly)
