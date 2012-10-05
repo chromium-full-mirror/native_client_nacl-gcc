@@ -141,8 +141,8 @@ package body Exp_Ch4 is
    --  Common expansion processing for short-circuit boolean operators
 
    procedure Expand_Compare_Minimize_Eliminate_Overflow (N : Node_Id);
-   --  Deal with comparison in Minimize/Eliminate overflow mode. This is where
-   --  we allow comparison of "out of range" values.
+   --  Deal with comparison in MINIMIZED/ELIMINATED overflow mode. This is
+   --  where we allow comparison of "out of range" values.
 
    function Expand_Composite_Equality
      (Nod    : Node_Id;
@@ -165,10 +165,10 @@ package body Exp_Ch4 is
    --  include both arrays and singleton elements.
 
    procedure Expand_Membership_Minimize_Eliminate_Overflow (N : Node_Id);
-   --  N is an N_In membership test mode, with the overflow check mode
-   --  set to Minimized or Eliminated, and the type of the left operand
-   --  is a signed integer type. This is a case where top level processing
-   --  is required to handle overflow checks in subtrees.
+   --  N is an N_In membership test mode, with the overflow check mode set to
+   --  MINIMIZED or ELIMINATED, and the type of the left operand is a signed
+   --  integer type. This is a case where top level processing is required to
+   --  handle overflow checks in subtrees.
 
    procedure Fixup_Universal_Fixed_Operation (N : Node_Id);
    --  N is a N_Op_Divide or N_Op_Multiply node whose result is universal
@@ -2325,13 +2325,16 @@ package body Exp_Ch4 is
       Minimize_Eliminate_Overflow_Checks
         (Right_Opnd (N), Rlo, Rhi, Top_Level => False);
 
-      --  See if the range information decides the result of the comparison
+      --  See if the range information decides the result of the comparison.
+      --  We can only do this if we in fact have full range information (which
+      --  won't be the case if either operand is bignum at this stage).
 
-      case N_Op_Compare (Nkind (N)) is
+      if Llo /= No_Uint and then Rlo /= No_Uint then
+         case N_Op_Compare (Nkind (N)) is
          when N_Op_Eq =>
             if Llo = Lhi and then Rlo = Rhi and then Llo = Rlo then
                Set_True;
-            elsif Llo > Rhi or else Rlo > Lhi then
+            elsif Llo > Rhi or else Lhi < Rlo then
                Set_False;
             end if;
 
@@ -2365,16 +2368,17 @@ package body Exp_Ch4 is
 
          when N_Op_Ne =>
             if Llo = Lhi and then Rlo = Rhi and then Llo = Rlo then
-               Set_True;
-            elsif Llo > Rhi or else Rlo > Lhi then
                Set_False;
+            elsif Llo > Rhi or else Lhi < Rlo then
+               Set_True;
             end if;
-      end case;
+         end case;
 
-      --  All done if we did the rewrite
+         --  All done if we did the rewrite
 
-      if Nkind (N) not in N_Op_Compare then
-         return;
+         if Nkind (N) not in N_Op_Compare then
+            return;
+         end if;
       end if;
 
       --  Otherwise, time to do the comparison
@@ -5520,7 +5524,7 @@ package body Exp_Ch4 is
       Ltyp := Etype (Left_Opnd  (N));
       Rtyp := Etype (Right_Opnd (N));
 
-      --  If Minimize/Eliminate overflow mode and type is a signed integer
+      --  If MINIMIZED/ELIMINATED overflow mode and type is a signed integer
       --  type, then expand with a separate procedure. Note the use of the
       --  flag No_Minimize_Eliminate to prevent infinite recursion.
 
@@ -7080,7 +7084,7 @@ package body Exp_Ch4 is
       Typl := Base_Type (Typl);
 
       --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if that
-      --  results in not having a comparison operation any more, we are done.
+      --  means we no longer have a comparison operation, we are all done.
 
       Expand_Compare_Minimize_Eliminate_Overflow (N);
 
@@ -7674,7 +7678,7 @@ package body Exp_Ch4 is
       Binary_Op_Validity_Checks (N);
 
       --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if that
-      --  results in not having a comparison operation any more, we are done.
+      --  means we no longer have a comparison operation, we are all done.
 
       Expand_Compare_Minimize_Eliminate_Overflow (N);
 
@@ -7724,7 +7728,7 @@ package body Exp_Ch4 is
       Binary_Op_Validity_Checks (N);
 
       --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if that
-      --  results in not having a comparison operation any more, we are done.
+      --  means we no longer have a comparison operation, we are all done.
 
       Expand_Compare_Minimize_Eliminate_Overflow (N);
 
@@ -7774,7 +7778,7 @@ package body Exp_Ch4 is
       Binary_Op_Validity_Checks (N);
 
       --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if that
-      --  results in not having a comparison operation any more, we are done.
+      --  means we no longer have a comparison operation, we are all done.
 
       Expand_Compare_Minimize_Eliminate_Overflow (N);
 
@@ -7824,7 +7828,7 @@ package body Exp_Ch4 is
       Binary_Op_Validity_Checks (N);
 
       --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if that
-      --  results in not having a comparison operation any more, we are done.
+      --  means we no longer have a comparison operation, we are all done.
 
       Expand_Compare_Minimize_Eliminate_Overflow (N);
 
@@ -8259,7 +8263,7 @@ package body Exp_Ch4 is
          Binary_Op_Validity_Checks (N);
 
          --  Deal with overflow checks in MINIMIZED/ELIMINATED mode and if
-         --  that results in not having a /= opertion any more, we are done.
+         --  means we no longer have a /= operation, we are all done.
 
          Expand_Compare_Minimize_Eliminate_Overflow (N);
 

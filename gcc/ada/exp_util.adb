@@ -710,8 +710,11 @@ package body Exp_Util is
                Subpool := Subpool_Handle_Name (Expr);
             end if;
 
+            --  If a subpool is present it can be an arbitrary name, so make
+            --  the actual by copying the tree.
+
             if Present (Subpool) then
-               Append_To (Actuals, New_Reference_To (Entity (Subpool), Loc));
+               Append_To (Actuals, New_Copy_Tree (Subpool, New_Sloc => Loc));
             else
                Append_To (Actuals, Make_Null (Loc));
             end if;
@@ -2163,6 +2166,7 @@ package body Exp_Util is
      (Var        : Entity_Id;
       Rep_Clause : Node_Id) return Node_Id
    is
+      Par : constant Node_Id   := Parent (Var);
       Typ : constant Entity_Id := Etype (Var);
 
       Init_Proc : Entity_Id;
@@ -2201,6 +2205,7 @@ package body Exp_Util is
 
    begin
       if not Has_Non_Null_Base_Init_Proc (Typ) then
+
          --  No init proc for the type, so obviously no call to be found
 
          return Empty;
@@ -2210,7 +2215,7 @@ package body Exp_Util is
 
       --  First scan the list containing the declaration of Var
 
-      Init_Call := Find_Init_Call_In_List (From => Next (Parent (Var)));
+      Init_Call := Find_Init_Call_In_List (From => Next (Par));
 
       --  If not found, also look on Var's freeze actions list, if any, since
       --  the init call may have been moved there (case of an address clause
@@ -2219,6 +2224,23 @@ package body Exp_Util is
       if No (Init_Call) and then Present (Freeze_Node (Var)) then
          Init_Call :=
            Find_Init_Call_In_List (First (Actions (Freeze_Node (Var))));
+      end if;
+
+      --  If the initialization call has actuals that use the secondary stack,
+      --  the call may have been wrapped into a temporary block, in which case
+      --  the block itself has to be removed.
+
+      if No (Init_Call) and then Nkind (Next (Par)) = N_Block_Statement then
+         declare
+            Blk : constant Node_Id := Next (Par);
+         begin
+            if Present
+                 (Find_Init_Call_In_List
+                   (First (Statements (Handled_Statement_Sequence (Blk)))))
+            then
+               Init_Call := Blk;
+            end if;
+         end;
       end if;
 
       return Init_Call;

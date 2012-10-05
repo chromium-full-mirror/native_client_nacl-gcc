@@ -1,3 +1,69 @@
+2012-10-05  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/50893
+	* g++.dg/cpp0x/defaulted38.C: New.
+
+2012-10-05  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/33763
+	* c-c++-common/pr33763.c: New test.
+
+	PR tree-optimization/54810
+	* gcc.dg/tree-ssa/vrp85.c: New test.
+
+2012-10-04  David Edelsohn  <dje.gcc@gmail.com>
+
+	* gcc.dg/ucnid-7.c: Skip on AIX.
+	* gcc.dg/ucnid-8.c: Same.
+	* gcc.dg/ucnid-10.c: Same.
+	* gcc.dg/ucnid-13.c: Same.
+	* gcc.dg/attr-alias-3.c: Same.
+	* gcc.dg/attr-alias-5.c: Same.
+	* gcc.dg/torture/pr51106-2.c: Same.
+	* gcc.dg/vmx/3b-13.c: Use valid splat index.
+
+2012-10-04  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/52233
+	* g++.dg/cpp0x/alias-decl-23.C: New.
+
+2012-10-04  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/53403
+	* g++.dg/template/friend53.C: New.
+
+2012-10-04  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* lib/gcc-dg.exp (cleanup-ada-spec): New procedure.
+	* lib/scanasm.exp (get_ada_spec_filename): Likewise.
+	(scan-ada-spec): Likewise.
+	(scan-ada-spec-not): Likewise.
+	* gcc.dg/dump-ada-spec-1.c: New test.
+	* g++.dg/other/dump-ada-spec-1.C: Likewise.
+
+2012-10-04  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/lto/20120723_0.c: Skip on SPARC 32-bit.
+
+2012-10-04  Florian Weimer  <fweimer@redhat.com>
+
+	* c-c++-common/cpp/diagnostic-pragma-1.c: New testcase.
+
+2012-10-04  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54323
+	* g++.dg/cpp0x/pr54323.C: New.
+
+2012-10-04  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/54735
+	* g++.dg/torture/pr54735.C: New testcase.
+
+2012-10-04  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/54739
+	* gcc.dg/lower-subreg-1.c: Also skip on SPARC.
+
 2012-10-03  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	PR target/51244
