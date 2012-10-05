@@ -11068,14 +11068,14 @@
 (define_insn "consttable_sfi_barrier_4"
   [(unspec_volatile [(const_int 0)] VUNSPEC_SFI_BARRIER_4)]
   "TARGET_SFI_NACL1"
-  "bkpt\\t0x7777\\t%@ SFI barrier for constant pool"
+  "sfi_constant_barrier"
   [(set_attr "length" "4")]
 )
 
 (define_insn "consttable_sfi_barrier_8"
   [(unspec_volatile [(const_int 0)] VUNSPEC_SFI_BARRIER_8)]
   "TARGET_SFI_NACL1"
-  "bkpt\\t0x7777\\t%@ SFI barrier for constant pool\\n\\t\
+  "sfi_constant_barrier\\n\\t\
 .word\\t0xdeadbeef\\t%@ pad next item to 8-byte alignment"
   [(set_attr "length" "8")]
 )
@@ -11496,6 +11496,12 @@
 (include "fpa.md")
 ;; Load the Maverick co-processor patterns
 (include "cirrus.md")
+
+(define_insn "trap"
+  [(trap_if (const_int 1) (const_int 0))]
+  "TARGET_SFI_NACL1"
+  "sfi_trap")
+
 ;; Vector bits common to IWMMXT and Neon
 (include "vec-common.md")
 ;; Load the Intel Wireless Multimedia Extension patterns
