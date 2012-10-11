@@ -753,6 +753,9 @@ int arm_arch6 = 0;
 /* Nonzero if this chip supports the ARM 6K extensions.  */
 int arm_arch6k = 0;
 
+/* Nonzero if instructions present in ARMv6-M can be used.  */
+int arm_arch6m = 0;
+
 /* Nonzero if this chip supports the ARM 7 extensions.  */
 int arm_arch7 = 0;
 
@@ -1763,6 +1766,7 @@ arm_option_override (void)
   arm_arch6 = (insn_flags & FL_ARCH6) != 0;
   arm_arch6k = (insn_flags & FL_ARCH6K) != 0;
   arm_arch_notm = (insn_flags & FL_NOTM) != 0;
+  arm_arch6m = arm_arch6 && !arm_arch_notm;
   arm_arch7 = (insn_flags & FL_ARCH7) != 0;
   arm_arch7em = (insn_flags & FL_ARCH7EM) != 0;
   arm_arch_thumb2 = (insn_flags & FL_THUMB2) != 0;
@@ -6314,7 +6318,7 @@ get_tls_get_addr (void)
   return tls_get_addr_libfunc;
 }
 
-static rtx
+rtx
 arm_load_tp (rtx target)
 {
   if (!target)
@@ -19555,8 +19559,6 @@ enum arm_builtins
 
   ARM_BUILTIN_WMERGE,
 
-  ARM_BUILTIN_THREAD_POINTER,
-
   ARM_BUILTIN_NEON_BASE,
 
   ARM_BUILTIN_MAX = ARM_BUILTIN_NEON_BASE + ARRAY_SIZE (neon_builtin_data)
@@ -20596,20 +20598,6 @@ arm_init_iwmmxt_builtins (void)
 }
 
 static void
-arm_init_tls_builtins (void)
-{
-  tree ftype, decl;
-
-  ftype = build_function_type (ptr_type_node, void_list_node);
-  decl = add_builtin_function ("__builtin_thread_pointer", ftype,
-			       ARM_BUILTIN_THREAD_POINTER, BUILT_IN_MD,
-			       NULL, NULL_TREE);
-  TREE_NOTHROW (decl) = 1;
-  TREE_READONLY (decl) = 1;
-  arm_builtin_decls[ARM_BUILTIN_THREAD_POINTER] = decl;
-}
-
-static void
 arm_init_fp16_builtins (void)
 {
   tree fp16_type = make_node (REAL_TYPE);
@@ -20621,8 +20609,6 @@ arm_init_fp16_builtins (void)
 static void
 arm_init_builtins (void)
 {
-  arm_init_tls_builtins ();
-
   if (TARGET_REALLY_IWMMXT)
     arm_init_iwmmxt_builtins ();
 
@@ -21733,9 +21719,6 @@ arm_expand_builtin (tree exp,
 	    }
 	}
       return arm_expand_binop_builtin (icode, exp, target);
-
-    case ARM_BUILTIN_THREAD_POINTER:
-      return arm_load_tp (target);
 
     default:
       break;
