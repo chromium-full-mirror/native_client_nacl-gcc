@@ -10,7 +10,7 @@
 .endm
 
 .macro _sfi_dmask reg
-	bfc \reg, #30, #2
+	bic \reg, \reg, #0xC0000000
 .endm
 
 @ Used in place of bx (indirect jump), no difference but the mnemonic.
