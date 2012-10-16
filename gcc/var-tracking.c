@@ -4680,11 +4680,11 @@ dataflow_set_remove_mem_locs (void **slot, void *data)
 static void
 dataflow_set_clear_at_call (dataflow_set *set)
 {
-  int r;
+  unsigned int r;
+  hard_reg_set_iterator hrsi;
 
-  for (r = 0; r < FIRST_PSEUDO_REGISTER; r++)
-    if (TEST_HARD_REG_BIT (regs_invalidated_by_call, r))
-      var_regno_delete (set, r);
+  EXECUTE_IF_SET_IN_HARD_REG_SET (regs_invalidated_by_call, 0, r, hrsi)
+    var_regno_delete (set, r);
 
   if (MAY_HAVE_DEBUG_INSNS)
     {
@@ -5768,6 +5768,11 @@ add_stores (rtx loc, const_rtx expr, void *cuip)
     goto log_and_return;
 
   resolve = preserve = !cselib_preserved_value_p (v);
+
+  if (loc == stack_pointer_rtx
+      && hard_frame_pointer_adjustment != -1
+      && preserve)
+    cselib_set_value_sp_based (v);
 
   nloc = replace_expr_with_values (oloc);
   if (nloc)
@@ -9867,6 +9872,19 @@ vt_initialize (void)
 		    {
 		      vt_init_cfa_base ();
 		      hard_frame_pointer_adjustment = fp_cfa_offset;
+		      /* Disassociate sp from fp now.  */
+		      if (MAY_HAVE_DEBUG_INSNS)
+			{
+			  cselib_val *v;
+			  cselib_invalidate_rtx (stack_pointer_rtx);
+			  v = cselib_lookup (stack_pointer_rtx, Pmode, 1,
+					     VOIDmode);
+			  if (v && !cselib_preserved_value_p (v))
+			    {
+			      cselib_set_value_sp_based (v);
+			      preserve_value (v);
+			    }
+			}
 		    }
 		}
 	    }

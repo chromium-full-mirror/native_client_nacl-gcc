@@ -68,12 +68,11 @@ input_identifier (struct data_in *data_in, struct lto_input_block *ib)
 tree
 streamer_read_chain (struct lto_input_block *ib, struct data_in *data_in)
 {
-  int i, count;
   tree first, prev, curr;
 
+  /* The chain is written as NULL terminated list of trees.  */
   first = prev = NULL_TREE;
-  count = streamer_read_hwi (ib);
-  for (i = 0; i < count; i++)
+  do
     {
       curr = stream_read_tree (ib, data_in);
       if (prev)
@@ -81,9 +80,9 @@ streamer_read_chain (struct lto_input_block *ib, struct data_in *data_in)
       else
 	first = curr;
 
-      TREE_CHAIN (curr) = NULL_TREE;
       prev = curr;
     }
+  while (curr);
 
   return first;
 }
@@ -366,9 +365,43 @@ unpack_ts_block_value_fields (struct data_in *data_in,
    structure of expression EXPR from bitpack BP.  */
 
 static void
-unpack_ts_translation_unit_decl_value_fields (struct bitpack_d *bp ATTRIBUTE_UNUSED, tree expr ATTRIBUTE_UNUSED)
+unpack_ts_translation_unit_decl_value_fields (struct data_in *data_in,
+					      struct bitpack_d *bp, tree expr)
 {
+  TRANSLATION_UNIT_LANGUAGE (expr) = xstrdup (bp_unpack_string (data_in, bp));
+  VEC_safe_push (tree, gc, all_translation_units, expr);
 }
+
+/* Unpack a TS_TARGET_OPTION tree from BP into EXPR.  */
+
+static void
+unpack_ts_target_option (struct bitpack_d *bp, tree expr)
+{
+  unsigned i, len;
+  struct cl_target_option *t = TREE_TARGET_OPTION (expr);
+
+  len = sizeof (struct cl_target_option);
+  for (i = 0; i < len; i++)
+    ((unsigned char *)t)[i] = bp_unpack_value (bp, 8);
+  if (bp_unpack_value (bp, 32) != 0x12345678)
+    fatal_error ("cl_target_option size mismatch in LTO reader and writer");
+}
+
+/* Unpack a TS_OPTIMIZATION tree from BP into EXPR.  */
+
+static void
+unpack_ts_optimization (struct bitpack_d *bp, tree expr)
+{
+  unsigned i, len;
+  struct cl_optimization *t = TREE_OPTIMIZATION (expr);
+
+  len = sizeof (struct cl_optimization);
+  for (i = 0; i < len; i++)
+    ((unsigned char *)t)[i] = bp_unpack_value (bp, 8);
+  if (bp_unpack_value (bp, 32) != 0x12345678)
+    fatal_error ("cl_optimization size mismatch in LTO reader and writer");
+}
+
 
 /* Unpack all the non-pointer fields in EXPR into a bit pack.  */
 
@@ -414,7 +447,27 @@ unpack_value_fields (struct data_in *data_in, struct bitpack_d *bp, tree expr)
     unpack_ts_block_value_fields (data_in, bp, expr);
 
   if (CODE_CONTAINS_STRUCT (code, TS_TRANSLATION_UNIT_DECL))
-    unpack_ts_translation_unit_decl_value_fields (bp, expr);
+    unpack_ts_translation_unit_decl_value_fields (data_in, bp, expr);
+
+  if (CODE_CONTAINS_STRUCT (code, TS_TARGET_OPTION))
+    unpack_ts_target_option (bp, expr);
+
+  if (CODE_CONTAINS_STRUCT (code, TS_OPTIMIZATION))
+    unpack_ts_optimization (bp, expr);
+
+  if (CODE_CONTAINS_STRUCT (code, TS_BINFO))
+    {
+      unsigned HOST_WIDE_INT length = bp_unpack_var_len_unsigned (bp);
+      if (length > 0)
+	VEC_safe_grow (tree, gc, BINFO_BASE_ACCESSES (expr), length);
+    }
+
+  if (CODE_CONTAINS_STRUCT (code, TS_CONSTRUCTOR))
+    {
+      unsigned HOST_WIDE_INT length = bp_unpack_var_len_unsigned (bp);
+      if (length > 0)
+	VEC_safe_grow (constructor_elt, gc, CONSTRUCTOR_ELTS (expr), length);
+    }
 }
 
 
@@ -776,12 +829,9 @@ static void
 lto_input_ts_exp_tree_pointers (struct lto_input_block *ib,
 			        struct data_in *data_in, tree expr)
 {
-  int i, length;
+  int i;
 
-  length = streamer_read_hwi (ib);
-  gcc_assert (length == TREE_OPERAND_LENGTH (expr));
-
-  for (i = 0; i < length; i++)
+  for (i = 0; i < TREE_OPERAND_LENGTH (expr); i++)
     TREE_OPERAND (expr, i) = stream_read_tree (ib, data_in);
 
   TREE_SET_BLOCK (expr, stream_read_tree (ib, data_in));
@@ -841,7 +891,7 @@ static void
 lto_input_ts_binfo_tree_pointers (struct lto_input_block *ib,
 				  struct data_in *data_in, tree expr)
 {
-  unsigned i, len;
+  unsigned i;
   tree t;
 
   /* Note that the number of slots in EXPR was read in
@@ -861,15 +911,12 @@ lto_input_ts_binfo_tree_pointers (struct lto_input_block *ib,
   BINFO_VTABLE (expr) = stream_read_tree (ib, data_in);
   BINFO_VPTR_FIELD (expr) = stream_read_tree (ib, data_in);
 
-  len = streamer_read_uhwi (ib);
-  if (len > 0)
+  /* The vector of BINFO_BASE_ACCESSES is pre-allocated during
+     unpacking the bitfield section.  */
+  for (i = 0; i < VEC_length (tree, BINFO_BASE_ACCESSES (expr)); i++)
     {
-      VEC_reserve_exact (tree, gc, BINFO_BASE_ACCESSES (expr), len);
-      for (i = 0; i < len; i++)
-	{
-	  tree a = stream_read_tree (ib, data_in);
-	  VEC_quick_push (tree, BINFO_BASE_ACCESSES (expr), a);
-	}
+      tree a = stream_read_tree (ib, data_in);
+      VEC_replace (tree, BINFO_BASE_ACCESSES (expr), i, a);
     }
 
   BINFO_INHERITANCE_CHAIN (expr) = stream_read_tree (ib, data_in);
@@ -886,64 +933,17 @@ static void
 lto_input_ts_constructor_tree_pointers (struct lto_input_block *ib,
 				        struct data_in *data_in, tree expr)
 {
-  unsigned i, len;
+  unsigned i;
 
-  len = streamer_read_uhwi (ib);
-  for (i = 0; i < len; i++)
+  for (i = 0; i < CONSTRUCTOR_NELTS (expr); i++)
     {
-      tree index, value;
-
-      index = stream_read_tree (ib, data_in);
-      value = stream_read_tree (ib, data_in);
-      CONSTRUCTOR_APPEND_ELT (CONSTRUCTOR_ELTS (expr), index, value);
+      constructor_elt e;
+      e.index = stream_read_tree (ib, data_in);
+      e.value = stream_read_tree (ib, data_in);
+      VEC_replace (constructor_elt, CONSTRUCTOR_ELTS (expr), i, e);
     }
 }
 
-
-/* Input a TS_TARGET_OPTION tree from IB into EXPR.  */
-
-static void
-lto_input_ts_target_option (struct lto_input_block *ib, tree expr)
-{
-  unsigned i, len;
-  struct bitpack_d bp;
-  struct cl_target_option *t = TREE_TARGET_OPTION (expr);
-
-  bp = streamer_read_bitpack (ib);
-  len = sizeof (struct cl_target_option);
-  for (i = 0; i < len; i++)
-    ((unsigned char *)t)[i] = bp_unpack_value (&bp, 8);
-  if (bp_unpack_value (&bp, 32) != 0x12345678)
-    fatal_error ("cl_target_option size mismatch in LTO reader and writer");
-}
-
-/* Input a TS_OPTIMIZATION tree from IB into EXPR.  */
-
-static void
-lto_input_ts_optimization (struct lto_input_block *ib, tree expr)
-{
-  unsigned i, len;
-  struct bitpack_d bp;
-  struct cl_optimization *t = TREE_OPTIMIZATION (expr);
-
-  bp = streamer_read_bitpack (ib);
-  len = sizeof (struct cl_optimization);
-  for (i = 0; i < len; i++)
-    ((unsigned char *)t)[i] = bp_unpack_value (&bp, 8);
-  if (bp_unpack_value (&bp, 32) != 0x12345678)
-    fatal_error ("cl_optimization size mismatch in LTO reader and writer");
-}
-
-/* Input a TS_TRANSLATION_UNIT_DECL tree from IB and DATA_IN into EXPR.  */
-
-static void
-lto_input_ts_translation_unit_decl_tree_pointers (struct lto_input_block *ib,
-						  struct data_in *data_in,
-						  tree expr)
-{
-  TRANSLATION_UNIT_LANGUAGE (expr) = xstrdup (streamer_read_string (data_in, ib));
-  VEC_safe_push (tree, gc, all_translation_units, expr);
-}
 
 /* Read all pointer fields in EXPR from input block IB.  DATA_IN
    contains tables and descriptors for the file being read.  */
@@ -1006,15 +1006,6 @@ streamer_read_tree_body (struct lto_input_block *ib, struct data_in *data_in,
 
   if (CODE_CONTAINS_STRUCT (code, TS_CONSTRUCTOR))
     lto_input_ts_constructor_tree_pointers (ib, data_in, expr);
-
-  if (CODE_CONTAINS_STRUCT (code, TS_TARGET_OPTION))
-    lto_input_ts_target_option (ib, expr);
-
-  if (CODE_CONTAINS_STRUCT (code, TS_OPTIMIZATION))
-    lto_input_ts_optimization (ib, expr);
-
-  if (CODE_CONTAINS_STRUCT (code, TS_TRANSLATION_UNIT_DECL))
-    lto_input_ts_translation_unit_decl_tree_pointers (ib, data_in, expr);
 }
 
 

@@ -1,3 +1,65 @@
+2012-10-15  Matthias Klose  <doko@ubuntu.com>
+
+	* configure.host: Match arm*-*-linux-* for ARM Linux/GNU.
+	* testsuite/20_util/make_signed/requirements/typedefs-2.cc: Likewise.
+	* testsuite/20_util/make_unsigned/requirements/typedefs-2.cc: Likewise.
+
+2012-10-15  Pavel Chupin  <pavel.v.chupin@intel.com>
+
+	* Makefile.in: Regenerate.
+	* acinclude.m4: Replace code with GCC_AC_THREAD_HEADER use.
+	* configure: Regenerate.
+	* doc/Makefile.in: Regenerate.
+	* include/Makefile.am: Regenerate.
+	* include/Makefile.in: Rename variable.
+	* libsupc++/Makefile.in: Regenerate.
+	* po/Makefile.in: Regenerate.
+	* python/Makefile.in: Regenerate.
+	* src/Makefile.in: Regenerate.
+	* src/c++11/Makefile.in: Regenerate.
+	* src/c++98/Makefile.in: Regenerate.
+	* testsuite/Makefile.in: Regenerate.
+
+2012-10-14  Jason Merrill  <jason@redhat.com>
+
+	PR target/54908
+	* libsupc++/atexit_thread.cc: Rewrite to keep the cleanup list
+	with get/setspecific.  Destroy the key on dlclose.
+
+2012-10-12  Edward Smith-Rowland  <3dw4rd@verizon.net>
+
+	* include/ext/random: Add __gnu_cxx::arcsine_distribution<>
+	and __gnu_cxx::hoyt_distribution<> classes.
+	* include/ext/random.tcc: Add out-of-line functions for
+	__gnu_cxx::arcsine_distribution<> and __gnu_cxx::hoyt_distribution<>.
+	* testsuite/ext/random/hoyt_distribution/cons/parms.cc: New file.
+	* testsuite/ext/random/hoyt_distribution/cons/default.cc: New file.
+	* testsuite/ext/random/hoyt_distribution/requirements/
+	explicit_instantiation/1.cc: New file.
+	* testsuite/ext/random/hoyt_distribution/requirements/typedefs.cc:
+	New file.
+	* testsuite/ext/random/hoyt_distribution/operators/inequal.cc: New file.
+	* testsuite/ext/random/hoyt_distribution/operators/equal.cc: New file.
+	* testsuite/ext/random/hoyt_distribution/operators/serialize.cc:
+	New file.
+	* testsuite/ext/random/arcsine_distribution/cons/parms.cc: New file.
+	* testsuite/ext/random/arcsine_distribution/cons/default.cc: New file.
+	* testsuite/ext/random/arcsine_distribution/requirements/
+	explicit_instantiation/1.cc: New file.
+	* testsuite/ext/random/arcsine_distribution/requirements/typedefs.cc:
+	New file.
+	* testsuite/ext/random/arcsine_distribution/operators/inequal.cc:
+	New file.
+	* testsuite/ext/random/arcsine_distribution/operators/equal.cc:
+	New file.
+	* testsuite/ext/random/arcsine_distribution/operators/serialize.cc:
+	New file.
+
+2012-10-12  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* include/bits/hashtable_policy.h: Revert libstdc++/53067 quick
+	hacks thanks to the resolution of c++/51213.
+
 2012-10-11  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	* testsuite/23_containers/bitset/45713.cc: Tweak.
