@@ -2,6 +2,121 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-17  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+        * config/arm/arm.md (UNSPEC_PROLOGUE_USE): Rename this...
+        (UNSPEC_REGISTER_USE): ... to this.
+        (prologue_use): Rename this...
+	  (force_register_use): ... to this and update output assembly.
+        (epilogue) Rename gen_prologue_use to gen_force_register_use.
+        * config/arm/arm.c (arm_expand_prologue): Likewise.
+        (thumb1_expand_epilogue): Likewise.
+        (arm_expand_epilogue): Likewise.
+        (arm_expand_epilogue): Likewise.
+
+2012-10-17  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/avr-arch.h (avr_extra_arch_macro): Remove prototype.
+	* config/avr/avr.c (avr_extra_arch_macro): Remove variable.
+	(avr_option_override): Remove setting of avr_extra_arch_macro.
+	* config/avr/avr-c.c (avr_extra_arch_macro): Replace with
+	avr_current_device->macro.
+
+2012-10-17  Richard Biener  <rguenther@suse.de>
+
+	* tree-streamer-out.c (write_ts_decl_common_tree_pointers):
+	Do not write TREE_CHAIN of PARM_DECLs.
+	(write_ts_decl_non_common_tree_pointers): Instead stream
+	the DECL_ARGUMENTS chain.
+	* tree-streamer-in.c (lto_input_ts_decl_common_tree_pointers):
+	Do not read TREE_CHAIN of PARM_DECLs.
+	(lto_input_ts_decl_non_common_tree_pointes): Instead read
+	the DECL_ARGUMENTS as chain.
+
+2012-10-17  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/iq2000/iq2000.h (call_used_regs): Remove definition.
+
+2012-10-16  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/54870
+	* tree.h (TREE_ADDRESSABLE): Document special usage on SSA_NAME.
+	* cfgexpand.c (update_alias_info_with_stack_vars ): Set it on the
+	SSA_NAME pointer that points to a partition if there is at least
+	one variable with it set in the partition.
+	* dse.c (local_variable_can_escape): New predicate.
+	(can_escape): Call it.
+	* gimplify.c (mark_addressable): If this is a partitioned decl, also
+	mark the SSA_NAME pointer that points to a partition.
+
+2012-10-16  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* df-problems.c (df_kill_notes): Split up in two functions.
+	(df_remove_dead_and_unused_notes): New function, first half of
+	df_kill notes to remove all REG_DEAD and REG_UNUSED notes.
+	(df_remove_dead_eq_notes): New function, second half of df_kill_notes
+	to remove REG_EQUAL and REG_EQUIV notes referring to dead registers.
+	(df_note_bb_compute): Call df_remove_dead_and_unused_notes instead
+	of df_kill_notes.  Call df_remove_dead_eq_notes after processing insn.
+
+	* web.c (web): Re-add DF_RD_PRUNE_DEAD_DEFS;
+
+2012-10-16  Ian Lance Taylor  <iant@google.com>
+
+	* doc/extend.texi (Return Address): Change
+	__builtin_extract_return_address to
+	__builtin_extract_return_addr.
+
+2012-10-16  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* rtl.h (get_call_rtx_from): New prototype.
+	* rtlanal.c (get_call_rtx_from): New function.
+	* calls.c (emit_call_1): Use it.
+	* dse.c (scan_insn): Likewise
+	* dwarf2out.c (dwarf2out_var_location): Likewise.
+	* sched-deps.c (call_may_noreturn_p): Likewise.
+	* var-tracking.c (prepare_call_arguments): Likewise.
+	* config/sh/sh.c (sh_adjust_cost): Likewise.
+
+2012-10-16  Tom de Vries  <tom@codesourcery.com>
+
+	* expr.c (move_by_pieces, move_by_pieces_ninsns, can_store_by_pieces)
+	(store_by_pieces_1): Don't enter loop when no more data is left.
+
+2012-10-16  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* loop-doloop.c (doloop_modify): Pass doloop_end pattern to
+	gen_doloop_begin.
+	(doloop_optimize): Pass flag to indicate if loop is entered at top
+	to gen_doloop_end.
+	* config/arm/thumb2.md (doloop_end): Accept extra operand.
+	* config/bfin/bfin.md (doloop_end): Likewise.
+	* config/c6x/c6x.md (doloop_end): Likewise.
+	* config/ia64/ia64.md (doloop_end): Likewise.
+	* config/mep/mep.md (doloop_begin, doloop_end): Likewise.
+	* config/rs6000/rs6000.md (doloop_end): Likewise.
+	* config/s390/s390.md (doloop_end): Likewise.
+	* config/sh/sh.md (doloop_end): Likewise.
+	* config/spu/spu.md (doloop_end): Likewise.
+	* config/tilegx/tilegx.md (doloop_end): Likewise.
+	* config/tilepro/tilepro.md (doloop_end): Likewise.
+	* doc/md.texi (doloop_end): Document new operand.
+	* basic-block.h (contains_no_active_insn_p): Declare.
+	* cfgrtl.c (contains_no_active_insn_p): New function, factored
+	out of ...
+	(forwarder_block_p): ... here.
+
+2012-10-16  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/53063
+	PR c/40989
+	* doc/options.texi (EnabledBy): Document new form.
+	* optc-gen.awk: Handle new form of EnabledBy.
+	* common.opt (Wunused-but-set-parameter): Use EnabledBy.
+	(Wunused-parameter): Likewise.
+	* opts.c (finish_options): Do not handle them explicitly.
+	* opt-functions.awk (search_var_name): New.
+
 2012-10-16  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR c/53063

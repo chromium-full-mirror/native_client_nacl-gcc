@@ -17043,7 +17043,7 @@ arm_expand_prologue (void)
 		}
 	      emit_set_insn (ip_rtx, insn);
 	      /* Add a USE to stop propagate_one_insn() from barfing.  */
-	      emit_insn (gen_prologue_use (ip_rtx));
+	      emit_insn (gen_force_register_use (ip_rtx));
 	    }
 	}
       else
@@ -23025,7 +23025,7 @@ thumb1_expand_epilogue (void)
 
   /* Emit a USE (stack_pointer_rtx), so that
      the stack adjustment will not be deleted.  */
-  emit_insn (gen_prologue_use (stack_pointer_rtx));
+  emit_insn (gen_force_register_use (stack_pointer_rtx));
 
   if (crtl->profile || !TARGET_SCHED_PROLOG)
     emit_insn (gen_blockage ());
@@ -23250,7 +23250,7 @@ arm_expand_epilogue (bool really_return)
 
           /* Emit USE(stack_pointer_rtx) to ensure that stack adjustment is not
              deleted.  */
-          emit_insn (gen_prologue_use (stack_pointer_rtx));
+          emit_insn (gen_force_register_use (stack_pointer_rtx));
         }
       else
         {
@@ -23268,7 +23268,7 @@ arm_expand_epilogue (bool really_return)
           emit_insn (gen_movsi (stack_pointer_rtx, hard_frame_pointer_rtx));
           /* Emit USE(stack_pointer_rtx) to ensure that stack adjustment is not
              deleted.  */
-          emit_insn (gen_prologue_use (stack_pointer_rtx));
+          emit_insn (gen_force_register_use (stack_pointer_rtx));
         }
     }
   else
@@ -23286,7 +23286,7 @@ arm_expand_epilogue (bool really_return)
                                  GEN_INT (amount)));
           /* Emit USE(stack_pointer_rtx) to ensure that stack adjustment is
              not deleted.  */
-          emit_insn (gen_prologue_use (stack_pointer_rtx));
+          emit_insn (gen_force_register_use (stack_pointer_rtx));
         }
     }
 
