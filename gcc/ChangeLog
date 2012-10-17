@@ -24,6 +24,25 @@
 	not a VAR_DECL.  Also don't limit it to UNSPECs with exactly one
 	operand.
 
+2012-10-17  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	Backported from mainline
+	2012-07-23  Ulrich Weigand  <ulrich.weigand@linaro.org>
+
+	* config/arm/arm.c (arm_reorg): Ensure all insns are split.
+
+2012-10-16  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/54870
+	* tree.h (TREE_ADDRESSABLE): Document special usage on SSA_NAME.
+	* cfgexpand.c (update_alias_info_with_stack_vars ): Set it on the
+	SSA_NAME pointer that points to a partition if there is at least
+	one variable with it set in the partition.
+	* dse.c (local_variable_can_escape): New predicate.
+	(can_escape): Call it.
+	* gimplify.c (mark_addressable): If this is a partitioned decl, also
+	mark the SSA_NAME pointer that points to a partition.
+
 2012-10-16  Andrey Belevantsev  <abel@ispras.ru>
 
 	Backport from mainline
