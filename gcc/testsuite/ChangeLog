@@ -1,3 +1,49 @@
+2012-10-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/54884
+	* gfortran.dg/public_private_module_7.f90: New.
+
+2012-10-18  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/29633
+	* g++.dg/template/pr29633.C: New.
+
+2012-10-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/loop_optimization13.ad[sb]: New test.
+	* gnat.dg/loop_optimization13_pkg.ads: New helper.
+
+2012-10-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* gcc.target/arm/neon/vfmaQf32.c: New testcase.
+	* gcc.target/arm/neon/vfmaf32.c: Likewise.
+	* gcc.target/arm/neon/vfmsQf32.c: Likewise.
+	* gcc.target/arm/neon/vfmsf32.c: Likewise.
+
+2012-10-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* gcc.target/arm/ftest-armv8a-arm.c: New testcase.
+	* gcc.target/arm/ftest-armv8a-thumb.c: Likewise.
+	* gcc.target/arm/ftest-support-arm.h (feature_matrix): Add
+	ARMv8-A row.
+	* gcc.target/arm/ftest-support-thumb.h (feature_matrix):
+	Likewise.
+	* gcc.target/arm/ftest-support.h (architecture): Add ARMv8-A.
+	* lib/target-supports.exp: Add ARMv8-A architecture expectation.
+
+2012-10-16  Jan Hubicka  <jh@suse.cz>
+
+	* gcc.target/i386/l_fma_float_?.c: Update.
+	* gcc.target/i386/l_fma_double_?.c: Update.
+	* gfortran.dg/do_1.f90: XFAIL
+	* gcc.dg/tree-ssa/cunroll-1.c: New testcase.
+	* gcc.dg/tree-ssa/cunroll-2.c: New testcase.
+	* gcc.dg/tree-ssa/cunroll-3.c: New testcase.
+	* gcc.dg/tree-ssa/cunroll-4.c: New testcase.
+	* gcc.dg/tree-ssa/cunroll-5.c: New testcase.
+	* gcc.dg/tree-ssa/ldist-17.c: Block cunroll to make testcase still
+	valid.
+
 2012-10-16  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR c/53063
