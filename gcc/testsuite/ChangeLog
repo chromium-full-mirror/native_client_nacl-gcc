@@ -1,3 +1,23 @@
+2012-10-19  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/54981
+	* gcc.dg/pr54981.c: New testcase.
+
+2012-10-19  Zhenqiang Chen <zhenqiang.chen@linaro.org>
+
+	PR target/54892
+	* gcc.target/arm/pr54892.c: New.
+
+2012-10-19  Bin Cheng  <bin.cheng@arm.com>
+
+	* testsuite/gcc.dg/hoist-register-pressure.c: New test.
+
+2012-10-18  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54501
+	* g++.dg/init/array30.C: New.
+	* g++.dg/init/array31.C: Likewise.
+
 2012-10-18  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/54884
