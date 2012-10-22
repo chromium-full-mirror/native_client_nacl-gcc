@@ -2,6 +2,190 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-22  Richard Biener  <rguenther@suse.de>
+
+	PR lto/55021
+	* tree-streamer-in.c (unpack_ts_int_cst_value_fields): Remove
+	bogus truncations.
+
+2012-10-22  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (memory_address_length): Assert that non-null
+	base or index RTXes are registers.  Do not check for REG RTXes.
+	Determine addr32 prefix from original base and index RTXes.
+	Simplify code.
+
+2012-10-22  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55011
+	* tree-vrp.c (update_value_range): For invalid lattice transitions
+	drop to VARYING.
+
+2012-10-22  Julian Brown  <julian@codesourcery.com>
+
+	* config/arm/arm.h (CANNOT_CHANGE_MODE_CLASS): Avoid subreg'ing
+	VFP D registers in big-endian mode.
+
+2012-10-22  Georg-Johann Lay  <avr@gjlay.de>
+
+	* doc/invoke.texi (AVR Options): Document __AVR_ARCH__.
+	Note __AVR_<device>__ is not defined for cores.
+	Don't point to --help=target.
+
+2012-10-22  Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.c (thumb2_emit_ldrd_pop): New function.
+	(arm_expand_epilogue): Use the new function.
+
+2012-10-22  Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.c (thumb2_emit_strd_push): New function.
+	(arm_expand_prologue): Use the new function.
+
+2012-10-22  Sameera Deshpande  <sameera.deshpande@arm.com>
+	    Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm-protos.h (offset_ok_for_ldrd_strd): New declaration.
+	(operands_ok_ldrd_strd): Likewise.
+	* config/arm/arm.c (offset_ok_for_ldrd_strd): New function.
+	(operands_ok_ldrd_strd): Likewise.
+	* config/arm/arm.md (thumb2_ldrd, thumb2_ldrd_base): New patterns.
+	(thumb2_ldrd_base_neg): Likewise.
+	(thumb2_strd, thumb2_strd_base, thumb_strd_base_neg): Likewise.
+	* predicates.md (ldrd_strd_offset_operand): New predicate.
+	* config/arm/constraints.md (Do): New constraint.
+
+2012-10-22  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* config/mmix/mmix.md ("nonlocal_goto_receiver"): Refer to the
+	frame-pointer as an operand.
+	("*nonlocal_goto_receiver_expanded"): Ditto.  Use
+	mmix_output_register_setting instead of naked output_asm_insn for
+	the offset from the frame-pointer to the saved rO.
+	* config/mmix/mmix.c (mmix_output_register_setting): Emit NEGU for
+	values -255..0.
+	* config/mmix/predicates.md ("frame_pointer_operand"): New.
+	* config/mmix/constraints.md ("Yf"): New.
+
+	* stmt.c (expand_nl_goto_receiver): Remove almost-copy of
+	expand_builtin_setjmp_receiver.
+	(expand_label): Adjust, call expand_builtin_setjmp_receiver
+	with NULL for the label parameter.
+	* builtins.c (expand_builtin_setjmp_receiver): Don't clobber
+	the frame-pointer.  Adjust comments.
+	[HAVE_builtin_setjmp_receiver]: Emit builtin_setjmp_receiver
+	only if LABEL is non-NULL.
+
+2012-10-21  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386-protos.h (memory_address_length): Add new bool
+	argument.  Update all uses.
+	* config/i386/i386.c (memory_address_length): If not LEA insn, then
+	add length of addr32 prefix based on mode of base or index register.
+	(ix86_attr_length_address_default) <TYPE_LEA>: Do not handle SImode
+	addresses here.  Update call to memory_address_length.
+	(ix86_print_address_operand): Use SImode_address_operand predicate.
+	* config/i386/predicates.md (SImode_address_operand): New.
+	* config/i386/i386.md (lea<mode>): Use SImode_address_operand
+	to calculate "mode" attribute.  Use SImode_address_operand predicate
+	instead of open-coding accepted RTX codes.
+
+2012-10-21  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* rtl.def (ADDR_DIFF_VEC): Fix comment typo.
+
+2012-10-21  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/44194
+	* calls.c (expand_call): Allow sibling calls in the PARALLEL case.
+
+2012-10-21  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/54725
+	* Makefile.in (TARGET_SYSTEM_ROOT_DEFINE): New.
+
+2012-10-21  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* config/xtensa/xtensa.c (xtensa_expand_builtin): Remove unused 'arg'
+	variable.
+
+2012-10-20  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/54315
+	* calls.c (expand_call): Don't deal specifically with BLKmode values
+	returned in naked registers.
+	* expr.h (copy_blkmode_from_reg): Adjust prototype.
+	* expr.c (copy_blkmode_from_reg): Rename first parameter into
+	TARGET and make it required.  Assert that SRCREG hasn't BLKmode.
+	Add a couple of short-circuits for common cases and be prepared
+	for sub-word registers.
+	(expand_assignment): Call copy_blkmode_from_reg for BLKmode values
+	returned in naked registers.
+	(store_expr): Likewise.
+	(store_field): Likewise.
+
+2012-10-20  Jan Hubicka  <jh@suse.cz>
+
+	* loop-unroll.c (decide_unroll_constant_iterations): Don't
+	perform unrolling for loops with low iterations bounds or estimates.
+
+2012-10-20  Jan Hubicka  <jh@suse.cz>
+
+	* loop-iv.c (iv_number_of_iterations): Record the upper bound
+	only if there are no further conditions on it.
+
+2012-10-20  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/53063
+	PR c/40989
+	* opts.c (finish_options): Remove explicit handling from here.
+
+2012-10-20  Joern Rennecke  <joern.rennecke@embecosm.com>
+	    Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* emit-rtl.c (copy_delay_slot_insn): New function.
+	* emit-rtl.h (copy_delay_slot_insn): Declare.
+	* reorg.c: Include "emit-rtl.h".
+	(steal_delay_list_from_target): Use copy_delay_slot_insn.
+	(fill_slots_from_thread, fill_simple_delay_slots): Likewise.
+
+	* final.c (shorten_branches): When optimizing, start with small
+	length and increase from there, and don't decrease lengths.
+
+2012-10-19  Jan Hubicka  <jh@suse.cz>
+
+	* builtins.def (BUILT_IN_UNREACHABLE): Make
+	ATTR_CONST_NORETURN_NOTHROW_LEAF_LIST.
+	* builtin-attrs.def (ATTR_CONST_NORETURN_NOTHROW_LEAF_LIST): Define.
+
+2012-10-19  Michael Meissner  <meissner@linux.vnet.ibm.com>
+	    Dominique Dhumieres  <dominiq@lps.ens.fr>
+
+	* config/rs6000/rs6000-cpus.def (POWERPC_MASKS): Don't assume
+	OPTION_MASK_STRICT_ALIGN is defined.
+	(MASK_STRICT_ALIGN): If OPTION_MASK_STRICT_ALIGN is not defined,
+	define this to 0 for the 3 ports that use it.
+
+	* config/rs6000/rs6000.c (OPTION_MASK_STRICT_ALIGN): Don't do
+	check for ports not having -mstrict-align here, move test to
+	rs6000-cpus.def.
+	(MASK_STRICT_ALIGN): Likewise.
+	(rs6000_debug_reg_global): Print out correct target flag words if
+	-mdebug=reg.
+
+2012-10-19  Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/54945
+	* fold-const.c (fold_sign_changed_comparison):  Punt if folding
+	pointer/non-pointer comparison.
+
+2012-10-19  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* doc/sourcebuild.texi (Effective-Target Keywords): Document
+	new effective target keyword arm_prefer_ldrd_strd.
+
 2012-10-19  Richard Guenther  <rguenther@suse.de>
 
 	PR tree-optimization/54981
