@@ -24,6 +24,23 @@
 	not a VAR_DECL.  Also don't limit it to UNSPECs with exactly one
 	operand.
 
+2012-10-22  Georg-Johann Lay  <avr@gjlay.de>
+
+	Backport from 2012-10-22 trunk r192685.
+	* doc/invoke.texi (AVR Options): Document __AVR_ARCH__.
+	Note __AVR_<device>__ is not defined for cores.
+	Don't point to --help=target.
+	Order --mcu= documentation according to trunk:/gcc/doc/avr-mmcu.texi.
+
+2012-10-19  Marek Polacek  <polacek@redhat.com>
+
+	Backported from mainline
+	2012-10-19  Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/54945
+	* fold-const.c (fold_sign_changed_comparison):  Punt if folding
+	pointer/non-pointer comparison.
+
 2012-10-19  Zhenqiang Chen <zhenqiang.chen@linaro.org>
 
 	Backported from mainline
