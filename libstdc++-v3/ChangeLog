@@ -1,3 +1,16 @@
+2012-10-23  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* config/cpu/aarch64/cxxabi_tweaks.h: New file.
+	* configure.host: Enable aarch64.
+
+2012-10-22  François Dumont  <fdumont@gcc.gnu.org>
+
+	* include/bits/unordered_set.h (unordered_set<>): Prefer
+	aggregation to inheritance with _Hashtable.
+	(unordered_multiset<>): Likewise.
+	* include/debug/unordered_set (operator==): Adapt.
+	* include/profile/unordered_set (operator==): Adapt.
+
 2012-10-22  Yufeng Zhang  <yufeng.zhang@arm.com>
 	    Jonathan Wakely  <jwakely.gcc@gmail.com>
 
