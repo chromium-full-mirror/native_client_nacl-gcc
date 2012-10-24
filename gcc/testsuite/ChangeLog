@@ -1,3 +1,26 @@
+2012-10-24  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/55037
+	* gfortran.dg/class_dummy_4.f03: New.
+
+2012-10-24  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/55010
+	* gcc.dg/pr55010.c: New test.
+
+	PR debug/54828
+	* g++.dg/debug/pr54828.C: New test.
+
+2012-10-23  Dominique d'Humieres  <dominiq@lps.ens.fr>
+
+        * gcc.dg/vect/vect-82_64.c: Adjust the dump file.
+        * gcc.dg/vect/vect-83_64.c: Likewise.
+
+2012-10-23  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54922
+	* g++.dg/cpp0x/constexpr-union4.C: New.
+
 2012-10-23  Jeff Law  <law@redhat.com>
 
 	* gcc.c-torture/execute/pr54985.c: New test.
@@ -6,7 +29,7 @@
 
 	PR debug/54508
 	* g++.dg/debug/dwarf2/pr54508.C: New.
-	
+
 2012-10-23  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c++/54844
