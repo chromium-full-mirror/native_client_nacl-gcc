@@ -2,6 +2,127 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-25  David S. Miller  <davem@davemloft.net>
+
+	* config/sparc/constraints.md ("U"): Delete.
+	* config/sparc/sparc.md: Use 'r' constraint instead of 'U'.
+	* config/sparc/sync.md: Likewise.
+
+2012-10-25  Lawrence Crowl  <crowl@google.com>
+
+	* hash-table.h: Add usage documentation.
+	(template struct typed_free_remove): Clarify documentation.
+	Rename template parameter.
+	(struct typed_noop_remove): Likewise.
+	(descriptor concept): Change typedef T to value_type.
+	Add typedef compare_type.  Use more precise template parameter name,
+	Descriptor instead of Descr.  Update users to match.
+	(struct hash_table): Change 'find' parameters to use compare_type
+	instead of the value type.
+
+2012-10-25  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-cp.c (ipcp_discover_new_direct_edges): If something was turned
+	to direct call update the summary.
+	* ipa-inline-transform.c (inline_call): Sanity check that summaries
+	match the predicted effect; fix updating of summary after edge
+	redirection.
+	* ipa-inline-analysis.c (inline_node_duplication_hook): Do not try
+	to update the summary and recompute it instead.
+	(estimate_function_body_sizes): Fix self size estimation; double
+	check that it agrees with inline_update_overall_summary.
+	(estimate_edge_size_and_time): Handle devirtualizaiton costs.
+	(estimate_edge_devirt_benefit): Update to be called from
+	estimate_edge_size_and_time.
+	(estimate_calls_size_and_time): Update.
+	(estimate_node_size_and_time): Watch overflows.
+	(inline_merge_summary): Likewise.
+	* ipa-prob.c: Include ipa-inline.h
+	(ipa_make_edge_direct_to_target): After redirection update the summary.
+
+2012-10-25  Cary Coutant  <ccoutant@google.com>
+
+	PR debug/55063
+	* dwarf2out.c (prune_unused_types_prune): Check whether DIE is
+	already a declaration.
+
+2012-10-25  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* lra-assigns.c (assign_by_spills): Add non-reload pseudos
+	assigned to hard register to changed_pseudo_bitmap.
+
+2012-10-25  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* config.gcc (microblaze*-*-rtems*): New target.
+	* config/microblaze/rtems.h: New.
+	* config/microblaze/t-rtems: New.
+
+2012-10-25  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimize/54980
+	* tree-ssa-loop-ivcanon.c (constant_after_peeling): Fix
+	obvious typo.
+	(loop_edge_to_cancel): Be sure that the edge is from an conditional
+	so we can cancel it.
+
+2012-10-25  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/54427
+	* tree.c (signed_or_unsigned_type_for): Handle vectors.
+
+2012-10-25  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (recursive_inlining): Redirect to master
+	clone before testing profitability.
+
+2012-10-25  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/54902
+	* tree-ssa-pre.c (fini_eliminate): Return TODO.
+	(do_pre): Adjust.
+	(execute_fre): Likewise.
+	* tree-ssa-tailmerge.c (tail_merge_optimize): Delete unreachable
+	blocks before computing dominators.
+
+2012-10-25  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* expr.c (emit_block_move_via_loop): Use simplify_gen_binary
+	rather than gen_rtx_PLUS.
+
+2012-10-24  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR bootstrap/55068
+	PR regression/55050
+	* ira.c (setup_reg_renumber): Fix assert.
+	* ira-emit.c (emit_move_list): Update equivalences only for LRA.
+
+2012-10-24  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR bootstrap/55067
+	* lra.c: Rename loc to sloc and loc_t to sloc_t.
+
+2012-10-24  Sharad Singhai  <singhai@google.com>
+
+	* config/rs6000/rs6000.c (rs6000_density_test): Use dump_enabled_p
+          instead of dump_kind_p.
+
+2012-10-24  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c++/54928
+	* tree-diagnostic.c (maybe_unwind_expanded_macro_loc):
+	Use diagnostic_append_note.
+	* diagnostic.c (diagnostic_build_prefix): Make diagnostic const.
+	(default_diagnostic_finalizer): Do not destroy prefix here.
+	(diagnostic_report_diagnostic): Destroy it here.
+	(diagnostic_append_note): New.
+	* diagnostic.h (diagnostic_append_note): Declare.
+
+2012-10-24  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55055
+	* lra-spills.c (alter_subregs): New function.
+	(lra_hard_reg_substitution): Use it.
+
 2012-10-24  Sharad Singhai  <singhai@google.com>
 
 	* dumpfile.c (dump_enabled_p): Make it inline and move the definition
