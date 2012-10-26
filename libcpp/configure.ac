@@ -137,7 +137,7 @@ case $target in
 	aarch64*-*-* | \
 	alpha*-*-* | \
 	arm*-*-*eabi* | \
-	arm*-*-*nacl* | \
+	arm*-*-nacl* | \
 	arm*-*-symbianelf* | \
 	x86_64-*-* | \
 	ia64-*-* | \
