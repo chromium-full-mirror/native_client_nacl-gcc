@@ -860,6 +860,8 @@ arm*-*-nacl*)
 		;;
 	esac
 	tmake_file="${tmake_file} arm/t-arm arm/t-nacl"
+	# See comment below under arm*-*-linux-* about why we force
+	# HOST_WIDE_INT to be 64 bits for this 32-bit target.
 	need_64bit_hwint=yes
 	with_tls=${with_tls:-gnu}
 	;;
