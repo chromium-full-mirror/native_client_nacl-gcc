@@ -150,7 +150,7 @@ m4_changequote(,)
 case $target in
 	alpha*-*-* | \
 	arm*-*-*eabi* | \
-	arm*-*-*nacl* | \
+	arm*-*-nacl* | \
 	arm*-*-symbianelf* | \
 	x86_64-*-* | \
 	ia64-*-* | \
