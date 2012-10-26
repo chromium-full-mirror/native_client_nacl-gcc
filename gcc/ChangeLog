@@ -36,6 +36,44 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2012-10-26  Gunther Nikl  <gnikl@users.sourceforge.net>
+
+	* common/config/m68k/m68k-common.c (m68k_handle_option): Set
+	gcc_options fields of opts_set for -m68020-40 and -m68020-60.
+
+2012-10-26  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* config/avr/t-rtems: Revert previous commit.
+
+2012-10-26  Terry Guo  <terry.guo@arm.com>
+
+	Backport from mainline
+	2012-10-23  Terry Guo  <terry.guo@arm.com>
+
+	PR target/55019
+	* config/arm/arm.c (thumb1_expand_prologue): Don't push high regs with
+	live argument regs.
+
+2012-10-26  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* config/avr/rtems.h (TARGET_OS_CPP_BUILTINS): Remove
+	__USE_INIT_FINI__.
+	* config/avr/t-rtems (LIB1ASMFUNCS): Filter out _exit.
+
+2012-10-25  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* config.gcc (microblaze*-*-rtems*): New target.
+	* config/microblaze/rtems.h: New.
+	* config/microblaze/t-rtems: New.
+
+2012-10-25  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/54902
+	* tree-ssa-pre.c (fini_pre): Return TODO.
+	(execute_pre): Adjust.
+	* tree-ssa-tailmerge.c (tail_merge_optimize): Delete unreachable
+	blocks before computing dominators.
+
 2012-10-24  Uros Bizjak  <ubizjak@gmail.com>
 
 	Backport from mainline
