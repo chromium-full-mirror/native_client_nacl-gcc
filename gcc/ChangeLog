@@ -2,6 +2,49 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-29  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/53066
+	* tree.h (FUNCTION_POINTER_TYPE_P): New.
+
+2012-10-29  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54693
+	* gcc/valtrack.c (dead_debug_insert_temp): Defer rescan of
+	newly-emitted debug insn.
+
+2012-10-29  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54693
+	* tree-ssa-threadedge.c (thread_around_empty_block): Copy
+	debug temps from predecessor before threading.
+
+2012-10-29  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54551
+	PR debug/54693
+	* valtrack.c (dead_debug_global_find): Accept NULL dtemp.
+	(dead_debug_global_insert): Return new entry.
+	(dead_debug_global_replace_temp): Return early if REG is no
+	longer in place, or if dtemp was already substituted.
+	(dead_debug_promote_uses): Insert for all defs and replace all
+	debug uses at once.
+	(dead_debug_local_finish): Release used after promotion.
+	(dead_debug_insert_temp): Stop if dtemp is NULL.
+
+2012-10-29  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54693
+	* loop-unroll.c (loop_exit_at_end_p): Skip debug insns.
+
+2012-10-29  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54693
+	* config/i386/i386.c (add_parameter_dependencies): Stop
+	backward scan at the insn before the incoming head.
+	(ix86_dependencies_evaluation_hook): Skip debug insns.  Stop
+	if first_arg is head.
+
 2012-10-29  Andrew Pinski  <apinski@cavium.com>
 
         * config/aarch64/aarch64-protos.h (aarch64_load_tp): New proto.
