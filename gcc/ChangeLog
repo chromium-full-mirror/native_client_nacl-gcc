@@ -2,6 +2,162 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-10-29  Andrew Pinski  <apinski@cavium.com>
+
+        * config/aarch64/aarch64-protos.h (aarch64_load_tp): New proto.
+        * config/aarch64/aarch64.c (aarch64_load_tp): Export.
+        (aarch64_init_builtins): Don't add __builtin_thread_pointer builtin.
+        * config/aarch64/aarch64.h (aarch64_builtins): Delete
+
+AARCH64_BUILTIN_THREAD_POINTER.
+        * config/aarch64/aarch64.md (get_thread_pointerdi): New pattern.
+
+2012-10-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/55027
+	* tree.c (real_zerop, real_onep, real_twop, real_minus_onep):
+	Handle VECTOR_CST.
+
+2012-10-29  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* rtlanal.c (strip_address_mutation): Use SUBREG_REG instead of
+	XEXP.
+
+2012-10-29  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (ix86_decompose_address): Use simplify_gen_subreg
+	for all addresses, zero-extended with AND.
+
+2012-10-29  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR middle-end/55116
+	* rtlanal.c (strip_address_mutation): Add SUBREG case.
+
+2012-10-29  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (want_inline_function_called_once_p): Rename to ...
+	(want_inline_function_to_all_callers_p): check also functions with
+	multiple callers.
+	(ipa_inline): Handle inlining for size into multiple callers.
+
+2012-10-29  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53695
+	* tracer.c (tracer): Fixup loop structure.
+	* cfgloopmanip.c (force_single_succ_latches): Add assert.
+	(fix_loop_structure): Re-compute loop latches and disambiguate
+	loops with multiple latches if required.
+
+2012-10-29  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (ix86_decompose_address): Use simplify_gen_subreg
+	to check SImode equivalent of address, zero-extended with AND RTX.
+	* config/i386/i386.md (ashift to lea splitter): Split to SImode mult.
+	(simple lea to add/shift peephole2s): Remove peephole2s that operate
+	on subregs of DImode operations.
+
+2012-10-28  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55106
+	* lra-constraints.c (skip_usage_debug_insns): New function.
+	(check_secondary_memory_needed_p): Ditto.
+	(inherit_reload_reg): Use the new functions.  Improve debug output.
+
+2012-10-29  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	* doc/cpp.texi (Search Path): Fix outdated C++ path.
+
+2012-10-28  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline-analysis.c (eliminated_by_inlining_prob): Handle
+	&this->field expressions.
+
+2012-10-28  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* rtl.h (struct rtx_def): Add a comment for member unchanging.
+	* lra-int.h (LRA_TEMP_CLOBBER_P): New macro.
+	(lra_hard_reg_substitution): Rename to lra_final_code_change.
+	* lra-constraints.c (match_reload): Mark temporary clobbers.
+	* lra-spill.c (lra_hard_reg_substitution): Rename to
+	lra_final_code_change.  Remove temporary clobbers.
+	* lra.c (lra): Rename to lra_final_code_change.
+
+2012-10-28  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (edge_badness): Fix overflow.
+	(inline_small_functions): Initialize SCCs correctly.
+	(do_estimate_edge_time, do_estimate_edge_hints): Skip self
+	recursive functions in SCC hints.
+
+2012-10-28  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR rtl-optimization/38711
+	* ira.c (ira): Remove DF_LIVE if the problem is in the stack.
+	(do_reload): Add it back at the end for -O2 and higher.
+
+	* function.c (thread_prologue_and_epilogue_insns): Use
+	REG_SET_TO_HARD_REG_SET instead of CLEAR_HARD_REG_SET and
+	reg_set_to_hard_reg_set.
+
+2012-10-28  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (edge_badness): Reduce precision; use scc hints.
+	(inline_small_functions): Fix dumps; update all callees after inlining.
+	* ipa-inline.h (INLINE_HINT_in_scc, INLINE_HINT_same_scc): New
+	constants.
+	(inline summary): Add SCC_NO.
+	* ipa-inline-analysis.c (dump_inline_hints): Dump SCC hints.
+	(reset_inline_summary): Reset scc_no.
+	(estimate_node_size_and_time): Set in_scc hint.
+	(do_estimate_edge_time): Add same_scc hint.
+	(do_estimate_edge_hints): Likewise.
+
+2012-10-28  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* doc/cppopts.texi: Fix use of @item vs. @itemx inside @table.
+	* doc/extend.texi: Likewise.
+	* doc/generic.texi: Likewise.
+	* doc/invoke.texi: Likewise.
+	* doc/md.texi: Likewise.
+	* doc/sourcebuild.texi: Likewise.
+
+	* doc/tm.texi.in (Misc): Add newline before @end.
+	* doc/tm.texi: Update.
+
+2012-10-27  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* lra-assigns.c (find_hard_regno_for): Fix use of WORDS_BIG_ENDIAN.
+
+2012-10-27  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/55034
+	* config/avr/avr.c (avr_out_lpm): Remove unused regno_dest.
+
+2012-10-27  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/55042
+	* config/sh/sh.c (sh1_builtin_p): Comment out unused function.
+
+2012-10-27  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*lea<mode>): Remove unneeded temporary.
+
+2012-10-26  David S. Miller  <davem@davemloft.net>
+
+	* config/sparc/constraints.md: Update unused letter list, move
+	"w" near other memory constraints.  Remove no longer relevant
+	comment.
+	* doc/md.texi: Sync sparc constraint documentation with reality.
+
+2012-10-26  DJ Delorie  <dj@redhat.com>
+
+	* config/rl78/rl78.c (rl78_as_legitimate_address): Do not allow
+	reg+addend addresses for the _far namespace.
+
+2012-10-26  Segher Boessenkool  <segher@kernel.crashing.org>
+
+	* config/rs6000/sync.md (ATOMIC): Correct DI condition.
+
 2012-10-26  Jakub Jelinek  <jakub@redhat.com>
 
 	PR debug/54970

@@ -639,6 +639,16 @@ dump_inline_hints (FILE *f, inline_hints hints)
       hints &= ~INLINE_HINT_loop_stride;
       fprintf (f, " loop_stride");
     }
+  if (hints & INLINE_HINT_same_scc)
+    {
+      hints &= ~INLINE_HINT_same_scc;
+      fprintf (f, " same_scc");
+    }
+  if (hints & INLINE_HINT_in_scc)
+    {
+      hints &= ~INLINE_HINT_in_scc;
+      fprintf (f, " in_scc");
+    }
   gcc_assert (!hints);
 }
 
@@ -973,6 +983,7 @@ reset_inline_summary (struct cgraph_node *node)
   info->stack_frame_offset = 0;
   info->size = 0;
   info->time = 0;
+  info->scc_no = 0;
   if (info->loop_iterations)
     {
       pool_free (edge_predicate_pool, info->loop_iterations);
@@ -1364,6 +1375,9 @@ dump_inline_summary (FILE * f, struct cgraph_node *node)
 	       (int) s->estimated_self_stack_size);
       fprintf (f, "  global stack:    %i\n",
 	       (int) s->estimated_stack_size);
+      if (s->scc_no)
+        fprintf (f, "  In SCC:          %i\n",
+	         (int) s->scc_no);
       for (i = 0;
 	   VEC_iterate (size_time_entry, s->entry, i, e);
 	   i++)
@@ -1553,6 +1567,7 @@ eliminated_by_inlining_prob (gimple stmt)
 	if (gimple_assign_rhs_code (stmt) == CONVERT_EXPR
 	    || gimple_assign_rhs_code (stmt) == NOP_EXPR
 	    || gimple_assign_rhs_code (stmt) == VIEW_CONVERT_EXPR
+	    || gimple_assign_rhs_code (stmt) == ADDR_EXPR
 	    || gimple_assign_rhs_class (stmt) == GIMPLE_SINGLE_RHS)
 	  {
 	    tree rhs = gimple_assign_rhs1 (stmt);
@@ -1570,6 +1585,20 @@ eliminated_by_inlining_prob (gimple stmt)
 	    /* Reads of parameter are expected to be free.  */
 	    if (unmodified_parm (stmt, inner_rhs))
 	      rhs_free = true;
+	    /* Match expressions of form &this->field. Those will most likely
+	       combine with something upstream after inlining.  */
+	    else if (TREE_CODE (inner_rhs) == ADDR_EXPR)
+	      {
+		tree op = get_base_address (TREE_OPERAND (inner_rhs, 0));
+		if (TREE_CODE (op) == PARM_DECL)
+		  rhs_free = true;
+	        else if (TREE_CODE (op) == MEM_REF)
+		  {
+		    op = get_base_address (TREE_OPERAND (op, 0));
+		    if (unmodified_parm (stmt, op))
+		      rhs_free = true;
+		  }
+	      }
 
 	    /* When parameter is not SSA register because its address is taken
 	       and it is just copied into one, the statement will be completely
@@ -2825,7 +2854,8 @@ estimate_node_size_and_time (struct cgraph_node *node,
   if (info->loop_stride
       && !evaluate_predicate (info->loop_stride, possible_truths))
     hints |=INLINE_HINT_loop_stride;
-
+  if (info->scc_no)
+    hints |= INLINE_HINT_in_scc;
 
   estimate_calls_size_and_time (node, &size, &time, &hints, possible_truths,
 				known_vals, known_binfos, known_aggs);
@@ -3323,6 +3353,9 @@ do_estimate_edge_time (struct cgraph_edge *edge)
   /* When caching, update the cache entry.  */
   if (edge_growth_cache)
     {
+      struct cgraph_node *to = (edge->caller->global.inlined_to
+			        ? edge->caller->global.inlined_to
+				: edge->caller);
       if ((int)VEC_length (edge_growth_cache_entry, edge_growth_cache)
 	  <= edge->uid)
 	VEC_safe_grow_cleared (edge_growth_cache_entry, heap, edge_growth_cache,
@@ -3332,6 +3365,10 @@ do_estimate_edge_time (struct cgraph_edge *edge)
 
       VEC_index (edge_growth_cache_entry, edge_growth_cache, edge->uid).size
 	= size + (size >= 0);
+      if (inline_summary (to)->scc_no
+	  && inline_summary (to)->scc_no == inline_summary (callee)->scc_no
+	  && !cgraph_edge_recursive_p (edge))
+	hints |= INLINE_HINT_same_scc;
       VEC_index (edge_growth_cache_entry, edge_growth_cache, edge->uid).hints
 	= hints + 1;
     }
@@ -3392,6 +3429,9 @@ do_estimate_edge_hints (struct cgraph_edge *edge)
   VEC (tree, heap) *known_vals;
   VEC (tree, heap) *known_binfos;
   VEC (ipa_agg_jump_function_p, heap) *known_aggs;
+  struct cgraph_node *to = (edge->caller->global.inlined_to
+		            ? edge->caller->global.inlined_to
+			    : edge->caller);
 
   /* When we do caching, use do_estimate_edge_time to populate the entry.  */
 
@@ -3417,6 +3457,10 @@ do_estimate_edge_hints (struct cgraph_edge *edge)
   VEC_free (tree, heap, known_vals);
   VEC_free (tree, heap, known_binfos);
   VEC_free (ipa_agg_jump_function_p, heap, known_aggs);
+  if (inline_summary (to)->scc_no
+      && inline_summary (to)->scc_no == inline_summary (callee)->scc_no
+      && !cgraph_edge_recursive_p (edge))
+    hints |= INLINE_HINT_same_scc;
   return hints;
 }
 

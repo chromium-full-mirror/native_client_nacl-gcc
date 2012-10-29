@@ -1,3 +1,44 @@
+2012-10-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/55027
+	* gcc.dg/pr55027.c: New testcase.
+
+2012-10-29  Jan Hubicka  <jh@suse.cz>
+
+	* gcc.dg/ipa/inline-6.c: New testcase.
+
+2012-10-29  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55106
+	* g++.dg/pr55106.C: New.
+
+2012-10-29  Richard Guenther  <rguenther@suse.de>
+
+	PR middle-end/53695
+	* gcc.dg/torture/pr53695.c: New testcase.
+
+2012-10-28  Jan Hubicka  <jh@suse.cz>
+
+	* gcc.dg/ipa/inlinehint-3.c: New testcase.
+
+2012-10-28  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/54958
+	* gfortran.dg/do_check_6.f90: New.
+
+2012-10-27  Dominique Dhumieres  <dominiq@lps.ens.fr>
+	    Jack Howarth <howarth@bromo.med.uc.edu>
+
+	PR target/54404
+	* g++.dg/other/darwin-cfstring1.C: Add -ftrack-macro-expansion=0
+	to dg-options.
+	* obj-c++.dg/strings/const-cfstring-2.mm: Likewise.
+
+2012-10-27  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/34283
+	* gcc.target/i386/pr34283.c: New test.
+
 2012-10-26  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c++/55081

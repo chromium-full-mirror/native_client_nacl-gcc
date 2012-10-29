@@ -663,7 +663,7 @@ match_reload (signed char out, signed char *ins, enum reg_class goal_class,
 	      rtx *before, rtx *after)
 {
   int i, in;
-  rtx new_in_reg, new_out_reg, reg;
+  rtx new_in_reg, new_out_reg, reg, clobber;
   enum machine_mode inmode, outmode;
   rtx in_rtx = *curr_id->operand_loc[ins[0]];
   rtx out_rtx = *curr_id->operand_loc[out];
@@ -694,8 +694,10 @@ match_reload (signed char out, signed char *ins, enum reg_class goal_class,
 	    new_in_reg = gen_rtx_SUBREG (inmode, reg, 0);
 	  /* NEW_IN_REG is non-paradoxical subreg.  We don't want
 	     NEW_OUT_REG living above.  We add clobber clause for
-	     this.  */
-	  emit_clobber (new_out_reg);
+	     this.  This is just a temporary clobber.  We can remove
+	     it at the end of LRA work.  */
+	  clobber = emit_clobber (new_out_reg);
+	  LRA_TEMP_CLOBBER_P (PATTERN (clobber)) = 1;
 	}
     }
   else
@@ -3571,6 +3573,48 @@ substitute_pseudo (rtx *loc, int old_regno, rtx new_reg)
   return result;
 }
 
+/* Return first non-debug insn in list USAGE_INSNS.  */
+static rtx
+skip_usage_debug_insns (rtx usage_insns)
+{
+  rtx insn;
+
+  /* Skip debug insns.  */
+  for (insn = usage_insns;
+       insn != NULL_RTX && GET_CODE (insn) == INSN_LIST;
+       insn = XEXP (insn, 1))
+    ;
+  return insn;
+}
+
+/* Return true if we need secondary memory moves for insn in
+   USAGE_INSNS after inserting inherited pseudo of class INHER_CL
+   into the insn.  */
+static bool
+check_secondary_memory_needed_p (enum reg_class inher_cl, rtx usage_insns)
+{
+#ifndef SECONDARY_MEMORY_NEEDED
+  return false;
+#else
+  rtx insn, set, dest;
+  enum reg_class cl;
+
+  if (inher_cl == ALL_REGS
+      || (insn = skip_usage_debug_insns (usage_insns)) == NULL_RTX)
+    return false;
+  lra_assert (INSN_P (insn));
+  if ((set = single_set (insn)) == NULL_RTX || ! REG_P (SET_DEST (set)))
+    return false;
+  dest = SET_DEST (set);
+  if (! REG_P (dest))
+    return false;
+  lra_assert (inher_cl != NO_REGS);
+  cl = get_reg_class (REGNO (dest));
+  return (cl != NO_REGS && cl != ALL_REGS
+	  && SECONDARY_MEMORY_NEEDED (inher_cl, cl, GET_MODE (dest)));
+#endif
+}
+
 /* Registers involved in inheritance/split in the current EBB
    (inheritance/split pseudos and original registers).	*/
 static bitmap_head check_only_regs;
@@ -3608,18 +3652,18 @@ inherit_reload_reg (bool def_p, int original_regno,
   lra_assert (! usage_insns[original_regno].after_p);
   if (lra_dump_file != NULL)
     fprintf (lra_dump_file,
-	     "	  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	     "    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
   if (! ira_reg_classes_intersect_p[cl][rclass])
     {
       if (lra_dump_file != NULL)
 	{
 	  fprintf (lra_dump_file,
-		   "	Rejecting inheritance for %d "
+		   "    Rejecting inheritance for %d "
 		   "because of disjoint classes %s and %s\n",
 		   original_regno, reg_class_names[cl],
 		   reg_class_names[rclass]);
 	  fprintf (lra_dump_file,
-		   "	>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+		   "    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	}
       return false;
     }
@@ -3636,6 +3680,31 @@ inherit_reload_reg (bool def_p, int original_regno,
       
       rclass = cl;
     }
+  if (check_secondary_memory_needed_p (cl, next_usage_insns))
+    {
+      /* Reject inheritance resulting in secondary memory moves.
+	 Otherwise, there is a danger in LRA cycling.  Also such
+	 transformation will be unprofitable.  */
+      if (lra_dump_file != NULL)
+	{
+	  rtx insn = skip_usage_debug_insns (next_usage_insns);
+	  rtx set = single_set (insn);
+
+	  lra_assert (set != NULL_RTX);
+
+	  rtx dest = SET_DEST (set);
+
+	  lra_assert (REG_P (dest));
+	  fprintf (lra_dump_file,
+		   "    Rejecting inheritance for insn %d(%s)<-%d(%s) "
+		   "as secondary mem is needed\n",
+		   REGNO (dest), reg_class_names[get_reg_class (REGNO (dest))],
+		   original_regno, reg_class_names[cl]);
+	  fprintf (lra_dump_file,
+		   "    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	}
+      return false;
+    }
   new_reg = lra_create_new_reg (GET_MODE (original_reg), original_reg,
 				rclass, "inheritance");
   start_sequence ();
@@ -3650,7 +3719,7 @@ inherit_reload_reg (bool def_p, int original_regno,
       if (lra_dump_file != NULL)
 	{
 	  fprintf (lra_dump_file,
-		   "	Rejecting inheritance %d->%d "
+		   "    Rejecting inheritance %d->%d "
 		   "as it results in 2 or more insns:\n",
 		   original_regno, REGNO (new_reg));
 	  debug_rtl_slim (lra_dump_file, new_insns, NULL_RTX, -1, 0);
@@ -3665,7 +3734,7 @@ inherit_reload_reg (bool def_p, int original_regno,
     /* We now have a new usage insn for original regno.  */
     setup_next_usage_insn (original_regno, new_insns, reloads_num, false);
   if (lra_dump_file != NULL)
-    fprintf (lra_dump_file, "	 Original reg change %d->%d (bb%d):\n",
+    fprintf (lra_dump_file, "    Original reg change %d->%d (bb%d):\n",
 	     original_regno, REGNO (new_reg), BLOCK_FOR_INSN (insn)->index);
   lra_reg_info[REGNO (new_reg)].restore_regno = original_regno;
   bitmap_set_bit (&check_only_regs, REGNO (new_reg));
