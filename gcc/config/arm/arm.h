@@ -527,8 +527,10 @@ extern int arm_arch_thumb_hwdiv;
 
 #define STACK_BOUNDARY  (ARM_DOUBLEWORD_ALIGN ? DOUBLEWORD_ALIGNMENT : 32)
 
+#ifndef PREFERRED_STACK_BOUNDARY
 #define PREFERRED_STACK_BOUNDARY \
     (arm_abi == ARM_ABI_ATPCS ? 64 : STACK_BOUNDARY)
+#endif
 
 #define FUNCTION_BOUNDARY  ((TARGET_THUMB && optimize_size) ? 16 : 32)
 

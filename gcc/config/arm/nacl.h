@@ -57,6 +57,10 @@
   fixed_regs[9] = 1; \
   call_used_regs[9] = 1;
 
+/* The NaCl ABI says the stack shall be aligned to a 16-byte boundary.  */
+#undef  PREFERRED_STACK_BOUNDARY
+#define PREFERRED_STACK_BOUNDARY        128
+
 /* TARGET_BIG_ENDIAN_DEFAULT is set in
    config.gcc for big endian configurations.  */
 #undef TARGET_LINKER_EMULATION
