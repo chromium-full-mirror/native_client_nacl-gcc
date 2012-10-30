@@ -1,3 +1,36 @@
+2012-10-30  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/vect/slp-perm-2.c: Adjust.
+
+2012-10-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55111
+	* gcc.dg/torture/pr55111.c: New testcase.
+
+2012-10-30  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/54988
+	* gcc.target/sh/pr53988.c: New.
+
+2012-10-30  Bin Cheng  <bin.cheng@arm.com>
+
+	PR target/54989
+	* gcc.dg/hoist-register-pressure-1.c: Rename from
+	hoist-register-pressure.c. Add nonpic condition.
+	* gcc.dg/hoist-register-pressure-2.c: New testcase.
+
+2012-10-29  Jonathan Wakely  <jwakely.gcc@gmail.com>
+
+	PR c++/54930
+	* gcc.dg/Wreturn-local-addr.c: New.
+	* g++.dg/warn/Wno-return-local-addr.C: New.
+	* g++.dg/warn/Wreturn-local-addr.C: New.
+
+2012-10-29  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR middle-end/55116
+	* gcc.target/i386/pr55116.c: New file.
+
 2012-10-29  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR c/53066
