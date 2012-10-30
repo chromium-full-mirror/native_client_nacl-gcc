@@ -11405,7 +11405,7 @@
 	     (match_operand:SI 1 "" "")
 	     (match_operand:SI 2 "" ""))]
   "TARGET_32BIT && arm_arch5e"
-  "pld\\t%a0")
+  "%b0pld\\t%a0")
 
 ;; General predication pattern
 
