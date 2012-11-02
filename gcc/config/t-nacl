@@ -1,0 +1,47 @@
+# Rules for *-nacl targets
+#
+# Copyright (C) 2012 Free Software Foundation, Inc.
+#
+# This file is part of GCC.
+#
+# GCC is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# GCC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GCC; see the file COPYING3.  If not see
+# <http://www.gnu.org/licenses/>.
+
+# A config/*/t-nacl file has set:
+#	nacl-macros-files = nacl-CPU-macros.s [nacl-CPU2-macros.s...]
+#	nacl-macros-subdir = config/CPU
+
+nacl-macros-srcdir = $(srcdir)/$(nacl-macros-subdir)
+
+define install-nacl-macros-files
+$(foreach file,$(nacl-macros-files),\
+$(INSTALL_DATA) $(nacl-macros-srcdir)/$(file) \
+		$(DESTDIR)$(gcc_tooldir)/lib/$(file)
+)
+endef
+
+# This arranges that the file(s) of macros gets installed by 'make install'.
+.PHONY: install-nacl-macros
+install-nacl-macros: $(addprefix $(nacl-macros-srcdir)/,$(nacl-macros-files))
+	$(mkinstalldirs) $(DESTDIR)$(gcc_tooldir)/lib
+	$(install-nacl-macros-files)
+
+install: install-nacl-macros
+
+# This arranges that the file(s) of macros get linked into the build
+# directory so that './xgcc -B./' and the like will find it there.
+$(nacl-macros-files): %: $(nacl-macros-srcdir)/%
+	$(LN_S) $< $@
+
+libgcc-support: $(nacl-macros-files)

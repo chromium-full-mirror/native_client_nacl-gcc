@@ -18,10 +18,6 @@
 # along with GCC; see the file COPYING3.  If not see
 # <http://www.gnu.org/licenses/>.
 
-.PHONY: install-nacl-macros
-install-nacl-macros: $(srcdir)/config/i386/nacl-i386-macros.s
-	$(mkinstalldirs) $(DESTDIR)$(gcc_tooldir)/lib
-	$(INSTALL_DATA) $(srcdir)/config/i386/nacl-i386-macros.s \
-			$(DESTDIR)$(gcc_tooldir)/lib/nacl-i386-macros.s
-
-install: install-nacl-macros
+# These just tell config/t-nacl how to name and find the file of macros.
+nacl-macros-files = nacl-i386-macros.s
+nacl-macros-subdir = config/i386
