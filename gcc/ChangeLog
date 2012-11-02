@@ -36,6 +36,25 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2012-10-31  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/i386/i386.c (ix86_expand_prologue): Emit frame info for the
+	special register pushes before frame probing and allocation.
+
+2012-10-31  Ralf Corsépius  <ralf.corsepius@rtems.org>,
+	    Joel Sherrill  <joel.sherrill@oarcorp.com>
+
+	* config/sparc/t-rtems: New (Custom multilibs).
+	* config/sparc/t-rtems-64: New (Custom multilibs).
+	* config.gcc (sparc64-*-rtems*): Add sparc/t-rtems-64.
+	(sparc-*-rtems*): Add sparc/t-rtems.
+
+2012-10-30  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* cse.c (hash_rtx_cb): Replace RTX_UNCHANGING_P with MEM_READONLY_P in
+	head comment.
+	(hash_rtx): Likewise.
+
 2012-10-29  Terry Guo  <terry.guo@arm.com>
 
 	Backport from mainline
