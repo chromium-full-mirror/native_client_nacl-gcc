@@ -859,7 +859,7 @@ arm*-*-nacl*)
 		tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
 		;;
 	esac
-	tmake_file="${tmake_file} arm/t-arm arm/t-nacl"
+	tmake_file="${tmake_file} arm/t-arm arm/t-nacl t-nacl"
 	# See comment below under arm*-*-linux-* about why we force
 	# HOST_WIDE_INT to be 64 bits for this 32-bit target.
 	need_64bit_hwint=yes
@@ -1328,7 +1328,7 @@ i[34567]86-*-linux* | i[34567]86-*-kfreebsd*-gnu | i[34567]86-*-knetbsd*-gnu | i
 		;;
 	i[34567]86-*-nacl*)
 		tm_file="$tm_file i386/gnu-user-common.h i386/gnu-user.h nacl.h i386/nacl.h"
-		tmake_file="${tmake_file} i386/t-nacl"
+		tmake_file="${tmake_file} i386/t-nacl t-nacl"
 		;;
 	esac
 	;;
