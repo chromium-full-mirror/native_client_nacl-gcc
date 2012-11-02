@@ -1403,6 +1403,11 @@ predict_loops (void)
 
       exits = get_loop_exit_edges (loop);
       n_exits = VEC_length (edge, exits);
+      if (!n_exits)
+	{
+          VEC_free (edge, heap, exits);
+	  continue;
+	}
 
       FOR_EACH_VEC_ELT (edge, exits, j, ex)
 	{
@@ -1414,7 +1419,7 @@ predict_loops (void)
 
 	  predict_extra_loop_exits (ex);
 
-	  if (number_of_iterations_exit (loop, ex, &niter_desc, false))
+	  if (number_of_iterations_exit (loop, ex, &niter_desc, false, false))
 	    niter = niter_desc.niter;
 	  if (!niter || TREE_CODE (niter_desc.niter) != INTEGER_CST)
 	    niter = loop_niter_by_eval (loop, ex);
