@@ -2,6 +2,393 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-02  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/55079
+	* tree-ssa-loop-niter.c (number_of_iterations_exit): Update
+	MAX field if NITER was folded to contant.
+	(record_estimate): Sanity check.
+	* tree-ssa-loop-ivcanon.c (remove_exits_and_undefined_stmts): New
+	function.
+	(remove_redundant_iv_test): New function.
+	(loops_to_unloop, loops_to_unloop_nunroll): New static vars.
+	(unloop_loops): Break out from ...
+	(try_unroll_loop_completely): ... here; Pass in MAXITER; use
+	remove_exits_and_undefined_stmts; do not unloop.
+	(canonicalize_loop_induction_variables): Compute MAXITER;
+	use remove_redundant_iv_test; remove loop_close_ssa_invalidated
+	and irred_invalidated arguments.
+	(canonicalize_induction_variables): Compute fresh bound estimates;
+	unloop; walk from innermost.
+	(tree_unroll_loops_completely): Likewise.
+
+2012-11-02  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR middle-end/55130
+	* lra-constraints.c (debug_loc_equivalence_change_p): Rename to
+	loc_equivalence_change_p.
+	(lra_constraints): Check equiv_insn_bitmap for debug insn.  Call
+	loc_equivalence_change_p for non-transformed insn.
+
+2012-11-02  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* cfg-flags.def (ABNORMAL_CALL): Fix comment.
+	(EH): Likewise.
+	(SIBCALL): Likewise.
+	* cfgrtl.c (rtl_verify_flow_info_1): Adjust error messages.
+	Deal with EDGE_SIBCALL and fix the EDGE_ABNORMAL check.
+
+2012-11-02  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/55147
+	* config/i386/i386.md (bswapdi2): Limit to TARGET_64BIT.
+	(*bswapdi2_doubleword): Removed.
+
+2012-11-02  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* doc/install.texi (Specific): Remove moxie web reference.
+
+2012-11-01  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/55001
+	* tree-vect-generic.c (expand_vector_condition): New function.
+	(expand_vector_operations_1): Call it.
+
+2012-11-01  Steve Ellcey  <sellcey@mips.com>
+
+	* target-globals.c (save_target_globals): Save lra_int struct.
+
+2012-11-01  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* doc/standards.texi (Standards): Adjust reference to Go
+	specification.
+
+2012-11-01  Lawrence Crowl  <crowl@google.com>
+
+	* ebitmap.h: Remove unused.
+	* ebitmap.c: Remove unused.
+	* Makefile.in: Remove ebitmap.h and ebitmap.c.
+	* sbitmap.h (SBITMAP_SIZE_BYTES): Move to source file.
+	(SET_BIT_WITH_POPCOUNT): Remove unused.
+	(RESET_BIT_WITH_POPCOUNT): Remove unused.
+	(bitmap_copy_n): Remove unused.
+	(bitmap_range_empty_p): Remove unused.
+	(sbitmap_popcount): Remove unused.
+	(sbitmap_verify_popcount): Make private to source file.
+	* sbitmap.c (SBITMAP_SIZE_BYTES): Move here from header.
+	(bitmap_copy_n): Remove unused.
+	(bitmap_range_empty_p): Remove unused.
+	(sbitmap_popcount): Remove unused.
+	(sbitmap_verify_popcount): Make private to source file.
+
+2012-11-01  Lawrence Crowl  <crowl@google.com>
+
+	* sbitmap.h (sbitmap_iter_init): Rename bmp_iter_set_init and add
+	unused parameter to match bitmap iterator.  Update callers.
+	(sbitmap_iter_cond): Rename bmp_iter_set.  Update callers.
+	(sbitmap_iter_next): Rename bmp_iter_next and add unused parameter to
+	match bitmap iterator.  Update callers.
+	(EXECUTE_IF_SET_IN_SBITMAP_REV): Remove unused.
+	(EXECUTE_IF_SET_IN_SBITMAP): Rename EXECUTE_IF_SET_IN_BITMAP and
+	adjust to be identical to the definition in bitmap.h.  Conditionalize
+	the definition based on not having been defined.  Update callers.
+	* bitmap.h (EXECUTE_IF_SET_IN_BITMAP): Conditionalize the definition
+	based on not having been defined.  (To match the above.)
+
+2012-11-01  Lawrence Crowl  <crowl@google.com>
+
+	* sbitmap.h (TEST_BIT): Rename bitmap_bit_p, normalizing parameter
+	type. Update callers to match.
+	(SET_BIT): Rename bitmap_set_bit, normalizing parameter type. Update
+	callers to match.
+	(SET_BIT_WITH_POPCOUNT): Rename bitmap_set_bit_with_popcount,
+	normalizing parameter type. Update callers to match.
+	(RESET_BIT): Rename bitmap_clear_bit, normalizing parameter type.
+	Update callers to match.
+	(RESET_BIT_WITH_POPCOUNT): Rename bitmap_clear_bit_with_popcount,
+	normalizing parameter type. Update callers to match.
+	* basic-block.h (sbitmap_intersection_of_succs): Rename
+	bitmap_intersection_of_succs. Update callers to match.
+	* basic-block.h (sbitmap_intersection_of_preds): Rename
+	bitmap_intersection_of_preds. Update callers to match.
+	* basic-block.h (sbitmap_union_of_succs): Rename
+	bitmap_union_of_succs. Update callers to match.
+	* basic-block.h (sbitmap_union_of_preds): Rename
+	bitmap_union_of_preds. Update callers to match.
+
+2012-11-01  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR middle-end/55150
+	* lra-constraints.c (lra_constraints): Check only pseudos with
+	equivalences.  Add insns with equivalence pseudos.
+
+2012-11-01  Sharad Singhai  <singhai@google.com>
+
+	PR other/55164
+	* dumpfile.h (struct dump_file_info): Fix order of flags.
+
+2012-11-01  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/55104
+	* ipa-inline-transform.c (inline_call): Silence an sanity check until
+	ipa-cp issue if fixed.
+
+2012-11-01  Sharad Singhai  <singhai@google.com>
+
+	* doc/invoke.texi: Update -fopt-info documentation.
+	* dumpfile.c: Move dump_flags here from passes.c.
+	Rename opt_info_options to optinfo_verbosity_options.
+	Add optgroup_options.
+	(dump_files): Add field for optinfo_flags in the static initializer.
+	(dump_register): Handle additional parameter for optgroup_flags.
+	(opt_info_enable_passes): Renamed opt_info_enable_all. Handle
+	optgroup_flags. Fix documentation.
+	(opt_info_switch_p_1): Handle optgroup options.
+	(opt_info_switch_p): Handle optgroup_flags. Warn on multiple files.
+	* dumpfile.h (dump_register): Additional argument for optgroup_flags.
+	All callers updated.
+	(struct dump_file_info): Add field for optgroup_flags.
+	Define OPTGROUP_* flags.
+	* tree-pass.h (struct opt_pass): Add addtional field for optinfo_flags.
+	All opt_pass static initializers updated.
+	* opts-global.c (dump_remap_tree_vectorizer_verbose): Use 'all'
+	instead of 'optall'.
+	(handle_common_deferred_options): Fix typo in error message.
+	* passes.c (register_one_dump_file): Add argument for optgroup_flags.
+	Turn on OPTGROUP_IPA for IPA passes.
+	Move dump_flags from here to dumpfile.c.
+	* statistics.c (statistics_early_init): Use OPTGROUP_NONE in call to
+	dump_register.
+
+2012-11-01  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	PR target/55160
+	* config/sh/sh.md (doloop_end): Use emit_jump_insn.
+
+2012-10-31  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53708
+	* tree-vect-data-refs.c (vect_can_force_dr_alignment_p): Preserve
+	user-supplied alignment when used with an explicit section name.
+
+2012-10-31  Dehao Chen  <dehao@google.com>
+
+	* tree-eh.c (do_return_redirection): Set location for jump statement.
+	(do_goto_redirection): Likewise.
+	(frob_into_branch_around): Likewise.
+	(lower_try_finally_nofallthru): Likewise.
+	(lower_try_finally_copy): Likewise.
+	(lower_try_finally_switch): Likewise.
+	* expr.c (store_expr): Use current insn location instead of expr
+	location.
+	(expand_expr_real): Likewise.
+	(expand_expr_real_1): Likewise.
+
+2012-10-31   Easwaran Raman  <eraman@google.com>
+
+	PR target/54938
+	PR middle-end/54957
+	* optabs.c (emit_cmp_and_jump_insn_1): Add REG_BR_PROB note
+	only if it doesn't already exist.
+	* stmt.c (get_outgoing_edge_probs): Return 0 if BB is NULL.
+	(emit_case_dispatch_table): Handle the case where STMT_BB is
+	NULL.
+	(expand_sjlj_dispatch_table): Pass BB containing before_case
+	to emit_case_dispatch_table.
+
+2012-10-31  Lawrence Crowl  <crowl@google.com>
+
+	* is-a.h: New.
+	(is_a <T> (U*)): New.  Test for is-a relationship.
+	(as_a <T> (U*)): New.  Treat as a derived type.
+	(dyn_cast <T> (U*)): New.  Conditionally cast based on is_a.
+	* cgraph.h (varpool_node): Rename to varpool_node_for_decl.
+	Adjust callers to match.
+	(is_a_helper <cgraph_node>::test (symtab_node_def *)): New.
+	(is_a_helper <varpool_node>::test (symtab_node_def *)): New.
+	(symtab_node_def::try_function): New.  Change most calls to
+	symtab_function_p with calls to dyn_cast <cgraph_node> (p).
+	(symtab_node_def::try_variable): New.  Change most calls to
+	symtab_variable_p with calls to dyn_cast <varpool_node> (p).
+	(symtab_function_p): Remove.  Change callers to use
+        is_a <cgraph_node> (p) instead.
+	(symtab_variable_p): Remove.  Change callers to use
+        is_a <varpool_node> (p) instead.
+	* cgraph.c (cgraph_node_for_asm): Remove redundant call to
+	symtab_node_for_asm.
+	* cgraphunit.c (symbol_finalized_and_needed): New.
+	(symbol_finalized): New.
+	(cgraph_analyze_functions): Split complicated conditionals out into
+	above new functions.
+	* Makefile.in (CGRAPH_H): Add is-a.h as used by cgraph.h.
+
+2012-10-31  Steven Bosscher  <steven@gcc.gnu.org>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/55018
+	* basic-block.h (dfs_find_deadend): New prototype.
+	* cfganal.c (dfs_find_deadend): No longer static.  Use bitmap
+	instead of sbitmap for visited.
+	(flow_dfs_compute_reverse_execute): Use dfs_find_deadend here, too.
+	* dominance.c (calc_dfs_tree): If saw_unconnected,
+	traverse from dfs_find_deadend of unconnected b
+	instead of b directly.
+
+2012-10-31  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/i386/i386.c (ix86_expand_prologue): Emit frame info for the
+	special register pushes before frame probing and allocation.
+
+2012-10-31  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR middle-end/55150
+	* lra-constraints.c (lra_constraints): Update debug insn info
+	after equivalence change.
+
+2012-10-31  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline.c (ipa_inline): Avoid infinite loop on inlining
+	empty virtual functions calling themselves.
+
+2012-10-31  Tom Tromey  <tromey@redhat.com>
+
+	PR other/50899
+	* doc/gcc.texi: Add @direntry for gcov.
+
+2012-10-31  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* expr.c (can_move_by_pieces): Apply ATTRIBUTE_UNUSED to len.
+
+2012-10-31  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/19105
+	PR tree-optimization/21643
+	PR tree-optimization/46309
+	* tree-ssa-reassoc.c (init_range_entry): Add STMT argument
+	and use it if EXP is NULL.
+	(update_range_test): Handle OPCODE equal to ERROR_MARK
+	and oe->op NULL.
+	(optimize_range_tests): Likewise.
+	(final_range_test_p, suitable_cond_bb, no_side_effect_bb, get_ops,
+	maybe_optimize_range_tests): New functions.
+	(reassociate_bb): Call maybe_optimize_range_tests if last
+	stmt of bb is GIMPLE_COND that hasn't been visited yet.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/rs6000/rs6000.md (insvsi, insvdi, extvsi, extvdi): Rename to...
+	(insvsi_internal, insvdi_internal, extvsi_internal)
+	(extvdi_internal): ...this.
+	(insv, extv): Update accordingly.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* combine.c (simplify_comparison): If BITS_BIG_ENDIAN, always assume
+	that zero_extracts of const_ints are doing word-sized extractions.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* combine.c (make_extraction): Remove dead wanted_inner_mode-
+	and pos_rtx-related code.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* expmed.c (store_bit_field_1): Move generation of MEM insvs
+	to the MEM_P block.
+	(extract_bit_field_1): Likewise extvs and extzvs.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* expmed.c (store_bit_field_using_insv): New function,
+	split out from...
+	(store_bit_field_1): ...here.
+	(extract_bit_field_using_extv): New function, split out from...
+	(extract_bit_field_1): ...here.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* expmed.c (store_bit_field_1): Use OP_MODE to check whether an
+	insv pattern is available.  Remove redundant checks for OP_MODE
+	being MAX_MACHINE_MODE.
+	(extract_bit_field_1): Remove redundant checks for EXT_MODE being
+	MAX_MACHINE_MODE.
+
+2012-10-31  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* expmed.c (store_bit_field_1): Remove test for BLKmode values.
+
+2012-10-31  Ralf Corsépius  <ralf.corsepius@rtems.org>,
+	    Joel Sherrill  <joel.sherrill@oarcorp.com>
+
+	* config/sparc/t-rtems: New (Custom multilibs).
+	* config/sparc/t-rtems-64: New (Custom multilibs).
+	* config.gcc (sparc64-*-rtems*): Add sparc/t-rtems-64.
+	(sparc-*-rtems*): Add sparc/t-rtems.
+
+2012-10-31  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/rs6000.c (legitimize_reload_address): Remove code
+	handling non-aligned ld/std.
+	* config/rs6000/paired.md (movv2sf_paired): Use 'Y' instead of 'o'.
+	* config/rs6000/vsx.md (vsx_mov, vsx_movti): Likewise.
+	* config/rs6000/altivec.md (altivec_mov, altivec_movti): Likewise.
+	* config/rs6000/dfp.md (movtd_internal): Use 'm' instead of 'o'.
+
+2012-10-31  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/linux64.h (TARGET_OS_CPP_BUILTINS): Define _CALL_LINUX.
+
+2012-10-31  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* lra-constraints.c (choose_split_class): Add ATTRIBUTE_UNUSED to
+	hard_reg_class.
+
+	PR target/52498
+	* vmsdbgout.c (vmsdbgout_write_source_line): Comment out names of
+	last two parameters.
+
+2012-10-30  Alexandre Oliva <aoliva@redhat.com>
+
+	PR debug/54551
+	PR debug/54693
+	* valtrack.c (dead_debug_promote_uses): Assert-check that
+	global used bit was clear and initialize entry
+	unconditionally.
+
+2012-10-30  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* cse.c (hash_rtx_cb): Replace RTX_UNCHANGING_P with MEM_READONLY_P in
+	head comment.
+	(hash_rtx): Likewise.
+
+2012-10-30  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR rtl-optimization/55093
+	* rtlanal.c (simplify_subreg_regno): Remove lra_in_progress
+	check for ARG_POINTER_REGNUM.
+
+2012-10-30  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mti-linux.h (SYSROOT_SUFFIX_SPEC): Change order
+	and add mabi=64.
+	(DRIVER_SELF_SPECS): Make -n32 the default on mips64* archs.
+	* config/mips/t-mti-linux (MULTILIB_OPTIONS): Change order.
+	(MULTILIB_DIRNAMES): Ditto.
+	(MULTILIB_EXCEPTIONS): New.
+
+2012-10-30  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* lra-constraints.c (check_secondary_memory_needed_p):
+	Add ATTRIBUTE_UNUSED to parameters.
+
+2012-10-30  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* defaults.h (SLOW_UNALIGNED_ACCESS): Provide default definition.
+	* expmed.c (SLOW_UNALIGNED_ACCESS): Remove default definition.
+	* expr.c (SLOW_UNALIGNED_ACCESS): Likewise.
+	* lra-constraints.c (SLOW_UNALIGNED_ACCESS): Likewise.
+	(simplify_operand_subreg): Don't check STRICT_ALIGNMENT here.
+
 2012-10-30  Jan Hubicka  <jh@suse.cz>
 
 	* ipa-inline-analysis.c (eliminated_by_inlining_prob): Cleanup.
@@ -34,7 +421,7 @@
 2012-10-30  Marc Glisse  <marc.glisse@inria.fr>
 
 	* fold-const.c (fold_binary_op_with_conditional_arg): Handle vectors.
-	(fold_binary_loc): call it for VEC_COND_EXPR.
+	(fold_binary_loc): Call it for VEC_COND_EXPR.
 
 2012-10-30  James Greenhalgh  <james.greenhalgh@arm.com>
 	    Tejas Belagod  <tejas.belagod@arm.com>
@@ -73,7 +460,7 @@
 
 2012-10-30  Oleg Endo  <olegendo@gcc.gnu.org>
 
-	PR target/54988
+	PR target/53988
 	* config/sh/sh.md (tstqi_t_zero): Rename to *tstqi_t_zero.
 	(*tst<mode>_t_zero): New insns.
 	* config/sh/iterators.md (lowpart_be, lowpart_le): New mode attributes.
