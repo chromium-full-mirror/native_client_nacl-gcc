@@ -4846,6 +4846,14 @@ it reasonable to use the optimizer for programs that might have bugs.
 The following options are useful when GCC is generated with the
 capability for more than one debugging format.
 
+@item -gsplit-dwarf
+@opindex gsplit-dwarf
+Separate as much dwarf debugging information as possible into a
+separate output file with the extension .dwo.  This option allows
+the build system to avoid linking files with debug information.  To
+be useful, this option requires a debugger capable of reading .dwo
+files.
+
 @item -ggdb
 @opindex ggdb
 Produce debugging information for use by GDB@.  This means to use the
@@ -8409,7 +8417,8 @@ Enable profile feedback directed optimizations, and optimizations
 generally profitable only with profile feedback available.
 
 The following options are enabled: @code{-fbranch-probabilities}, @code{-fvpt},
-@code{-funroll-loops}, @code{-fpeel-loops}, @code{-ftracer}
+@code{-funroll-loops}, @code{-fpeel-loops}, @code{-ftracer}, @code{-ftree-vectorize},
+@code{ftree-loop-distribute-patterns}
 
 By default, GCC emits an error message if the feedback profiles do not
 match the source code.  This error can be turned into a warning by using
@@ -9083,6 +9092,9 @@ the loop code is peeled.
 
 @item max-peel-times
 The maximum number of peelings of a single loop.
+
+@item max-peel-branches
+The maximum number of branches on the hot path through the peeled sequence.
 
 @item max-completely-peeled-insns
 The maximum number of insns of a completely peeled loop.

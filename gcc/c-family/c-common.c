@@ -193,10 +193,6 @@ const char *pch_file;
    user's namespace.  */
 int flag_iso;
 
-/* Warn about #pragma directives that are not recognized.  */
-
-int warn_unknown_pragmas; /* Tri state variable.  */
-
 /* Warn about format/argument anomalies in calls to formatted I/O functions
    (*printf, *scanf, strftime, strfmon, etc.).  */
 
@@ -2670,22 +2666,14 @@ conversion_warning (tree type, tree expr)
 
     case COND_EXPR:
       {
-	/* In case of COND_EXPR, if both operands are constants or
-	   COND_EXPR, then we do not care about the type of COND_EXPR,
-	   only about the conversion of each operand.  */
-	tree op1 = TREE_OPERAND (expr, 1);
-	tree op2 = TREE_OPERAND (expr, 2);
-
-	if ((TREE_CODE (op1) == REAL_CST || TREE_CODE (op1) == INTEGER_CST
-	     || TREE_CODE (op1) == COND_EXPR)
-	    && (TREE_CODE (op2) == REAL_CST || TREE_CODE (op2) == INTEGER_CST
-		|| TREE_CODE (op2) == COND_EXPR))
-	  {
-	    conversion_warning (type, op1);
-	    conversion_warning (type, op2);
-	    return;
-	  }
-	/* Fall through.  */
+        /* In case of COND_EXPR, we do not care about the type of
+           COND_EXPR, only about the conversion of each operand.  */
+        tree op1 = TREE_OPERAND (expr, 1);
+        tree op2 = TREE_OPERAND (expr, 2);
+        
+        conversion_warning (type, op1);
+        conversion_warning (type, op2);
+        return;
       }
 
     default: /* 'expr' is not a constant.  */
