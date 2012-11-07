@@ -36,6 +36,61 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2012-11-05  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/i386/i386.c (print_reg): Replace REX_INT_REG_P with
+	REX_INT_REGNO_P.
+
+2012-11-05  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR tree-optimization/54986
+	* gimple-fold.c (canonicalize_constructor_val): Strip again all no-op
+	conversions on entry but add them back on exit if needed.
+
+2012-11-05  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR target/55204
+	* config/i386/i386.c (ix86_address_subreg_operand): Remove stack
+	pointer check.
+	(print_reg): Use true_regnum rather than REGNO.
+	(ix86_print_operand_address): Remove SUBREG handling.
+
+2012-11-05  Jakub Jelinek  <jakub@redhat.com>
+
+	Backported from mainline
+	2012-10-24  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/54828
+	* gimple.h (is_gimple_sizepos): New inline function.
+	* gimplify.c (gimplify_one_sizepos): Use it.  Remove useless
+	final assignment to expr variable.
+	* tree.c (RETURN_TRUE_IF_VAR): Return true also if
+	!TYPE_SIZES_GIMPLIFIED (type) and _t is going to be gimplified
+	into a local temporary.
+
+	2012-10-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/54877
+	* tree-vect-loop.c (vect_is_simple_reduction_1): For MINUS_EXPR
+	use make_ssa_name instead of copy_ssa_name.
+
+2012-11-03  Peter Bergner  <bergner@vnet.ibm.com>
+
+	Backport from mainline
+	2012-10-31  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/53708
+	* tree-vect-data-refs.c (vect_can_force_dr_alignment_p): Preserve
+	user-supplied alignment when used with an explicit section name.
+
+2012-11-02  Jeff Law  <law@redhat.com>
+
+	PR tree-optimization/54985
+	* tree-ssa-threadedge.c (cond_arg_set_in_bb): New function extracted
+	from thread_across_edge.
+	(thread_across_edge): Use it in all cases where we might thread
+	across a back edge.
+
 2012-10-31  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* config/i386/i386.c (ix86_expand_prologue): Emit frame info for the
