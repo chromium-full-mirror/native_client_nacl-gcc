@@ -1,3 +1,17 @@
+2012-11-07  David Edelsohn  <dje.gcc@gmail.com>
+
+	* gcc.target/powerpc/pr46728-[1234578].c: Tighten regex to ignore
+	word powerpc.
+	* gcc.target/powerpc/vsx-mass-1.c: Escape [ and ] in regex.
+	* gcc.target/powerpc/loop_align.c: Skip on AIX.
+	* gcc.target/powerpc/ppc-pow.c: Allow dot symbols in branch.
+	* gcc.target/powerpc/tfmode_off.c: Skip on AIX.
+
+2012-11-07  Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR c/53063
+	* gcc.dg/warn-nsstring.c: Use -Wformat explicitly.
+
 2012-11-07  Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR c/51294
@@ -32,6 +46,7 @@
 
 2012-11-07  Kaz Kojima  <kkojima@gcc.gnu.org>
 
+	PR target/49220
 	* gcc.c-torture/compile/pr49220.c: New test.
 
 2012-11-07  Florian Weimer  <fweimer@redhat.com>
