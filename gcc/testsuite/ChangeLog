@@ -1,3 +1,39 @@
+2012-11-08  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/48636
+	* gcc.dg/winline-3.c: Update.
+
+2012-11-08  Martin Jambor  <mjambor@suse.cz>
+
+	* gfortran.dg/ipcp-array-1.f90: New test.
+
+2012-11-08  Florian Weimer  <fweimer@redhat.com>
+
+	* g++.old-deja/g++.abi/cxa_vec.C: Fix typo in comment.
+
+2012-11-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55151
+	* gcc.dg/pr55151.c: Use ia32 instead of x86_64.
+
+2012-11-05  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.dg/tree-ssa/cunroll-1.c: Scan cunrolli dump.
+
+2012-11-07  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.c-torture/compile/20121107-1.c: New test.
+
+2012-11-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55151
+	* gcc.dg/pr55151.c: Compile it only for x86_64.
+
+2012-11-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55122
+	* gcc.dg/pr55122.c: New test.
+
 2012-11-07  David Edelsohn  <dje.gcc@gmail.com>
 
 	* gcc.target/powerpc/pr46728-[1234578].c: Tighten regex to ignore

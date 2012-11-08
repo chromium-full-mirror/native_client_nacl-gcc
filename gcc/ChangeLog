@@ -2,6 +2,48 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-08  Bernd Schmidt  <bernds@codesourcery.com>
+
+	PR rtl-optimization/54850
+	* sched-deps.c (find_inc): Add all dependencies from the inc_insn
+	to the mem_insn.
+
+2012-11-08  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/48636
+	* ipa-inline.c (big_speedup_p): New function.
+	(want_inline_small_function_p): Use it.
+	(edge_badness): Dump it.
+	* params.def (inline-min-speedup): New parameter.
+	* doc/invoke.texi (inline-min-speedup): Document.
+
+2012-11-08  Martin Jambor  <mjambor@suse.cz>
+
+	* ipa-prop.c (determine_known_aggregate_parts): Skip writes to
+	different declarations when tracking writes to a declaration.
+
+2012-11-07  David S. Miller  <davem@davemloft.net>
+
+	* config/sparc/constraints.md ("U"): Document, in detail,
+	which this constraint is necessary.
+
+2012-11-07  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR middle-end/55235
+	* expr.c (store_expr): Do not call emit_block_move for
+	non-BLKmode values.
+
+2012-11-07  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR middle-end/55219
+	* fold-const.c (fold_binary_op_with_conditional_arg): Do not fold if
+	the argument is itself a conditional expression.
+
+2012-11-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55122
+	* lra-constraints.c (match_reload): Sync values for dead input pseudos.
+
 2012-11-07  Richard Henderson  <rth@redhat.com>
 
 	* trans-mem.c (pass_ipa_tm): Don't use TODO_update_ssa.
