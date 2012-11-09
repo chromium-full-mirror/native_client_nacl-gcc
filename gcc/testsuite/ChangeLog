@@ -1,3 +1,46 @@
+2012-11-09  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54859
+	* g++.dg/cpp0x/alias-decl-25.C: New.
+
+	* g++.dg/abi/abi-tag1.C: New.
+	* g++.dg/abi/abi-tag2.C: New.
+
+2012-11-09  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55154
+	* gcc.target/i386/pr55154.c: New test.
+
+2012-11-09  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55151
+	* gcc.dg/pr55151.c: Move ...
+	* gcc.target/i386/pr55151.c: ... here.
+
+2012-11-09  Andrey Belevantsev  <abel@ispras.ru>
+
+	PR rtl-optimization/54472
+	* gcc.dg/pr54472.c: New test.
+
+2012-11-09  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/stack_check3.ad[sb]: New test.
+
+2012-11-08  Ian Lance Taylor  <iant@google.com>
+
+	* go.test/go-test.exp (go-gc-tests): Handle runoutput test type
+	with arguments.  Handle errorcheckoutput and rundir test types.
+
+2012-11-08  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR tree-optimization/55191
+	* gcc.dg/pr55191.c: New test.
+
+2012-11-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/54499
+	* g++.dg/debug/pr54499.C: New test.
+
 2012-11-08  Jan Hubicka  <jh@suse.cz>
 
 	PR middle-end/48636

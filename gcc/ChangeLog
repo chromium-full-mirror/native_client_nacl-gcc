@@ -2,6 +2,111 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-09  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (ix86_lra_p): Remove.
+	(TARGET_LRA_P): Use hook_bool_void_true.
+
+2012-11-09  Jason Merrill  <jason@redhat.com>
+
+	* attribs.c (lookup_attribute_spec): Handle getting a TREE_LIST.
+
+2012-11-09  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR tree-optimization/55154
+	* lra-int.h (LRA_LOSER_COST_FACTOR, LRA_MAX_REJECT): New macros.
+	* lra.c (setup_operand_alternative): Use them.
+	* lra-constraints.c (LOSER_COST_FACTOR, MAX_OVERALL_COST_BOUND):
+	Remove.
+	(process_alt_operands): Use LRA_LOSER_COST_FACTOR and
+	LRA_MAX_REJECT.  Accumulate reject instead of setting for
+	non-const.
+	(curr_insn_transform): Initialize best_losers and best_overall by
+	INT_MAX.
+
+2012-11-09  Christian Bruel  <christian.bruel@st.com>
+
+	* config/sh/sh.c (sh_can_use_simple_return_p): Enable with
+	-freorder-blocks-and-partition.
+
+2012-11-09  Kenneth Zadeck <zadeck@naturalbridge.com>
+
+	* rtl.h (CONST_SCALAR_INT_P): New macro.
+   	* cfgexpand.c (expand_debug_locations): Changed to use
+	CONST_SCALAR_INT_P macro.
+	* combine.c (try_combine, subst, make_extraction,
+	gen_lowpart_for_combine): Ditto.
+	* cselib.c (entry_and_rtx_equal_p, rtx_equal_for_cselib_1): Ditto.
+	* dwarf2out.c (loc_descriptor): Ditto.
+	* emit-rtl.c (gen_lowpart_common): Ditto.
+	* ira-costs.c (record_reg_classes, record_address_regs): Ditto.
+	* ira-lives.c (single_reg_class): Ditto.
+	* recog.c (simplify_while_replacing, asm_operand_ok,
+	constrain_operands): Ditto.
+	* reload.c (find_reloads): Ditto.
+	* simplify-rtx.c (simplify_unary_operation_1,
+	simplify_const_unary_operation, simplify_binary_operation_1,
+	simplify_const_binary_operation, simplify_relational_operation_1,
+	simplify_subreg): Ditto.
+
+2012-11-09  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR middle-end/54385
+	* postreload.c (reload_cse_simplify): Return a bool indicating
+	whether the CFG was changed.
+	(reload_cse_regs_1): Traverse the CFG instead of the insns chain.
+	Cleanup the CFG if edges may have been removed.
+	(reload_cse_regs): Update.
+
+2012-11-09  Andrey Belevantsev  <abel@ispras.ru>
+
+	PR rtl-optimization/54472
+	* sel-sched-ir.c (has_dependence_note_reg_set): Handle implicit sets.
+	(has_dependence_note_reg_clobber,
+	has_dependence_note_reg_use): Likewise. 
+
+2012-11-09  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/i386/i386.c (release_scratch_register_on_entry): Also adjust
+	sp_offset manually.
+
+2012-11-08  Christian Bruel  <christian.bruel@st.com>
+
+	* tree-ssa-tail-merge.c (replace_block_by): Update bb2 profile count.
+	Do not reset dead bb1->frequency.
+
+2012-11-08  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR tree-optimization/55191
+	* cfganal.c (connect_infinite_loops_to_exit): Call dfs_deadend here.
+	(flow_dfs_compute_reverse_execute): Don't call it here.
+
+2012-11-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/53145
+	* dwarf2out.c (gen_compile_unit_die): Don't call gen_producer_string
+	here, instead add "" if producer_string is NULL.
+	(dwarf2out_finish): Call gen_producer_string here, unconditionally
+	decrease refcount of the old indirect string and set val_str to
+	find_AT_string result.
+
+	PR debug/54499
+	* cgraphunit.c (assemble_thunk): Don't call source_line debug hook
+	here, instead call insn_locations_{init,finalize} and initialize
+	prologue_location.
+
+2012-11-08  Dmitry Gorbachev  <d.g.gorbachev@gmail.com>
+
+	PR driver/54789
+	* gcc.c (process_command): Use save_switch for synthesized
+	-fcompare-debug=* option; mark the switch as known.
+
+2012-11-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54308
+	* config/rs6000/rs6000.c (legitimate_indirect_address_p): Remove
+	inline keyword.
+
 2012-11-08  Bernd Schmidt  <bernds@codesourcery.com>
 
 	PR rtl-optimization/54850

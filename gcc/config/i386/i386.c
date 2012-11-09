@@ -9560,6 +9560,7 @@ release_scratch_register_on_entry (struct scratch_reg *sr)
 {
   if (sr->saved)
     {
+      struct machine_function *m = cfun->machine;
       rtx x, insn = emit_insn (gen_pop (sr->reg));
 
       /* The RTX_FRAME_RELATED_P mechanism doesn't know about pop.  */
@@ -9567,6 +9568,7 @@ release_scratch_register_on_entry (struct scratch_reg *sr)
       x = gen_rtx_PLUS (Pmode, stack_pointer_rtx, GEN_INT (UNITS_PER_WORD));
       x = gen_rtx_SET (VOIDmode, stack_pointer_rtx, x);
       add_reg_note (insn, REG_FRAME_RELATED_EXPR, x);
+      m->fs.sp_offset -= UNITS_PER_WORD;
     }
 }
 
@@ -32979,13 +32981,6 @@ ix86_free_from_memory (enum machine_mode mode)
     }
 }
 
-/* Return true if we use LRA instead of reload pass.  */
-static bool
-ix86_lra_p (void)
-{
-  return true;
-}
-
 /* Return a register priority for hard reg REGNO.  */
 static int
 ix86_register_priority (int hard_regno)
@@ -42242,7 +42237,7 @@ ix86_memmodel_check (unsigned HOST_WIDE_INT val)
 #define TARGET_LEGITIMATE_ADDRESS_P ix86_legitimate_address_p
 
 #undef TARGET_LRA_P
-#define TARGET_LRA_P ix86_lra_p
+#define TARGET_LRA_P hook_bool_void_true
 
 #undef TARGET_REGISTER_PRIORITY
 #define TARGET_REGISTER_PRIORITY ix86_register_priority
