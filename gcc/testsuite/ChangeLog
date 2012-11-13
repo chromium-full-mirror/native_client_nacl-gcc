@@ -1,3 +1,124 @@
+2012-11-13  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/55253
+	* gcc.dg/torture/pr55253.c: New test.
+	* gcc.dg/torture/pr55305.c: Likewise.
+
+2012-11-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR middle-end/55142
+	* gcc.target/i386/pr55142-1.c: New file.
+	* gcc.target/i386/pr55142-2.c: Likewise.
+
+2012-11-13  Dodji Seketeli  <dodji@redhat.com>
+
+	PR c++/54466
+	* g++.dg/cpp0x/alias-decl-26.C: New test file.
+
+2012-11-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* gcc.target/i386/avx256-unaligned-load-2.c: Requre !ia32
+	instead of lp64.
+	* gcc.target/i386/avx256-unaligned-store-2.c: Likewise.
+	* gcc.target/i386/pr49715-2.c: Likewise.
+	* gcc.target/i386/retarg.c: Likewise.  Scan both %rdi and %edi.
+
+2012-11-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/55281
+	* gcc.dg/vect/fast-math-pr55281.c: New test.
+	* g++.dg/opt/pr55281.C: New test.
+
+	PR rtl-optimization/54127
+	* gcc.dg/torture/pr54127.c: New test.
+
+2012-11-12  Steven Bosscher  <steven@gcc.gnu.org>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/51447
+	* gcc.c-torture/execute/pr51447.c: New test.
+
+2012-11-12  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/csinc-2.c: New test.
+
+2012-11-12  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/cmn.c: New test.
+	* gcc.target/aarch64/adds.c: New test.
+	* gcc.target/aarch64/subs.c: New test.
+
+2012-11-12  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/55272
+	* gfortran.dg/coarray_29_1.f90: New.
+	* gfortran.dg/coarray_29_2.f90: New.
+
+2012-11-12  Bin Cheng  <bin.cheng@arm.com>
+
+	* gcc.dg/hoist-register-pressure-3.c: New test.
+
+2012-11-11  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* gcc.target/sh/sh4a-fprun.c: Add test_sinf and test_cosf noinline
+	wrappers around sinf and cosf.
+
+2012-11-11  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR middle-end/55247
+	PR middle-end/55259
+	* gcc.target/i386/pr55247-2.c: New file.
+
+2012-11-11  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR middle-end/55263
+	* g++.dg/pr55263.C: New test.
+
+2012-11-11  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/55238
+	* testsuite/gcc.dg/torture/pr55238.c: New test.
+
+2012-11-11  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+	* gcc.dg/torture/pr54920.c: Add "-fno-common" option on hppa*-*-hpux*.
+	* c-c++-common/torture/vector-subscript-1.c: Likewise.
+	* c-c++-common/torture/vector-subscript-2.c: Likewise.
+
+2012-11-10  Jan Hubicka  <jh@suse.cz>
+
+	* gcc.dg/tree-ssa/cunroll-1.c: Fix bogus testcase.
+
+2012-11-10  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* gcc.target/i386/pr55247.c: Require maybe_x32 target.  Add
+	-mno-sse -mno-mmx to dg-options.  Reformat.
+
+2012-11-10  David Edelsohn  <dje.gcc@gmail.com>
+
+	* c-c++-common/scal-to-vec2.c: Ignore non-standard ABI message.
+	* c-c++-common/vector-compare-1.c: Same.
+	* c-c++-common/vector-compare-2.c: Same.
+	* g++.dg/other/unused1.C: Skip on AIX.
+	* g++.dg/other/anon5.C: Allow Undefined to be capitalized. Ignore
+	extra message on AIX.
+
+2012-11-10  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/55247
+	* gcc.target/i386/pr55247.c: New test.
+
+2012-11-09  Andrew Pinski  <apinski@cavium.com>
+
+	* gcc.c-torture/execute/20121108-1.c: New test.
+
+2012-11-09  Ed Smith-Rowland  <3dw4rd@verizon.net>
+
+	PR c++/54413
+	* g++.dg/cpp0x/gnu_fext-numeric-literals.C: New.
+	* g++.dg/cpp0x/std_fext-numeric-literals.C: New.
+	* g++.dg/cpp0x/gnu_fno-ext-numeric-literals.C: New.
+	* g++.dg/cpp0x/std_fno-ext-numeric-literals.C: New.
+
 2012-11-09  Siddhesh Poyarekar  <siddhesh@redhat.com>
 
 	* gcc.dg/Warray-bounds-3.c (bar): Keep array access within
@@ -72,7 +193,7 @@
 	PR rtl-optimization/55151
 	* gcc.dg/pr55151.c: Use ia32 instead of x86_64.
 
-2012-11-05  Uros Bizjak  <ubizjak@gmail.com>
+2012-11-07  Uros Bizjak  <ubizjak@gmail.com>
 
 	* gcc.dg/tree-ssa/cunroll-1.c: Scan cunrolli dump.
 
