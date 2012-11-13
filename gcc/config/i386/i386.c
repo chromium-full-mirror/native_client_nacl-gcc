@@ -29086,11 +29086,6 @@ ix86_get_function_versions_dispatcher (void *decl)
 #if defined (ASM_OUTPUT_TYPE_DIRECTIVE) && HAVE_GNU_INDIRECT_FUNCTION
   /* Right now, the dispatching is done via ifunc.  */
   dispatch_decl = make_dispatcher_decl (default_node->symbol.decl); 
-#else
-  error_at (DECL_SOURCE_LOCATION (default_node->symbol.decl),
-	    "Multiversioning needs ifunc which is not supported "
-	    "in this configuration");
-#endif
 
   dispatcher_node = cgraph_get_create_node (dispatch_decl);
   gcc_assert (dispatcher_node != NULL);
@@ -29107,7 +29102,11 @@ ix86_get_function_versions_dispatcher (void *decl)
       it_v->dispatcher_resolver = dispatch_decl;
       it_v = it_v->next;
     }
-
+#else
+  error_at (DECL_SOURCE_LOCATION (default_node->symbol.decl),
+	    "multiversioning needs ifunc which is not supported "
+	    "in this configuration");
+#endif
   return dispatch_decl;
 }
 
