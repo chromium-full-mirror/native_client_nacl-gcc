@@ -250,3 +250,12 @@ Talternate:
 	sfi_breg r0, stm r0, {r2, r3, r4}
 	sfi_breg r0, stmia r0!, {r2, r3, r4}
 .endif
+
+.pushsection .note.NaCl.ABI.arm, "aG", %note, .note.NaCl.ABI.arm, comdat
+	.int 1f - 0f, 3f - 2f, 1
+	.balign 4
+0:	.string "NaCl"
+1:	.balign 4
+2:	.string "arm"
+3:	.balign 4
+.popsection
