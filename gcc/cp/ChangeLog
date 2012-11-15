@@ -1,3 +1,32 @@
+2012-11-14  Jason Merrill  <jason@redhat.com>
+
+	PR c++/54903
+	* decl2.c (mark_used): Don't complain about auto in templates.
+
+	PR c++/37276
+	* decl.c (decls_match): Remove #ifdef around earlier fix.
+
+2012-11-13  Jason Merrill  <jason@redhat.com>
+
+	* class.c (finish_struct_1): Check virtual functions
+	for missing ABI tags.
+
+	PR c++/55275
+	* pt.c (maybe_process_partial_specialization): Update
+	DECL_SOURCE_LOCATION for new specializations.
+
+2012-11-14  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/55323
+	* init.c (emit_mem_initializers): Skip arguments == error_mark_node.
+
+2012-11-14  Fabien Chêne  <fabien@gcc.gnu.org>
+
+	PR c++/11750
+	* call.c (build_new_method_call_1): Check that the instance type
+	and the function context are the same before setting the flag
+	LOOKUP_NONVIRTUAL.
+
 2012-11-13  Sriraman Tallam  <tmsriram@google.com>
 
 	* class.c (mark_versions_used): Remove.

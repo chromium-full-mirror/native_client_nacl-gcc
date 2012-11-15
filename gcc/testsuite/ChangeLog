@@ -1,8 +1,21 @@
+2012-11-14  Jakub Jelinek  <jakub@redhat.com>
+
+	* lib/asan-dg.exp: New file.
+	* gcc.dg/asan/asan.exp: New file.
+	* g++.dg/dg.exp: Prune also asan tests.
+	* g++.dg/asan/asan.exp: New file.
+	* c-c++-common/asan/memcmp-1.c: New test.
+
+2012-11-14  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/55323
+	* g++.dg/cpp0x/vt-55323.C: New.
+
 2012-11-13  Sriraman Tallam  <tmsriram@google.com>
 
-	* testsuite/g++.dg/mv4.C: Add require ifunc. Change error message.
-	* testsuite/g++.dg/mv5.C: Add require ifunc.
-	* testsuite/g++.dg/mv6.C: Add require ifunc.
+	* g++.dg/mv4.C: Add require ifunc. Change error message.
+	* g++.dg/mv5.C: Add require ifunc.
+	* g++.dg/mv6.C: Add require ifunc.
 
 2012-11-13  Martin Jambor  <mjambor@suse.cz>
 

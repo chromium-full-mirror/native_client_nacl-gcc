@@ -2301,6 +2301,52 @@ static const char *const cpu_names[TARGET_CPU_DEFAULT_max] =
   "btver2"
 };
 
+static bool
+gate_insert_vzeroupper (void)
+{
+  return TARGET_VZEROUPPER;
+}
+
+static unsigned int
+rest_of_handle_insert_vzeroupper (void)
+{
+  int i;
+
+  /* vzeroupper instructions are inserted immediately after reload to
+     account for possible spills from 256bit registers.  The pass
+     reuses mode switching infrastructure by re-running mode insertion
+     pass, so disable entities that have already been processed.  */
+  for (i = 0; i < MAX_386_ENTITIES; i++)
+    ix86_optimize_mode_switching[i] = 0;
+
+  ix86_optimize_mode_switching[AVX_U128] = 1;
+
+  /* Call optimize_mode_switching.  */
+  pass_mode_switching.pass.execute ();
+  return 0;
+}
+
+struct rtl_opt_pass pass_insert_vzeroupper =
+{
+ {
+  RTL_PASS,
+  "vzeroupper",				/* name */
+  OPTGROUP_NONE,			/* optinfo_flags */
+  gate_insert_vzeroupper,		/* gate */
+  rest_of_handle_insert_vzeroupper,	/* execute */
+  NULL,					/* sub */
+  NULL,					/* next */
+  0,					/* static_pass_number */
+  TV_NONE,				/* tv_id */
+  0,					/* properties_required */
+  0,					/* properties_provided */
+  0,					/* properties_destroyed */
+  0,					/* todo_flags_start */
+  TODO_df_finish | TODO_verify_rtl_sharing |
+  0,					/* todo_flags_finish */
+ }
+};
+
 /* Return true if a red-zone is in use.  */
 
 static inline bool
@@ -3709,7 +3755,16 @@ ix86_option_override_internal (bool main_args_p)
 static void
 ix86_option_override (void)
 {
+  static struct register_pass_info insert_vzeroupper_info
+    = { &pass_insert_vzeroupper.pass, "reload",
+	1, PASS_POS_INSERT_AFTER
+      };
+
   ix86_option_override_internal (true);
+
+
+  /* This needs to be done at start up.  It's convenient to do it here.  */
+  register_pass (&insert_vzeroupper_info);
 }
 
 /* Update register usage after having seen the compiler flags.  */
@@ -15093,10 +15148,15 @@ output_387_binary_op (rtx insn, rtx *operands)
 /* Check if a 256bit AVX register is referenced inside of EXP.   */
 
 static int
-ix86_check_avx256_register (rtx *exp, void *data ATTRIBUTE_UNUSED)
+ix86_check_avx256_register (rtx *pexp, void *data ATTRIBUTE_UNUSED)
 {
-  if (REG_P (*exp)
-      && VALID_AVX256_REG_OR_OI_MODE (GET_MODE (*exp)))
+  rtx exp = *pexp;
+
+  if (GET_CODE (exp) == SUBREG)
+    exp = SUBREG_REG (exp);
+
+  if (REG_P (exp)
+      && VALID_AVX256_REG_OR_OI_MODE (GET_MODE (exp)))
     return 1;
 
   return 0;
@@ -23574,7 +23634,6 @@ ix86_init_machine_status (void)
   f = ggc_alloc_cleared_machine_function ();
   f->use_fast_prologue_epilogue_nregs = -1;
   f->call_abi = ix86_abi;
-  f->optimize_mode_switching[AVX_U128] = TARGET_VZEROUPPER;
 
   return f;
 }
@@ -29032,12 +29091,15 @@ ix86_get_function_versions_dispatcher (void *decl)
   struct cgraph_node *node = NULL;
   struct cgraph_node *default_node = NULL;
   struct cgraph_function_version_info *node_v = NULL;
-  struct cgraph_function_version_info *it_v = NULL;
   struct cgraph_function_version_info *first_v = NULL;
 
   tree dispatch_decl = NULL;
+
+#if defined (ASM_OUTPUT_TYPE_DIRECTIVE) && HAVE_GNU_INDIRECT_FUNCTION
+  struct cgraph_function_version_info *it_v = NULL;
   struct cgraph_node *dispatcher_node = NULL;
   struct cgraph_function_version_info *dispatcher_version_info = NULL;
+#endif
 
   struct cgraph_function_version_info *default_version_info = NULL;
  
