@@ -2,6 +2,126 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-16  Jan HUbicka  <jh@suse.cz>
+
+	* params.def (max-peeled-insns, max-completely-peeled-insns): Reduce to 100.
+
+2012-11-16  Simon Baldwin  <simonb@google.com>
+
+	* doc/cppopts.texi: Document -f[no-]canonical-system-headers.
+	* doc/install.texi: Document --enable-canonical-system-headers.
+
+2012-11-16  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55330
+	* lra-constraints.c (MAX_INHERITANCE_PASSES): New macro.
+	(lra_inheritance, lra_undo_inheritance): Use it to limit number of
+	the passes.
+
+2012-11-16  Matthias Klose  <doko@ubuntu.com>
+
+	* config/pa/t-linux: New file; define MULTIARCH_DIRNAME.
+	* config.gcc <hppa*64*-*-linux*, hppa*-*-linux*> (tmake_file):
+	Include pa/t-linux.
+
+2012-11-16  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/54073
+	* config/i386/i386.md (mov<mode>cc): Use comparison_operator
+	instead of ordered_comparison_operator resp.
+	ix86_fp_comparison_operator predicates.
+	* config/i386/i386.c (ix86_expand_fp_movcc): Reject TImode
+	or for -m32 DImode comparisons.
+
+2012-11-16  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/54717
+	* tree-ssa-pre.c (do_partial_partial_insertion): Consider also edges
+	with ANTIC_IN.
+
+2012-11-16  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386-protos.h (ix86_emit_mode_set): Add third argument.
+	* config/i386/i386.h (EMIT_MODE_SET): Update.
+	* config/i386/i386.c (ix86_avx_emit_vzeroupper): New function.
+	(ix86_emit_mode_set) <AVX_U128>: Call ix86_avx_emit_vzeroupper.
+
+2012-11-16  Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	bdver3 Enablement
+	* doc/extend.texi: Add details about bdver3.
+	* doc/invoke.texi: Add details about bdver3.
+	* config.gcc (i[34567]86-*-linux* | ...): Add bdver3.
+	(case ${target}): Add bdver3.
+	* config/i386/i386.h (TARGET_BDVER3): New definition.
+	* config/i386/i386.md (define_attr "cpu"): Add bdver3.
+	* config/i386/sse.md (sseshuf, sseshuf1): New type attributes.
+	* config/i386/athlon.md: Handle sseshuf attribute.
+	* config/i386/atom.md: Likewise.
+	* config/i386/ppro.md: Likewise.
+	* config/i386/bdver1.md: Likewise.
+	* config/i386/i386.opt (flag_dispatch_scheduler): Add bdver3.
+	* config/i386/i386-c.c (ix86_target_macros_internal): Add
+	bdver3 def_and_undef
+	* config/i386/driver-i386.c (host_detect_local_cpu): Let
+	-march=native recognize bdver3 processors.
+	* config/i386/i386.c (struct processor_costs bdver3_cost): New.
+	(m_BDVER3): New definition.
+	(m_AMD_MULTIPLE): Includes m_BDVER3.
+	(initial_ix86_tune_features): Add bdver3 tune.
+	(processor_target_table): Add bdver3 entry.
+	(static const char *const cpu_names): Add bdver3 entry.
+	(software_prefetching_beneficial_p): Add bdver3.
+	(ix86_option_override_internal): Add bdver3 instruction sets.
+	(ix86_option_override_internal): Remove XSAVEOPT for bdver1 and bdver2.
+	(ix86_issue_rate): Add bdver3.
+	(ix86_adjust_cost): Add bdver3.
+	(enum target_cpu_default): Add TARGET_CPU_DEFAULT_bdver3.
+	(enum processor_type): Add PROCESSOR_BDVER3.
+	* config/i386/bdver3.md: New file describing bdver3 pipelines.
+
+2012-11-15  David S. Miller  <davem@davemloft.net>
+
+	* expmed.c (expand_shift_1): Don't strip non-integral SUBREGs.
+
+	* configure.ac: Add check for assembler SPARC4 instruction support.
+	* configure: Rebuild.
+	* config.in: Add HAVE_AS_SPARC4 section.
+	* config/sparc/sparc.opt (mcbcond): New option.
+	* doc/invoke.texi: Document it.
+	* config/sparc/constraints.md: New constraint 'A' for 5-bit signed
+	immediates.
+	* doc/md.texi: Document it.
+	* config/sparc/sparc.c (dump_target_flag_bits): Handle MASK_CBCOND.
+	(sparc_option_override): Likewise.
+	(emit_cbcond_insn): New function.
+	(emit_conditional_branch_insn): Call it.
+	(emit_cbcond_nop): New function.
+	(output_ubranch): Use cbcond, remove label arg.
+	(output_cbcond): New function.
+	* config/sparc/sparc-protos.h (output_ubranch): Update.
+	(output_cbcond): Declare it.
+	(emit_cbcond_nop): Likewise.
+	* config/sparc/sparc.md (type attribute): New types 'cbcond'
+	and uncond_cbcond.
+	(emit_cbcond_nop): New attribute.
+	(length attribute): Handle cbcond and uncond_cbcond.
+	(in_call_delay attribute): Reject cbcond and uncond_cbcond.
+	(in_branch_delay attribute): Likewise.
+	(in_uncond_branch_delay attribute): Likewise.
+	(in_annul_branch_delay attribute): Likewise.
+	(*cbcond_sp32, *cbcond_sp64): New insn patterns.
+	(jump): Rewrite into an expander.
+	(*jump_ubranch, *jump_cbcond): New patterns.
+	* config/sparc/niagara4.md: Match 'cbcond' in 'n4_cti'.
+	* config/sparc/sparc.h (AS_NIAGARA4_FLAG): New macro, use it
+	when target default is niagara4.
+	(SPARC_SIMM5_P): Define.
+	* config/sparc/sol2.h (AS_SPARC64_FLAG): Adjust.
+	(AS_SPARC32_FLAG): Define.
+	(ASM_CPU32_DEFAULT_SPEC, ASM_CPU64_DEFAULT_SPEC): Use
+	AS_NIAGARA4_FLAG as needed.
+
 2012-11-15  Steve Ellcey  <sellcey@mips.com>
 
 	* expr.c (expand_cond_expr_using_cmove): Use promoted mode for temp.
@@ -18,9 +138,8 @@
 	* asan.c (report_error_func): Set DECL_IGNORED_P, don't touch
 	DECL_ASSEMBLER_NAME.
 	(asan_init_func): Likewise.
-	(asan_finish_file): Use void * instead of __asan_global * as
-	type of __asan_{,un}register_globals.  Set DECL_IGNORED_P on
-	the decls.
+	(asan_finish_file): Use void * instead of __asan_global * as type of
+	__asan_{,un}register_globals.  Set DECL_IGNORED_P on the decls.
 
 2012-11-15  Matthias Klose  <doko@ubuntu.com>
 
