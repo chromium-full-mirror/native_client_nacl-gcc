@@ -2,6 +2,111 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-27  Meador Inge  <meadori@codesourcery.com>
+
+	* collect2.c (main): Call find_file_set_debug.
+	(find_a_find, add_prefix, prefix_from_env, prefix_from_string):
+	Factor out into ...
+	* file-find.c (New file): ... here and ...
+	* file-find.h (New file): ... here.
+	* gcc-ar.c (standard_exec_prefix): New variable.
+	(standard_libexec_prefix): Ditto.
+	(tooldir_base_prefix) Ditto.
+	(self_exec_prefix): Ditto.
+	(self_libexec_prefix): Ditto.
+	(self_tooldir_prefix): Ditto.
+	(target_version): Ditto.
+	(path): Ditto.
+	(target_path): Ditto.
+	(setup_prefixes): New function.
+	(main): Rework how wrapped programs are found.
+	* Makefile.in (OBJS-libcommon-target): Add file-find.o.
+	(AR_OBJS): New variable.
+	(gcc-ar$(exeext)): Add dependency on $(AR_OBJS).
+	(gcc-nm$(exeext)): Ditto.
+	(gcc-ranlib(exeext)): Ditto.
+	(COLLECT2_OBJS): Add file-find.o.
+	(collect2.o): Add file-find.h prerequisite.
+	(file-find.o): New rule.
+
+2010-11-27  Dehao Chen  <dehao@google.com>
+
+	* ipa-prop.c (ipa_modify_call_arguments): Set loc correctly.
+	* emit-rtl.c (last_location): Remove unused variable.
+
+2012-11-27  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md
+	(*jcc<X87MODEF:mode>_<SWI24:mode>_i387 splitters): Remove
+	unneeded temporary.
+
+2012-11-27  Dehao Chen  <dehao@google.com>
+
+	* cfgrtl.c (rtl_merge_blocks): Check with UNKNOWN_LOCATION correctly.
+	(cfg_layout_merge_blocks): Likewise.
+
+2012-11-27  Jakub Jelinek  <jakub@redhat.com>
+
+	* passes.c (init_optimization_passes): Add pass_asan and pass_tsan
+	to -Og optimization passes.
+
+2012-11-27  H.J. Lu  <hongjiu.lu@intel.com>
+	    Markus Trippelsdorf  <markus@trippelsdorf.de>
+
+	PR lto/54795
+	* lto-opts.c (lto_write_options): Also handle
+	OPT_SPECIAL_unknown, OPT_SPECIAL_ignore and
+	OPT_SPECIAL_program_name.
+
+	PR lto/55474
+	* lto-wrapper.c (merge_and_complain): Handle
+	OPT_SPECIAL_unknown, OPT_SPECIAL_ignore,
+	OPT_SPECIAL_program_name and OPT_SPECIAL_input_file.
+
+2012-11-27  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/52650
+	* function.c (instantiate_virtual_regs_in_insn): Don't delete invalid
+	asm gotos, instead just clear their template and inputs.
+
+	PR tree-optimization/55110
+	* tree-vect-loop.c (vectorizable_reduction): Don't assert
+	that STMT_VINFO_RELATED_STMT of orig_stmt is stmt.
+
+2012-11-27  Richard Biener  <rguenther@suse.de>
+
+	* gimple-fold.c (fold_stmt_1): Remove unnecessary code.
+
+2012-11-27  Bin Cheng  <bin.cheng@arm.com>
+
+	* config/arm/arm.c (thumb1_reorg): New function.
+	(arm_reorg): Call thumb1_reorg.
+	(thumb1_final_prescan_insn): Record src operand in thumb1_cc_op0.
+	* config/arm/arm.md : Remove peephole2 patterns which rewrite move
+	into subtract of ZERO.
+
+2012-11-27  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/55331
+	* gimple-fold.c (gimplify_and_update_call_from_tree): Replace
+	stmt with a NOP instead of removing it.
+
+2012-11-27  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* loop-invariant.c (check_invariant_table_size): Take sizeof of
+	the right type.
+
+	* reorg.c (resource_conflicts_p): Use hard_reg_set_intersect_p.
+	(rare_destination): Remove.
+	(mostly_true_jump): Simplify.  Base result on REG_BR_PROP notes if
+	available, otherwise assume branches are not taken.
+	(fill_eager_delay_slots): Update mostly_true_jump call.
+	(relax_delay_slots): Likewise.
+
+2012-11-26  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* reorg.c (redundant_insn): Do not handle DEBUG_INSNs.
+
 2012-11-26  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR target/55277
@@ -48,8 +153,7 @@
 
 2012-11-26  Marek Polacek  <polacek@redhat.com>
 
-	* cprop.c (hash_set): Remove variable.  Use regno
-	variable directly.
+	* cprop.c (hash_set): Remove variable.  Use regno variable directly.
 
 2012-11-26  Eric Botcazou  <ebotcazou@adacore.com>
 
@@ -157,8 +261,7 @@
 
 2012-11-23  Tobias Burnus  <burnus@net-b.de>
 
-	* doc/invoke.texi (-fsanitize=address): Remove obsolete
-	remark.
+	* doc/invoke.texi (-fsanitize=address): Remove obsolete remark.
 
 2012-11-23  Jakub Jelinek  <jakub@redhat.com>
 
@@ -167,8 +270,7 @@
 	* gimple-low.c: Include langhooks.c.
 	(block_may_fallthru): Handle TARGET_EXPR and ERROR_MARK,
 	by default call lang_hooks.block_may_fallthru.
-	* langhooks.h (struct lang_hooks): Add block_may_fallthru
-	langhook.
+	* langhooks.h (struct lang_hooks): Add block_may_fallthru langhook.
 	* langhooks-def.h (LANG_HOOKS_BLOCK_MAY_FALLTHRU): Define.
 	(LANG_HOOKS_INITIALIZER): Use it.
 
@@ -259,13 +361,13 @@
 2012-11-22  Dmitry Vyukov  <dvyukov@google.com>
 	    Wei Mi  <wmi@google.com>
 
-	* builtins.def (DEF_SANITIZER_BUILTIN): Define tsan builtins. 
-	* sanitizer.def: Ditto. 
-	* Makefile.in (tsan.o): Add tsan.o target. 
+	* builtins.def (DEF_SANITIZER_BUILTIN): Define tsan builtins.
+	* sanitizer.def: Ditto.
+	* Makefile.in (tsan.o): Add tsan.o target.
 	(BUILTINS_DEF): Add sanitizer.def.
 	* passes.c (init_optimization_passes): Add tsan passes.
 	* tree-pass.h (register_pass_info): Ditto.
-	* toplev.c (compile_file): Ditto. 
+	* toplev.c (compile_file): Ditto.
 	* doc/invoke.texi: Document tsan related options.
 	* gcc.c (LINK_COMMAND_SPEC): Add LIBTSAN_SPEC in link command if
 	-fsanitize=thread.
