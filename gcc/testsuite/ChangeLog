@@ -1,3 +1,109 @@
+2012-11-29  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/55073
+	* gcc.target/arm/pr55073.C: New test.
+
+2012-11-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53094
+	* g++.dg/ext/vector20.C: New testcase.
+
+2012-11-28  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/52161
+	* coarray/sync_3.f90: Extend test.
+
+2012-11-29  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/55512
+	* gcc.target/i386/pr55512-2.c: Remove unnecessary define.
+	* gcc.target/i386/pr55512-4.c: Likewise.
+
+2012-11-29  Ed Smith-Rowland  <3dw4rd@verizon.net>
+
+	PR c++/52654
+	* g++.dg/cpp0x/udlit-overflow.C: New.
+	* g++.dg/cpp0x/udlit-overflow-neg.C: New.
+
+2012-11-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/36728
+	PR debug/55467
+	PR middle-end/55507
+	PR bootstrap/55511
+	* gcc.dg/guality/pr36728-1.c: Include "../nop.h", make sure the asm
+	are non-empty and add dependency between the first and second asm.
+	* gcc.dg/guality/pr36728-2.c: Likewise.
+	* gcc.dg/guality/pr36728-3.c: New test.
+	* gcc.dg/guality/pr36728-4.c: New test.
+
+2012-11-28  Andrew Pinski  <apinski@cavium.com>
+
+	PR bootstrap/54279
+	* lib/g++.exp (g++_init): Search for xg++ instead of g++ in the build
+	directories.
+	* lib/obj-c++.exp (obj-c++_init): Likewise.
+
+2012-11-28  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/52161
+	* coarray/sync_3.f90: New.
+
+2012-11-28  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gcc.target/i386/pr55458.c: Require ia32 target instead of ilp32.
+
+2012-11-28  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55512
+	* gcc.target/i386/pr55512-[1234].c: New tests.
+
+2012-11-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR testsuite/55505
+	* gcc.c-torture/execute/921202-1.c: Increase size of dx and dy arrays.
+
+	PR testsuite/55504
+	* gcc.c-torture/execute/20071018-1.c (foo): Add noinline/noclone
+	attributes.  Avoid clobbering memory before malloced chunk.
+	(main): Pass 1 instead of 0 as argument.
+
+2012-11-28  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/object_overflow.adb: Rename to...
+	* gnat.dg/object_overflow1.adb: ...this.
+	* gnat.dg/object_overflow2.adb: New test.
+	* gnat.dg/object_overflow3.adb: Likewise.
+	* gnat.dg/object_overflow4.adb: Likewise.
+
+2012-11-28  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/55497
+	* g++.dg/init/pr55497.C: New.
+
+2012-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR testsuite/55327
+	* gcc.dg/vect/slp-perm-8.c: Mark worker as noinline.
+	* gcc.dg/vect/slp-perm-9.c: Likewise.
+
+2012-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR c/35634
+	* gcc.dg/torture/pr35634.c: New testcase.
+	* g++.dg/torture/pr35634.C: Likewise.
+	* gcc.dg/vect/pr18536.c: Mark worker function noinline.
+
+2012-11-27  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/55476
+	* gfortran.dg/warn_target_lifetime_3.f90: New.
+
+2012-11-27  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55458
+	* gcc.target/i386/pr55458.c: New test.
+
 2012-11-27  Jakub Jelinek  <jakub@redhat.com>
 
 	PR tree-optimization/55110

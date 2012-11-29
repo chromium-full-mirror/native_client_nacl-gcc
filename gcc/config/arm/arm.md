@@ -300,6 +300,9 @@
 ; POOL_RANGE is how far away from a constant pool entry that this insn
 ; can be placed.  If the distance is zero, then this insn will never
 ; reference the pool.
+; Note that for Thumb constant pools the PC value is rounded down to the
+; nearest multiple of four.  Therefore, THUMB2_POOL_RANGE (and POOL_RANGE for
+; Thumb insns) should be set to <max_range> - 2.
 ; NEG_POOL_RANGE is nonzero for insns that can reference a constant pool entry
 ; before its address.  It is set to <max_range> - (8 + <data_size>).
 (define_attr "arm_pool_range" "" (const_int 0))
@@ -4993,7 +4996,7 @@
 					(const_int 2) (const_int 4))
 			  (const_int 4)])
    (set_attr "type" "alu_shift,load_byte")
-   (set_attr "pool_range" "*,1020")]
+   (set_attr "pool_range" "*,1018")]
 )
 
 ;; This pattern will only be used when ldsh is not available
@@ -5411,7 +5414,7 @@
    (set_attr "type" "*,*,*,load2,store2")
    (set_attr "arm_pool_range" "*,*,*,1020,*")
    (set_attr "arm_neg_pool_range" "*,*,*,1004,*")
-   (set_attr "thumb2_pool_range" "*,*,*,4096,*")
+   (set_attr "thumb2_pool_range" "*,*,*,4094,*")
    (set_attr "thumb2_neg_pool_range" "*,*,*,0,*")]
 )
 
@@ -5550,7 +5553,7 @@
   [(set_attr "length" "4,4,6,2,2,6,4,4")
    (set_attr "type" "*,*,*,load2,store2,load2,store2,*")
    (set_attr "insn" "*,mov,*,*,*,*,*,mov")
-   (set_attr "pool_range" "*,*,*,*,*,1020,*,*")]
+   (set_attr "pool_range" "*,*,*,*,*,1018,*,*")]
 )
 
 (define_expand "movsi"
@@ -5725,7 +5728,7 @@
    mov\\t%0, %1"
   [(set_attr "length" "2,2,4,4,2,2,2,2,2")
    (set_attr "type" "*,*,*,*,load1,store1,load1,store1,*")
-   (set_attr "pool_range" "*,*,*,*,*,*,1020,*,*")
+   (set_attr "pool_range" "*,*,*,*,*,*,1018,*,*")
    (set_attr "conds" "set,clob,*,*,nocond,nocond,nocond,nocond,nocond")])
 
 (define_split
@@ -5849,7 +5852,7 @@
        		     		 (match_dup 2)] UNSPEC_PIC_BASE))]
  "operands[3] = TARGET_THUMB ? GEN_INT (4) : GEN_INT (8);"
  [(set_attr "type" "load1,load1,load1")
-  (set_attr "pool_range" "4096,4096,1024")
+  (set_attr "pool_range" "4096,4094,1022")
   (set_attr "neg_pool_range" "4084,0,0")
   (set_attr "arch"  "a,t2,t1")
   (set_attr "length" "8,6,4")]
@@ -5866,7 +5869,10 @@
   "%b1ldr%?\\t%0, %1"
   [(set_attr "type" "load1")
    (set (attr "length") (attr "length_breg_op1"))
-   (set_attr "pool_range" "4096")
+   (set (attr "pool_range")
+	(if_then_else (eq_attr "is_thumb" "no")
+		      (const_int 4096)
+		      (const_int 4094)))
    (set (attr "neg_pool_range")
 	(if_then_else (eq_attr "is_thumb" "no")
 		      (const_int 4084)
@@ -5879,7 +5885,7 @@
   "TARGET_THUMB1 && flag_pic"
   "ldr\\t%0, %1"
   [(set_attr "type" "load1")
-   (set (attr "pool_range") (const_int 1024))]
+   (set (attr "pool_range") (const_int 1018))]
 )
 
 (define_insn "pic_add_dot_plus_four"
@@ -6716,7 +6722,7 @@
   [(set_attr "length" "2")
    (set_attr "type" "*,load1,store1,*,*")
    (set_attr "insn" "mov,*,*,mov,mov")
-   (set_attr "pool_range" "*,1020,*,*,*")
+   (set_attr "pool_range" "*,1018,*,*,*")
    (set_attr "conds" "clob,nocond,nocond,nocond,nocond")])
 
 (define_expand "movsf"
@@ -6776,7 +6782,8 @@
 			      (const_string "*")))
    (set_attr "type" "*,load1,store1")
    (set_attr "insn" "mov,*,*")
-   (set_attr "pool_range" "*,4096,*")
+   (set_attr "arm_pool_range" "*,4096,*")
+   (set_attr "thumb2_pool_range" "*,4094,*")
    (set_attr "arm_neg_pool_range" "*,4084,*")
    (set_attr "thumb2_neg_pool_range" "*,0,*")]
 )
@@ -6798,7 +6805,7 @@
    mov\\t%0, %1"
   [(set_attr "length" "2")
    (set_attr "type" "*,load1,store1,load1,store1,*,*")
-   (set_attr "pool_range" "*,*,*,1020,*,*,*")
+   (set_attr "pool_range" "*,*,*,1018,*,*,*")
    (set_attr "insn" "*,*,*,*,*,mov,mov")
    (set_attr "conds" "clob,nocond,nocond,nocond,nocond,nocond,nocond")]
 )
@@ -6887,7 +6894,8 @@
   "
   [(set_attr "length" "8,12,16,8,8")
    (set_attr "type" "*,*,*,load2,store2")
-   (set_attr "pool_range" "*,*,*,1020,*")
+   (set_attr "arm_pool_range" "*,*,*,1020,*")
+   (set_attr "thumb2_pool_range" "*,*,*,1018,*")
    (set_attr "arm_neg_pool_range" "*,*,*,1004,*")
    (set_attr "thumb2_neg_pool_range" "*,*,*,0,*")]
 )
@@ -6931,7 +6939,7 @@
   [(set_attr "length" "4,2,2,6,4,4")
    (set_attr "type" "*,load2,store2,load2,store2,*")
    (set_attr "insn" "*,*,*,*,*,mov")
-   (set_attr "pool_range" "*,*,*,1020,*,*")]
+   (set_attr "pool_range" "*,*,*,1018,*,*")]
 )
 
 

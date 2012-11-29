@@ -2,6 +2,302 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-11-29  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/55073
+	* arm/neon.md (neon_vtrn<mode>_internal): Split into expand
+	and insn patterns.  Re-order insn arguments to tie inputs to
+	outputs.
+	(neon_vzip<mode>_internal): Likewise.
+	(neon_vuzp<mode>_internal): Likewise.
+
+2012-11-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53094
+	* fold-const.c (fold): Replace a CONSTRUCTOR with a VECTOR_CST.
+
+2012-11-29  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-pre.c (get_expr_value_id): Do not add expr
+	to the set of value expressions here.
+	(add_to_exp_gen, make_values_for_phi): Fold into ...
+	(compute_avail): ... here, and avoid useless work.  Dump
+	avail sets in processing order.
+	(do_pre): Do not dump avail sets here.
+
+2012-11-29  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+
+	PR target/54974
+	* config/arm/arm.md (thumb2_pool_range, pool_range): Add comment on
+	Thumb pool ranges.
+	(thumb1_extendhisi2): Reduce Thumb pool range.
+	(arm_movdi): Likewise.
+	(thumb1_movdi_insn): Likewise.
+	(thumb1_movsi_insn): Likewise.
+	(pic_load_addr_unified): Likewise.
+	(pic_load_addr_32bit): Likewise.
+	(pic_load_addr_thumb1): Likewise.
+	(thumb1_movhf): Likewise.
+	(arm_movsf_soft_insn): Likewise.
+	(thumb1_movsf_soft_insn): Likewise.
+	(movdf_soft_insn): Likewise.
+	(thumb1_movdf_soft_insn): Likewise.
+	* config/arm/neon.md (*neon_mov<mode>): Likewise.
+	(*neon_mov<mode>): Likwise.
+	* config/arm/thumb2.md: (*thumb2_movsi_insn): Likewise.
+	(*thumb2_movhi_insn): Likewise.
+	(*thumb2_extendqisi_v6): Likewise.
+	(*thumb2_zero_extendqisi_v6): Likewise.
+	(*thumb2_zero_extendqisi2_v6): Likewise.
+	* config/arm/vfp.md: (*thumb2_movsi_vfp): Likewise.
+	(*movdi_vfp): Likewise.
+	(*movdi_vfp_cortexa8): Likewise.
+	(*thumb2_movsf_vfp): Likewise.
+	(*thumb2_movdf_vfp): Likewise.
+
+2012-11-29  Kai Tietz  <ktietz@redhat.com>
+
+	PR target/55171
+	* i386.c (get_scratch_register_on_entry): Handle
+	thiscall-convention.
+	(split_stack_prologue_scratch_regno): Likewise.
+	(ix86_static_chain): Likewise.
+	(x86_output_mi_thunk): Likewise.
+
+2012-11-29  Marek Polacek  <polacek@redhat.com>
+
+	* cprop.c (bypass_block): Improve debug message.
+
+2012-11-29  Oleg Raikhman  <oleg@adapteva.com>
+
+	* config/epiphany/epiphany.h (FIXED_REGISTERS, CALL_USED_REGISTERS):
+	Make r40..r43 call-used.
+	(REG_ALLOC_ORDER): Sort r40..r43 into the call-used registers.
+
+2012-11-29  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/predicates.md (addsub_operator): New predicate.
+	* config/epiphany/epiphany-sched.md (sched_use_fpu): New attribute.
+	* config/epiphany/epiphany.md (isub_i+1): New peephole2.
+	* config/epiphany/epiphany-protos.h (get_attr_sched_use_fpu): Declare.
+
+	* config/epiphany/epiphany.h (EPIPHANY_LIBRARY_EXTRA_SPEC): Define.
+	(EXTRA_SPECS, DRIVER_SELF_SPECS): Likewise.
+	* config/epiphany/t-epiphany (SPECS): Set.
+	(specs): New rule.
+
+	* config/epiphany/epiphany.md (isub_i+1): Work around generator bug.
+
+	* config/epiphany/epiphany.c (epiphany_adjust_cost): Use
+	reg_overlap_mentioned_p.
+
+2012-11-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/36728
+	PR debug/55467
+	PR middle-end/55507
+	PR bootstrap/55511
+	* cselib.c (cselib_process_insn): If cselib_preserve_constants,
+	don't reset table and exit early on volatile insns and setjmp.
+	Reset table afterwards on setjmp.
+
+2012-11-28  Andrew Pinski  <apinski@cavium.com>
+
+	PR bootstrap/54279
+	* Makefile.in (${QMTEST_DIR}/context): Use xg++ instead of g++.
+
+2012-11-28  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR rtl-optimization/55052
+	* simplify-rtx.c (simplify_subreg): Restore SCALAR_INT_MODE_P check.
+
+2012-11-28  David Edelsohn  <dje.gcc@gmail.com>
+
+	* target.def (use_blocks_for_decl_p): New hook.
+	* varasm.c (use_blocks_for_decl_p): Apply hook as final condition.
+	* doc/tm.texi.in (USE_BLOCKS_FOR_DECL_P): New description.
+	* doc/tm.texi: Regenerated.
+	
+2012-11-28  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR middle-end/55438
+	* expmed.c (simple_mem_bitfield_p): New function, extracted from
+	store_bit_field_1 and extract_bit_field_1.  Use GET_MODE_ALIGNMENT
+	rather than bitsize when checking the alignment.
+	(store_bit_field_1, extract_bit_field_1): Call it.
+	* stor-layout.c (bit_field_mode_iterator::bit_field_mode_iterator):
+	Don't limit ALIGN_.  Assume that memory is mapped in chunks of at
+	least word size, regardless of BIGGEST_ALIGNMENT.
+	(bit_field_mode_iterator::get_mode): Use GET_MODE_ALIGNMENT rather
+	than unit when checking the alignment.
+	(get_best_mode): Use GET_MODE_ALIGNMENT.
+
+2012-11-28  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55512
+	* lra-assigns.c (assign_by_spills): Assigned arbitrary hard regs
+	to failed reload pseudos instead of changing asm pattern.
+	* lra-constraints.c (MAX_CONSTRAINT_ITERATION_NUMBER): Increase
+	value.
+
+2012-11-28  Markus Trippelsdorf  <markus@trippelsdorf.de>
+
+	PR other/55358
+	* dse.c (rest_of_handle_dse): Remove superfluous clearing.
+
+2012-11-28  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/predicates.md (move_double_src_operand):
+	Check that misaligned addresses are offsettable.
+	(move_dest_operand): Likewise.
+	* config/epiphany/epiphany.c (REG_OK_FOR_BASE_P): Don't force a
+	misaligned stack address to reg+index.
+
+	* config/epiphany/epiphany.opt (mfp-iarith): New option.
+	* config/epiphany/epiphgany.md (addsi3): Check for TARGET_FP_IARITH.
+	(subsi3, iadd, isub): Rename to ..
+	(subsi3_i, iadd_i, isub_i): .. This.
+	(subsi3, iadd, isub): New define_expands.
+
+	* config/epiphany/epiphgany.md (attribute type): Add v2fp.
+	(attribute fp_mode): Test for v2fp.
+	(<float_operation:insn_opname>v2sf3_i): Change type to v2fp.
+	* config/epiphany/epiphgany-sched.md (fp_arith_nearest, fp_arith_trunc):
+	Combine to ..
+	(fp_arith): .. this. 
+	(v2fp_arith): New insn reservation.
+
+	* config/epiphany/epiphgany.md (maddsi_combine): Fix output pattern.
+
+2012-11-28  Oleg Raikhman  <oleg@adapteva.com>
+
+	* config/epiphany/epiphany.h (ASM_OUTPUT_ALIGN_WITH_NOP): Define.
+
+2012-11-28  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/epiphany.h (HARD_REGNO_RENAME_OK): Define.
+	* config/epiphany/epiphany-protos.h (epiphany_regno_rename_ok): Declare.
+	* config/epiphany/epiphany.c (epiphany_regno_rename_ok): New function.
+
+	* config/epiphany/epiphany.md (mov<mode>, *mov<mode>_insn): Check
+	for misaligned memory operands.
+	* config/epiphany/predicates.md (misaligned_operand): New predicate.
+
+	* config/epiphany/epiphany.opt (-may-round-for-trunc): New option.
+	* config/epiphany/epiphany.md (*fix_truncsfsi2_i): Take it into account.
+
+2012-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/54547
+	* tree-vrp.c (set_and_canonicalize_value_range): Handle
+	1-bit anti-ranges explicitely.
+	(extract_range_from_assert): Properly canonicalize all
+	built anti-ranges.
+
+2012-11-28  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* stor-layout.c (layout_type) <ARRAY_TYPE>: Do not clear TREE_OVERFLOW
+	on overflowed zeroes, except in one specific case.
+
+2012-11-28  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR middle-end/55266
+	* fold-const.c (fold_ternary_loc) [BIT_FIELD_REF]: Handle
+	CONSTRUCTOR with vector elements.
+	* tree-ssa-propagate.c (valid_gimple_rhs_p): Handle CONSTRUCTOR
+	and BIT_FIELD_REF.
+
+2012-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR c/35634
+	* gimple.h (gimplify_self_mod_expr): Declare.
+	* gimplify.c (gimplify_self_mod_expr): Export.  Take a different
+	type for performing the arithmetic in.
+	(gimplify_expr): Adjust.
+	* tree-vect-loop-manip.c (vect_can_advance_ivs_p): Strip
+	sign conversions we can re-apply after adjusting the IV.
+
+2012-11-28  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR rtl-optimization/55006
+	* loop-unroll.c (struct iv_to_split): Add new 'orig_var' member.
+	(analyze_iv_to_split_insn): Record it.
+	(maybe_strip_eq_note_for_split_iv): New function to remove REG_EQUAL
+	notes that refer to IVs that are being split.
+	(apply_opt_in_copies): Use maybe_strip_eq_note_for_split_iv.  Twice.
+	Use FOR_BB_INSNS_SAFE.
+
+2012-11-27  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* rtl.h (debug_bb_n_slim, debug_bb_slim, debug_insn_slim): Remove
+	prototypes.
+	(debug_rtl_slim): Rename to dump_rtl_slim.
+	(print_value_slim): Rename to dump_value_slim.
+	* ira.c (ira_update_equiv_info_by_shuffle_insn): Update
+	print_value_slim user.
+	* lra.c (lra_process_new_insns): Use dump_insn_slim to dump single
+	insns.  Use dump_rtl_slim for insn chains.
+	* lra-constraints.c (get_reload_reg): Update print_value_slim user.
+	(process_addr_reg): Likewise.
+	(equiv_address_substitution): Likewise.
+	(inherit_reload_reg): Likewise.  Use dump_insn_slim to dump single
+	insns.
+	(check_and_process_move): Likewise.
+	(lra_constraints): Likewise.
+	(split_reg): Likewise.
+	(update_ebb_live_info): Likewise.
+	(remove_inheritance_pseudos): Likewise.
+	* sched-vis.c: Don't include sched-int.h.
+	Remove #ifdef INSN_SCHEDULING tests.
+	(print_value_slim): Rename to dump_value_slim.  Simplify a few
+	cases using GET_RTX_NAME.
+	(print_pattern): Do not handle UNSPEC and UNSPECV here, explain why.
+	(print_insn): Reorganize code to be independent of INSN_SCHEDULING.
+	Always print CALL_INSN patterns.  Harmonize INSN_UID dumping template.
+	Handle NOTE_INSN_CALL_ARG_LOCATION.
+	(dump_rtl_slim): Copied from debug_rtl_slim.
+	(debug_rtl_slim): Wrapper around dump_rtl_slim to stderr.
+	* haifa-sched.c (schedule_insn): Update print_insn user.
+
+2012-11-27  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/55458
+	* lra-assigns.c: Include rtl-error.h.
+	(assign_by_spills): Report about asm impossible constraints.
+	* Makefile.in (lra-assigns.c): Add $(RTL_ERROR_H).
+
+2012-11-27  Paolo Bonzini  <pbonzini@redhat.com>
+
+	PR rtl-optimization/55489
+	* gcse.c (compute_transp): Precompute a canonical version
+	of XEXP (x, 0), and pass it to canon_true_dependence.
+
+	* alias.c (init_alias_analysis): Fix allocation of reg_known_value.
+
+2012-11-27  Diego Novillo  <dnovillo@google.com>
+
+	* vec.h: Replace 'class vec' with 'struct vec' everywhere.
+	(ggc_internal_cleared_alloc_stat): Remove.
+	(va_gc::reserve): Add PASS_MEM_STAT to ggc_realloc_stat call.
+	(va_stack::reserve): Add PASS_MEM_STAT to va_heap::reserve call.
+	(vec<T, A, vl_embed>::copy): Replace ALONE_MEM_STAT_DECL with
+	ALONE_CXX_MEM_STAT_INFO.
+	(vec_safe_reserve): Replace MEM_STAT_DECL with CXX_MEM_STAT_INFO.
+	(vec_safe_reserve_exact): Likewise.
+	(vec_alloc): Likewise.
+	(vec_safe_grow): Likewise.
+	(vec_safe_grow_cleared): Likewise.
+	(vec_safe_push): Likewise.
+	(vec_safe_insert): Likewise.
+	(vec_safe_splice): Likewise.
+	(vec_alloc): Likewise.
+	(vec_check_alloc): Likewise.
+
+2012-11-27  Marc Glisse  <marc.glisse@inria.fr>
+
+	* tree-cfg.c (verify_gimple_comparison): Verify that vector
+	comparison returns a vector.
+
 2012-11-27  Meador Inge  <meadori@codesourcery.com>
 
 	* collect2.c (main): Call find_file_set_debug.

@@ -1,3 +1,29 @@
+2012-11-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53094
+	* cvt.c (ocp_convert): Call convert_to_vector.
+
+2012-11-29  Kai Tietz  <ktietz@redhat.com>
+
+	PR target/53912
+	* class.c (dump_class_hierarchy_r): Cast from pointer via uintptr_t.
+	(dump_vtable): Likewise.
+
+2012-11-29  Ed Smith-Rowland  <3dw4rd@verizon.net>
+
+	PR c++/52654
+	* parser.c (cp_parser_string_literal): Add overflow_type arg.
+	(cp_parser_userdef_numeric_literal): Warn on numeric overflow.
+
+2012-11-28  Andrew Pinski  <apinski@cavium.com>
+
+	PR bootstrap/54279
+	* Make-lang.in (g++$(exeext)): Rename to
+	(xg++$(exeext)): This.
+	(g++-cross$(exeext)): Use xg++$(exeext) instead of g++$(exeext).
+	(c++.start.encap): Likewise.
+	(c++.install-common): Likewise.
+
 2012-11-24  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/55446
