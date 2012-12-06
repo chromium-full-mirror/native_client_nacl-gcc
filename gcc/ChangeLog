@@ -2,6 +2,77 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-12-06  Jack Howarth <howarth@bromo.med.uc.edu>
+
+	PR 55599/sanitizer
+        * config/darwin.h (LINK_COMMAND_SPEC_A): Remove static libasan support.
+
+2012-12-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/43631
+	* var-tracking.c (emit_note_insn_var_location, emit_notes_in_bb):
+	Clear BLOCK_FOR_INSN on notes emitted in between basic blocks,
+	don't adjust BB_END when inserting note after BB_END of some bb.
+
+	PR c++/55137
+	* fold-const.c (fold_binary_loc) <associate>: Don't introduce
+	TREE_OVERFLOW through reassociation.  If type doesn't have defined
+	overflow, but one or both of the operands do, use the wrapping type
+	for reassociation and only convert to type at the end.
+
+2012-12-06  Richard Biener  <rguenther@suse.de>
+
+	* gimple-fold.c (fold_stmt_1): Remove code handling folding
+	stmts away.
+
+2012-12-06  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* doc/sourcebuild.texi: Document arm_v8_neon_ok.
+
+2012-12-06  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.c (neon_itype): Define NEON_RINT enum element.
+	(neon_builtin_data): Register vrintn, vrinta, vrintp, vrintm,
+	vrintz,	vrintx neon builtins.
+	(arm_init_neon_builtins): Handle NEON_RINT.
+	(arm_expand_neon_builtin): Likewise.
+	* config/arm/unspecs.md: New file.
+	* config/arm/arm.md ("unspec"): Move to unspecs.md.
+	* config/arm/iterators.md (NEON_VRINT): New int iterator.
+	(nvrint_variant): New int attribute.
+	* config/arm/neon.md 
+	(neon_vrint<NEON_VRINT:nvrint_variant><VCVTF:mode>): New pattern.
+	("unspec"): Move to unspecs.md.
+	* config/arm/iwmmxt2.md ("unspec"): Move to unspecs.md.
+
+2012-12-05  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* config/pa/pa.md: Use "const_int 0" instead of match_test to simplify
+	opaque cond in all call insns.
+
+2012-12-05  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR rtl-optimization/55604
+	* lra-lives.c (lra_create_live_ranges): If there are no referenced
+	pseudos left, do not compute live ranges.
+
+2012-12-05  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* doc/tm.texi.in (TARGET_CLASS_LIKELY_SPILLED_P): Update documentation.
+	* doc/tm.texi: Regenerate.
+	* regs.h (REG_LIVE_LENGTH): Update comments to not refer to no longer
+	existing files global.c and local-alloc.c.
+	* regmove.c (copy_src_to_dest): Likewise.
+	* function.h (struct rtl_data): Likewise.
+	* ira-color.c (allocno_priority_compare_func): Likewise.
+	* regstat.c (regstat_compute_ri): Likewise.
+	* config/epiphany/epiphany.h, config/vax/vax.h, config/cris/cris.h,
+	config/h8300/h8300.h, config/alpha/alpha.h, config/sparc/sparc.h,
+	config/rs6000/rs6000.h, config/pdp11/pdp11.h, config/pa/pa.h,
+	config/v850/v850.h, config/mn10300/mn10300.h, config/m32r/m32r.h,
+	config/i386/i386.h, config/mcore/mcore.h, config/sh/sh.h,
+	config/arm/arm.h (REGNO_OK_FOR_BASE_P): Likewise.
+
 2012-12-05  Aldy Hernandez  <aldyh@redhat.com>
 
 	PR target/54160

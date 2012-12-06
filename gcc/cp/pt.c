@@ -9552,7 +9552,7 @@ tsubst_template_parms (tree parms, tree args, tsubst_flags_t complain)
   ++processing_template_decl;
 
   for (new_parms = &r;
-       TMPL_PARMS_DEPTH (parms) > TMPL_ARGS_DEPTH (args);
+       parms && TMPL_PARMS_DEPTH (parms) > TMPL_ARGS_DEPTH (args);
        new_parms = &(TREE_CHAIN (*new_parms)),
 	 parms = TREE_CHAIN (parms))
     {
@@ -9831,6 +9831,10 @@ tsubst_decl (tree t, tree args, tsubst_flags_t complain)
 	    tree new_type = tsubst (TREE_TYPE (t), args, complain, in_decl);
 	    if (new_type == error_mark_node)
 	      RETURN (error_mark_node);
+	    /* If we get a real template back, return it.  This can happen in
+	       the context of most_specialized_class.  */
+	    if (TREE_CODE (new_type) == TEMPLATE_DECL)
+	      return new_type;
 
 	    r = copy_decl (t);
 	    DECL_CHAIN (r) = NULL_TREE;
@@ -16593,6 +16597,8 @@ unify (tree tparms, tree targs, tree parm, tree arg, int strict,
       if ((TYPE_DOMAIN (parm) == NULL_TREE)
 	  != (TYPE_DOMAIN (arg) == NULL_TREE))
 	return unify_type_mismatch (explain_p, parm, arg);
+      RECUR_AND_CHECK_FAILURE (tparms, targs, TREE_TYPE (parm), TREE_TYPE (arg),
+			       strict & UNIFY_ALLOW_MORE_CV_QUAL, explain_p);
       if (TYPE_DOMAIN (parm) != NULL_TREE)
 	{
 	  tree parm_max;
@@ -16651,8 +16657,7 @@ unify (tree tparms, tree targs, tree parm, tree arg, int strict,
 	  RECUR_AND_CHECK_FAILURE (tparms, targs, parm_max, arg_max,
 				   UNIFY_ALLOW_INTEGER, explain_p);
 	}
-      return unify (tparms, targs, TREE_TYPE (parm), TREE_TYPE (arg),
-		    strict & UNIFY_ALLOW_MORE_CV_QUAL, explain_p);
+      return unify_success (explain_p);
 
     case REAL_TYPE:
     case COMPLEX_TYPE:
