@@ -1778,8 +1778,6 @@ finish_qualified_id_expr (tree qualifying_class,
     ;
   else
     {
-      expr = convert_from_reference (expr);
-
       /* In a template, return a SCOPE_REF for most qualified-ids
 	 so that we can check access at instantiation time.  But if
 	 we're looking at a member of the current instantiation, we
@@ -1790,6 +1788,8 @@ finish_qualified_id_expr (tree qualifying_class,
 	expr = build_qualified_name (TREE_TYPE (expr),
 				     qualifying_class, expr,
 				     template_p);
+
+      expr = convert_from_reference (expr);
     }
 
   return expr;
@@ -6451,7 +6451,7 @@ adjust_temp_type (tree type, tree temp)
   /* Avoid wrapping an aggregate value in a NOP_EXPR.  */
   if (TREE_CODE (temp) == CONSTRUCTOR)
     return build_constructor (type, CONSTRUCTOR_ELTS (temp));
-  gcc_assert (SCALAR_TYPE_P (type));
+  gcc_assert (scalarish_type_p (type));
   return cp_fold_convert (type, temp);
 }
 
