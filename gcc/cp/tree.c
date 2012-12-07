@@ -407,17 +407,12 @@ build_aggr_init_array (tree return_type, tree fn, tree slot, int nargs,
    callable.  */
 
 tree
-build_aggr_init_expr (tree type, tree init, tsubst_flags_t complain)
+build_aggr_init_expr (tree type, tree init, tsubst_flags_t /*complain*/)
 {
   tree fn;
   tree slot;
   tree rval;
   int is_ctor;
-
-  /* Make sure that we're not trying to create an instance of an
-     abstract class.  */
-  if (abstract_virtuals_error_sfinae (NULL_TREE, type, complain))
-    return error_mark_node;
 
   if (TREE_CODE (init) == CALL_EXPR)
     fn = CALL_EXPR_FN (init);
@@ -477,6 +472,11 @@ build_cplus_new (tree type, tree init, tsubst_flags_t complain)
   tree rval = build_aggr_init_expr (type, init, complain);
   tree slot;
 
+  /* Make sure that we're not trying to create an instance of an
+     abstract class.  */
+  if (abstract_virtuals_error_sfinae (NULL_TREE, type, complain))
+    return error_mark_node;
+
   if (TREE_CODE (rval) == AGGR_INIT_EXPR)
     slot = AGGR_INIT_EXPR_SLOT (rval);
   else if (TREE_CODE (rval) == CALL_EXPR
@@ -524,7 +524,8 @@ build_vec_init_elt (tree type, tree init, tsubst_flags_t complain)
   argvec = make_tree_vector ();
   if (init)
     {
-      tree dummy = build_dummy_object (inner_type);
+      tree init_type = strip_array_types (TREE_TYPE (init));
+      tree dummy = build_dummy_object (init_type);
       if (!real_lvalue_p (init))
 	dummy = move (dummy);
       argvec->quick_push (dummy);
