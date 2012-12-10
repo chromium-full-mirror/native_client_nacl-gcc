@@ -329,8 +329,6 @@ build_target_expr (tree decl, tree value, tsubst_flags_t complain)
      side-effects, then the optimizer should be able to get rid of
      whatever code is generated anyhow.  */
   TREE_SIDE_EFFECTS (t) = 1;
-  if (literal_type_p (type))
-    TREE_CONSTANT (t) = TREE_CONSTANT (value);
 
   return t;
 }
@@ -407,7 +405,7 @@ build_aggr_init_array (tree return_type, tree fn, tree slot, int nargs,
    callable.  */
 
 tree
-build_aggr_init_expr (tree type, tree init, tsubst_flags_t /*complain*/)
+build_aggr_init_expr (tree type, tree init)
 {
   tree fn;
   tree slot;
@@ -469,7 +467,7 @@ build_aggr_init_expr (tree type, tree init, tsubst_flags_t /*complain*/)
 tree
 build_cplus_new (tree type, tree init, tsubst_flags_t complain)
 {
-  tree rval = build_aggr_init_expr (type, init, complain);
+  tree rval = build_aggr_init_expr (type, init);
   tree slot;
 
   /* Make sure that we're not trying to create an instance of an
