@@ -1,3 +1,44 @@
+2012-12-11  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/55619
+	* g++.dg/ext/asm12.C: New test.
+
+	PR tree-optimization/54570
+	* gcc.dg/builtin-object-size-8.c: Xfail.
+	* gcc.dg/builtin-object-size-13.c: New test.
+
+2012-12-11  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/55642
+	* gcc.target/arm/pr55642.c: New testcase.
+
+2012-12-11  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/43631
+	PR bootstrap/55615
+	* g++.dg/other/pr43631.C: New test.
+
+2012-12-11  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55079
+	* gcc.dg/Warray-bounds-9.c: New testcase.
+	* gcc.dg/Warray-bounds-10.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-pre-1.c: Adjust.
+
+2012-12-10  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/52909
+	* gfortran.dg/proc_ptr_39.f90: New test case.
+
+2012-12-10  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.target/mips/octeon-bbit-2.c: Restructure loops so that no
+	code duplication is required.  Allow BNE to appear.
+
+2012-12-10  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.target/mips/ext-2.c: Require -mlong64.
+
 2012-12-10  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/55107
