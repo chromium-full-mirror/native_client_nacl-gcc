@@ -2,6 +2,84 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-12-13  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/53476
+	* varpool.c (varpool_remove_unreferenced_decls): Revert to 4.7
+	behavior.
+
+2012-12-13  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/unspecs.md: Add copyright notice.
+
+2012-12-13  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-ssa-threadedge.c (propagate_threaded_block_debug_into): Avoid
+	-Wsign-compare warning.
+
+2012-12-13  Richard Biener  <rguenther@suse.de>
+
+	PR lto/55660
+	* tree-streamer.c (record_common_node): Check that we are not
+	recursively pre-loading nodes we want to skip.  Handle
+	char_type_node appearing as part of va_list_type_node.
+
+2012-12-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR gcov-profile/55650
+	* coverage.c (coverage_obj_init): Return false if no functions
+	are being emitted.
+
+2012-12-13  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* bitmap.c (struct bitmap_descriptor): Remove forward declaration.
+	(struct bitmap_head_def): Remove desc pointer.  Add descriptor_id
+	field.  Reorder fields for pointer alignment.
+	* bitmap.c: Include vec.h.
+	(struct bitmap_descriptor): Rename to bitmap_descriptor_d.
+	(bitmap_descriptor): New typedef, pointer to bitmap_descriptor_d.
+	Update all struct bitmap_descriptor references.
+	(next_bitmap_desc_id): New running index for bitmap desciptors.
+	(bitmap_descriptors): Vec of all bitmap descriptors by descriptor id.
+	(hash_descriptor, eq_descriptor): Update for struct bitmap_descriptor
+	change.
+	(bitmap_descriptor): Rename function to get_bitmap_descriptor.
+	Stuff newly allocated bitmap descriptor into bitmap_descriptors.
+	Set the bitmap descriptor id.
+	(bitmap_register): Lookup bitmap desciptor and store its ID in
+	the passed bitmap.
+	(register_overhead): Likewise.
+	(bitmap_find_bit): Lookup descriptor by id in bitmap_descriptors.
+	(print_statistics): Update for struct bitmap_descriptor change.
+
+	* Makefile.in: Fix bitmap.o dependencies.
+
+2012-12-13  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-pre.c (get_representative_for): Adjust dumping.
+	Mark created SSA names for release.
+	(eliminate_bb): Insert only when expr is not NULL.
+
+2012-12-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/55665
+	* tree-inline.c (remap_decls): Change nonlocalized_list
+	to pointer to pointer to vector from pointer to vector.
+	(remap_block): Pass address of BLOCK_NONLOCALIZED_VARS.
+
+	PR sanitizer/55508
+	* builtin-attrs.def (ATTR_TMPURE_NOTHROW_LEAF_LIST,
+	ATTR_TMPURE_NORETURN_NOTHROW_LEAF_LIST): New.
+	* asan.c (ATTR_TMPURE_NOTHROW_LEAF_LIST,
+	ATTR_TMPURE_NORETURN_NOTHROW_LEAF_LIST): Define.
+	* sanitizer.def: Make __asan_report_* and __asan_handle_no_return
+	builtins tm pure.
+
+2012-12-12  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips.c (mips_option_override): Set
+	mips_dbx_regno entries to IGNORED_DWARF_REGNUM by default.
+
 2012-12-12  Steven Bosscher  <steven@gcc.gnu.org>
 
 	* graph.c: Include sbitmap.h and cfgloop.h.
