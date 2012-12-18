@@ -2,6 +2,88 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-12-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/55562
+	* sbitmap.c (bitmap_and, bitmap_xor, bitmap_ior): Return whether
+	dst sbitmap changed even if it doesn't have popcount.
+
+2012-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.md (insv_imm<mode>): Add modes
+	for source operands.
+
+2012-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_simd_attr_length_move):
+	Remove unused variables.
+	(aarch64_split_compare_and_swap): Likewise.
+
+2012-12-18  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/driver-arm.c (arm_cpu_table):
+	Add Cortex-A7.
+
+2012-12-18  Aldy Hernandez  <aldyh@redhat.com>
+
+	PR other/54324
+	* doc/install.texi (Tools/packages necessary for building GCC):
+	Suggest --disable-stage1-checking for older GCC's.
+
+2012-12-18  Aldy Hernandez  <aldyh@redhat.com>
+
+	PR other/54324
+	* tree-ssa-coalesce.c (struct ssa_name_var_hash): Remove "union"
+	from template parameter.
+
+2012-12-18  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/54838
+	* cfgloopmanip.c (fix_loop_structure): Re-discover latch
+	edges first and mark loops for removal if no latch edges remain.
+	Properly re-create LOOPS_HAVE_FALLTHRU_PREHEADERS.
+	* loop-init.c (loop_optimizer_finalize): Set
+	LOOPS_MAY_HAVE_MULTIPLE_LATCHES.
+
+2012-12-18  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55555
+	* tree-ssa-loop-niter.c (idx_infer_loop_bounds): Properly
+	analyze evolution of the index for the loop it is used in.
+	* tree-scalar-evolution.c (instantiate_scev_name): Take
+	inner loop we will be creating a chrec for.  Generalize
+	fix for PR40281 and prune invalid SCEVs.
+	(instantiate_scev_poly): Likewise - pass down inner loop
+	we will be creating a chrec for.
+	(instantiate_scev_binary): Take and pass through inner loop.
+	(instantiate_array_ref): Likewise.
+	(instantiate_scev_convert): Likewise.
+	(instantiate_scev_not): Likewise.
+	(instantiate_scev_3): Likewise.
+	(instantiate_scev_2): Likewise.
+	(instantiate_scev_1): Likewise.
+	(instantiate_scev_r): Likewise.
+	(resolve_mixers): Adjust.
+	(instantiate_scev): Likewise.
+
+2012-12-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/55717
+	* rtlhooks-def.h (RTL_HOOKS_GEN_LOWPART_NO_EMIT): Define to
+	gen_lowpart_if_possible.
+	(gen_lowpart_no_emit_general): Remove prototype.
+	* rtlhooks.c (gen_lowpart_no_emit_general): Removed.
+	* simplify-rtx.c (simplify_unary_operation_1, 
+	simplify_binary_operation_1): Continue simplifying if
+	rtl_hooks.gen_lowpart_no_emit returns NULL_RTX.
+	* dwarf2out.c (mem_loc_descriptor) <case TRUNCATE>: Handle
+	truncation like lowpart SUBREG.
+
+2012-12-17  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* doc/contrib.texi (Contributors): Update Kaveh Ghazi's entry;
+	remove broken link to Rutgers University.
+
 2012-12-17  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* varasm.c (pending_assemble_externals_processed): Guard
