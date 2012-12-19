@@ -16723,6 +16723,7 @@ arm_get_frame_offsets (void)
   int core_saved;
   HOST_WIDE_INT frame_size;
   int i;
+  int stack_alignment;
 
   offsets = &cfun->machine->stack_offsets;
 
@@ -16812,9 +16813,12 @@ arm_get_frame_offsets (void)
       return offsets;
     }
 
+  stack_alignment = PREFERRED_STACK_BOUNDARY / BITS_PER_UNIT;
+  if (ARM_DOUBLEWORD_ALIGN)
+    stack_alignment = MAX (stack_alignment, 8);
+
   /* Ensure SFP has the correct alignment.  */
-  if (ARM_DOUBLEWORD_ALIGN
-      && (offsets->soft_frame & 7))
+  while (offsets->soft_frame & (stack_alignment - 1))
     {
       offsets->soft_frame += 4;
       /* Try to align stack by pushing an extra reg.  Don't bother doing this
@@ -16859,12 +16863,14 @@ arm_get_frame_offsets (void)
   offsets->outgoing_args = (offsets->locals_base
 			    + crtl->outgoing_args_size);
 
-  if (ARM_DOUBLEWORD_ALIGN)
+  if (stack_alignment > 4)
     {
-      /* Ensure SP remains doubleword aligned.  */
-      if (offsets->outgoing_args & 7)
-	offsets->outgoing_args += 4;
-      gcc_assert (!(offsets->outgoing_args & 7));
+      /* Ensure SP remains adequately aligned.  */
+      if (offsets->outgoing_args & (stack_alignment - 1))
+	offsets->outgoing_args
+          += (stack_alignment
+              - (offsets->outgoing_args & (stack_alignment - 1)));
+      gcc_assert (!(offsets->outgoing_args & (stack_alignment - 1)));
     }
 
   return offsets;
