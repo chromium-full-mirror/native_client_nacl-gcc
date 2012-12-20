@@ -2,6 +2,85 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2012-12-20  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc/config/aarch64/aarch64.md
+	(*addsi3_aarch64_uxtw): New pattern.
+	(*addsi3_compare0_uxtw): New pattern.
+	(*add_<shift>_si_uxtw): New pattern.
+	(*add_<optab><SHORT:mode>_si_uxtw): New pattern.
+	(*add_<optab><SHORT:mode>_shft_si_uxtw): New pattern.
+	(*add_<optab><SHORT:mode>_mult_si_uxtw): New pattern.
+	(*add_<optab>si_multp2_uxtw): New pattern.
+	(*addsi3_carryin_uxtw): New pattern.
+	(*addsi3_carryin_alt1_uxtw): New pattern.
+	(*addsi3_carryin_alt2_uxtw): New pattern.
+	(*addsi3_carryin_alt3_uxtw): New pattern.
+	(*add_uxtsi_multp2_uxtw): New pattern.
+	(*subsi3_uxtw): New pattern.
+	(*subsi3_compare0_uxtw): New pattern.
+	(*sub_<shift>_si_uxtw): New pattern.
+	(*sub_mul_imm_si_uxtw): New pattern.
+	(*sub_<optab><SHORT:mode>_si_uxtw): New pattern.
+	(*sub_<optab><SHORT:mode>_shft_si_uxtw): New pattern.
+	(*sub_<optab>si_multp2_uxtw): New pattern.
+	(*sub_uxtsi_multp2_uxtw): New pattern.
+	(*negsi2_uxtw): New pattern.
+	(*negsi2_compare0_uxtw): New pattern.
+	(*neg_<shift>_si2_uxtw): New pattern.
+	(*neg_mul_imm_si2_uxtw): New pattern.
+	(*mulsi3_uxtw): New pattern.
+	(*maddsi_uxtw): New pattern.
+	(*msubsi_uxtw): New pattern.
+	(*mulsi_neg_uxtw): New pattern.
+	(*<su_optab>divsi3_uxtw): New pattern.
+
+2012-12-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/55750
+	* gimplify.c (gimplify_self_mod_expr): Don't force lvalue to
+	pass is_gimple_min_lval.
+
+2012-12-20  Richard Henderson  <rth@redhat.com>
+	    Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/constraints.md (NxxDq, NxxSq): New.
+	* config/s390/predicates.md (contiguous_bitmask_operand): New.
+	* config/s390/s390.c (print_operand) ['e', 'f', 's', 't']: New
+	operand letters.
+	* config/s390/s390.md (bfstart, bfend): New mode attrs.
+	(*insv<GPR>_zEC12_noshift): Use them.
+	(*insv<GPR>_z10_noshift): Likewise.
+	(*insv<GPR>_or_z10_noshift): Likewise.
+
+	* config/s390/s390.md (*insv_l_di_reg_extimm): Un-macroize from :P.
+
+	* config/s390/s390.md (*anddi3_cc): Add risbg alternative.
+	(*anddi3_cconly, *anddi3): Likewise.
+	(*andsi3, *andsi3_cconly, *andsi3_zarch): Likewise.
+
+	* config/s390/s390.md (bitsize): New mode attr.
+	(*extzv<GPR>, *extzv<GPR>, *insv<GPR>_zEC12, *insv<GPR>_z10): Use it.
+	(extend<HQI><DSI>2, zero_extend<HQI>si2): Likewise.
+	(zero_extend<HQI>di2, fixuns_trunc<BFP><GPR>2): Likewise.
+
+	* config/s390/predicates.md (nonzero_shift_count_operand): New.
+	* config/s390/s390-protos.h (s390_extzv_shift_ok): Declare.
+	* config/s390/s390.c (s390_extzv_shift_ok): New function.
+	* config/s390/s390.md (extzv): New expander.
+	(*extzv<GPR>_zEC12, *extzv<GPR>_z10): New insns.
+	(*pre_z10_extzv<GPR>): Rename from *extzv<GPR>; simplify with
+	nonzero_shift_count_operand.
+	(*extzv_<GPR>_srl, *extzv_<GPR>_sll): New insns.
+
+	* config/s390/s390.md (IXOR): New code iterator.
+	(*r<IXOR>sbg_<GPR>_noshift): Rename from *insv<GPR>_or_z10_noshift;
+	macro-ize to handle XOR too.
+	(*r<IXOR>sbg_di_rotl, *r<IXOR>sbg_<GPR>_srl, *r<IXOR>sbg_<GPR>_sll):
+	New patterns.
+
+	* config/s390/s390.md (*insv_rnsbg_noshift, *insv_rnsbg_srl): New.
+
 2012-12-20  Thomas Schwinge  <thomas@codesourcery.com>
 
 	PR bootstrap/55202
