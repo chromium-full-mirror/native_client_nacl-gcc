@@ -5,25 +5,25 @@
 @ This turns on instruction bundling in the assembler, with 16-byte bundles.
 .bundle_align_mode 4
 
-.macro _sfi_cmask reg
-	bic \reg, \reg, #0xC000000F
+.macro _sfi_cmask reg, cond=
+	bic\cond \reg, \reg, #0xC000000F
 .endm
 
-.macro _sfi_dmask reg
-	bic \reg, \reg, #0xC0000000
+.macro _sfi_dmask reg, cond=
+	bic\cond \reg, \reg, #0xC0000000
 .endm
 
 @ Used in place of bx (indirect jump), no difference but the mnemonic.
 @ NB: GCC output uses this.
 .macro sfi_bx reg, cond=
 	.bundle_lock
-	_sfi_cmask \reg
+	_sfi_cmask \reg, \cond
 	bx\cond \reg
 	.bundle_unlock
 .endm
 
 .macro _sfi_bl label, target, cond=
-	adr lr, \label
+	adr\cond lr, \label
 	b\cond \target
 	.p2align 4
 \label\():
@@ -38,7 +38,7 @@
 .macro _sfi_blx label, reg, cond
 	adr lr, \label
 	.bundle_lock
-	_sfi_cmask \reg
+	_sfi_cmask \reg, \cond
 	bx\cond \reg
 	.bundle_unlock
 	.p2align 4
