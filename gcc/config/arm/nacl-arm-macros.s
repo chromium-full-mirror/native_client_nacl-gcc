@@ -13,6 +13,25 @@
 	bic\cond \reg, \reg, #0xC0000000
 .endm
 
+.macro _sfi_for_each_cond macro, args:vararg
+	\macro eq, \args
+	\macro ne, \args
+	\macro cs, \args
+	\macro cc, \args
+	\macro mi, \args
+	\macro pl, \args
+	\macro vs, \args
+	\macro vc, \args
+	\macro hi, \args
+	\macro ls, \args
+	\macro ge, \args
+	\macro lt, \args
+	\macro gt, \args
+	\macro le, \args
+	\macro al, \args
+	\macro nv, \args
+.endm
+
 @ Used in place of bx (indirect jump), no difference but the mnemonic.
 @ NB: GCC output uses this.
 .macro sfi_bx reg, cond=
@@ -51,28 +70,13 @@
 	_sfi_blx .Lsfi.\@, \target, \cond
 .endm
 
-.macro _sfi_condify_1 macro, cond
+.macro _sfi_condify_1 cond, macro
 	.macro \macro\cond args:vararg
 	\macro \args, \cond
 	.endm
 .endm
 .macro _sfi_condify macro
-	_sfi_condify_1 \macro, eq
-	_sfi_condify_1 \macro, ne
-	_sfi_condify_1 \macro, cs
-	_sfi_condify_1 \macro, cc
-	_sfi_condify_1 \macro, mi
-	_sfi_condify_1 \macro, pl
-	_sfi_condify_1 \macro, vs
-	_sfi_condify_1 \macro, vc
-	_sfi_condify_1 \macro, hi
-	_sfi_condify_1 \macro, ls
-	_sfi_condify_1 \macro, ge
-	_sfi_condify_1 \macro, lt
-	_sfi_condify_1 \macro, gt
-	_sfi_condify_1 \macro, le
-	_sfi_condify_1 \macro, al
-	_sfi_condify_1 \macro, nv
+	_sfi_for_each_cond _sfi_condify_1, \macro
 .endm
 
 @ Conditionalized variants of the branching macros.
@@ -183,12 +187,80 @@ _sfi_condify sfi_bx
 @ possibility of errors where the base register in the first parameter
 @ is not the actual base register used in the addressing mode syntax.
 @ NB: GCC output uses this.
-.macro sfi_breg basereg, insn:vararg
+.macro sfi_breg basereg, insn, operands:vararg
 	.bundle_lock
-	_sfi_dmask \basereg
-	\insn
+	_sfi_breg_dmask_\insn \basereg
+	\insn \operands
 	.bundle_unlock
 .endm
+
+.macro _sfi_breg_dmask_define insn, suffix1=, suffix2=
+	_sfi_for_each_cond _sfi_breg_dmask_define_1, \insn, \suffix1, \suffix2
+	_sfi_breg_dmask_define_1 \(), \insn, \suffix1, \suffix2
+.endm
+
+.macro _sfi_breg_dmask_define_1 cond, insn, suffix1=, suffix2=
+	.ifb \suffix1
+	.macro _sfi_breg_dmask_\insn\cond basereg
+	_sfi_dmask \basereg, \cond
+	.endm
+	.else
+	.macro _sfi_breg_dmask_\insn\cond\suffix1\suffix2 basereg
+	_sfi_dmask \basereg, \cond
+	.endm
+	.ifnb \cond
+	.macro _sfi_breg_dmask_\insn\suffix1\cond\suffix2 basereg
+	_sfi_dmask \basereg, \cond
+	.endm
+	.endif
+	.endif
+.endm
+
+@ We need to name here all the instructions that might appear in sfi_breg,
+@ so as to handle all their conditionalized forms.
+.macro _sfi_breg_dmask_define_ldst insn
+	_sfi_breg_dmask_define \insn
+	_sfi_breg_dmask_define \insn, h
+	_sfi_breg_dmask_define \insn, sh
+	_sfi_breg_dmask_define \insn, b
+	_sfi_breg_dmask_define \insn, sb
+	_sfi_breg_dmask_define \insn, d
+.endm
+.macro _sfi_breg_dmask_define_ldmstm insn, suffix=
+	_sfi_breg_dmask_define \insn, \suffix
+	_sfi_breg_dmask_define \insn, ia, \suffix
+	_sfi_breg_dmask_define \insn, fd, \suffix
+	_sfi_breg_dmask_define \insn, da, \suffix
+	_sfi_breg_dmask_define \insn, fa, \suffix
+	_sfi_breg_dmask_define \insn, db, \suffix
+	_sfi_breg_dmask_define \insn, ea, \suffix
+	_sfi_breg_dmask_define \insn, ib, \suffix
+	_sfi_breg_dmask_define \insn, ed, \suffix
+.endm
+_sfi_breg_dmask_define_ldst ldr
+_sfi_breg_dmask_define_ldst ldrex
+_sfi_breg_dmask_define_ldst str
+_sfi_breg_dmask_define_ldst strex
+_sfi_breg_dmask_define_ldmstm ldm
+_sfi_breg_dmask_define_ldmstm stm
+_sfi_breg_dmask_define pld
+_sfi_breg_dmask_define pldw
+_sfi_breg_dmask_define pldi
+_sfi_breg_dmask_define vldr
+_sfi_breg_dmask_define vldm
+_sfi_breg_dmask_define fld, s
+_sfi_breg_dmask_define fld, d
+_sfi_breg_dmask_define fst, s
+_sfi_breg_dmask_define fst, d
+_sfi_breg_dmask_define_ldmstm fldm, s
+_sfi_breg_dmask_define_ldmstm fldm, d
+_sfi_breg_dmask_define_ldmstm fstm, s
+_sfi_breg_dmask_define_ldmstm fstm, d
+
+.purgem _sfi_breg_dmask_define
+.purgem _sfi_breg_dmask_define_1
+.purgem _sfi_breg_dmask_define_ldst
+.purgem _sfi_breg_dmask_define_ldmstm
 
 @ Macro to precede an instruction that touches sp.
 @ NB: GCC output uses this.
@@ -214,6 +286,8 @@ _sfi_condify sfi_bx
 .macro sfi_trap
 	.word 0xe7f6def0
 .endm
+
+.purgem _sfi_for_each_cond
 
 @ TODO(mcgrathr): examples don't belong here
 .if 0
