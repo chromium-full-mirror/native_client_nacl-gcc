@@ -1,3 +1,27 @@
+2012-12-21  David Edelsohn  <dje.gcc@gmail.com>
+
+	* gcc.dg/pthread-init-2.c (dg-options): Define _XOPEN_SOURCE=500
+	on AIX.
+
+	* lib/target-supports.exp (add_options_for_tls): Add -pthread for
+	AIX as well.
+	(check_effective_target_powerpc_vsx_ok): Only test VSX on AIX 7.1
+	and above.
+
+	* gcc.c-torture/compile/pr44707.c: Do not try to assemble on AIX.
+
+	* c-c++-common/pr43942.c: Remove XFAIL for AIX.
+
+2012-12-21  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/55763
+	* gfortran.dg/unlimited_polymorphic_4.f03: New test.
+
+2012-12-21  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/52996
+	* gcc.dg/torture/pr52996.c: New testcase.
+
 2012-12-20  Jakub Jelinek  <jakub@redhat.com>
 
 	PR middle-end/55750
@@ -1300,12 +1324,12 @@
 	* gcc.target/powerpc/ppc-pow.c: Allow dot symbols in branch.
 	* gcc.target/powerpc/tfmode_off.c: Skip on AIX.
 
-2012-11-07  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-11-07  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/53063
 	* gcc.dg/warn-nsstring.c: Use -Wformat explicitly.
 
-2012-11-07  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-11-07  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/51294
 	* c-c++-common/pr51294.c: New.
@@ -1686,7 +1710,7 @@
 	PR middle-end/55116
 	* gcc.target/i386/pr55116.c: New file.
 
-2012-10-29  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-10-29  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/53066
 	* gcc.dg/Wshadow-4.c: New.
@@ -2115,7 +2139,7 @@
 
 	* gcc.dg/webizer.c (main): Add missing exit call.
 
-2012-10-21  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-10-21  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/54465
 	* gfortran.dg/wextra_1.f:  New test.
@@ -2198,7 +2222,7 @@
 	* gcc.dg/tree-ssa/ldist-17.c: Block cunroll to make testcase still
 	valid.
 
-2012-10-16  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-10-16  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/53063
 	PR c/40989
@@ -3004,7 +3028,7 @@
 
 	* go.test/go-test.exp: Update for latest version of Go testsuite.
 
-2012-09-29  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-09-29  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/52724
 	* gfortran.dg/internal_readwrite_3.f90:  New test.
@@ -3509,7 +3533,7 @@
 	* g++.dg/torture/builtin-location.C: New testcase.
 
 2012-09-13  Paolo Carlini  <paolo.carlini@oracle.com>
-	    Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+	    Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c++/53210
 	* g++.dg/warn/Wuninitialized-self.C: New.
@@ -4370,7 +4394,7 @@
 	PR fortran/54301
 	* gfortran.dg/warn_target_lifetime_1.f90: New.
 
-2012-08-19  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-08-19  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/54298
 	* gfortran.dg/real_compare_1.f90: New test case.
@@ -4825,7 +4849,7 @@
 	* gcc.dg/tree-ssa/pta-ptrarith-1.c: Likewise.
 	* gcc.dg/tree-ssa/pta-ptrarith-2.c: Likewise.
 
-2012-08-01  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-08-01  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/54033
 	* gfortran.dg/include_6.f90:  New test case.
@@ -5298,7 +5322,7 @@
 	* g++.dg/parse/access8.C: Adjust.
 	* g++.dg/template/sfinae6_neg.C: Adjust.
 
-2012-07-16  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-07-16  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/53824
 	* gfortran.dg/coarray_allocate_1.f90:  New test.
@@ -6329,12 +6353,12 @@
 	PR middle-end/53535
 	* gcc.dg/pr46647.c: xfail for cris-* and crisv32-*.
 
-2012-06-07  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-06-07  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/52861
 	* gfortran.dg/string_assign_2.f90:  New test case.
 
-2012-06-07  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-06-07  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/52861
 	* gfortran.dg/string_assign_1.f90:  New test case.
@@ -6350,7 +6374,7 @@
 	* gfortran.dg/gomp/appendix-a/a.35.6.f90: Likewise.
 	* c-c++-common/gomp/pr53580.c: New test.
 
-2012-06-07  Fabien Ch√™ne  <fabien@gcc.gnu.org>
+2012-06-07  Fabien ChÅ√Å™ne  <fabien@gcc.gnu.org>
 
 	PR c++/51214
 	* g++.dg/cpp0x/forw_enum11.C: New.
@@ -6378,7 +6402,7 @@
 	* gfortran.dg/vect/pr32380.f: Adjust number of expected vectorized
 	loops.
 
-2012-06-06  Fabien Ch√™ne  <fabien@gcc.gnu.org>
+2012-06-06  Fabien ChÅ√Å™ne  <fabien@gcc.gnu.org>
 
 	PR c++/52841
 	* g++.dg/cpp0x/pr52841.C: New testcase.
@@ -7166,7 +7190,7 @@
 	* gnat.dg/discr36.ad[sb]: New test.
 	* gnat.dg/discr36_pkg.ad[sb]: New helper.
 
-2012-05-05  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-05-05  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/43772
 	* c-c++-common/pr43772.c: New.
@@ -7228,7 +7252,7 @@
 	* gcc.target/ia64/pr48496.c: New test.
 	* gcc.target/ia64/pr52657.c: Likewise.
 
-2012-05-04  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-05-04  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR c/51712
 	* c-c++-common/pr51712.c: New.
@@ -7471,7 +7495,7 @@
 
 	* gnat.dg/warn6.ad[sb]: New test.
 
-2012-04-29  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-29  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR 53149
 	* gcc.dg/20011021-1.c: Adjust testcase.
@@ -7579,7 +7603,7 @@
 	PR c/52880
 	* gcc.dg/pr52880.c: New test.
 
-2012-04-25  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-25  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	* gcc.dg/m-un-2.c: Update.
 	* gcc.dg/20011021-1.c: Update.
@@ -7662,7 +7686,7 @@
 	PR fortran/53051
 	* gfortran.dg/read_float_4.f90: New.
 
-2012-04-21  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-21  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR 35441
 	* c-c++-common/pr35441.C: New.
@@ -7697,7 +7721,7 @@
 
 	* gcc.dg/pr52283.c: New test.
 
-2012-04-19  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-19  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	* gcc.dg/pr37985.c: New test.
 
@@ -7945,12 +7969,12 @@
 	* gcc/target/sh/pr50751-6.c: New.
 	* gcc/target/sh/pr50751-7.c: New.
 
-2012-04-11  Fabien Ch√™ne  <fabien@gcc.gnu.org>
+2012-04-11  Fabien ChÅ√Å™ne  <fabien@gcc.gnu.org>
 
 	PR c++/52465
 	* g++.dg/lookup/using52.C: New.
 
-2012-04-11  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-11  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	* lib/prune.exp (TEST_ALWAYS_FLAGS): If undefined, set to empty.
 
@@ -8046,7 +8070,7 @@
 	* gcc.dg/builtin-bswap-5.c: Likewise.
 	* gcc.target/i386/builtin-bswap-4.c: New test.
 
-2012-04-11  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-11  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	PR 24985
 	* lib/prune.exp: Add -fno-diagnostics-show-caret.
@@ -8155,7 +8179,7 @@
 	PR fortran/52751
 	* gfortran.dg/public_private_module_2.f90: New.
 
-2012-04-08  Manuel L√≥pez-Ib√°√±ez  <manu@gcc.gnu.org>
+2012-04-08  Manuel LÅ√Å≥pez-IbÅ√Å°Å√Å±ez  <manu@gcc.gnu.org>
 
 	* g++.dg/warn/Wstrict-aliasing-float-ref-int-obj.C: Add labels to
 	directives.
@@ -9390,7 +9414,7 @@
 	PR c++/52248
 	* g++.dg/ext/timevar1.C: New.
 
-2012-02-16  Fabien Ch√™ne  <fabien@gcc.gnu.org>
+2012-02-16  Fabien ChÅ√Å™ne  <fabien@gcc.gnu.org>
 
 	PR c++/52126
 	* g++.dg/template/using21.C: New.
@@ -9725,7 +9749,7 @@
 	PR fortran/51514
 	* gfortran.dg/class_to_type_2.f90: New.
 
-2012-02-06  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-02-06  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/32373
 	* gfortran.dg/vect/vect-8.f90:  Use vect_double effective target.
@@ -9751,12 +9775,12 @@
 	* gcc.dg/pr48374.c: Actually add the test I forgot
 	in the 2012-01-25 commit.
 
-2012-02-05  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-02-05  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/32373
 	* gfortran.dg/vect/vect-8.f90:  New test case.
 
-2012-02-05  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-02-05  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/48847
 	* gfortran.dg/warn_unused_dummy_argument_3.f90:  New test.
@@ -9848,7 +9872,7 @@
 	PR tree-optimization/52073
 	* gcc.c-torture/compile/pr52073.c: New test.
 
-2012-02-01  Thomas K√∂nig  <tkoenig@gcc.gnu.org>
+2012-02-01  Thomas KÅ√Å∂nig  <tkoenig@gcc.gnu.org>
 
 	PR fortran/51958
 	* gfortran.dg/function_optimize_10.f90:  New test.
@@ -11031,7 +11055,7 @@
 
 	* g++.dg/cpp0x/constexpr-delegating2.C: Add missing piece.
 
-2012-01-01  Fabien Ch√™ne  <fabien@gcc.gnu.org>
+2012-01-01  Fabien ChÅ√Å™ne  <fabien@gcc.gnu.org>
 
 	* g++.old-deja/g++.brendan/crash25.C: Adjust.
 	* g++.old-deja/g++.brendan/crash56.C: Likewise.
