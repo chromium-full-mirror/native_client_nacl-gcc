@@ -29415,7 +29415,7 @@ ix86_get_function_versions_dispatcher (void *decl)
 
   /* Set the dispatcher for all the versions.  */
   it_v = default_version_info;
-  while (it_v->next != NULL)
+  while (it_v != NULL)
     {
       it_v->dispatcher_resolver = dispatch_decl;
       it_v = it_v->next;
@@ -29751,15 +29751,9 @@ fold_builtin_cpu (tree fndecl, tree *args)
       {"avx2",   F_AVX2}
     };
 
-  static tree __processor_model_type = NULL_TREE;
-  static tree __cpu_model_var = NULL_TREE;
-
-  if (__processor_model_type == NULL_TREE)
-    __processor_model_type = build_processor_model_struct ();
-
-  if (__cpu_model_var == NULL_TREE)
-    __cpu_model_var = make_var_decl (__processor_model_type,
-				     "__cpu_model");
+  tree __processor_model_type = build_processor_model_struct ();
+  tree __cpu_model_var = make_var_decl (__processor_model_type,
+					"__cpu_model");
 
   gcc_assert ((args != NULL) && (*args != NULL));
 
