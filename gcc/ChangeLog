@@ -36,6 +36,24 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2013-01-03  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (ix86_expand_move): Always assign to op1
+	after eliminating TLS symbols.
+
+2013-01-03  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR target/53789
+	* config/pa/pa.md (movsi): Revert previous change.
+	* config/pa/pa.c (pa_legitimate_constant_p): Reject all TLS symbol
+	references.
+
+2013-01-02  Rainer Emrich  <rainer@emrich-ebersheim.de>
+
+	PR bootstrap/55707
+	* graphite-dependences.c (hash_poly_ddr_p): Cast from pointer via
+	intptr_t.
+
 2013-01-02  Jason Merrill  <jason@redhat.com>
 
 	PR c++/55804
