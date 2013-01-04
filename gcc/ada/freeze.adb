@@ -1114,9 +1114,7 @@ package body Freeze is
                 Attribute_Scalar_Storage_Order);
 
       if Is_Record_Type (Comp_Type) or else Is_Array_Type (Comp_Type) then
-         if Present (Comp)
-              and then Chars (Comp) = Name_uParent
-         then
+         if Present (Comp) and then Chars (Comp) = Name_uParent then
             if Reverse_Storage_Order (Encl_Type)
                  /=
                Reverse_Storage_Order (Comp_Type)
@@ -3344,6 +3342,30 @@ package body Freeze is
             then
                Layout_Object (E);
             end if;
+
+            --  If initialization statements were captured in an expression
+            --  with actions with null expression, and the object does not
+            --  have delayed freezing, move them back now directly within the
+            --  enclosing statement sequence.
+
+            if Ekind_In (E, E_Constant, E_Variable)
+                 and then not Has_Delayed_Freeze (E)
+            then
+               declare
+                  Init_Stmts : constant Node_Id :=
+                                 Initialization_Statements (E);
+               begin
+                  if Present (Init_Stmts)
+                    and then Nkind (Init_Stmts) = N_Expression_With_Actions
+                    and then Nkind (Expression (Init_Stmts)) = N_Null_Statement
+                  then
+                     Insert_List_Before (Init_Stmts, Actions (Init_Stmts));
+                     Remove (Init_Stmts);
+                     Set_Initialization_Statements (E, Empty);
+                  end if;
+               end;
+            end if;
+
          end if;
 
       --  Case of a type or subtype being frozen

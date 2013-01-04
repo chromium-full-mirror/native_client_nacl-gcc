@@ -5522,6 +5522,23 @@ package body Checks is
         or else Index_Checks_Suppressed (Etype (A))
       then
          return;
+
+      --  The indexed component we are dealing with contains 'Loop_Entry in its
+      --  prefix. This case arises when analysis has determined that constructs
+      --  such as
+
+      --     Prefix'Loop_Entry (Expr)
+      --     Prefix'Loop_Entry (Expr1, Expr2, ... ExprN)
+
+      --  require rewriting for error detection purposes. A side effect of this
+      --  action is the generation of index checks that mention 'Loop_Entry.
+      --  Delay the generation of the check until 'Loop_Entry has been properly
+      --  expanded. This is done in Expand_Loop_Entry_Attributes.
+
+      elsif Nkind (Prefix (N)) = N_Attribute_Reference
+        and then Attribute_Name (Prefix (N)) = Name_Loop_Entry
+      then
+         return;
       end if;
 
       --  Generate a raise of constraint error with the appropriate reason and
@@ -6222,6 +6239,8 @@ package body Checks is
 
       declare
          DRC : constant Boolean := Do_Range_Check (Exp);
+         PV  : Node_Id;
+         CE  : Node_Id;
 
       begin
          Set_Do_Range_Check (Exp, False);
@@ -6234,22 +6253,43 @@ package body Checks is
             Force_Evaluation (Exp, Name_Req => True);
          end if;
 
-         --  Insert the validity check. Note that we do this with validity
-         --  checks turned off, to avoid recursion, we do not want validity
-         --  checks on the validity checking code itself!
+         --  Build the prefix for the 'Valid call
 
-         Insert_Action
-           (Expr,
+         PV := Duplicate_Subexpr_No_Checks (Exp, Name_Req => True);
+
+         --  A rather specialized kludge. If PV is an analyzed expression
+         --  which is an indexed component of a packed array that has not
+         --  been properly expanded, turn off its Analyzed flag to make sure
+         --  it gets properly reexpanded.
+
+         --  The reason this arises is that Duplicate_Subexpr_No_Checks did
+         --  an analyze with the old parent pointer. This may point e.g. to
+         --  a subprogram call, which deactivates this expansion.
+
+         if Analyzed (PV)
+           and then Nkind (PV) = N_Indexed_Component
+           and then Present (Packed_Array_Type (Etype (Prefix (PV))))
+         then
+            Set_Analyzed (PV, False);
+         end if;
+
+         --  Build the raise CE node to check for validity
+
+         CE :=
             Make_Raise_Constraint_Error (Loc,
               Condition =>
                 Make_Op_Not (Loc,
                   Right_Opnd =>
                     Make_Attribute_Reference (Loc,
-                      Prefix =>
-                        Duplicate_Subexpr_No_Checks (Exp, Name_Req => True),
+                      Prefix         => PV,
                       Attribute_Name => Name_Valid)),
-              Reason => CE_Invalid_Data),
-            Suppress => Validity_Check);
+              Reason => CE_Invalid_Data);
+
+         --  Insert the validity check. Note that we do this with validity
+         --  checks turned off, to avoid recursion, we do not want validity
+         --  checks on the validity checking code itself!
+
+         Insert_Action (Expr, CE, Suppress => Validity_Check);
 
          --  If the expression is a reference to an element of a bit-packed
          --  array, then it is rewritten as a renaming declaration. If the

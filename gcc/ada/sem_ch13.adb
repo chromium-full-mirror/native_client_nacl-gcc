@@ -1318,14 +1318,16 @@ package body Sem_Ch13 is
                            P_Name := A_Name;
 
                         elsif A_Name = Name_Link_Name then
-                           L_Assoc := Make_Pragma_Argument_Association (Loc,
-                              Chars => A_Name,
-                              Expression => Relocate_Node (Expression (A)));
+                           L_Assoc :=
+                             Make_Pragma_Argument_Association (Loc,
+                               Chars      => A_Name,
+                               Expression => Relocate_Node (Expression (A)));
 
                         elsif A_Name = Name_External_Name then
-                           E_Assoc := Make_Pragma_Argument_Association (Loc,
-                              Chars => A_Name,
-                              Expression => Relocate_Node (Expression (A)));
+                           E_Assoc :=
+                             Make_Pragma_Argument_Association (Loc,
+                               Chars      => A_Name,
+                               Expression => Relocate_Node (Expression (A)));
                         end if;
 
                         Next (A);
@@ -1434,7 +1436,7 @@ package body Sem_Ch13 is
                --  Case 2d : Aspects that correspond to a pragma with one
                --  argument.
 
-               when Aspect_Abstract_State        =>
+               when Aspect_Abstract_State =>
                   Aitem :=
                     Make_Pragma (Loc,
                       Pragma_Identifier            =>
@@ -1445,7 +1447,20 @@ package body Sem_Ch13 is
 
                   Delay_Required := False;
 
-               when Aspect_Relative_Deadline     =>
+               --  Aspect Global must be delayed because it can mention names
+               --  and benefit from the forward visibility rules applicable to
+               --  aspects of subprograms.
+
+               when Aspect_Global =>
+                  Aitem :=
+                    Make_Pragma (Loc,
+                      Pragma_Identifier            =>
+                        Make_Identifier (Sloc (Id), Name_Global),
+                      Pragma_Argument_Associations => New_List (
+                        Make_Pragma_Argument_Association (Loc,
+                          Expression => Relocate_Node (Expr))));
+
+               when Aspect_Relative_Deadline =>
                   Aitem :=
                     Make_Pragma (Loc,
                       Pragma_Argument_Associations => New_List (
@@ -1947,6 +1962,20 @@ package body Sem_Ch13 is
                      end if;
 
                      Prepend (Aitem, Declarations (N));
+
+                  --  Aspect Abstract_State produces implicit declarations for
+                  --  all state abstraction entities it defines. To emulate
+                  --  this behavior, insert the pragma at the start of the
+                  --  visible declarations of the related package.
+
+                  elsif Nam = Name_Abstract_State
+                    and then Nkind (N) = N_Package_Declaration
+                  then
+                     if No (Visible_Declarations (Specification (N))) then
+                        Set_Visible_Declarations (Specification (N), New_List);
+                     end if;
+
+                     Prepend (Aitem, Visible_Declarations (Specification (N)));
 
                   else
                      if No (Pragmas_After (Aux)) then
@@ -2903,11 +2932,26 @@ package body Sem_Ch13 is
                   --  before its definition.
 
                   declare
-                     Init_Call : constant Node_Id := Find_Init_Call (U_Ent, N);
+                     Init_Call : constant Node_Id :=
+                                   Remove_Init_Call (U_Ent, N);
+
                   begin
                      if Present (Init_Call) then
-                        Remove (Init_Call);
-                        Append_Freeze_Action (U_Ent, Init_Call);
+
+                        --  If the init call is an expression with actions with
+                        --  null expression, just extract the actions.
+
+                        if Nkind (Init_Call) = N_Expression_With_Actions
+                          and then
+                            Nkind (Expression (Init_Call)) = N_Null_Statement
+                        then
+                           Append_Freeze_Actions (U_Ent, Actions (Init_Call));
+
+                        --  General case: move Init_Call to freeze actions
+
+                        else
+                           Append_Freeze_Action (U_Ent, Init_Call);
+                        end if;
                      end if;
                   end;
 
@@ -2916,9 +2960,8 @@ package body Sem_Ch13 is
                        ("& cannot be exported if an address clause is given",
                         Nam);
                      Error_Msg_N
-                       ("\define and export a variable " &
-                        "that holds its address instead",
-                        Nam);
+                       ("\define and export a variable "
+                        & "that holds its address instead", Nam);
                   end if;
 
                   --  Entity has delayed freeze, so we will generate an
@@ -4684,14 +4727,18 @@ package body Sem_Ch13 is
 
       function Is_Inherited (Comp : Entity_Id) return Boolean is
          Comp_Base : Entity_Id;
+
       begin
          if Ekind (Rectype) = E_Record_Subtype then
             Comp_Base := Original_Record_Component (Comp);
          else
             Comp_Base := Comp;
          end if;
+
          return Comp_Base /= Original_Record_Component (Comp_Base);
       end Is_Inherited;
+
+      --  Local variables
 
       Is_Record_Extension : Boolean;
       --  True if Rectype is a record extension
@@ -4709,9 +4756,7 @@ package body Sem_Ch13 is
       Find_Type (Ident);
       Rectype := Entity (Ident);
 
-      if Rectype = Any_Type
-        or else Rep_Item_Too_Early (Rectype, N)
-      then
+      if Rectype = Any_Type or else Rep_Item_Too_Early (Rectype, N) then
          return;
       else
          Rectype := Underlying_Type (Rectype);
@@ -5141,8 +5186,9 @@ package body Sem_Ch13 is
          return Empty;
       end if;
 
-      SId := Make_Defining_Identifier (Loc,
-         Chars => New_External_Name (Chars (Typ), "Invariant"));
+      SId :=
+        Make_Defining_Identifier (Loc,
+          Chars => New_External_Name (Chars (Typ), "Invariant"));
       Set_Has_Invariants (SId);
       Set_Has_Invariants (Typ);
       Set_Ekind (SId, E_Procedure);
@@ -6868,32 +6914,32 @@ package body Sem_Ch13 is
               Library_Unit_Aspects =>
             T := Standard_Boolean;
 
+         --  Aspects corresponding to attribute definition clauses
+
+         when Aspect_Address =>
+            T := RTE (RE_Address);
+
          when Aspect_Attach_Handler =>
             T := RTE (RE_Interrupt_ID);
+
+         when Aspect_Bit_Order | Aspect_Scalar_Storage_Order =>
+            T := RTE (RE_Bit_Order);
 
          when Aspect_Convention =>
             return;
 
-         --  Default_Value is resolved with the type entity in question
-
-         when Aspect_Default_Value =>
-            T := Entity (ASN);
+         when Aspect_CPU =>
+            T := RTE (RE_CPU_Range);
 
          --  Default_Component_Value is resolved with the component type
 
          when Aspect_Default_Component_Value =>
             T := Component_Type (Entity (ASN));
 
-         --  Aspects corresponding to attribute definition clauses
+         --  Default_Value is resolved with the type entity in question
 
-         when Aspect_Address =>
-            T := RTE (RE_Address);
-
-         when Aspect_Bit_Order | Aspect_Scalar_Storage_Order =>
-            T := RTE (RE_Bit_Order);
-
-         when Aspect_CPU =>
-            T := RTE (RE_CPU_Range);
+         when Aspect_Default_Value =>
+            T := Entity (ASN);
 
          when Aspect_Dispatching_Domain =>
             T := RTE (RE_Dispatching_Domain);
@@ -6903,6 +6949,14 @@ package body Sem_Ch13 is
 
          when Aspect_External_Name =>
             T := Standard_String;
+
+         --  Global is a delayed aspect because it may reference names that
+         --  have not been declared yet. There is no action to be taken with
+         --  respect to the aspect itself as the reference checking is done on
+         --  the corresponding pragma.
+
+         when Aspect_Global =>
+            return;
 
          when Aspect_Link_Name =>
             T := Standard_String;
@@ -8765,10 +8819,11 @@ package body Sem_Ch13 is
                                 Designated_Type (Etype (F)), Loc))));
 
          if Nam = TSS_Stream_Input then
-            Spec := Make_Function_Specification (Loc,
-                      Defining_Unit_Name       => Subp_Id,
-                      Parameter_Specifications => Formals,
-                      Result_Definition        => T_Ref);
+            Spec :=
+              Make_Function_Specification (Loc,
+                Defining_Unit_Name       => Subp_Id,
+                Parameter_Specifications => Formals,
+                Result_Definition        => T_Ref);
          else
             --  V : [out] T
 

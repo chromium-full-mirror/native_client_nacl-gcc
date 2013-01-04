@@ -2,6 +2,57 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-04  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (ix86_legitimize_address): Call convert_to_mode
+	unconditionally.
+	(ix86_expand_move): Ditto.
+	(ix86_zero_extend_to_Pmode): Ditto.
+	(ix86_expand_call): Ditto.
+	(ix86_expand_special_args_builtin): Ditto.
+	(ix86_expand_builtin): Ditto.
+
+2013-01-04  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55862
+	* tree-ssa-pre.c (phi_translate_1): Valueize SSA names after
+	translating them through PHI nodes.
+
+2013-01-04  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/55755
+	* tree-sra.c (sra_modify_assign): Do not check that an access has no
+	children when trying to avoid producing a VIEW_CONVERT_EXPR.
+
+2013-01-04  Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/55859
+	* opts.c (default_options_optimization): Clarify error message.
+
+2013-01-04  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/55863
+	* fold-const.c (split_tree): Undo -X - 1 to ~X folding for
+	reassociation.
+
+2013-01-03  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR target/53789
+	* config/pa/pa.md (movsi): Revert previous change.
+	* config/pa/pa.c (pa_legitimate_constant_p): Reject all TLS symbol
+	references.
+
+2013-01-03  Richard Henderson  <rth@redhat.com>
+
+	* config/i386/i386.c (ix86_expand_move): Always assign to op1
+	after eliminating TLS symbols.
+
+2013-01-03  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR bootstrap/50167
+	* graphite-interchange.c (pdr_stride_in_loop): Use gmp_fprintf.
+	* graphite-poly.c (debug_gmp_value): Likewise.
+
 2013-01-03  Uros Bizjak  <ubizjak@gmail.com>
 
 	PR target/55712
@@ -15,8 +66,7 @@
 
 2013-01-03  Richard Biener  <rguenther@suse.de>
 
-	* tree-data-ref.c (dump_conflict_function): Use less vertical
-	spacing.
+	* tree-data-ref.c (dump_conflict_function): Use less vertical spacing.
 	(dump_subscript): Adjust.
 	(finalize_ddr_dependent): Do not dump redundant info.
 	(analyze_siv_subscript): Adjust.
@@ -35,8 +85,7 @@
 	2013-01-02  Richard Biener  <rguenther@suse.de>
 
 	* tree-vect-stmts.c (vectorizable_load): When vectorizing an
-	invariant load do not generate a vector load from the scalar
-	location.
+	invariant load do not generate a vector load from the scalar location.
 
 2013-01-03  Richard Biener  <rguenther@suse.de>
 
@@ -83,8 +132,7 @@
 	* params.def (PARAM_MAX_VARTRACK_REVERSE_OP_SIZE): New param.
 	* var-tracking.c (reverse_op): Don't add reverse ops to
 	VALUEs that have already
-	PARAM_VALUE (PARAM_MAX_VARTRACK_REVERSE_OP_SIZE) or longer
-	locs list.
+	PARAM_VALUE (PARAM_MAX_VARTRACK_REVERSE_OP_SIZE) or longer locs list.
 
 2013-01-02  Gerald Pfeifer  <gerald@pfeifer.com>
 
@@ -111,19 +159,6 @@
 	(decide_unroll_stupid): Ditto.
 	* cfgloop.c (get_loop_location): New function.
 	* cfgloop.h (get_loop_location): Declare.
-
-	testsuite/
-	* gcc.dg/tree-ssa/loop-1.c: Update expected dump message.
-	* gcc.dg/tree-ssa/loop-23.c: Ditto.
-	* gcc.dg/tree-ssa/cunroll-1.c: Ditto.
-	* gcc.dg/tree-ssa/cunroll-2.c: Ditto.
-	* gcc.dg/tree-ssa/cunroll-3.c: Ditto.
-	* gcc.dg/tree-ssa/cunroll-4.c: Ditto.
-	* gcc.dg/tree-ssa/cunroll-5.c: Ditto.
-	* gcc.dg/unroll_1.c: Ditto.
-	* gcc.dg/unroll_2.c: Ditto.
-	* gcc.dg/unroll_3.c: Ditto.
-	* gcc.dg/unroll_4.c: Ditto.
 
 2013-01-02  Sriraman Tallam  <tmsriram@google.com>
 
@@ -156,8 +191,7 @@
 2013-01-02  Richard Biener  <rguenther@suse.de>
 
 	* tree-vect-stmts.c (vectorizable_load): When vectorizing an
-	invariant load do not generate a vector load from the scalar
-	location.
+	invariant load do not generate a vector load from the scalar location.
 
 2013-01-02  Richard Biener  <rguenther@suse.de>
 

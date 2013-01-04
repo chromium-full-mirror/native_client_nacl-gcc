@@ -1,3 +1,239 @@
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* warnsw.adb: Minor fixes to -gnatw.d handling.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* einfo.adb, atree.adb: Enlarge entities to make 63 more flags, 6 more
+	fields.
+
+2013-01-04  Joel Brobecker  <brobecker@adacore.com brobecker>
+
+	* gnat_ugn.texi: Fix typo.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* gnat_rm.texi: Document alignment choice for subtypes.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* validsw.ads: Minor fix to comment.
+
+2013-01-04  Doug Rupp  <rupp@adacore.com>
+
+	* Makefile.rtl (GNATRTL_NONTASKING_OBJS,
+	GNATRTL_ALTIVEC_OBJS): Factor g-al* objects.
+	* gcc-interface/Makefile.in (ADA_EXCLUDE_SRCS): Add g-al* sources.
+	(GNATRTL_ALTIVEC_OBJS): Override to null for VMS.
+	Rename leon vxworks toolchain as leon-wrs-vxworks.
+	* gcc-interface/Make-lang.in: Update dependencies
+
+2013-01-04  Pascal Obry  <obry@adacore.com>
+
+	* prj.ads (For_Each_Source): Add Locally_Removed parameter.
+	(Source_Iterator): Add Locally_Removed field.
+	* prj.adb (For_Each_Source): Ignore Locally_Removed files if needed.
+	(Next): Likewise.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* exp_attr.adb: Minor reformatting.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* checks.adb (Insert_Valid_Check): Fix handling of renamed
+	packed array element.
+	* exp_ch4.adb (Expand_Concatenate): Fix some missing parent
+	fields in generated code.
+	* exp_util.adb (Side_Effect_Free): Improve detection of cases
+	needing renaming.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* sinfo.ads: Clean up order of N_xxx subtypes
+
+2013-01-04  Vincent Celier  <celier@adacore.com>
+
+	* prj-conf.adb (Check_Target): Allow --autoconf= with no target.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* types.ads, prj-conf.adb, par-tchk.adb: Minor reformatting.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* par-ch6.adb (P_Subprogram): Better handling of missing IS
+	after expression function.
+	* par-util.adb (No_Constraint): Improve handling to avoid bad warnings.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* exp_util.ads, exp_util.adb (Insert_Actions): In expression with
+	actions case, new actions are appended to the sequence rather than
+	prepended.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* gnat_ugn.texi: Document -gnatw.d/w.D (does no apply in VMS mode).
+	* usage.adb: Add lines for -gnatw.d/w.D switches.
+	* warnsw.adb: Minor fixes (some missing cases of setting
+	Warning_Doc_Switch). Reject -gnatw.d and -gnatw.D in VMS mode.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* exp_util.adb (Remove_Side_Effects): Make sure scope suppress
+	is restored on exit.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* usage.adb: Document -gnateF (check overflow for predefined Float).
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* sem_res.adb (Resolve_Type_Conversion): Remove incorrect
+	prevention of call to Apply_Type_Conversion_Checks, which resulted
+	in missing check flags in formal mode.
+
+2013-01-04  Vincent Celier  <celier@adacore.com>
+
+	* makeutl.ads (Db_Switch_Args): New table used by gprbuild.
+	* prj-conf.adb (Check_Builder_Switches): Check for switches
+	--config= (Get_Db_Switches): New procedure to get the --db
+	switches so that they are used when invoking gprconfig in
+	auto-configuration.
+	(Do_Autoconf): When invoking gprconfig, use the --db switches, if any.
+
+2013-01-04  Pascal Obry  <obry@adacore.com>
+
+	* prj-nmsc.adb: Minor reformatting.
+
+2013-01-04  Vincent Celier  <celier@adacore.com>
+
+	* makeutl.ads (Root_Environment): New variable, moved rom
+	gprbuild (Load_Standard_Base): New Boolean variable, moved
+	from gprbuild.
+	* prj-conf.adb (Check_Builder_Switches): New procedure to check
+	for switch --RTS in package Builder. If a runtime specified
+	by --RTS is a relative path name, but not a base name, then
+	find the path on the Project Search Path.
+	(Do_Autoconf): Call Check_Builder_Switches.
+	(Locate_Runtime): New procedure, moved from gprbuild, to get the
+	absolute paths of runtimes when they are not specified as a base name.
+	* prj-conf.ads (Locate_Runtime): New procedure, moved from gprbuild.
+
+2013-01-04  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_ch3.adb (Build_Private_Derived_Type): Set
+	Has_Private_Ancestor on type derived from an untagged private
+	type whose full view has discriminants
+	* sem_aggr.adb (Resolve_Record_Aggregate): Reject non-extension
+	aggregate for untagged record type with private ancestor.
+
+2013-01-04  Thomas Quinot  <quinot@adacore.com>
+
+	* sem_elab.adb, sem_ch3.adb: Minor reformatting.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* table.adb: Minor reformatting.
+
+2013-01-04  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_ch10.adb (Check_Redundant_Withs): A with_clause that does
+	not come from source does not generate a warning for redundant
+	with_clauses.
+
+2013-01-04  Hristian Kirtchev  <kirtchev@adacore.com>
+
+	* aspects.adb, aspects.ads: Add Aspect_Global to all relevant tables.
+	* par-prag.adb: Add pragma Global to the list of pragmas that
+	do not need special processing by the parser.
+	* sem_ch13.adb (Analyze_Aspect_Specifications): Convert aspect
+	Global into a pragma without any form of legality checks. The
+	work is done by Analyze_Pragma. The aspect and pragma are both
+	marked as needing delayed processing.  Insert the corresponding
+	pragma of aspect Abstract_State in the visible declarations of the
+	related package.
+	(Check_Aspect_At_Freeze_Point): Aspect Global
+	does not need processing even though it is marked as delayed.
+	Alphabetize the list on aspect names.
+	* sem_prag.adb: Add a value for pragma Global in table Sig_Flags.
+	(Analyze_Pragma): Add ??? comment about the grammar of pragma
+	Abstract_State.  Move the error location from the pragma to the
+	state to improve the quality of error placement.  Add legality
+	checks for pragma Global.
+	* snames.ads-tmpl Add the following specially recognized names
+
+2013-01-04  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* sem_ch3.adb: Fix minor typo.
+
+2013-01-04  Ed Schonberg  <schonberg@adacore.com>
+
+	* par-ch13.adb (Aspect_Specifications_Present): In Strict mode,
+	accept an aspect name followed by a comma, indicating a defaulted
+	boolean aspect.
+
+2013-01-04  Joel Brobecker  <brobecker@adacore.com brobecker>
+
+	* gnat_ugn.texi: Document procedure to codesign GDB on Darwin.
+	Update doc on gnattest --separates switch.
+
+2013-01-04  Thomas Quinot  <quinot@adacore.com>
+
+	* s-chepoo.ads: Minor reformatting.
+
+2013-01-04  Arnaud Charlet  <charlet@adacore.com>
+
+	* usage.adb: Remove mention of -gnatN in usage.
+
+2013-01-04  Robert Dewar  <dewar@adacore.com>
+
+	* exp_prag.adb, gnatcmd.adb, exp_util.adb, table.adb, sem_prag.adb,
+	freeze.adb, sem_ch4.adb, sem_warn.adb, opt.ads, exp_aggr.adb,
+	prj-conf.adb, sem_ch13.adb: Minor reformatting.
+
+2013-01-04  Thomas Quinot  <quinot@adacore.com>
+
+	* sinfo.ads: Minor documentation update.
+
+2013-01-04  Thomas Quinot  <quinot@adacore.com>
+
+	* sem_ch3.adb, einfo.adb (Analyze_Object_Declaration): Do not set Ekind
+	before resolving initialization expression.
+
+2013-01-04  Hristian Kirtchev  <kirtchev@adacore.com>
+
+	* checks.adb (Generate_Index_Checks): Delay the generation of
+	the check for an indexed component where the prefix mentions
+	Loop_Entry until the attribute has been properly expanded.
+	* exp_ch5.adb (Expand_Loop_Entry_Attributes): Perform minor
+	decoration of the constant that captures the value of Loop_Entry's
+	prefix at the entry point into a loop.	Generate index checks
+	for an attribute reference that has been transformed into an
+	indexed component.
+
+2013-01-04  Thomas Quinot  <quinot@adacore.com>
+
+	* exp_prag.adb, exp_util.adb, exp_util.ads, freeze.adb, exp_aggr.adb,
+	sem_ch13.adb (Exp_Aggr.Collect_Initialization_Statements): Nothing to
+	do if Obj is already frozen.
+	(Exp_Util.Find_Init_Call): Rename to...
+	(Exp_Util.Remove_Init_Call): New subprogram, renamed from
+	Find_Init_Call.  Remove the initialization call from the enclosing
+	list if found, and if it is from an Initialization_Statements
+	attribute, reset it.
+	(Exp_Util.Append_Freeze_Action): Minor code reorganization.
+	(Exp_Util.Append_Freeze_Actions): Ensure a freeze node has been
+	allocated (as is already done in Append_Freeze_Action).
+	(Freeze.Freeze_Entity): For an object with captured
+	Initialization_Statements and non-delayed freezeing, unwrap the
+	initialization statements and insert and them directly in the
+	enclosing list.
+	(Sem_Ch13.Check_Address_Clause): For an object
+	with Initialization_Statements and an address clause, unwrap the
+	initialization statements when moving them to the freeze actions.
+
 2013-01-03  Pascal Obry  <obry@adacore.com>
 
 	* prj-attr.adb, projects.texi, snames.ads-tmpl: Add package remote and
