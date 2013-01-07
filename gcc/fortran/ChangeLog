@@ -1,3 +1,108 @@
+2013-01-07  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/55763
+	* gfortran.h (gfc_check_assign_symbol): Update prototype.
+	* decl.c (add_init_expr_to_sym, do_parm): Update call.
+	* expr.c (gfc_check_assign_symbol): Handle BT_CLASS and
+	improve error location; support components.
+	(gfc_check_pointer_assign): Handle component assignments.
+	* resolve.c (resolve_fl_derived0): Call gfc_check_assign_symbol.
+	(resolve_values): Update call.
+	(resolve_structure_cons): Avoid double diagnostic.
+
+2013-01-07  Tobias Burnus  <burnus@net-b.de>
+	    Thomas Koenig  <tkoenig@gcc.gnu.org>
+
+	PR fortran/55852
+	* expr.c (gfc_build_intrinsic_call): Avoid clashes
+	with user's procedures.
+	* gfortran.h (gfc_build_intrinsic_call): Update prototype.
+	* simplify.c (gfc_simplify_size): Update call.
+	* class.c (finalization_scalarizer, finalization_get_offset,
+	finalizer_insert_packed_call, generate_finalization_wrapper):
+	Clean up by using gfc_build_intrinsic_call.
+
+2012-01-07  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/55763
+	* resolve.c (resolve_select_type): Reject intrinsic types for
+	a non-unlimited-polymorphic selector.
+
+2013-01-06  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/PR53876
+	PR fortran/PR54990
+	PR fortran/PR54992
+	* trans-array.c (build_array_ref): Check the TYPE_CANONICAL
+	to see if it is GFC_CLASS_TYPE_P.
+	* trans-expr.c (gfc_get_vptr_from_expr): The same.
+	(gfc_conv_class_to_class): If the types are not the same,
+	cast parmese->expr to the type of ctree.
+	* trans-types.c (gfc_get_derived_type): GFC_CLASS_TYPE_P of
+	CLASS components must be set.
+
+2013-01-06  Mikael Morin  <mikael@gcc.gnu.org>
+
+	PR fortran/42769
+	PR fortran/45836
+	PR fortran/45900
+	* module.c (read_module): Don't reuse local symtree if the associated
+	symbol isn't exactly the one wanted.  Don't reuse local symtree if it is
+	ambiguous.
+	* resolve.c (resolve_call): Use symtree's name instead of symbol's to
+	lookup the symtree.
+
+2013-01-05  Steven G. Kargl  <kargl@gcc.gnu.org>
+	    Mikael Morin  <mikael@gcc.gnu.org>
+
+	PR fortran/55827
+	* class.c (gfc_fix_class_refs): Adapt ts initialization for the case
+	e->symtree == NULL.
+	* trans-expr.c (gfc_conv_function_expr): Init sym earlier. Use it.
+
+2013-01-05  Tobias Burnus  <burnus@net-b.de>
+
+	* class.c (finalize_component): Used passed offset expr.
+	(finalization_get_offset): New static function.
+	(finalizer_insert_packed_call, generate_finalization_wrapper): Use it
+	to handle noncontiguous arrays.
+
+2013-01-04  Tobias Burnus  <burnus@net-b.de>
+
+	* trans.c (gfc_build_final_call): New function.
+	* trans.h (gfc_build_final_call, gfc_conv_scalar_to_descriptor):
+	New function prototypes.
+	* trans-expr.c (gfc_conv_scalar_to_descriptor): Renamed from
+	conv_scalar_to_descriptor, removed static attribute.
+	(gfc_conv_procedure_call): Honor renaming.
+
+2013-01-04  Tobias Burnus  <burnus@net-b.de>
+
+	* intrinsic.c (add_functions): New internal intrinsic
+	function GFC_PREFIX ("stride").
+	* gfortran.h (gfc_isym_id): Add GFC_ISYM_STRIDE.
+	* intrinsic.h (gfc_resolve_stride): New prototypes.
+	* iresolve.c (gfc_resolve_stride): New function.
+	* trans-intrinsic.c (conv_intrinsic_stride): New static
+	function.
+	(gfc_conv_intrinsic_function): Use it.
+
+2013-01-04  Tobias Burnus  <burnus@net-b.de>
+
+	* class.c (gfc_find_intrinsic_vtab): Add _final
+	component.
+	* decl.c (gfc_match_null): Remove superfluous
+	variadic argument to gfc_match.
+
+2013-01-04  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/55172
+	* match.c (copy_ts_from_selector_to_associate): Remove call to
+	gfc_resolve_expr and replace it with explicit setting of the
+	array reference type.
+	* resolve.c (resolve_select_type): It is an error if the
+	selector is coindexed.
+
 2013-01-04  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/55763

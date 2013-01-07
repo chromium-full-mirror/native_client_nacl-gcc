@@ -2,6 +2,174 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/55897
+	* doc/extend.texi (AVR Named Address Spaces): __memx goes into
+	.progmemx.data now.
+
+2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/55897
+	* config/avr/avr.h (ADDR_SPACE_COUNT): New enum.
+	(avr_addrspace_t): Add .section_name field.
+	* config/avr/avr.c (progmem_section): Use ADDR_SPACE_COUNT as
+	array size.
+	(avr_addrspace): Same.  Initialize .section_name.  Remove last
+	NULL entry.  Put __memx into .progmemx.data.
+	(progmem_section_prefix): Remove.
+	(avr_asm_init_sections): No need to initialize progmem_section.
+	(avr_asm_named_section): Use avr_addrspace[].section_name to get
+	section name prefix.
+	(avr_asm_select_section): Ditto.  And use get_unnamed_section to
+	retrieve the progmem section.
+	* avr-c.c (avr_cpu_cpp_builtins): Use ADDR_SPACE_COUNT as loop
+	boundary to run over avr_addrspace[].
+	(avr_register_target_pragmas): Ditto.
+
+2013-01-06  Jakub Jelinek  <jakub@redhat.com>
+
+	* varasm.c (output_constant_def_contents): For asan_protect_global
+	protected strings, adjust DECL_ALIGN if needed, before testing for
+	anchored symbols.
+	(place_block_symbol): Adjust size for asan protected STRING_CSTs if
+	TREE_CONSTANT_POOL_ADDRESS_P.  Increase alignment for asan protected
+	normal decls.
+	(output_object_block): For asan protected decls, emit asan padding
+	after their contents.
+	* asan.c (asan_protect_global): Don't check TREE_ASM_WRITTEN here.
+	(asan_finish_file): Test it here instead.
+
+2013-01-07   Nick Clifton  <nickc@redhat.com>
+	     Matthias Klose <doko@debian.org>
+	     Doug Kwan  <dougkwan@google.com>
+	     H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR driver/55470
+	* collect2.c (main): Support -fuse-ld=bfd and -fuse-ld=gold.
+
+	* common.opt: Add fuse-ld=bfd and fuse-ld=gold.
+
+	* gcc.c (LINK_COMMAND_SPEC): Pass -fuse-ld=* to collect2.
+
+	* opts.c (comman_handle_option): Ignore -fuse-ld=bfd and
+	-fuse-ld=gold.
+
+	* doc/invoke.texi: Document -fuse-ld=bfd and -fuse-ld=gold.
+
+2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/54461
+	* doc/install.texi (Cross-Compiler-Specific Options): Document
+	--with-avrlibc.
+
+2013-01-07  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/arm_neon.h (vmovn_high_is16, vmovn_high_s32,
+	vmovn_high_s64, vmovn_high_u16, vmovn_high_u32, vmovn_high_u64,
+	vqmovn_high_s16, vqmovn_high_s32, vqmovn_high_s64, vqmovn_high_u16,
+	vqmovn_high_u32, vqmovn_high_u64, vqmovun_high_s16, vqmovun_high_s32,
+	vqmovun_high_s64): Fix source operand number and update copyright.
+
+2013-01-07  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/55890
+	* gimple.h (gimple_call_builtin_p): New overload.
+	* gimple.c (validate_call): New function.
+	(gimple_call_builtin_p): Likewise.
+	* tree-ssa-structalias.c (find_func_aliases_for_builtin_call):
+	Use gimple_call_builtin_p.
+	(find_func_clobbers): Likewise.
+	* tree-ssa-strlen.c (adjust_last_stmt): Likewise.
+	(strlen_optimize_stmt): Likewise.
+
+2013-01-07  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/arm_neon.h (vld1_dup_*): Make argument const.
+	(vld1q_dup_*): Likewise.
+	(vld1_*): Likewise.
+	(vld1q_*): Likewise.
+	(vld1_lane_*): Likewise.
+	(vld1q_lane_*): Likewise.
+
+2013-01-07  Richard Biener  <rguenther@suse.de>
+
+	* lto-streamer.h (LTO_minor_version): Bump to 2.
+
+2013-01-07  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-protos.h
+	(aarch64_const_double_zero_rtx_p): Rename to...
+	(aarch64_float_const_zero_rtx_p): ...this.
+	(aarch64_float_const_representable_p): New.
+	(aarch64_output_simd_mov_immediate): Likewise.
+	* config/aarch64/aarch64-simd.md (*aarch64_simd_mov<mode>): Refactor
+	move immediate case.
+	* config/aarch64/aarch64.c
+	(aarch64_const_double_zero_rtx_p): Rename to...
+	(aarch64_float_const_zero_rtx_p): ...this.
+	(aarch64_print_operand): Allow printing of new constants.
+	(aarch64_valid_floating_const): New.
+	(aarch64_legitimate_constant_p): Check for valid floating-point
+	constants.
+	(aarch64_simd_valid_immediate): Likewise.
+	(aarch64_vect_float_const_representable_p): New.
+	(aarch64_float_const_representable_p): Likewise.
+	(aarch64_simd_imm_zero_p): Also allow for floating-point 0.0.
+	(aarch64_output_simd_mov_immediate): New.
+	* config/aarch64/aarch64.md (*movsf_aarch64): Add new alternative.
+	(*movdf_aarch64): Likewise.
+	* config/aarch64/constraints.md (Ufc): New.
+	(Y): call aarch64_float_const_zero_rtx.
+	* config/aarch64/predicates.md (aarch64_fp_compare_operand): New.
+
+2013-01-07  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55888
+	PR tree-optimization/55862
+	* tree-ssa-pre.c (phi_translate_1): Revert previous change.
+	(valid_in_sets): Check if a NAME has a leader in AVAIL_OUT,
+	not if it is contained therein.
+
+2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	* config/avr/t-avr: Typo.
+
+2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR55243
+	* config/avr/t-avr: Don't automatically rebuild
+	$(srcdir)/config/avr/t-multilib
+	$(srcdir)/config/avr/avr-tables.opt
+	$(srcdir)/doc/avr-mmcu.texi
+	(avr-mcus): New phony target to build them on request.
+	(s-avr-mlib, s-avr-mmcu-texi): Remove.
+	* avr/avr-mcus.def: Adjust comments.
+
+2013-01-07  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (DEFAULT_PCC_STRUCT_RETURN): Remove.
+
+2013-01-06  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* file-find.c, file-find.h, realmpfr.c: Add FSF as copyright holder.
+
+2013-01-06  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/tilepro/gen-mul-tables.cc: Put copyright on one line.
+
+2013-01-05  David Edelsohn  <dje.gcc@gmail.com>
+
+	* config/rs6000/aix53.h (LIB_SPEC): Add -lpthreads when compiling
+	to generate profiling.
+	* config/rs6000/aix64.h (LIB_SPEC): Same.
+
+2013-01-04  Andrew Pinski  <apinski@cavium.com>
+
+	* config/aarch64/aarch64.c (aarch64_fixed_condition_code_regs):
+	New function.
+	(TARGET_FIXED_CONDITION_CODE_REGS): Define.
+
 2013-01-04  Uros Bizjak  <ubizjak@gmail.com>
 
 	* config/i386/i386.c (ix86_legitimize_address): Call convert_to_mode
