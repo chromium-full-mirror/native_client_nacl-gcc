@@ -2,6 +2,27 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-04  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/55823
+	* ipa-prop.c (update_indirect_edges_after_inlining): Fix ordering issue.
+
+2012-01-08  Jakub Jelinek  <jakub@redhat.com>
+	    Uros Bizjak  <ubizjak@gmail.com>
+
+	PR rtl-optimization/55845
+	* df-problems.c (can_move_insns_across): Stop scanning at
+	volatile_insn_p source instruction or give up if
+	across_from .. across_to range contains any volatile_insn_p
+	instructions.
+
+2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-simd.md (vec_init<mode>): New. 
+	* config/aarch64/aarch64-protos.h (aarch64_expand_vector_init): Declare.
+	* config/aarch64/aarch64.c (aarch64_simd_dup_constant,
+	aarch64_simd_make_constant, aarch64_expand_vector_init): New. 
+
 2013-01-08  Jakub Jelinek  <jakub@redhat.com>
 
 	PR fortran/55341
