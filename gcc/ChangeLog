@@ -2,6 +2,75 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR fortran/55341
+	* asan.c (asan_clear_shadow): New function.
+	(asan_emit_stack_protection): Use it.
+
+2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-simd.md (aarch64_simd_vec_<su>mult_lo_<mode>,
+	aarch64_simd_vec_<su>mult_hi_<mode>): Separate instruction and operand
+	with tab instead of space.
+
+2013-01-08  Nick Clifton  <nickc@redhat.com>
+
+	* config/rl78/rl78.c (rl78_expand_prologue): Always select
+	register bank 0 at the start of an interrupt handler.
+	* config/rl78/rl78.md (mulsi3_g13): Correct values for MDBL and
+	MDBH registers.
+
+2013-01-08  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd.md
+	(aarch64_simd_bsl<mode>_internal): Add floating-point modes.
+	(aarch64_simd_bsl): Likewise.
+	(aarch64_vcond_internal<mode>): Likewise.
+	(vcond<mode><mode>): Likewise.
+	(aarch64_cm<cmp><mode>): Fix constraints, add new modes.
+	* config/aarch64/iterators.md (V_cmp_result): Add V2DF.
+
+2013-01-08  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_builtin_vectorized_function): Handle sqrt, sqrtf.
+
+2013-01-08  Martin Jambor  <mjambor@suse.cz>
+
+	PR debug/55579
+	* tree-sra.c (analyze_access_subtree): Return true also after
+	potentially creating a debug-only replacement.
+
+2013-01-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/55890
+	* tree-ssa-ccp.c (evaluate_stmt): Use gimple_call_builtin_p.
+
+	PR tree-optimization/54120
+	* tree-vrp.c (range_fits_type_p): Don't allow
+	src_precision < precision from signed vr to unsigned_p
+	if vr->min or vr->max is negative.
+	(simplify_float_conversion_using_ranges): Test can_float_p
+	against CODE_FOR_nothing.
+
+2013-01-08  Jakub Jelinek  <jakub@redhat.com>
+	    Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/55851
+	* fold-const.c (int_binop_types_match_p): Allow all INTEGRAL_TYPE_P
+	types instead of just INTEGER_TYPE types.
+
+2013-01-07  Mark Kettenis  <kettenis@openbsd.org>
+
+	* config/i386/openbsdelf.h (LIBGCC2_HAS_TF_MODE, LIBGCC2_TF_CEXT,
+	TF_SIZE): Define.
+
+2013-01-07  Steve Ellcey  <sellcey@mips.com>
+
+	PR target/42661
+	* config/mips/mips.opt: Change mad to mmad to match documentation.
+
 2013-01-07  Georg-Johann Lay  <avr@gjlay.de>
 
 	PR target/55897
