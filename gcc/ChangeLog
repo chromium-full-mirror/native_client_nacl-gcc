@@ -2,10 +2,115 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-09  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR middle-end/55114
+	* expr.h (maybe_emit_group_store): Declare.
+	* expr.c (maybe_emit_group_store): New function.
+	* builtins.c (expand_builtin_int_roundingfn): Call it.
+	(expand_builtin_int_roundingfn_2): Likewise.
+
+2013-01-09  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/pr55829
+	* lra-constraints.c (match_reload): Add code for absent output.
+	(curr_insn_transform): Add code for reloads of matched inputs
+	without output.
+
+2013-01-09  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/sse.md (*vec_interleave_highv2df): Change mode
+	attribute of movddup insn to DF.
+	(*vec_interleave_lowv2df): Ditto.
+	(vec_dupv2df): Ditto.
+
+2013-01-09  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimiation/55875
+	* tree-ssa-loop-niter.c (number_of_iterations_cond): Add
+	EVERY_ITERATION parameter.
+	(number_of_iterations_exit): Check if exit is executed every iteration.
+	(idx_infer_loop_bounds): Similarly here.
+	(n_of_executions_at_most): Simplify
+	to only test for cases where statement is dominated by the
+	particular bound; handle correctly the "postdominance" test.
+	(scev_probably_wraps_p): Use max loop iterations info
+	as a global bound first.
+
+2013-01-09  Nguyen Duy Dat
+	    Nick Clifton  <nickc@redhat.com>
+
+	* config/v850/v850.md (cbranchsf4): New pattern.
+	(cstoresf4): New pattern.
+	(cbranchdf4): New pattern.
+	(cstoredf4): New pattern.
+	(movsicc): Disallow floating point comparisons.
+	(cmpsf_le_insn): Fix order of operators.
+	(cmpsf_lt_insn): Likewise.
+	(cmpsf_eq_insn): Likewise.
+	(cmpdf_le_insn): Likewise.
+	(cmpdf_lt_insn): Likewise.
+	(cmpdf_eq_insn): Likewise.
+	(cmpsf_ge_insn): Use LE comparison.
+	(cmpdf_ge_insn): Likewise.
+	(cmpsf_gt_insn): Use LT comparison.
+	(cmpdf_gt_insn): Likewise.
+	(cmpsf_ne_insn): Delete pattern.
+	(cmpdf_ne_insn): Delete pattern.
+	* config/v850/v850.c (v850_gen_float_compare): Use
+	gen_cmpdf_eq_insn for NE comparison.
+	(v850_float_z_comparison_operator)
+	(v850_float_nz_comparison_operator): Move from here ...
+	* config/v850/predicates.md: ... to here.  Move GT and GE
+	comparisons into v850_float_z_comparison_operator.
+	* config/v850/v850-protos.h (v850_float_z_comparison_operator):
+	Delete prototype.
+	(v850_float_nz_comparison_operator): Likewise.
+
+2013-01-09  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* config/pa/pa.c (pa_emit_move_sequence): Replace calls to gen_insv
+	with calls to gen_insvsi/gen_insvdi.
+
+2013-01-09  Venkataramanan Kumar  <venkataramanan.kumar@amd.com>
+
+	* config/i386/i386.c (initial_ix86_tune_features): Set up
+	X86_TUNE_AVX128_OPTIMAL for m_BTVER2.
+
+2013-01-09  Steven Bosscher  <steven@gcc.gnu.org>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/48189
+	* predict.c (predict_loops): If max is 0, don't call compare_tree_int.
+	If nitercst is 0, don't predict the exit edge.
+
+2013-01-08  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* config/pa/pa.h (VAL_U6_BITS_P): Define.
+	(INT_U6_BITS): Likewise.
+	* config/pa/predicates.md (uint6_operand): New predicate.
+	(shift5_operand, shift6_operand): Likewise.
+	* config/pa/pa.md (lshrsi3, rotrsi3): Use shift5_operand instead of
+	arith32_operand.
+	(lshrdi3): Use shift6_operand.
+	(shrpsi4, shrpdi4): New insn patterns.
+	(extzv): Delete expander.
+	(extzvsi, extzvdi): New expanders.  Use uint5_operand and uint6_operand
+	predicates in unamed zero extract patterns.  Tighten common constraint.
+	(extv): Delete expander.
+	(extvsi, extvdi): New expanders.  Use uint5_operand and uint6_operand
+	predicates in unamed sign extract patterns.  Tighten common constraint.
+	(insv): Delete expander.
+	(insvsi, insvdi): New expanders.  Use uint5_operand and uint6_operand
+	predicates in unamed insert patterns.  Tighten common constraint.
+	Change uint32_operand predicate to uint6_operand predicate in unamed
+	DImode pattern to insert constant values of type 1...1xxxx.
+
 2013-01-04  Jan Hubicka  <jh@suse.cz>
 
 	PR tree-optimization/55823
-	* ipa-prop.c (update_indirect_edges_after_inlining): Fix ordering issue.
+	* ipa-prop.c (update_indirect_edges_after_inlining): Fix ordering
+	issue.
 
 2012-01-08  Jakub Jelinek  <jakub@redhat.com>
 	    Uros Bizjak  <ubizjak@gmail.com>
@@ -18,10 +123,11 @@
 
 2013-01-08  Tejas Belagod  <tejas.belagod@arm.com>
 
-	* config/aarch64/aarch64-simd.md (vec_init<mode>): New. 
-	* config/aarch64/aarch64-protos.h (aarch64_expand_vector_init): Declare.
+	* config/aarch64/aarch64-simd.md (vec_init<mode>): New.
+	* config/aarch64/aarch64-protos.h (aarch64_expand_vector_init):
+	Declare.
 	* config/aarch64/aarch64.c (aarch64_simd_dup_constant,
-	aarch64_simd_make_constant, aarch64_expand_vector_init): New. 
+	aarch64_simd_make_constant, aarch64_expand_vector_init): New.
 
 2013-01-08  Jakub Jelinek  <jakub@redhat.com>
 
@@ -142,8 +248,7 @@
 
 	* gcc.c (LINK_COMMAND_SPEC): Pass -fuse-ld=* to collect2.
 
-	* opts.c (comman_handle_option): Ignore -fuse-ld=bfd and
-	-fuse-ld=gold.
+	* opts.c (comman_handle_option): Ignore -fuse-ld=bfd and -fuse-ld=gold.
 
 	* doc/invoke.texi: Document -fuse-ld=bfd and -fuse-ld=gold.
 
