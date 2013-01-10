@@ -1,3 +1,11 @@
+2013-01-10  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* MAINTAINERS (arc): Add new port maintainership for myself.
+
+2013-01-09  Jason Merrill  <jason@redhat.com>
+
+	* .gitignore: Import from gdb repository.
+
 2013-01-09  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* Makefile.def (configure-gcc): Depend on all-gmp.

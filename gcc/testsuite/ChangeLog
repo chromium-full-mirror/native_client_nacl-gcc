@@ -1,6 +1,51 @@
+2013-01-10  Jason Merrill  <jason@redhat.com>
+
+	* ada/.gitignore: New.
+
+2013-01-10  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* g++.dg/tls/thread_local-cse.C: Don't xfail on *-*-solaris2.9.
+	Add tls options.
+	* g++.dg/tls/thread_local2.C: Likewise.
+	* g++.dg/tls/thread_local2g.C: Likewise.
+	* g++.dg/tls/thread_local6.C: Likewise.
+	* g++.dg/tls/thread_local-order1.C: Add tls options.
+	* g++.dg/tls/thread_local-order2.C: Likewise.
+	* g++.dg/tls/thread_local3.C: Likewise.
+	* g++.dg/tls/thread_local3g.C: Likewise.
+	* g++.dg/tls/thread_local4.C: Likewise.
+	* g++.dg/tls/thread_local4g.C: Likewise.
+	* g++.dg/tls/thread_local5.C: Likewise.
+	* g++.dg/tls/thread_local5g.C: Likewise.
+	* g++.dg/tls/thread_local6g.C: Likewise.
+
+2013-01-10  Kostya Serebryany  <kcc@google.com>
+
+	* g++.dg/asan/asan_test.cc: Sync from upstream.
+
+2013-01-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/55921
+	* gcc.c-torture/compile/pr55921.c: New test.
+
+2013-01-09  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/55569
+	* gcc.c-torture/compile/pr55569.c: New testcase.
+
+2013-01-09  Mikael Morin  <mikael@gcc.gnu.org>
+
+	PR fortran/47203
+	* gfortran.dg/use_28.f90: New test.
+
+2012-01-09  Uros Bizjak  <ubizjak@gmail.com>
+
+	* gfortran.dg/intrinsic_size_3.f90: Make scan-tree-dump-times
+	number matching more robust.
+
 2013-01-09  Vladimir Makarov  <vmakarov@redhat.com>
 
-	PR rtl-optimization/pr55829
+	PR rtl-optimization/55829
 	* gcc.target/i386/pr55829.c: New.
 
 2013-01-09  Tobias Burnus  <burnus@net-b.de>

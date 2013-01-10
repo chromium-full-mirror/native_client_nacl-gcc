@@ -2,6 +2,62 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-10  David Edelsohn  <dje.gcc@gmail.com>
+
+	* configure.ac (HAVE_AS_TLS): Add check for powerpc-ibm-aix.
+	* configure: Regenerate.
+
+2013-01-10  Richard Biener  <rguenther@suse.de>
+
+	* builtins.c (expand_builtin_init_trampoline): Use
+	set_mem_attributes.
+
+2013-01-10  Richard Biener  <rguenther@suse.de>
+
+	PR bootstrap/55792
+	* tree-into-ssa.c (rewrite_add_phi_arguments): Do not set
+	locations for virtual PHI arguments.
+	(rewrite_update_phi_arguments): Likewise.
+
+2013-01-10  Joel Sherrill  <joel.sherrill@OARcorp.com>
+
+	* config/v850/rtems.h (ASM_SPEC): Pass -m8byte-align and -mgcc-abi
+	on to assembler.
+
+2013-01-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/55921
+	* tree-complex.c (expand_complex_asm): New function.
+	(expand_complex_operations_1): Call it for GIMPLE_ASM.
+
+2013-01-10  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	PR target/55718
+	* config/s390/s390.c (s390_symref_operand_p)
+	(s390_loadrelative_operand_p): Merge the two functions.
+	(s390_check_qrst_address, print_operand_address): Add parameters
+	to s390_loadrelative_operand_p invokation.
+	(s390_check_symref_alignment): Use s390_loadrelative_operand_p.
+	(s390_reload_larl_operand, s390_secondary_reload): Use
+	s390_loadrelative_operand_p instead of s390_symref_operand_p.
+	(legitimize_pic_address): Handle @GOTENT and @PLT + addend.
+
+2013-01-09  Mike Stump  <mikestump@comcast.net>
+
+	* dse.c (record_store): Remove unnecessary assert.
+
+2013-01-09  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/55569
+	* cfgloopmanip.c (scale_loop_profile): Make ITERATION_BOUND gcov_type.
+	* cfgloop.h (scale_loop_profile): Likewise.
+
+2013-01-09  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/45375
+	* ipa-inline.c (ipa_inline): Remove extern inlines and virtual functions.
+	* cgraphclones.c (cgraph_clone_node): Cpoy also LTO file data.
+
 2013-01-09  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	PR middle-end/55114
@@ -12,7 +68,7 @@
 
 2013-01-09  Vladimir Makarov  <vmakarov@redhat.com>
 
-	PR rtl-optimization/pr55829
+	PR rtl-optimization/55829
 	* lra-constraints.c (match_reload): Add code for absent output.
 	(curr_insn_transform): Add code for reloads of matched inputs
 	without output.
@@ -37,7 +93,7 @@
 	(scev_probably_wraps_p): Use max loop iterations info
 	as a global bound first.
 
-2013-01-09  Nguyen Duy Dat
+2013-01-09  Nguyen Duy Dat  <dat.nguyen.yn@rvc.renesas.com>
 	    Nick Clifton  <nickc@redhat.com>
 
 	* config/v850/v850.md (cbranchsf4): New pattern.
@@ -83,6 +139,14 @@
 	PR tree-optimization/48189
 	* predict.c (predict_loops): If max is 0, don't call compare_tree_int.
 	If nitercst is 0, don't predict the exit edge.
+
+2013-01-08   Naveen H.S  <Naveen.Hurugalawadi@caviumnetworks.com>
+
+	* config/aarch64/aarch64.c (aarch64_print_operand): Replace %r
+	in asm_fprintf with reg_names.
+	(aarch64_print_operand_address): Likewise.
+	(aarch64_return_addr): Likewise.
+	* config/aarch64/aarch64.h (ASM_FPRINTF_EXTENSIONS): Remove.
 
 2013-01-08  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
