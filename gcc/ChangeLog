@@ -2,6 +2,50 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-01-11  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	* doc/extend.texi (X86 Built-in Functions): Add whitespace in
+	__builtin_ia32_paddb256 and __builtin_ia32_pavgb256
+	documentation.  Add missing '__' in front of
+	__builtin_ia32_packssdw256.
+
+2013-01-11  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	PR target/55719
+	* config/s390/s390.c (s390_preferred_reload_class): Do not return
+	NO_REGS for larl operands.
+	(s390_reload_larl_operand): Use s390_load_address instead of
+	emit_move_insn.
+
+2013-01-11  Richard Biener  <rguenther@suse.de>
+
+	* tree-cfg.c (verify_node_sharing_1): Split out from ...
+	(verify_node_sharing): ... here.
+	(verify_gimple_in_cfg): Use verify_node_sharing_1 for walk_tree.
+
+2013-01-11  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure.ac (Tree checking): Set TREECHECKING to yes if enabled.
+	Substitute TREECHECKING.
+	* configure: Regenerate.
+	* Makefile.in (TREECHECKING): New.
+
+2012-01-11  Richard Guenther  <rguenther@suse.de>
+
+	PR tree-optimization/44061
+	* tree-vrp.c (extract_range_basic): Compute zero as
+	value-range for __builtin_constant_p of function parameters.
+
+2013-01-10  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	Update copyright years
+
+2013-01-10  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/pr55672
+	* lra-eliminations.c (mark_not_eliminable): Permit addition with
+	const to be eliminable.
+
 2013-01-10  David Edelsohn  <dje.gcc@gmail.com>
 
 	* configure.ac (HAVE_AS_TLS): Add check for powerpc-ibm-aix.
@@ -9,8 +53,7 @@
 
 2013-01-10  Richard Biener  <rguenther@suse.de>
 
-	* builtins.c (expand_builtin_init_trampoline): Use
-	set_mem_attributes.
+	* builtins.c (expand_builtin_init_trampoline): Use set_mem_attributes.
 
 2013-01-10  Richard Biener  <rguenther@suse.de>
 
@@ -55,7 +98,8 @@
 2013-01-09  Jan Hubicka  <jh@suse.cz>
 
 	PR lto/45375
-	* ipa-inline.c (ipa_inline): Remove extern inlines and virtual functions.
+	* ipa-inline.c (ipa_inline): Remove extern inlines and virtual
+	functions.
 	* cgraphclones.c (cgraph_clone_node): Cpoy also LTO file data.
 
 2013-01-09  Richard Sandiford  <rdsandiford@googlemail.com>
