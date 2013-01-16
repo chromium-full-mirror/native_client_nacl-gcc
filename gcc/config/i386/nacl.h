@@ -26,7 +26,8 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    definitions across all NaCl targets.  */
 #undef	SUBTARGET_EXTRA_SPECS
 #define SUBTARGET_EXTRA_SPECS \
-  { "subtarget_cpp_spec",	SUBTARGET_CPP_SPEC },
+  { "subtarget_cpp_spec",	SUBTARGET_CPP_SPEC }, \
+  GNU_USER_SUBTARGET_EXTRA_SPECS
 
 #undef  CPP_SPEC
 #define CPP_SPEC "%(subtarget_cpp_spec)"
