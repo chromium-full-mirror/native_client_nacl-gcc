@@ -1,5 +1,5 @@
 /* Definitions for Native Client systems.
-   Copyright (C) 2012 Free Software Foundation, Inc.
+   Copyright (C) 2013 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -38,6 +38,12 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 /* This is the value for %(subtarget_cpp_spec).  It goes with gnu-user.opt.  */
 #undef  SUBTARGET_CPP_SPEC
 #define SUBTARGET_CPP_SPEC  "%{posix:-D_POSIX_SOURCE} %{pthread:-D_REENTRANT}"
+
+/* The assembler is always a GNU one, which understands a - argument.
+   Since CPU/nacl.h defines SUBTARGET_EXTRA_ASM_SPEC to pass an extra
+   input file to the assembler, we need an explicit - to make it also
+   read the actual input when it's from stdin.  */
+#define AS_NEEDS_DASH_FOR_PIPED_INPUT
 
 /* Since non-instructions can never go into code sections,
    this is always false for Native Client targets.  */
