@@ -212,6 +212,11 @@ _sfi_condify sfi_bx
 	.macro _sfi_breg_dmask_\insn\suffix1\cond\suffix2 basereg
 	_sfi_dmask \basereg, \cond
 	.endm
+	.ifnb \suffix2
+	.macro _sfi_breg_dmask_\insn\suffix1\suffix2\cond basereg
+	_sfi_dmask \basereg, \cond
+	.endm
+	.endif
 	.endif
 	.endif
 .endm
