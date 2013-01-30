@@ -12831,6 +12831,44 @@ set_minipool_offset (Mnode *mp, HOST_WIDE_INT offset)
 
           mp = barrier;
         }
+      else if (offset / 16 != (offset + mp->fix_size - 1) / 16)
+        {
+          /* This entry would span a bundle boundary.  Insert a dummy entry
+             before it to fill out this bundle so that this entry starts in
+             the next bundle, after a new barrier.
+
+             TODO(mcgrathr): This can happen when this bundle got a barrier
+             and then two 4-byte entries.  In that case, it would have been
+             better to reorder things to put the 8-byte entry requiring
+             alignment between those two so that the first bundle gets
+             barrier, 4-byte entry, 8-byte entry, and only the second
+             4-byte entry has to be pushed to the next bundle.  */
+
+          gcc_assert (mp->fix_size == 8);
+          gcc_assert (offset % 16 == 12);
+
+          Mnode *dummy = XNEW (Mnode);
+          dummy->fix_size = 4;
+          dummy->mode = SImode;
+          dummy->value = const0_rtx;
+          dummy->refcount = 1;
+
+          /* These don't actually matter for the dummy, since
+             nothing refers to it.  The generic logic will wind
+             up adjusting them based on the neighbors.  */
+          dummy->min_address = HOST_WIDE_INT_MIN;
+          dummy->max_address = HOST_WIDE_INT_MAX;
+
+          dummy->next = mp;
+          dummy->prev = mp->prev;
+          if (dummy->prev == NULL)
+            minipool_vector_head = dummy;
+          else
+            dummy->prev->next = dummy;
+          mp->prev = dummy;
+
+          mp = dummy;
+        }
 
       if (mp->refcount > 0)
         gcc_assert ((offset % 16 == 0) == (mp->value == NULL_RTX));
