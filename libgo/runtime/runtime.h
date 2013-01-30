@@ -119,6 +119,13 @@ enum
 {
 	PtrSize = sizeof(void*),
 };
+enum
+{
+	// Per-M stack segment cache size.
+	StackCacheSize = 32,
+	// Global <-> per-M stack segment cache transfer batch size.
+	StackCacheBatch = 16,
+};
 
 /*
  * structures
@@ -171,6 +178,7 @@ struct	G
 	G*	schedlink;
 	bool	readyonstop;
 	bool	ispanic;
+	bool	issystem;
 	int8	raceignore; // ignore race detection events
 	M*	m;		// for debuggers, but offset not hard-coded
 	M*	lockedm;
@@ -178,6 +186,8 @@ struct	G
 	int32	sig;
 	int32	writenbuf;
 	byte*	writebuf;
+	// DeferChunk	*dchunk;
+	// DeferChunk	*dchunknext;
 	uintptr	sigcode0;
 	uintptr	sigcode1;
 	// uintptr	sigpc;
@@ -199,6 +209,7 @@ struct	M
 	G*	curg;		// current running goroutine
 	int32	id;
 	int32	mallocing;
+	int32	throwing;
 	int32	gcing;
 	int32	locks;
 	int32	nomemprof;
@@ -344,14 +355,14 @@ struct CgoMal
  * external data
  */
 extern	uintptr runtime_zerobase;
-G*	runtime_allg;
-G*	runtime_lastg;
-M*	runtime_allm;
+extern	G*	runtime_allg;
+extern	G*	runtime_lastg;
+extern	M*	runtime_allm;
 extern	int32	runtime_gomaxprocs;
 extern	bool	runtime_singleproc;
 extern	uint32	runtime_panicking;
 extern	int32	runtime_gcwaiting;		// gc is waiting to run
-int32	runtime_ncpu;
+extern	int32	runtime_ncpu;
 
 /*
  * common functions and data
@@ -380,7 +391,7 @@ void	runtime_goroutineheader(G*);
 void	runtime_goroutinetrailer(G*);
 void	runtime_traceback();
 void	runtime_tracebackothers(G*);
-void	runtime_printtrace(uintptr*, int32);
+void	runtime_printtrace(uintptr*, int32, bool);
 String	runtime_gostringnocopy(const byte*);
 void*	runtime_mstart(void*);
 G*	runtime_malg(int32, byte**, size_t*);
@@ -584,7 +595,7 @@ void	runtime_osyield(void);
 void	runtime_LockOSThread(void) __asm__ (GOSYM_PREFIX "runtime.LockOSThread");
 void	runtime_UnlockOSThread(void) __asm__ (GOSYM_PREFIX "runtime.UnlockOSThread");
 
-bool	runtime_showframe(String);
+bool	runtime_showframe(String, bool);
 
 uintptr	runtime_memlimit(void);
 
