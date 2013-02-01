@@ -16,6 +16,7 @@
 struct callers_data
 {
   Location *locbuf;
+  int skip;
   int index;
   int max;
 };
@@ -33,12 +34,29 @@ callback (void *data, uintptr_t pc, const char *filename, int lineno,
   /* Skip split stack functions.  */
   if (function != NULL)
     {
-      const char *p = function;
+      const char *p;
 
+      p = function;
       if (__builtin_strncmp (p, "___", 3) == 0)
 	++p;
       if (__builtin_strncmp (p, "__morestack_", 12) == 0)
 	return 0;
+    }
+  else if (filename != NULL)
+    {
+      const char *p;
+
+      p = strrchr (filename, '/');
+      if (p == NULL)
+	p = filename;
+      if (__builtin_strncmp (p, "/morestack.S", 12) == 0)
+	return 0;
+    }
+
+  if (arg->skip > 0)
+    {
+      --arg->skip;
+      return 0;
     }
 
   loc = &arg->locbuf[arg->index];
@@ -75,10 +93,11 @@ runtime_callers (int32 skip, Location *locbuf, int32 m)
   struct callers_data data;
 
   data.locbuf = locbuf;
+  data.skip = skip + 1;
   data.index = 0;
   data.max = m;
-  backtrace_full (__go_get_backtrace_state (), skip + 1, callback,
-		  error_callback, &data);
+  backtrace_full (__go_get_backtrace_state (), 0, callback, error_callback,
+		  &data);
   return data.index;
 }
 
