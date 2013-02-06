@@ -36,6 +36,14 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2013-02-06  David Edelsohn  <dje.gcc@gmail.com>
+
+	Backport from mainline
+	2013-01-25  Michael Haubenwallner  <michael.haubenwallner@salomon.at>
+
+	* configure.ac (gcc_cv_ld_static_dynamic): Define for AIX native ld.
+	* configure: Regenerate.
+
 2013-02-05  David Edelsohn  <dje.gcc@gmail.com>
 
 	Backport from mainline
