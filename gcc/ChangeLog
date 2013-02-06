@@ -2,6 +2,24 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-02-06  Richard Biener  <rguenther@suse.de>
+
+	* tracer.c (tracer): Mark loops with LOOPS_NEED_FIXUP
+	instead of calling fix_loop_structure.
+
+2013-02-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56217
+	* omp-low.c (use_pointer_for_field): Return false if
+	lower_send_shared_vars doesn't generate any copy-out code.
+
+2013-02-06  Tom de Vries  <tom@codesourcery.com>
+
+	PR rtl-optimization/56131
+	* cfgrtl.c (delete_insn): Use NOTE_BASIC_BLOCK instead of BLOCK_FOR_INSN
+	to get the bb of a NOTE_INSN_BASIC_BLOCK.  Handle the case that the bb
+	of the label is NULL.  Add comment.
+
 2013-02-05  Jakub Jelinek  <jakub@redhat.com>
 
 	* tree.h (struct tree_decl_with_vis): Remove thread_local field.

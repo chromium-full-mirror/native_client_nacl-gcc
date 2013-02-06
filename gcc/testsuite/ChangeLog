@@ -1,3 +1,18 @@
+2013-02-06 Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/55789
+	* gfortran.dg/array_constructor_41.f90: New test.
+
+2013-02-06  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/55978
+	* gfortran.dg/class_optional_2.f90: Uncomment some cases which work now.
+
+2013-02-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56217
+	* g++.dg/gomp/pr56217.C: New test.
+
 2013-02-05  Jakub Jelinek  <jakub@redhat.com>
 
 	PR tree-optimization/56205
