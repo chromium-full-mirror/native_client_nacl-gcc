@@ -1,3 +1,42 @@
+2013-02-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/56225
+	* gcc.target/i386/pr56225.c: New test.
+
+2013-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/56154
+	* gcc.dg/guality/pr56154-1.c: New test.
+	* gcc.dg/guality/pr56154-2.c: New test.
+	* gcc.dg/guality/pr56154-3.c: New test.
+	* gcc.dg/guality/pr56154-4.c: New test.
+	* gcc.dg/guality/pr56154-aux.c: New file.
+
+	PR tree-optimization/55789
+	* g++.dg/ipa/inline-3.C: Use cleanup-ipa-dump instead of
+	cleanup-tree-dump.
+	* gcc.dg/tree-ssa/inline-3.c: Add
+	--param max-early-inliner-iterations=2 option.
+
+2013-02-07  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	PR debug/53363
+	* g++.dg/debug/dwarf2/thunk1.C: Restrict to 32-bit x86.
+	Add -fno-dwarf2-cfi-asm to dg-options.
+	Adapt match count.
+
+2013-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/56228
+	* gcc.dg/pr56228.c: New test.
+
+2013-02-07  Alan Modra  <amodra@gmail.com>
+
+	PR target/54009
+	* gcc.target/powerpc/pr54009.c: New test.
+	PR target/54131
+	* gfortran.dg/pr54131.f: New test.
+
 2013-02-06 Paul Thomas  <pault@gcc.gnu.org>
 
 	PR fortran/55789

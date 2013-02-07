@@ -2,6 +2,65 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-02-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* lra-constraints.c (process_alt_operands): Fix recently added
+	comment.
+
+2013-02-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/56225
+	* lra-constraints.c (process_alt_operands): Check that reload hard
+	reg can hold value for strict_low_part.
+
+2013-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/56154
+	* dwarf2out.c (dwarf2_debug_hooks): Set end_function hook to
+	dwarf2out_end_function.
+	(in_first_function_p, maybe_at_text_label_p,
+	first_loclabel_num_not_at_text_label): New variables.
+	(dwarf2out_var_location): In the first function find out
+	lowest loclabel_num N where .LVLN is known not to be equal
+	to .Ltext0.
+	(find_empty_loc_ranges_at_text_label, dwarf2out_end_function): New
+	functions.
+
+2013-02-07  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/56178
+	* cse.c (cse_insn): Do not create a REG_EQUAL note if the source is a
+	SUBREG of a register.  Tidy up related block of code.
+	* fwprop.c (forward_propagate_and_simplify): Do not create a REG_EQUAL
+	note if the source is a register or a SUBREG of a register.
+
+2013-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/56228
+	* config/rs6000/rs6000.md (ptrm): New mode attr.
+	(call_indirect_aix<ptrsize>, call_indirect_aix<ptrsize>_nor11,
+	call_value_indirect_aix<pttrsize>,
+	call_value_indirect_aix<pttrsize>_nor11): Use <ptrm> instead of
+	m in constraints.
+
+2013-02-07  Michael Haubenwallner  <michael.haubenwallner@salomon.at>
+
+	* collect2.c (main): Set aix64_flag for -G and -bsvr4 too, disable
+	if -bnortl. Convert to strcmp and strncmp.
+
+2013-02-07  Alan Modra  <amodra@gmail.com>
+
+	PR target/54009
+	* config/rs6000/rs6000.c (mem_operand_gpr): Check that LO_SUM
+	addresses won't wrap when offsetting.
+	(rs6000_secondary_reload): Provide secondary reloads needed for
+	wrapping LO_SUM addresses.
+
+2013-02-06  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* config/gnu.h (GNU_USER_TARGET_OS_CPP_BUILTINS): Never define
+	MACH, just __MACH__.
+
 2013-02-06  Richard Biener  <rguenther@suse.de>
 
 	* tracer.c (tracer): Mark loops with LOOPS_NEED_FIXUP
