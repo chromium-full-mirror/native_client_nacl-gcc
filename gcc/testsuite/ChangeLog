@@ -1,3 +1,36 @@
+2013-02-13  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/56184
+	* gcc.target/arm/pr56184.C: New test.
+
+2013-02-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/56302
+	* g++.dg/torture/pr56302.C: New test.
+	* g++.dg/cpp0x/constexpr-56302.C: New test.
+	* c-c++-common/pr56302.c: New test.
+
+2013-02-13  Tobias Burnus  <burnus@net-b.de>
+	    Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	PR fortran/56204
+	* gfortran.dg/quad_2.f90: Use "< epsilon" instead of "==".
+	* gfortran.dg/quad_3.f90: Ditto.
+
+2013-02-13  Kostya Serebryany  <kcc@google.com>
+
+	* c-c++-common/asan/strncpy-overflow-1.c: Update the test
+	to match the fresh asan run-time.
+	* c-c++-common/asan/rlimit-mmap-test-1.c: Ditto.
+
+2013-02-12  Dodji Seketeli  <dodji@redhat.com>
+
+	Avoid instrumenting duplicated memory access in the same basic block
+	* c-c++-common/asan/no-redundant-instrumentation-1.c: New test.
+	* testsuite/c-c++-common/asan/no-redundant-instrumentation-2.c: Likewise.
+	* testsuite/c-c++-common/asan/no-redundant-instrumentation-3.c: Likewise.
+	* testsuite/c-c++-common/asan/inc.c: Likewise.
+
 2013-02-12  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR inline-asm/56148
@@ -6,7 +39,7 @@
 2013-02-12  Dominique d'Humieres  <dominiq@lps.ens.fr>
 	    Tobias Burnus  <burnus@net-b.de>
 
-	PR fortran/56082
+	PR testsuite/56082
 	* gfortran.dg/bind_c_bool_1.f90 (sub): Change kind=4
 	to kind=2.
 
