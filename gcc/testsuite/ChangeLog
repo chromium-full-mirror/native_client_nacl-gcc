@@ -1,3 +1,62 @@
+2013-02-20  Aldy Hernandez  <aldyh@redhat.com>
+
+	PR middle-end/56108
+	* gcc.dg/tm/memopt-1.c: Declare functions transaction_safe.
+
+2013-02-21  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/56310
+	* g++.dg/ipa/pr56310.C: New test.
+
+2013-02-21  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/56385
+	* gfortran.dg/proc_ptr_comp_37.f90: New.
+
+2013-02-21  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56415
+	Revert
+	2013-02-11  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56273
+	* g++.dg/warn/Warray-bounds-6.C: New testcase.
+	* gcc.dg/tree-ssa/pr21559.c: Adjust.
+	* gcc.dg/tree-ssa/vrp17.c: Likewise.
+	* gcc.dg/tree-ssa/vrp18.c: Likewise.
+	* gcc.dg/tree-ssa/vrp23.c: Likewise.
+	* gcc.dg/tree-ssa/vrp24.c: Likewise.
+
+2013-02-21  Marek Polacek  <polacek@redhat.com>
+
+	PR tree-optimization/56398
+	* g++.dg/torture/pr56398.C: New test. 
+
+2013-02-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR inline-asm/56405
+	* gcc.c-torture/compile/pr56405.c: New test.
+
+2013-02-20  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/56265
+	* testsuite/g++.dg/ipa/devirt-11.C: New testcase.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/forwprop-8.c: Adjust.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+	Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56396
+	* gcc.dg/pr56396.c: New testcase.
+
+2013-02-20  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/56373
+	* g++.dg/cpp0x/Wzero-as-null-pointer-constant-2.C: New.
+
 2013-02-19  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/56384

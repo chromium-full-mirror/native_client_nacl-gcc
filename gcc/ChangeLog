@@ -2,6 +2,142 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-02-20  Aldy Hernandez  <aldyh@redhat.com>
+
+	PR middle-end/56108
+	* trans-mem.c (execute_tm_mark): Do not expand transactions that
+	are sure to go irrevocable.
+
+2013-02-21  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/rtl.texi (vec_concat, vec_duplicate): Mention that
+	scalars are valid operands.
+
+2013-02-21  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/56310
+	* ipa-cp.c (agg_replacements_to_vector): New parameter index, copy
+	only matching indices and non-negative final offsets.
+	(intersect_aggregates_with_edge): Pass src_idx to
+	agg_replacements_to_vector.  Pass src_idx insstead of index to
+	intersect_with_agg_replacements.
+
+2013-02-21  Martin Jambor  <mjambor@suse.cz>
+
+	* ipa-cp.c (good_cloning_opportunity_p): Dump the real threshold
+	instead of hard-wired defaults.
+
+2013-02-21  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* doc/invoke.texi (MIPS Options): Update documentation of the
+	floating-point multiply-accumulate instruction restrictions.
+
+2013-02-21  Kostya Serebryany  <kcc@google.com>
+
+	* config/i386/i386.c (ix86_asan_shadow_offset): Use 0x7fff8000 as
+	asan_shadow_offset on x86_64 linux.
+
+2013-02-21  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56415
+	Revert
+	2013-02-11  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56273
+	* tree-vrp.c (simplify_cond_using_ranges): Disable for the
+	first VRP run.
+
+2013-02-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR bootstrap/56258
+	* doc/invoke.texi (-fdump-rtl-pro_and_epilogue): Use @item
+	instead of @itemx.
+
+	PR inline-asm/56405
+	* expr.c (expand_expr_real_1) <case TARGET_MEM_REF, MEM_REF>: Don't
+	use movmisalign or extract_bit_field for EXPAND_MEMORY modifier.
+
+2013-02-20  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/56265
+	* ipa-prop.c (ipa_make_edge_direct_to_target): Fixup callgraph when target is
+	referenced for firs ttime.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+
+	* tree-call-cdce.c (tree_call_cdce): Do not remove unused locals.
+	* tree-ssa-forwprop.c (ssa_forward_propagate_and_combine): Likewise.
+	* tree-ssa-dce.c (perform_tree_ssa_dce): Likewise.
+	* tree-ssa-copyrename.c (copy_rename_partition_coalesce): Do
+	not return anything.
+	(rename_ssa_copies): Do not remove unused locals.
+	* tree-ssa-ccp.c (do_ssa_ccp): Likewise.
+	* tree-ssanames.c (pass_release_ssa_names): Remove unused
+	locals first.
+	* passes.c (execute_function_todo): Do not schedule unused locals
+	removal if cleanup_tree_cfg did something.
+	* tree-ssa-live.c (remove_unused_locals): Dump statistics
+	about the number of removed locals.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56398
+	* tree-vect-loop-manip.c (adjust_debug_stmts): Skip
+	SSA default defs.
+
+2013-02-20  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/55334
+	* ipa-cp.c (initialize_node_lattices): Disable IPA-CP through and to
+	restricted pointers to arrays.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+	Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56396
+	* tree-ssa-ccp.c (n_const_val): New static variable.
+	(get_value): Return NULL for SSA names we don't have a lattice
+	entry for.
+	(ccp_initialize): Initialize n_const_val.
+	* tree-ssa-copy.c (n_copy_of): New static variable.
+	(init_copy_prop): Initialize n_copy_of.
+	(get_value): Return NULL_TREE for SSA names we don't have a
+	lattice entry for.
+
+2013-02-20  Martin Jambor  <mjambor@suse.cz>
+
+	* ipa-cp.c (initialize_node_lattices): Fix dumping condition.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+
+	* genpreds.c (write_lookup_constraint): Do not compare first
+	letter of the constraint again.
+
+2013-02-20  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-loop-ivopts.c (alloc_use_cost_map): Use bitmap_count_bits
+	and ceil_log2.
+	(get_use_iv_cost): Terminate hashtable walk when coming across
+	an empty entry.
+
+2013-02-20  Igor Zamyatin  <igor.zamyatin@intel.com>
+
+	* config/i386/i386.c (initial_ix86_tune_features): Turn on fp
+	reassociation for avx2 targets.
+
+2012-02-19  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+	* config/microblaze/microblaze.c: microblaze_has_clz = 0
+	Add version check for v8.10.a to enable microblaze_has_clz
+	* config/microblaze/microblaze.h: Add TARGET_HAS_CLZ as combined 
+	version and TARGET_PATTERN_COMPARE check
+	* config/microblaze/microblaze.md: New clzsi2 instruction
+	
+2012-02-19  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+	*  config/microblaze/microblaze.md (call_value_intern): Check symbol is 
+	function before branching.
+
 2012-02-19  Andrey Belevantsev  <abel@ispras.ru>
 
 	* sel-sched-dump.c (dump_insn_rtx_flags): Explicitly set
