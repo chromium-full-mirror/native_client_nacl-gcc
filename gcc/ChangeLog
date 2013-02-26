@@ -2,6 +2,76 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-02-26  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arm/arm.c (const_ok_for_dimode_op): Back out last change.
+	(arm_block_move_unaligned_straight): Likewise.
+	(arm_adjust_block_mem): Likewise.
+
+2013-02-26  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	PR target/48901
+	* config/lm32/lm32.c (gen_int_relational): Remove unused variables
+	temp, cond and label.
+	* config/lm32/lm32.md (ashlsi3): Remove unused variable one.
+
+	PR target/52500
+	* config/c6x/c6x.c (dbx_register_map): Change to unsigned.
+	* config/c6x/c6x.h (dbx_register_map): Update declaration.
+
+	PR target/52501
+	* config/cr16/cr16-protos.h: Move end of RTX_CODE guard below end
+	of prologue/epilogue functions.
+
+	PR target/52550
+	* config/tilegx/tilegx.c (tilegx_expand_prologue):
+	Remove unused variable cfa_offset.
+	* config/tilepro/tilepro.c (tilepro_expand_prologue): Likewise.
+
+	PR target/54639
+	* config/mn10300/mn10300.c (mn10300_expand_epilogue): Avoid offset
+	type promotion to unsigned.
+
+	PR target/54640
+	* config/arm/arm.c (const_ok_for_dimode_op): Make code consistent
+	for HOST_WIDE_INT of 32 bit / same size as int.
+	(arm_block_move_unaligned_straight): Likewise.
+	(arm_adjust_block_mem): Likewise.
+
+	PR target/54662
+	* config/mep/t-mep (mep-pragma.o): Use ALL_COMPILERFLAGS instead of
+	ALL_CFLAGS.
+
+2013-02-26  Marek Polacek  <polacek@redhat.com>
+
+	PR tree-optimization/56426
+	* tree-ssa-loop.c (tree_ssa_loop_init): Always call
+	scev_initialize.
+
+2013-02-26  Richard Biener  <rguenther@suse.de>
+
+	PR target/56444
+	* config/mn10300/mn10300.c (mn10300_scan_for_setlb_lcc): Remove
+	unused variable loops.
+
+2013-02-26  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56448
+	* fold-const.c (operand_equal_p) <case tcc_reference>: Don't look at
+	TREE_SIDE_EFFECTS if flags contain OEP_CONSTANT_ADDRESS_OF.
+	Clear OEP_CONSTANT_ADDRESS_OF from flags before recursing on second or
+	later operands of the references, or even first operand for
+	INDIRECT_REF, TARGET_MEM_REF or MEM_REF.
+
+	PR tree-optimization/56443
+	* tree-vect-stmts.c (get_vectype_for_scalar_type_and_size): For
+	overaligned types, pass TYPE_UNSIGNED (scalar_type) as second argument
+	to type_for_mode langhook.
+
+2013-02-25  Matt Turner  <mattst88@gmail.com>
+
+	* doc/invoke.texi: Document r4700.
+
 2013-02-25  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/56175
