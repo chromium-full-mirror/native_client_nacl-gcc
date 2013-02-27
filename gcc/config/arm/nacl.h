@@ -1,5 +1,5 @@
 /* Definitions for ARM running Native Client
-   Copyright (C) 2012 Free Software Foundation, Inc.
+   Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
    This file is part of GCC.
 
@@ -44,7 +44,9 @@
 
 /* Nacl specific constants. */
 /* Instruction bundles have this size and at least this alignment. */
-#define NACL_ARM_BUNDLE_ALIGN  16
+#define NACL_ARM_BUNDLE_ALIGN   16
+
+#define FUNCTION_BOUNDARY       (NACL_ARM_BUNDLE_ALIGN * BITS_PER_UNIT)
 
 /* Do nacl-specific parts of TARGET_OPTION_OVERRIDE.  */
 #undef SUBTARGET_OVERRIDE_OPTIONS
