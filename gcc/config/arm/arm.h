@@ -625,7 +625,9 @@ extern int arm_arch_thumb_hwdiv;
     (arm_abi == ARM_ABI_ATPCS ? 64 : STACK_BOUNDARY)
 #endif
 
+#ifndef FUNCTION_BOUNDARY
 #define FUNCTION_BOUNDARY  ((TARGET_THUMB && optimize_size) ? 16 : 32)
+#endif
 
 /* The lowest bit is used to indicate Thumb-mode functions, so the
    vbit must go into the delta field of pointers to member

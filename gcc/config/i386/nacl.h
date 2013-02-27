@@ -1,5 +1,5 @@
 /* Definitions for Intel 386 running Native Client.
-   Copyright (C) 2012 Free Software Foundation, Inc.
+   Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -33,7 +33,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define CPP_SPEC "%(subtarget_cpp_spec)"
 
 /* Instruction bundles have this size and at least this alignment.  */
-#define NACL_X86_BUNDLE_ALIGN           32
+#define NACL_X86_BUNDLE_ALIGN	32
+
+#undef	FUNCTION_BOUNDARY
+#define FUNCTION_BOUNDARY       (NACL_X86_BUNDLE_ALIGN * BITS_PER_UNIT)
 
 /* Do NaCl-specific parts of TARGET_OPTION_OVERRIDE.  */
 #undef SUBTARGET_OVERRIDE_OPTIONS
