@@ -289,7 +289,7 @@ _sfi_breg_dmask_define_ldmstm fstm, d
 @ (and vice versa in big-endian Thumb-2).
 @ NB: GCC output uses this.
 .macro sfi_trap
-	.word 0xe7f6def0
+	.word 0xe7fedef0
 .endm
 
 .purgem _sfi_for_each_cond
