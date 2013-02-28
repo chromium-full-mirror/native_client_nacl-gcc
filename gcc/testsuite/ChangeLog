@@ -1,3 +1,23 @@
+2013-02-28  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/56294
+	* g++.dg/debug/pr56294.C: New test.
+
+2013-02-28  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* g++.old-deja/g++.pt/ptrmem6.C(main): Add xfail aarch64*-*-*.
+
+2013-02-27  Marek Polacek  <polacek@redhat.com>
+
+	PR rtl-optimization/56466
+	* gcc.dg/pr56466.c: New test.
+
+2013-02-28  Naveen H.S  <Naveen.Hurugalawadi@caviumnetworks.com>
+
+	* gcc.dg/tree-ssa/slsr-1.c: Allow widening multiplications.
+	* gcc.dg/tree-ssa/slsr-2.c: Likewise.
+	* gcc.dg/tree-ssa/slsr-3.c: Likewise.
+
 2013-02-27  Andrey Belevantsev  <abel@ispras.ru>
 
 	PR middle-end/45472
