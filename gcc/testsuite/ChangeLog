@@ -1,3 +1,28 @@
+2013-03-01  Steve Ellcey  <sellcey@mips.com>
+
+	* gcc.dg/pr56396.c: Require pic support.
+
+2013-03-01  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55481
+	* gcc.dg/torture/pr56488.c: New testcase.
+
+2013-02-28  Konstantin Serebryany  <konstantin.s.serebryany@gmail.com>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR sanitizer/56454
+	* g++.dg/asan/default-options-1.C (__asan_default_options): Use
+	no_sanitize_address attribute rather than no_address_safety_analysis.
+	* g++.dg/asan/sanitizer_test_utils.h
+	(ATTRIBUTE_NO_ADDRESS_SAFETY_ANALYSIS): Likewise.
+	* c-c++-common/asan/attrib-1.c: Test no_sanitize_address attribute
+	in addition to no_address_safety_analysis.
+
+2013-02-28  Jason Merrill  <jason@redhat.com>
+
+	PR c++/56481
+	* g++.dg/cpp0x/constexpr-and.C: New.
+
 2013-02-28  Martin Jambor  <mjambor@suse.cz>
 
 	PR tree-optimization/56294

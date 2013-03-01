@@ -2,6 +2,70 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-03-01  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56461
+	* tree-vect-stmts.c (vect_create_vectorized_promotion_stmts): Call
+	vec_oprnds0->release (); rather than vec_oprnds0->truncate (0)
+	before overwriting it.
+
+2013-03-01  Tobias Burnus  <burnus@net-b.de>
+
+	* doc/extended.texi (C Extensions): Change order in @menu
+	to match @node.
+	(Other MIPS Built-in Functions): Move last MIPS entry before
+	"picoChip Built-in Functions".
+	(SH Built-in Functions): Move after RX Built-in Functions.
+	* doc/gcc.texi (Introduction): Change order in @menu
+	to match @node.
+	* doc/md.texi (Constraints): Ditto.
+	* gty.texi (Type Information): Ditto.
+	(User-provided marking routines for template types): Make
+	subsection.
+	* doc/invoke.texi (AArch64 Options): Move before
+	"Adapteva Epiphany Options".
+
+2013-02-28  Konstantin Serebryany  <konstantin.s.serebryany@gmail.com>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR sanitizer/56454
+	* asan.c (gate_asan): Lookup no_sanitize_address instead of
+	no_address_safety_analysis attribute.
+	* doc/extend.texi (no_address_safety_attribute): Rename to
+	no_sanitize_address attribute, mention no_address_safety_analysis
+	attribute as deprecated alias.
+
+2013-02-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56461
+	* tree-vectorizer.h (vect_get_slp_defs): Change 3rd argument
+	type to vec<vec<tree> > *.
+	* tree-vect-slp.c (vect_get_slp_defs): Likewise.  Change vec_defs
+	to be vec<tree> instead of vec<tree> *, set vec_defs
+	to vNULL and call vec_defs.create (number_of_vects), adjust other
+	uses of vec_defs.
+	* tree-vect-stmts.c (vect_get_vec_defs, vectorizable_call,
+	vectorizable_condition): Adjust vect_get_slp_defs callers.
+
+2013-02-28  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.c
+	(aarch64_float_const_representable): Remove unused variable.
+
+2013-02-28  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_mangle_type): Make static.
+
+2013-02-28  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_init_simd_builtins): Make static.
+
+2013-02-28  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.c
+	(aarch64_simd_make_constant): Make static.
+
 2013-02-28  Martin Jambor  <mjambor@suse.cz>
 
 	* tree-sra.c (load_assign_lhs_subreplacements): Do not put replacements
