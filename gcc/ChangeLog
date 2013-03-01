@@ -36,6 +36,25 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2013-03-01  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline
+	2012-12-12  Zdenek Dvorak  <ook@ucw.cz>
+
+	PR tree-optimization/55481
+	* tree-ssa-loop-ivopts.c (rewrite_use_nonlinear_expr): Fall
+	back to general rewriting if we cannot leave an original biv
+	definition alone.
+
+2013-03-01  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline
+	2012-04-10  Richard Guenther  <rguenther@suse.de>
+ 
+	PR middle-end/52888
+	* gimple-low.c (gimple_check_call_args): Properly account for
+	compatible aggregate types.
+
 2013-02-26  Nick Clifton  <nickc@redhat.com>
 
 	PR target/56453
