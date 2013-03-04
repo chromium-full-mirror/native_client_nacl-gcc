@@ -2,7 +2,98 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-03-04  Martin Jambor  <mjambor@suse.cz>
+
+	* tree-dfa.c (get_or_create_ssa_default_def): Use parameter fn in
+	all appropriate places.
+
+2013-01-04  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR tree-optimization/56424
+	* ipa-split.c (split_function): Do not set the RSO flag if result is
+	not by reference and its type is a register type.
+
+2013-03-04  David Holsgrove <david.holsgrove@xilinx.com>
+
+	* config/microblaze/microblaze.c (microblaze_valid_pic_const): New 
+	(microblaze_legitimate_pic_operand): Likewise
+	* config/microblaze/microblaze.h (LEGITIMATE_PIC_OPERAND_P): calls 
+	new function microblaze_legitimate_pic_operand
+	* config/microblaze/microblaze-protos.h
+	(microblaze_legitimate_pic_operand): Declare.
+
+2013-03-04  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+	*  config/microblaze/predicates.md (call_insn_simple_operand):
+	New predicate for supported rtx code types.
+	*  config/microblaze/microblaze.md (call_internal1): Use
+	call_insn_simple_operand predicate.
+
+2013-03-04  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56461
+	* tree-loop-distribution.c (ldist_gen): Call partition_free after each
+	partitions.ordered_remove.
+
+	PR middle-end/56461
+	* tree-vect-stmts.c (vectorizable_conversion): Don't call
+	vec_oprnds0.create (1) for modifier == NONE.
+
+	PR middle-end/56461
+	* tree-vect-stmts.c (vectorizable_shift): Don't call create methods
+	on vec_oprnds0 or vec_oprnds1 before loop, only call it on
+	vec_oprnds1 right before pushing anything to it for
+	scalar_shift_arg.
+
+	PR middle-end/56461
+	* tree-vect-loop.c (destroy_loop_vec_info): For !clean_stmts, just
+	set nbbs to 0 instead of having separate code path.
+	(vect_analyze_loop_form): Call destroy_loop_vec_info with true
+	instead of false as last argument if returning NULL.
+
+2013-03-03  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* target.def (TARGET_OPTION_VALID_ATTRIBUTE_P): Update comments;
+	the attribute is now called "target" instead of "option".
+	(TARGET_OPTION_PRAGMA_PARSE): Likewise, for the pragma.
+	* doc/tm.texi.in (Target Attributes):  Likewise document the correct
+	attribute/pragma name for TARGET_OPTION_VALID_P and
+	TARGET_OPTION_PRAGMA_PARSE.  Also copy-edit and correct markup.
+	* doc/tm.texi: Regenerated.
+
+2013-03-02  David Holsgrove  <david.holsgrove@xilinx.com>
+
+	* config/microblaze/microblaze.c:
+	Check mcpu, pcmp requirement and set TARGET_REORDER to 0 if not met.
+	* config/microblaze/microblaze.h: Add -mxl-reorder to
+	DRIVER_SELF_SPECS.
+	* config/microblaze/microblaze.md: New bswapsi2 and bswaphi2.
+	instructions emitted if TARGET_REORDER.
+	* config/microblaze/microblaze.opt: New option -mxl-reorder set to 1 
+	or 0 for -m/-mno case, but initialises as 2 to detect default use case 
+	separately.
+
+2013-03-01  Xinliang David Li  <davidxl@google.com>
+
+	* tree-ssa-uninit.c (compute_control_dep_chain): Limit post-dom
+	walk length.
+
 2013-03-01  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56461
+	* tree-ssa-loop-ivcanon.c (tree_estimate_loop_size): Release path
+	vector even when returning true.  Fix up function comment formatting.
+
+	PR middle-end/56461
+	* ira-build.c (ira_loop_nodes_count): New variable.
+	(create_loop_tree_nodes): Initialize it.
+	(finish_loop_tree_nodes): Use it instead of looking at current_loops.
+
+	PR middle-end/56461
+	* tree-vect-data-refs.c (vect_permute_store_chain): Avoid using copy
+	method on dr_chain and result_chain.
+	* tree-vect-stmts.c (vectorizable_store): Only call
+	result_chain.create if j == 0.
 
 	PR middle-end/56461
 	* tree-vect-stmts.c (vect_create_vectorized_promotion_stmts): Call
