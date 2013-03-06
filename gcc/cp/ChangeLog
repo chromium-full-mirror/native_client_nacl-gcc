@@ -1,3 +1,13 @@
+2013-03-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/56543
+	* tree.c (strip_typedefs): Don't copy args if they are NULL.
+
+2013-03-05  Jakub Jelinek  <jakub@redhat.com>
+
+	* parser.c (cp_parser_braced_list): For {} initialize
+	*non_constant_p to false.
+
 2013-03-04  Jason Merrill  <jason@redhat.com>
 
 	PR c++/56464
