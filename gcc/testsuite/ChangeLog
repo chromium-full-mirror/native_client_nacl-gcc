@@ -1,3 +1,97 @@
+2013-03-11  Dominique d'Humieres  <dominiq@lps.ens.fr>
+
+	* gcc.dg/inline_3.c: Remove target and dg-excess-errors.
+	* gcc.dg/inline_4.c: Likewise.
+	* gcc.dg/unroll_2.c: Likewise.
+	* gcc.dg/unroll_3.c: Likewise.
+	* gcc.dg/unroll_4.c: Likewise.
+
+2013-03-10  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR testsuite/54119
+	* gcc.dg/tree-ssa/vector-4.c: xfail on 32-bit hppa*-*-*.
+
+	PR debug/56307
+	* gcc.dg/tree-ssa/pr55579.c: xfail 32-bit hppa*-*-hpux*.
+
+2013-03-11  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/40797
+	* gcc.c-torture/compile/pr40797.c: New.
+
+2013-03-10  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* gcc.dg/pr44194-1.c: Skip compilation on hppa*64*-*-*.
+
+2013-03-10  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/56575
+	* gfortran.dg/class_56.f90: New test.
+
+2013-03-09  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR middle-end/56524
+	* gcc.target/mips/pr56524.c: New test.
+
+2013-03-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/56565
+	* g++.dg/cpp0x/lambda/lambda-nsdmi2.C: New.
+
+2013-03-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51412
+	* g++.dg/cpp0x/lambda/lambda-err3.C: New.
+
+2013-03-08  Marek Polacek  <polacek@redhat.com>
+
+	PR tree-optimization/56478
+	* gcc.dg/torture/pr56478.c: New test.
+
+2013-03-08  Kai Tietz  <ktietz@redhat.com>
+
+	* gcc.c-torture/execute/builtins/builtins.exp: Add for mingw
+	targets linker option --allow-multiple-definition.
+
+	* gcc.dg/pr14092-1.c: Mark intptr_t typedef to use extension.
+	* gcc.dg/pr24683.c: Avoid warning about casting constant string.
+	* gcc.dg/pr52549.c: Add LLP64 case.
+	* gcc.dg/pr53701.c: Use for uintptr_t typedef __UINTPTR_TYPE__.
+	* gcc.dg/pr56510.c: Adjust for LLP64 targets.
+	* gcc.dg/torture/pr51071-2.c: Likewise.
+	* gcc.dg/tree-ssa/vrp72.c: Likewise.
+	* gcc.dg/tree-ssa/vrp73.c: Likewise.
+	* gcc.dg/tree-ssa/vrp75.c: Likewise.
+	* gcc.dg/torture/pr53922.c: Skip test for mingw-targets.
+	* gcc.dg/weak/weak-1.c: Likewise.
+	* gcc.dg/weak/weak-2.c: Likewise.
+	* gcc.dg/weak/weak-3.c: Likewise.
+	* gcc.dg/weak/weak-4.c: Likewise.
+	* gcc.dg/weak/weak-5.c: Likewise.
+	* gcc.dg/weak/weak-15.c: Likewise.
+	* gcc.dg/weak/weak-16.c: Likewise.
+
+	* c-c++-common/pr54486.c: Skip test for mingw-targets.
+
+2013-03-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56559
+	* gcc.dg/tree-ssa/reassoc-26.c: New test.
+
+2013-03-07  Andreas Schwab  <schwab@suse.de>
+
+	* gcc.dg/pr31490.c: Fix last change.
+
+2013-03-06  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/56534
+	* g++.dg/template/crash115.C: New.
+
+2013-03-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56539
+	* gcc.c-torture/compile/pr56539.c: New test.
+
 2013-03-06  Kai Tietz  <ktietz@redhat.com>
 
 	* gcc.dg/lto/20090914-2_0.c: Skip for mingw and cygwin
@@ -266,7 +360,7 @@
 2013-02-21  Marek Polacek  <polacek@redhat.com>
 
 	PR tree-optimization/56398
-	* g++.dg/torture/pr56398.C: New test. 
+	* g++.dg/torture/pr56398.C: New test.
 
 2013-02-21  Jakub Jelinek  <jakub@redhat.com>
 
