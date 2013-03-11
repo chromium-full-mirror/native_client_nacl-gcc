@@ -180,18 +180,28 @@ _sfi_condify sfi_bx
 .endm
 
 
-@ Alternative scheme with just one macro (macro name TBD).
-@ This has the feature that most of the line is exactly the
-@ usual ARM instruction syntax, unmodified.  It has the downside
-@ that the base register appears twice, thus introducing the
+@ Alternative scheme with just one macro.  This has the feature that
+@ most of the line is exactly the usual ARM instruction syntax,
+@ unmodified.  If the instruction is wholly unmodified, this has the
+@ downside that the base register appears twice, thus introducing the
 @ possibility of errors where the base register in the first parameter
 @ is not the actual base register used in the addressing mode syntax.
+@ However, you can instead modify the instruction only slightly: just
+@ replace the base register with \B (backslash followed by capital B).
+@ Then the instruction syntax remains normal, idiosyncrasies of ARM
+@ addressing mode syntaxes all supported--only the base register part of
+@ the addressing mode syntax is replaced--and there is no error-prone
+@ duplication of the base register.
 @ NB: GCC output uses this.
 .macro sfi_breg basereg, insn, operands:vararg
+	.macro _sfi_breg_doit B
+	\insn \operands
+	.endm
 	.bundle_lock
 	_sfi_breg_dmask_\insn \basereg
-	\insn \operands
+	_sfi_breg_doit \basereg
 	.bundle_unlock
+	.purgem _sfi_breg_doit
 .endm
 
 .macro _sfi_breg_dmask_define insn, suffix1=, suffix2=
