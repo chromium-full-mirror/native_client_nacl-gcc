@@ -514,7 +514,7 @@ Objective-C and Objective-C++ Dialects}.
 @emph{AVR Options}
 @gccoptlist{-mmcu=@var{mcu} -maccumulate-args -mbranch-cost=@var{cost} @gol
 -mcall-prologues -mint8 -mno-interrupts -mrelax @gol
--mstrict-X -mtiny-stack}
+-mstrict-X -mtiny-stack -Waddr-space-convert}
 
 @emph{Blackfin Options}
 @gccoptlist{-mcpu=@var{cpu}@r{[}-@var{sirevision}@r{]} @gol
@@ -11632,6 +11632,11 @@ sbiw r26, const   ; X -= const
 @item -mtiny-stack
 @opindex mtiny-stack
 Only change the lower 8@tie{}bits of the stack pointer.
+
+@item -Waddr-space-convert
+@opindex Waddr-space-convert
+Warn about conversions between address spaces in the case where the
+resulting address space is not contained in the incoming address space.
 @end table
 
 @subsubsection @code{EIND} and Devices with more than 128 Ki Bytes of Flash
