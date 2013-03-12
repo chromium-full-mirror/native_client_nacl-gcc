@@ -254,8 +254,10 @@ _sfi_condify sfi_bx
 .endm
 _sfi_breg_dmask_define_ldst ldr
 _sfi_breg_dmask_define_ldst ldrex
+_sfi_breg_dmask_define_ldst ldc
 _sfi_breg_dmask_define_ldst str
 _sfi_breg_dmask_define_ldst strex
+_sfi_breg_dmask_define_ldst stc
 _sfi_breg_dmask_define_ldmstm ldm
 _sfi_breg_dmask_define_ldmstm stm
 _sfi_breg_dmask_define pld
