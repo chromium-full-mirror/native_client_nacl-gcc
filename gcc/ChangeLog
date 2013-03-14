@@ -36,6 +36,15 @@
 	* sel-sched-ir.c (has_dependence_note_reg_use): Call ds_full_merge
 	only if producer writes to the register given by regno.
 
+2013-03-14  Seth LaForge  <sethml@google.com>
+
+	PR target/56351
+	Backport from mainline
+	2012-10-22  Julian Brown  <julian@codesourcery.com>
+
+	* config/arm/arm.h (CANNOT_CHANGE_MODE_CLASS): Avoid subreg'ing
+	VFP D registers in big-endian mode.
+
 2013-03-08  Joey Ye  <joey.ye@arm.com>
 
 	Backport from mainline
