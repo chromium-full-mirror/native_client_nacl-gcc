@@ -1,3 +1,47 @@
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56661
+	* gcc.dg/torture/pr56661.c: New testcase.
+
+2013-03-20  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	PR rtl-optimization/56605
+	* gcc.target/powerpc/pr56605.c: New.
+
+2013-03-20  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	PR fortran/54932
+	* gfortran.dg/do_1.f90: Don't xfail.
+
+2013-03-20  Tilo Schwarz  <tilo@tilo-schwarz.de>
+
+	PR libfortran/51825
+	* gfortran.dg/namelist_77.f90: New.
+	* gfortran.dg/namelist_78.f90: New.
+
+2013-03-20  Tilo Schwarz  <tilo@tilo-schwarz.de>
+
+	PR libfortran/48618
+	* gfortran.dg/open_negative_unit_1.f90: New.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/sbc.c: New test.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/ror.c: New test.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* gcc.target/aarch64/extr.c: New test.
+
+2013-03-19  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56273
+	* gcc.dg/tree-ssa/vrp47.c: Adjust.
+	* c-c++-common/uninit-17.c: Likewise.
+
 2013-03-18  Jakub Jelinek  <jakub@redhat.com>
 
 	PR tree-optimization/56635
@@ -473,7 +517,7 @@
 2013-02-20  Jan Hubicka  <jh@suse.cz>
 
 	PR tree-optimization/56265
-	* testsuite/g++.dg/ipa/devirt-11.C: New testcase.
+	* g++.dg/ipa/devirt-11.C: New testcase.
 
 2013-02-20  Richard Biener  <rguenther@suse.de>
 
@@ -577,7 +621,7 @@
 2013-02-15  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/56318
-	* gcc/testsuite/gfortran.dg/matmul_9.f90: New.
+	* gfortran.dg/matmul_9.f90: New.
 
 2013-02-15  Tobias Burnus  <burnus@net-b.de>
 
@@ -660,9 +704,9 @@
 
 	Avoid instrumenting duplicated memory access in the same basic block
 	* c-c++-common/asan/no-redundant-instrumentation-1.c: New test.
-	* testsuite/c-c++-common/asan/no-redundant-instrumentation-2.c: Likewise.
-	* testsuite/c-c++-common/asan/no-redundant-instrumentation-3.c: Likewise.
-	* testsuite/c-c++-common/asan/inc.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-2.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-3.c: Likewise.
+	* c-c++-common/asan/inc.c: Likewise.
 
 2013-02-12  Vladimir Makarov  <vmakarov@redhat.com>
 

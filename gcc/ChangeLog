@@ -2,6 +2,103 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56661
+	* tree-ssa-sccvn.c (visit_use): Only value-number calls if
+	the result does not have to be distinct.
+
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	* tree-inline.c (copy_tree_body_r): Sync MEM_REF code with
+	remap_gimple_op_r.
+
+2013-03-20  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+	    Steven Bosscher <steven@gcc.gnu.org>
+
+	PR rtl-optimization/56605
+	* loop-iv.c (implies_p): Handle equal RTXs and subregs.
+
+2013-03-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR bootstrap/56656
+	* config/i386/i386.md (*movdi_internal): Handle broken assemblers
+	that require movd instead of movq.
+
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-structalias.c (struct variable_info): Add pointer
+	to the first field of an aggregate with sub-vars.  Make
+	this and the pointer to the next subfield its ID.
+	(vi_next): New function.
+	(nothing_id, anything_id, readonly_id, escaped_id, nonlocal_id,
+	storedanything_id, integer_id): Increment by one.
+	(new_var_info, get_call_vi, lookup_call_clobber_vi,
+	get_call_clobber_vi): Adjust.
+	(solution_set_expand): Simplify and speedup.
+	(solution_set_add): Inline into ...
+	(set_union_with_increment): ... this.  Adjust accordingly.
+	(do_sd_constraint): Likewise.
+	(do_ds_constraint): Likewise.
+	(do_complex_constraint): Simplify.
+	(build_pred_graph): Adjust.
+	(solve_graph): Likewise.  Simplify and speedup.
+	(get_constraint_for_ssa_var, get_constraint_for_ptr_offset,
+	get_constraint_for_component_ref, get_constraint_for_1,
+	first_vi_for_offset, first_or_preceding_vi_for_offset,
+	create_function_info_for, create_variable_info_for_1,
+	create_variable_info_for, intra_create_variable_infos): Adjust.
+	(init_base_vars): Push NULL for ID zero.
+	(compute_points_to_sets): Adjust.
+
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	* cfgloop.c (verify_loop_structure): Streamline and avoid
+	ICEing on corrupt loop tree.
+	* graph.c (draw_cfg_nodes_for_loop): Avoid ICEing on corrupt
+	loop tree.
+
+2013-03-20  Richard Biener  <rguenther@suse.de>
+
+	* tree-vect-loop-manip.c (slpeel_can_duplicate_loop_p): Do not
+	check whether an SSA update is needed.
+
+2013-03-20  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/mips/constraints.md (T): Rename to...
+	(Yf): ...this.
+	(U): Rename to...
+	(Yd): ...this.
+	* config/mips/mips.md (*movdi_64bit, *movdi_64bit_mips16)
+	(*mov<mode>_internal, *mov<mode>_mips16): Update accordingly.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (*sub<mode>3_carryin): New pattern.
+	(*subsi3_carryin_uxtw): Likewise.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (*ror<mode>3_insn): New pattern.
+	(*rorsi3_insn_uxtw): Likewise.
+
+2013-03-19  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (*extr<mode>5_insn): New pattern.
+	(*extrsi5_insn_uxtw): Likewise.
+
+2013-03-19  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56273
+	* passes.c (init_optimization_passes): Move second VRP after DOM.
+
+2013-03-19  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*movti_internal): Merge from
+	*movti_internal_rex64 and *movti_internal_sse.  Use x64 isa attribute.
+	(*movdi_internal): Merge with *movdi_internal_rex64.  Use x64 and
+	nox64 isa attributes.
+
 2013-03-18  Richard Biener  <rguenther@suse.de>
 
 	* tree-ssa-structalias.c (find): Use gcc_checking_assert.
@@ -177,8 +274,8 @@
 	__ATOMIC_HLE_RELEASE. Document __builtin_ia32 TSX intrincs.
 	Document _x* TSX intrinsics.
 
-2013-03-14  Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-	    David Holsgrove <david.holsgrove@xilinx.com>
+2013-03-14  Edgar E. Iglesias  <edgar.iglesias@xilinx.com>
+	    David Holsgrove  <david.holsgrove@xilinx.com>
 
 	* configure.ac: Add MicroBlaze TLS support detection.
 	* configure: Regenerate.
@@ -1618,7 +1715,7 @@
 	* config/microblaze/microblaze.c (microblaze_asm_trampoline_template):
 	Replace with a microblaze version.
 	(microblaze_trampoline_init): Adapt for microblaze.
-	* gcc/config/microblaze/microblaze.h (TRAMPOLINE_SIZE): Adapt for
+	* config/microblaze/microblaze.h (TRAMPOLINE_SIZE): Adapt for
 	microblaze.
 
 2013-02-16  Jakub Jelinek  <jakub@redhat.com>
