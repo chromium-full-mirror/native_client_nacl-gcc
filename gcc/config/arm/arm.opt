@@ -254,6 +254,10 @@ munaligned-access
 Target Report Var(unaligned_access) Init(2)
 Enable unaligned word and halfword accesses to packed data.
 
+mneon-for-64bits
+Target Report RejectNegative Var(use_neon_for_64bits) Init(0)
+Use Neon to perform 64-bits operations rather than core registers.
+
 msfi-nacl1
 Target Report Mask(SFI_NACL1)
 Generate code for Native Client software fault isolation
