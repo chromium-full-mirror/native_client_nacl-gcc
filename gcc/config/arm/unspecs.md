@@ -140,6 +140,10 @@
   VUNSPEC_ATOMIC_OP	; Represent an atomic operation.
   VUNSPEC_LL		; Represent a load-register-exclusive.
   VUNSPEC_SC		; Represent a store-register-exclusive.
+  VUNSPEC_LAX		; Represent a load-register-acquire-exclusive.
+  VUNSPEC_SLX		; Represent a store-register-release-exclusive.
+  VUNSPEC_LDA		; Represent a store-register-acquire.
+  VUNSPEC_STL		; Represent a store-register-release.
   VUNSPEC_SFI_BARRIER_4	; TARGET_SFI_NACL1 version of VUNSPEC_ALIGN
   VUNSPEC_SFI_BARRIER_8	; TARGET_SFI_NACL1 version of VUNSPEC_ALIGN
 ])

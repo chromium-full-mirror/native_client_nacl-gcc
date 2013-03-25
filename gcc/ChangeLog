@@ -2,6 +2,208 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-03-25  Martin Jambor  <mjambor@suse.cz>
+
+	* ipa-cp.c (ipa_get_indirect_edge_target): Renamed to
+	ipa_get_indirect_edge_target_1, added parameter agg_reps and ability to
+	process it.
+	(ipa_get_indirect_edge_target): New function.
+	(devirtualization_time_bonus): New parameter known_aggs, pass it to
+	ipa_get_indirect_edge_target.  Update all callers.
+	(ipcp_discover_new_direct_edges): New parameter aggvals.  Pass it to
+	ipa_get_indirect_edge_target_1 instead of calling
+	ipa_get_indirect_edge_target.
+	(create_specialized_node): Pass aggvlas to
+	ipcp_discover_new_direct_edges.
+
+2013-03-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (f_sels, f_seld): New types.
+	(*cmov<mode>): New pattern.
+	* config/arm/predicates.md (arm_vsel_comparison_operator): New
+	predicate.
+
+2013-03-25  Kai Tietz  <ktietz@redhat.com>
+
+	* config/i386/xm-mingw32.h (__USE_MINGW_ANSI_STDIO): Enable
+	POSIX-printf for mingw-hosted  builds.
+
+2013-03-25  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/56694
+	* tree-eh.c (lower_eh_must_not_throw): Strip BLOCKs from the
+	must-not-throw stmt location.
+
+2013-03-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.c (arm_emit_load_exclusive): Add acq parameter.
+	Emit load-acquire versions when acq is true.
+	(arm_emit_store_exclusive): Add rel parameter.
+	Emit store-release versions when rel is true.
+	(arm_split_compare_and_swap): Use acquire-release instructions
+	instead.
+	of barriers when appropriate.
+	(arm_split_atomic_op): Likewise.
+	* config/arm/arm.h (TARGET_HAVE_LDACQ): New macro.
+	* config/arm/unspecs.md (VUNSPEC_LAX): New unspec.
+	(VUNSPEC_SLX): Likewise.
+	(VUNSPEC_LDA): Likewise.
+	(VUNSPEC_STL): Likewise.
+	* config/arm/sync.md (atomic_load<mode>): New pattern.
+	(atomic_store<mode>): Likewise.
+	(arm_load_acquire_exclusive<mode>): Likewise.
+	(arm_load_acquire_exclusivesi): Likewise.
+	(arm_load_acquire_exclusivedi): Likewise.
+	(arm_store_release_exclusive<mode>): Likewise.
+
+2013-03-25  Catherine Moore  <clm@codesourcery.com>
+
+	* config/mips/constraints.md (u, Udb7 Uead, Uean, Uesp, Uib3,
+	Uuw6, Usb4, ZS, ZT, ZU, ZV, ZW): New constraints.
+	* config/mip/predicates.md (lwsp_swsp_operand,
+	lw16_sw16_operand, lhu16_sh16_operand, lbu16_operand,
+	sb16_operand, db4_operand, db7_operand, ib3_operand,
+	sb4_operand, ub4_operand, uh4_operand, uw4_operand,
+	uw5_operand, uw6_operand, addiur2_operand, addiusp_operand,
+	andi16_operand): New predicates.
+	* config/mips/mips.md (compression): New attribute.
+	(enabled): New attribute.
+	(length): Consider compression in computing length.
+	(shift_compression): New code attribute.
+	(*add<mode>3): New operands. Record compression.
+	(sub<mode>3): Likewise.
+	(one_cmpl<mode>2): Likewise.
+	(*and<mode>3): Likewise.
+	(*ior<mode>3): Likewise.
+	(unnamed pattern for xor): Likewise.
+	(*zero_extend<SHORT:mode><GPR:mode>2): Likewise.
+	(*<optab><mode>3): Likewise.
+	(*mov<mode>_internal: Likewise.
+	* config/mips/mips-protos.h (mips_signed_immediate_p): New.
+	(mips_unsigned_immediate_p): New.
+	(umips_lwsp_swsp_address_p): New.
+	(m16_based_address_p): New.
+	* config/mips/mips-protos.h (mips_signed_immediate_p): New prototype.
+	(mips_unsigned_immediate_p): New prototype.
+	(lwsp_swsp_address_p): New prototype.
+	(m16_based_address_p): New prototype.
+	* config/mips/mips.c (mips_unsigned_immediate_p): New function.
+	(mips_signed_immediate_p): New function.
+	(m16_based_address_p): New function.
+	(lwsp_swsp_address_p): New function.
+	(mips_print_operand_punctuation): Recognize short delay slot insns
+	for microMIPS.add<mode>3"
+
+2013-03-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/56720
+	* config/arm/iterators.md (v_cmp_result): New mode attribute.
+	* config/arm/neon.md (vcond<mode><mode>): Handle unordered cases.
+
+2013-03-25  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56689
+	* tree-vrp.c (execute_vrp): Mark loops for fixup if we removed
+	any edge.
+
+2013-03-25  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-loop-im.c (struct mem_ref): Use bitmap_head instead
+	of bitmap.
+	(memory_references): Likewise.
+	(outermost_indep_loop, mem_ref_alloc, mark_ref_stored,
+	gather_mem_refs_stmt, record_dep_loop, ref_indep_loop_p_1,
+	ref_indep_loop_p_2, find_refs_for_sm): Adjust.
+	(gather_mem_refs_in_loops): Fold into ...
+	(analyze_memory_references): ... this.  Move initialization
+	to tree_ssa_lim_initialize.
+	(fill_always_executed_in): Rename to ...
+	(fill_always_executed_in_1): ... this.
+	(fill_always_executed_in): Move contains_call computation to
+	this new function from ...
+	(tree_ssa_lim_initialize): ... here.
+	(tree_ssa_lim): Call fill_always_executed_in.
+
+2013-03-25  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* postreload.c (reload_combine): Fix code detecting returns.
+
+2013-03-25  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* function.c (emit_use_return_register_into_block): On cc0 targets,
+	do not emit the sequence between cc0 setter and user.
+
+2013-03-25  Kai Tietz  <ktietz@redhat.com>
+
+	* config/i386/predicates.md (local_symbolic_operand): Interpret
+	dll-imported symbols as none-local.
+
+2013-03-25  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-loop-im.c (struct depend): Remove.
+	(struct lim_aux_data): Make depends a vec of gimples.
+	(free_lim_aux_data): Adjust.
+	(add_dependency): Likewise.
+	(set_level): Likewise.
+
+2013-03-25  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/56434
+	* calls.c (expand_call): Use MALLOC_ABI_ALIGNMENT to annotate
+	the pointer returned by calls with ECF_MALLOC set.
+
+2013-03-24  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/mmx.md (mov<mode>): Add ?!Ym,r and r,?!Ym alternatives.
+
+2013-03-24  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/mmx.md (mov<mode>): Merge with movv2sf expander
+	using MMXMODE mode iterator.
+	(*move<mode>_internal): Merge with *movv2sf_internal and
+	*movv2sf_internal_rex64 using MMXMODE mode iterator.
+
+2013-03-23  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* gcse.c (oprs_unchanged_p): Respect flag_gcse_lm.
+	(record_last_mem_set_info): Likewise.
+
+	* df-core.c (rest_of_handle_df_initialize): Use XCNEWVEC instead
+	of XNEWVEC followed by memset.
+	(df_worklist_dataflow): Use XNEWVEC instead of xmalloc with a cast.
+
+2013-03-23  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/avr/avr.c, config/bfin/bfin.c, config/c6x/c6x.c,
+	config/epiphany/epiphany.c, config/frv/frv.c, config/ia64/ia64.c,
+	config/iq2000/iq2000.c, config/mcore/mcore.c, config/mep/mep.c,
+	config/mmix/mmix.c, config/pa/pa.c, config/rs6000/rs6000.c,
+	config/s390/s390.c, config/sparc/sparc.c, config/spu/spu.c,
+	config/stormy16/stormy16.c, config/v850/v850.c, config/xtensa/xtensa.c,
+	dwarf2out.c, hw-doloop.c, resource.c, rtl.h : Where applicable, use
+	the predicates NOTE_P, NONJUMP_INSN_P, JUMP_P, CALL_P, LABEL_P, and
+	BARRIER_P instead of GET_CODE.
+
+2013-03-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/sparc/sparc.c (sparc_emit_probe_stack_range): Fix small
+	inaccuracy in the probing code.
+
+	* config/sparc/sparc.md (ctrapsi4): Add predicate for operand #3.
+	(ctrapdi4): Likewise.
+
+2013-03-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* calls.c (expand_call): Add missing guard to code handling return
+	of non-BLKmode structures in MSB.
+	* function.c (expand_function_end): Likewise.
+
+2013-03-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* combine.c (try_combine): Adjust comment.  Do not add the set of
+	insn #0 if the destination indirectly is set or dies in insn #2.
+	Tidy up code to distribute a new note.
+
 2013-03-22  Uros Bizjak  <ubizjak@gmail.com>
 
 	* config/i386/i386.md (*movdi_internal): Set prefix_rex attribute
