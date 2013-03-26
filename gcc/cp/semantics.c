@@ -9445,6 +9445,11 @@ lambda_expr_this_capture (tree lambda)
 
   tree this_capture = LAMBDA_EXPR_THIS_CAPTURE (lambda);
 
+  /* In unevaluated context this isn't an odr-use, so just return the
+     nearest 'this'.  */
+  if (cp_unevaluated_operand)
+    return lookup_name (this_identifier);
+
   /* Try to default capture 'this' if we can.  */
   if (!this_capture
       && LAMBDA_EXPR_DEFAULT_CAPTURE_MODE (lambda) != CPLD_NONE)
@@ -9514,11 +9519,6 @@ lambda_expr_this_capture (tree lambda)
 
   if (!this_capture)
     {
-      /* In unevaluated context this isn't an odr-use, so just return the
-	 nearest 'this'.  */
-      if (cp_unevaluated_operand)
-	return lookup_name (this_identifier);
-
       error ("%<this%> was not captured for this lambda function");
       result = error_mark_node;
     }
@@ -9556,7 +9556,8 @@ maybe_resolve_dummy (tree object)
 
   if (type != current_class_type
       && current_class_type
-      && LAMBDA_TYPE_P (current_class_type))
+      && LAMBDA_TYPE_P (current_class_type)
+      && DERIVED_FROM_P (type, current_nonlambda_class_type ()))
     {
       /* In a lambda, need to go through 'this' capture.  */
       tree lam = CLASSTYPE_LAMBDA_EXPR (current_class_type);
