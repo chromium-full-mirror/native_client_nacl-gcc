@@ -2,6 +2,142 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-03-26  Roland McGrath  <mcgrathr@google.com>
+
+	* config/arm/arm.c (arm_print_operand: case 'w'): Use fputs rather
+	than fprintf with a non-constant, non-format string.
+
+2013-03-26  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*cmpqi_ext_1): Merge with *cmpqi_ext_1_rex64
+	using nox64 isa attribute.  Use nonimmediate_x86nomem_operand as
+	operand 0 predicate.
+	(*cmpqi_ext_3): Merge with *cmpqi_ext_3_rex64 using nox64 isa
+	attribute.  Use general_x64nomem_operand as operand 1 predicate.
+	(*movqi_extv_1): Merge with *movqi_extv_1_rex64 using nox64 isa
+	attribute.  Use nonimmediate_x64nomem_operand as operand 0 predicate.
+	(*movqi_extzv_2): Merge with *movqi_extzv_2_rex64 using nox64 isa
+	attribute.  Use nonimmediate_x64nomem_operand as operand 0 predicate.
+	(mov<mode>_insv_1): Remove expander.  Merge insn with
+	movsi_insv_1 using SWI48 mode iterator and nox64 isa attribute.
+	Use general_x64nomem_operand as operand 1 predicate.
+	(addqi_ext_1): Merge with *addqi_ext_1_rex64 using nox64 isa attribute.
+	(*testqi_ext_1): Merge with *testqi_ext_1_rex64 using nox64 isa
+	attribute.  Use nonimmediate_x64nomem_operand as operand 1 predicate.
+	(*andqi_ext_1): Merge with *andqi_ext_1_rex64 using nox64 isa
+	attribute.  Use nonimmediate_x64nomem_operand as operand 2 predicate.
+	(*<code>qi_ext_1): Merge with *<code>qi_ext_1_rex64 using nox64 isa
+	attribute.  Use nonimmediate_x64nomem_operand as operand 1 predicate.
+	(*xorqi_cc_ext_1): Merge with *xorqi_cc_ext_1_rex64 using nox64
+	isa attribute.  Use general_x64nomem_operand as operand 2 predicate.
+	* config/i386/predicates.md (nonimmediate_x64nomem_operand): New.
+	(general_x64nomem_operand): Ditto.
+
+2013-03-26  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* config/rtems.opt: Add -pthread option.
+
+2013-03-26  Richard Biener  <rguenther@suse.de>
+
+	* alias.c (find_base_term): Avoid redundant and not used recursion.
+	(base_alias_check): Get the initial base term from the caller.
+	(true_dependence_1): Compute and pass base terms to base_alias_check.
+	(write_dependence_p): Likewise.
+	(may_alias_p): Likewise.
+
+2013-03-26  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_classify_address): Support
+	PC-relative load in SI modes and above only.
+
+2013-03-26  Xinyu Qi  <xyqi@marvell.com>
+
+	* config/arm/arm.h (FIRST_IWMMXT_GR_REGNUM): Add comment.
+        * config/arm/iwmmxt.md (WCGR0): Update.
+        (WCGR1, WCGR2, WCGR3): Likewise.
+
+2013-03-26  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*movdfcc_1): Merge with *movdfcc_1_rex64.
+	Use x64 and nox64 isa attributes.
+
+2013-03-26  Richard Biener  <rguenther@suse.de>
+
+	* emit-rtl.c (set_mem_attributes_minus_bitpos): Remove
+	alignment computations and rely on get_object_alignment_1
+	for the !TYPE_P case.
+	Commonize DECL/COMPONENT_REF handling in the ARRAY_REF path.
+
+2013-03-26  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.h (PROFILE_BEFORE_PROLOGUE): Define.
+	* config/tilegx/tilepro.h (PROFILE_BEFORE_PROLOGUE): Define.
+
+2013-03-25  Jeff Law  <law@redhat.com>
+        * tree-ssa-dom.c (record_equivalences_from_incoming_edge): Add missing
+        check for INTEGRAL_TYPE_P that was missing due to checking in
+	wrong version of prior patch.
+
+2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx-builtins.h (enum tilegx_builtin): Add
+	TILEGX_INSN_SHUFFLEBYTES1.
+	* config/tilegx/tilegx.c (tilegx_builtin_info): Add entry for
+	shufflebytes1.
+	(tilegx_builtins): Ditto.
+	* config/tilegx/tilegx.md (insn_shufflebytes1): New pattern.
+
+2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.md (floatsisf2): New pattern.
+	(floatunssisf2): New pattern.
+	(floatsidf2): New pattern.
+	(floatunssidf2): New pattern.
+
+2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.c (expand_set_cint64_one_inst): Inline
+	tests for constraint J, K, N, P.
+
+2013-03-25  Walter Lee  <walt@tilera.com>
+
+	* config/tilegx/tilegx.c (tilegx_asm_preferred_eh_data_format):
+	Use indirect/pcrel encoding.
+	* config/tilepro/tilepro.c (tilepro_asm_preferred_eh_data_format):
+	Ditto.
+
+2013-03-25  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mmips-cpus.def (74kc, 74kf2_1, 74kf, 74kf, 74kf1_1,
+	74kfx, 74kx, 74kf3_2): Add PTF_AVOID_IMADD.
+	* config/mips/mips.c (mips_option_override): Set IMADD default.
+	* config/mips/mips.h (PTF_AVOID_IMADD): New.
+	(ISA_HAS_MADD_MSUB): Remove MIPS16 check.
+	(GENERATE_MADD_MSUB): Remove TUNE_74K check, add MIPS16 check.
+	* config/mips/mips.md (mimadd): New flag for integer madd/msub.
+	* doc/invoke.texi (-mimadd/-mno-imadd): New.
+
+2013-03-25  Jeff Law  <law@redhat.com>
+
+	* tree-ssa-dom.c (record_equivalences_from_incoming_edge): Rework
+	slightly to avoid creating and folding useless trees.  Simplify
+	slightly by restricting to INTEGER_CSTs and using int_fits_type_p.
+
+2013-03-25  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*zero_extendsidi2): Merge with
+	*zero_extendsidi2_rex64.  Use x64 and nox64 isa attributes.
+	* config/i386/predicates.md (x86_64_zext_operand): Rename from
+	x86_64_zext_general_operand.  Use nonimmediate_operand on 32bit
+	targets.  Clarify comment.
+
+2013-03-25  Martin Jambor  <mjambor@suse.cz>
+
+	* ipa-prop.c (ipa_write_jump_function): Stream simple and aritmetic
+	pass-through jump functions differently.
+	(ipa_read_jump_function): Likewise.  Also use setter functions to set
+	up jump functions.
+
 2013-03-25  Martin Jambor  <mjambor@suse.cz>
 
 	* ipa-cp.c (ipa_get_indirect_edge_target): Renamed to

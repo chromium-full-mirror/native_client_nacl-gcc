@@ -1,3 +1,26 @@
+2013-03-26  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/56649
+	* gfortran.dg/merge_init_expr_2.f90: New.
+	* gfortran.dg/merge_char_1.f90: Modify test to
+	stay a run-time test.
+	* gfortran.dg/merge_char_3.f90: Ditto.
+
+2013-03-26  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* g++.dg/cpp0x/constexpr-friend-2.C: New.
+	* g++.dg/cpp0x/constexpr-main.C: Likewise.
+
+2013-03-25  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/56722
+	* g++.dg/cpp0x/range-for23.C: New.
+
+2013-03-25  Tilo Schwarz  <tilo@tilo-schwarz.de>
+
+	PR libfortran/52512
+	* gfortran.dg/namelist_79.f90: New.
+
 2013-03-25  Martin Jambor  <mjambor@suse.cz>
 
 	* gcc.dg/ipa/ipcp-agg-9.c: New test.

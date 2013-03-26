@@ -6111,7 +6111,8 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
       tree d_init;
       if (init == NULL_TREE)
 	{
-	  if (DECL_TEMPLATE_INSTANTIATION (decl)
+	  if (DECL_LANG_SPECIFIC (decl)
+	      && DECL_TEMPLATE_INSTANTIATION (decl)
 	      && !DECL_TEMPLATE_INSTANTIATED (decl))
 	    {
 	      /* init is null because we're deferring instantiating the
@@ -7426,13 +7427,16 @@ grokfndecl (tree ctype,
 	      return NULL_TREE;
 	    }
 
+	  if (inlinep & 1)
+	    error ("%<inline%> is not allowed in declaration of friend "
+		   "template specialization %qD",
+		   decl);
+	  if (inlinep & 2)
+	    error ("%<constexpr%> is not allowed in declaration of friend "
+		   "template specialization %qD",
+		   decl);
 	  if (inlinep)
-	    {
-	      error ("%<inline%> is not allowed in declaration of friend "
-		     "template specialization %qD",
-		     decl);
-	      return NULL_TREE;
-	    }
+	    return NULL_TREE;
 	}
     }
 
@@ -7471,8 +7475,10 @@ grokfndecl (tree ctype,
     {
       if (PROCESSING_REAL_TEMPLATE_DECL_P())
 	error ("cannot declare %<::main%> to be a template");
-      if (inlinep)
+      if (inlinep & 1)
 	error ("cannot declare %<::main%> to be inline");
+      if (inlinep & 2)
+	error ("cannot declare %<::main%> to be constexpr");
       if (!publicp)
 	error ("cannot declare %<::main%> to be static");
       inlinep = 0;
@@ -8650,6 +8656,7 @@ grokdeclarator (const cp_declarator *declarator,
   bool parameter_pack_p = declarator? declarator->parameter_pack_p : false;
   bool template_type_arg = false;
   bool template_parm_flag = false;
+  bool typedef_p = decl_spec_seq_has_spec_p (declspecs, ds_typedef);
   bool constexpr_p = decl_spec_seq_has_spec_p (declspecs, ds_constexpr);
   source_location saved_loc = input_location;
   const char *errmsg;
@@ -8861,7 +8868,7 @@ grokdeclarator (const cp_declarator *declarator,
 
   if (dname && IDENTIFIER_OPNAME_P (dname))
     {
-      if (decl_spec_seq_has_spec_p (declspecs, ds_typedef))
+      if (typedef_p)
 	{
 	  error ("declaration of %qD as %<typedef%>", dname);
 	  return error_mark_node;
@@ -8899,7 +8906,7 @@ grokdeclarator (const cp_declarator *declarator,
   if (name == NULL)
     name = decl_context == PARM ? "parameter" : "type name";
 
-  if (constexpr_p && decl_spec_seq_has_spec_p (declspecs, ds_typedef))
+  if (constexpr_p && typedef_p)
     {
       error ("%<constexpr%> cannot appear in a typedef declaration");
       return error_mark_node;
@@ -9197,7 +9204,7 @@ grokdeclarator (const cp_declarator *declarator,
   /* Issue errors about use of storage classes for parameters.  */
   if (decl_context == PARM)
     {
-      if (decl_spec_seq_has_spec_p (declspecs, ds_typedef))
+      if (typedef_p)
 	{
 	  error ("typedef declaration invalid in parameter declaration");
 	  return error_mark_node;
@@ -9241,7 +9248,7 @@ grokdeclarator (const cp_declarator *declarator,
       && ((storage_class
 	   && storage_class != sc_extern
 	   && storage_class != sc_static)
-	  || decl_spec_seq_has_spec_p (declspecs, ds_typedef)))
+	  || typedef_p))
     {
       error ("multiple storage classes in declaration of %qs", name);
       thread_p = false;
@@ -9255,7 +9262,7 @@ grokdeclarator (const cp_declarator *declarator,
 	  && (storage_class == sc_register
 	      || storage_class == sc_auto))
 	;
-      else if (decl_spec_seq_has_spec_p (declspecs, ds_typedef))
+      else if (typedef_p)
 	;
       else if (decl_context == FIELD
 	       /* C++ allows static class elements.  */
@@ -9865,8 +9872,7 @@ grokdeclarator (const cp_declarator *declarator,
 	      return error_mark_node;
 	    }
 	}
-      else if (decl_spec_seq_has_spec_p (declspecs, ds_typedef)
-	       && current_class_type)
+      else if (typedef_p && current_class_type)
 	{
 	  error ("cannot declare member %<%T::%s%> within %qT",
 		 ctype, name, current_class_type);
@@ -9943,8 +9949,7 @@ grokdeclarator (const cp_declarator *declarator,
 	  error ("non-member %qs cannot be declared %<mutable%>", name);
 	  storage_class = sc_none;
 	}
-      else if (decl_context == TYPENAME
-	       || decl_spec_seq_has_spec_p (declspecs, ds_typedef))
+      else if (decl_context == TYPENAME || typedef_p)
 	{
 	  error ("non-object member %qs cannot be declared %<mutable%>", name);
 	  storage_class = sc_none;
@@ -9974,7 +9979,7 @@ grokdeclarator (const cp_declarator *declarator,
     }
 
   /* If this is declaring a typedef name, return a TYPE_DECL.  */
-  if (decl_spec_seq_has_spec_p (declspecs, ds_typedef) && decl_context != TYPENAME)
+  if (typedef_p && decl_context != TYPENAME)
     {
       tree decl;
 
