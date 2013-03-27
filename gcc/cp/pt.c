@@ -213,9 +213,8 @@ static tree instantiate_alias_template (tree, tree, tsubst_flags_t);
 static void
 push_access_scope (tree t)
 {
-  gcc_assert (TREE_CODE (t) == FUNCTION_DECL
-	      || TREE_CODE (t) == TYPE_DECL
-	      || TREE_CODE (t) == VAR_DECL);
+  gcc_assert (VAR_OR_FUNCTION_DECL_P (t)
+	      || TREE_CODE (t) == TYPE_DECL);
 
   if (DECL_FRIEND_CONTEXT (t))
     push_nested_class (DECL_FRIEND_CONTEXT (t));
@@ -5736,7 +5735,7 @@ convert_nontype_argument (tree type, tree expr, tsubst_flags_t complain)
 	 shall be one of: [...]
 
 	 -- the address of an object or function with external linkage.  */
-      if (TREE_CODE (expr) == INDIRECT_REF
+      if (INDIRECT_REF_P (expr)
 	  && TYPE_REF_OBJ_P (TREE_TYPE (TREE_OPERAND (expr, 0))))
 	{
 	  expr = TREE_OPERAND (expr, 0);
@@ -14014,7 +14013,7 @@ tsubst_copy_and_build (tree t,
 		if (unq != function)
 		  {
 		    tree fn = unq;
-		    if (TREE_CODE (fn) == INDIRECT_REF)
+		    if (INDIRECT_REF_P (fn))
 		      fn = TREE_OPERAND (fn, 0);
 		    if (TREE_CODE (fn) == COMPONENT_REF)
 		      fn = TREE_OPERAND (fn, 1);
@@ -18598,8 +18597,7 @@ instantiate_decl (tree d, int defer_ok,
 
   /* This function should only be used to instantiate templates for
      functions and static member variables.  */
-  gcc_assert (TREE_CODE (d) == FUNCTION_DECL
-	      || TREE_CODE (d) == VAR_DECL);
+  gcc_assert (VAR_OR_FUNCTION_DECL_P (d));
 
   /* Variables are never deferred; if instantiation is required, they
      are instantiated right away.  That allows for better code in the
