@@ -280,6 +280,23 @@ vect_analyze_data_ref_dependence (struct data_dependence_relation *ddr,
   /* Unknown data dependence.  */
   if (DDR_ARE_DEPENDENT (ddr) == chrec_dont_know)
     {
+      if (STMT_VINFO_GATHER_P (stmtinfo_a)
+	  || STMT_VINFO_GATHER_P (stmtinfo_b))
+	{
+	  if (dump_enabled_p ())
+	    {
+	      dump_printf_loc (MSG_MISSED_OPTIMIZATION, vect_location,
+			       "versioning for alias not supported for: "
+			       "can't determine dependence between ");
+	      dump_generic_expr (MSG_MISSED_OPTIMIZATION, TDF_SLIM,
+				 DR_REF (dra));
+	      dump_printf (MSG_MISSED_OPTIMIZATION, " and ");
+	      dump_generic_expr (MSG_MISSED_OPTIMIZATION, TDF_SLIM,
+				 DR_REF (drb));
+	    }
+	  return false;
+	}
+
       if (dump_enabled_p ())
 	{
 	  dump_printf_loc (MSG_MISSED_OPTIMIZATION, vect_location,
@@ -299,6 +316,23 @@ vect_analyze_data_ref_dependence (struct data_dependence_relation *ddr,
   /* Known data dependence.  */
   if (DDR_NUM_DIST_VECTS (ddr) == 0)
     {
+      if (STMT_VINFO_GATHER_P (stmtinfo_a)
+	  || STMT_VINFO_GATHER_P (stmtinfo_b))
+	{
+	  if (dump_enabled_p ())
+	    {
+	      dump_printf_loc (MSG_MISSED_OPTIMIZATION, vect_location,
+			       "versioning for alias not supported for: "
+			       "bad dist vector for ");
+	      dump_generic_expr (MSG_MISSED_OPTIMIZATION, TDF_SLIM,
+				 DR_REF (dra));
+	      dump_printf (MSG_MISSED_OPTIMIZATION, " and ");
+	      dump_generic_expr (MSG_MISSED_OPTIMIZATION, TDF_SLIM,
+				 DR_REF (drb));
+	    }
+	  return false;
+	}
+
       if (dump_enabled_p ())
         {
           dump_printf_loc (MSG_MISSED_OPTIMIZATION, vect_location, 
@@ -448,6 +482,13 @@ vect_slp_analyze_data_ref_dependence (struct data_dependence_relation *ddr)
 
   /* Read-read is OK.  */
   if (DR_IS_READ (dra) && DR_IS_READ (drb))
+    return false;
+
+  /* If dra and drb are part of the same interleaving chain consider
+     them independent.  */
+  if (STMT_VINFO_GROUPED_ACCESS (vinfo_for_stmt (DR_STMT (dra)))
+      && (GROUP_FIRST_ELEMENT (vinfo_for_stmt (DR_STMT (dra)))
+	  == GROUP_FIRST_ELEMENT (vinfo_for_stmt (DR_STMT (drb)))))
     return false;
 
   /* Unknown data dependence.  */
@@ -3572,6 +3613,8 @@ vect_create_data_ref_ptr (gimple stmt, tree aggr_type, struct loop *at_loop,
       dump_generic_expr (MSG_NOTE, TDF_SLIM, aggr_type);
       if (TREE_CODE (dr_base_type) == ARRAY_TYPE)
         dump_printf (MSG_NOTE, "  vectorizing an array ref: ");
+      else if (TREE_CODE (dr_base_type) == VECTOR_TYPE)
+        dump_printf (MSG_NOTE, "  vectorizing a vector ref: ");
       else if (TREE_CODE (dr_base_type) == RECORD_TYPE)
         dump_printf (MSG_NOTE, "  vectorizing a record based array ref: ");
       else

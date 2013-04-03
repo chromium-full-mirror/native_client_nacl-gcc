@@ -12870,12 +12870,10 @@ is_jump_table (rtx insn)
   rtx table;
 
   if (jump_to_label_p (insn)
-      && ((table = next_real_insn (JUMP_LABEL (insn)))
-	  == next_real_insn (insn))
+      && ((table = next_active_insn (JUMP_LABEL (insn)))
+	  == next_active_insn (insn))
       && table != NULL
-      && JUMP_P (table)
-      && (GET_CODE (PATTERN (table)) == ADDR_VEC
-	  || GET_CODE (PATTERN (table)) == ADDR_DIFF_VEC))
+      && JUMP_TABLE_DATA_P (table))
     return table;
 
   return NULL_RTX;
@@ -23104,12 +23102,7 @@ thumb_far_jump_used_p (void)
      insn with the far jump attribute set.  */
   for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
     {
-      if (JUMP_P (insn)
-	  /* Ignore tablejump patterns.  */
-	  && GET_CODE (PATTERN (insn)) != ADDR_VEC
-	  && GET_CODE (PATTERN (insn)) != ADDR_DIFF_VEC
-	  && get_attr_far_jump (insn) == FAR_JUMP_YES
-	  )
+      if (JUMP_P (insn) && get_attr_far_jump (insn) == FAR_JUMP_YES)
 	{
 	  /* Record the fact that we have decided that
 	     the function does use far jumps.  */
@@ -26266,7 +26259,7 @@ arm_output_iwmmxt_tinsr (rtx *operands)
 const char *
 thumb1_output_casesi (rtx *operands)
 {
-  rtx diff_vec = PATTERN (next_real_insn (operands[0]));
+  rtx diff_vec = PATTERN (next_active_insn (operands[0]));
 
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
@@ -26289,7 +26282,7 @@ thumb1_output_casesi (rtx *operands)
 const char *
 thumb2_output_casesi (rtx *operands)
 {
-  rtx diff_vec = PATTERN (next_real_insn (operands[2]));
+  rtx diff_vec = PATTERN (next_active_insn (operands[2]));
 
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
@@ -26337,6 +26330,7 @@ arm_issue_rate (void)
     case cortexa7:
     case cortexa8:
     case cortexa9:
+    case cortexa53:
     case fa726te:
     case marvell_pj4:
       return 2;

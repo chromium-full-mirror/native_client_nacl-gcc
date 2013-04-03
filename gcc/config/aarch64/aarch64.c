@@ -3879,14 +3879,21 @@ aarch64_can_eliminate (const int from, const int to)
     }
   else
     {
-      /* If we decided that we didn't need a frame pointer but then used
-	 LR in the function, then we do need a frame pointer after all, so
-	 prevent this elimination to ensure a frame pointer is used.  */
+      /* If we decided that we didn't need a leaf frame pointer but then used
+	 LR in the function, then we'll want a frame pointer after all, so
+	 prevent this elimination to ensure a frame pointer is used.
 
+	 NOTE: the original value of flag_omit_frame_pointer gets trashed
+	 IFF flag_omit_leaf_frame_pointer is true, so we check the value
+	 of faked_omit_frame_pointer here (which is true when we always
+	 wish to keep non-leaf frame pointers but only wish to keep leaf frame
+	 pointers when LR is clobbered).  */
       if (from == FRAME_POINTER_REGNUM && to == STACK_POINTER_REGNUM
-	  && df_regs_ever_live_p (LR_REGNUM))
+	  && df_regs_ever_live_p (LR_REGNUM)
+	  && faked_omit_frame_pointer)
 	return false;
     }
+
   return true;
 }
 
@@ -4063,7 +4070,7 @@ aarch64_output_casesi (rtx *operands)
 {
   char buf[100];
   char label[100];
-  rtx diff_vec = PATTERN (next_real_insn (operands[2]));
+  rtx diff_vec = PATTERN (next_active_insn (operands[2]));
   int index;
   static const char *const patterns[4][2] =
   {
@@ -6398,6 +6405,21 @@ aarch64_simd_gen_const_vector_dup (enum machine_mode mode, int val)
     RTVEC_ELT (v, i) = GEN_INT (val);
 
   return gen_rtx_CONST_VECTOR (mode, v);
+}
+
+/* Check OP is a legal scalar immediate for the MOVI instruction.  */
+
+bool
+aarch64_simd_scalar_immediate_valid_for_move (rtx op, enum machine_mode mode)
+{
+  enum machine_mode vmode;
+
+  gcc_assert (!VECTOR_MODE_P (mode));
+  vmode = aarch64_preferred_simd_mode (mode);
+  rtx op_v = aarch64_simd_gen_const_vector_dup (vmode, INTVAL (op));
+  int retval = aarch64_simd_immediate_valid_for_move (op_v, vmode, 0,
+						      NULL, NULL, NULL, NULL);
+  return retval;
 }
 
 /* Construct and return a PARALLEL RTX vector.  */

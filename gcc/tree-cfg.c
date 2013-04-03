@@ -3815,9 +3815,9 @@ verify_gimple_assign_single (gimple stmt)
     }
 
   if (gimple_clobber_p (stmt)
-      && !DECL_P (lhs))
+      && !(DECL_P (lhs) || TREE_CODE (lhs) == MEM_REF))
     {
-      error ("non-decl LHS in clobber statement");
+      error ("non-decl/MEM_REF LHS in clobber statement");
       debug_generic_expr (lhs);
       return true;
     }
@@ -7062,7 +7062,8 @@ print_loop (FILE *file, struct loop *loop, int indent, int verbosity)
    loop, or just its structure.  */
 
 static void
-print_loop_and_siblings (FILE *file, struct loop *loop, int indent, int verbosity)
+print_loop_and_siblings (FILE *file, struct loop *loop, int indent,
+			 int verbosity)
 {
   if (loop == NULL)
     return;
@@ -7082,6 +7083,40 @@ print_loops (FILE *file, int verbosity)
   bb = ENTRY_BLOCK_PTR;
   if (bb && bb->loop_father)
     print_loop_and_siblings (file, bb->loop_father, 0, verbosity);
+}
+
+/* Dump a loop.  */
+
+DEBUG_FUNCTION void
+debug (struct loop &ref)
+{
+  print_loop (stderr, &ref, 0, /*verbosity*/0);
+}
+
+DEBUG_FUNCTION void
+debug (struct loop *ptr)
+{
+  if (ptr)
+    debug (*ptr);
+  else
+    fprintf (stderr, "<nil>\n");
+}
+
+/* Dump a loop verbosely.  */
+
+DEBUG_FUNCTION void
+debug_verbose (struct loop &ref)
+{
+  print_loop (stderr, &ref, 0, /*verbosity*/3);
+}
+
+DEBUG_FUNCTION void
+debug_verbose (struct loop *ptr)
+{
+  if (ptr)
+    debug (*ptr);
+  else
+    fprintf (stderr, "<nil>\n");
 }
 
 
