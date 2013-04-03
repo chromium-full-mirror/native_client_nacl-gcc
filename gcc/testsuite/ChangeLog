@@ -1,7 +1,76 @@
+2013-04-03  Marek Polacek  <polacek@redhat.com>
+
+	Backport from mainline:
+	2013-04-03  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/55702
+	* gcc.dg/pr55702.c: New test.
+
+2013-04-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/56819
+	* g++.dg/debug/pr56819.C: New test.
+
+2013-04-03  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56817
+	* g++.dg/torture/pr56817.C: New testcase.
+
+2013-04-03  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/55964
+	* gcc.dg/torture/pr55964-2.c: New testcase.
+
+2013-04-03  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56501
+	* gcc.dg/torture/pr56501.c: New testcase.
+
+2013-04-03  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56407
+	* gcc.dg/torture/pr56407.c: New testcase.
+
+2013-04-02  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/56745
+	* gcc.c-torture/compile/pr56745.c: New test.
+
+2013-04-02  Tobias Burnus  <burnus@net-b.de>
+
+	Backport from mainline:
+	2013-03-28  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/56735
+	* gfortran.dg/namelist_80.f90: New.
+
+2013-04-02  Tobias Burnus  <burnus@net-b.de>
+
+	Backport from mainline:
+	2013-03-29  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/56737
+	* testsuite/gfortran.dg/fmt_cache_3.f90: New.
+
+2013-04-02  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/56768
+	* g++.dg/torture/pr56768.C: New testcase.
+
+2013-04-01  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/55951
+	* g++.dg/ext/desig5.C: New.
+
+2013-03-29  Kirill Yukhin  <kirill.yukhin@intel.com>
+
+	* gcc.target/i386/avx2-vbroadcastsi128-1.c: Fix intrinsic name.
+	* gcc.target/i386/avx2-vbroadcastsi128-1.c: Ditto.
+
 2013-03-28  Tejas Belagod  <tejas.belagod@arm.com>
 
 	PR middle-end/56694
-	* g++.dg/torture/pr56694.C: Fix test case to build on bare-metal 
+	* g++.dg/torture/pr56694.C: Fix test case to build on bare-metal
 	targets.
 
 2013-03-25  Paolo Carlini  <paolo.carlini@oracle.com>
