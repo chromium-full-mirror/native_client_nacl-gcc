@@ -2,6 +2,29 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-04-08  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.c (s390_expand_insv): Only accept insertions
+	within mode size.
+
+2013-04-08  Marek Polacek  <polacek@redhat.com>
+
+	PR rtl-optimization/48182
+	* params.def (PARAM_MIN_CROSSJUMP_INSNS): Increase the minimum
+	value to 1.
+
+2013-04-06  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR target/55487
+	* config/pa/pa.c (legitimize_pic_address): Before incrementing label
+	nuses, make sure we have a label.
+
+2013-04-04  Ian Lance Taylor  <iant@google.com>
+
+	Backport from mainline:
+	* doc/standards.texi (Standards): The Go frontend supports the Go
+	1 language standard.
+
 2013-04-04  Marek Polacek  <polacek@redhat.com>
 
 	Backport from mainline:
