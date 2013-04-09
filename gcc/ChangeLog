@@ -2,6 +2,101 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-04-09  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (minmax_arithsi_non_canon): New pattern.
+
+2013-04-09  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* sched-vis.c (print_pattern): Print SEQUENCE of insns as insns.
+
+	* config/sparc/sparc.md: Use define_c_enum for "unspec" and "unspecv".
+
+2013-04-09  Marek Polacek  <polacek@redhat.com>
+
+	PR tree-optimization/48762
+	* params.def (PARAM_MAX_CSE_INSNS): Increase the minimum
+	value to 1.
+
+2013-04-09  Richard Biener  <rguenther@suse.de>
+
+	* tree-vect-slp.c (vect_get_and_check_slp_defs): Remove code
+	dealing with cost.
+	(vect_build_slp_tree): Likewise.
+	(vect_analyze_slp_cost_1, vect_analyze_slp_cost): New functions
+	calculating the cost of a SLP instance.
+	(vect_analyze_slp_instance): Use it from here, after building
+	the SLP tree.
+
+2013-04-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/56883
+	* omp-low.c (expand_omp_for_generic, expand_omp_for_static_nochunk,
+	expand_omp_for_static_chunk): Use simple_p = true in
+	force_gimple_operand_gsi calls when assigning to addressable decls.
+
+2013-04-09  Jeff Law  <law@redhat.com>
+
+	* tree-vrp.c (simplify_cond_using_ranges): Simplify test of boolean
+	when the boolean was created by converting a wider object which
+	had a boolean range.
+
+2013-04-09  Richard Biener  <rguenther@suse.de>
+
+	* tree-vectorizer.h (slp_void_p): Remove.
+	(slp_tree): Typedef before _slp_tree declaration.
+	(struct _slp_tree): Use a vector of slp_tree as children.
+	(vect_get_place_in_interleaving_chain): Remove.
+	* tree-vect-data-refs.c (vect_get_place_in_interleaving_chain):
+	Move ...
+	* tree-vect-slp.c (vect_get_place_in_interleaving_chain): ... here
+	and make static.
+	(vect_free_slp_tree, vect_print_slp_tree, vect_mark_slp_stmts,
+	vect_mark_slp_stmts_relevant, vect_slp_rearrange_stmts,
+	vect_detect_hybrid_slp_stmts, vect_slp_analyze_node_operations,
+	vect_schedule_slp_instance, vect_remove_slp_scalar_calls):
+	Use slp_node instead of slp_void_p and adjust.
+
+2013-04-09  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-loop-manip.c (rewrite_into_loop_closed_ssa): Avoid
+	work that is not necessary.
+
+2013-04-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56854
+	* tree-ssa-forwprop.c (forward_propagate_addr_expr_1): Don't
+	forward into clobber stmts if it would change MEM_REF lhs into
+	non-MEM_REF.
+
+2013-04-09  Maxim Kuvyrkov  <maxim@kugelworks.com>
+
+	* tree.c (type_hash_lookup, type_hash_add): Make static.
+	* tree.h (type_hash_lookup, type_hash_add): Remove global declarations.
+
+2013-04-09  Richard Biener  <rguenther@suse.de>
+
+	* tree.h (unsave_expr_now): Remove.
+	* tree-inline.c (mark_local_for_remap_r): Remove.
+	(unsave_expr_1): Likewise.
+	(unsave_r): Likewise.
+	(unsave_expr_now): Likewise.
+	* tree-ssa-copy.c (replace_exp_1): Use unshare_expr.
+	(propagate_tree_value): Likewise.
+
+2013-04-08  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* doc/rtl.texi (sequence): Rewrite documentation to match the
+	current use of SEQUENCE rtl objects.
+	* rtl.def (SEQUENCE): Likewise.
+
+	* doc/rtl.texi (NOTE_INSN_EH_REGION_BEG, NOTE_INSN_EH_REGION_END):
+	Update documentation.
+	(NOTE_INSN_LOOP_BEG, NOTE_INSN_LOOP_END, NOTE_INSN_LOOP_CONT,
+	NOTE_INSN_LOOP_VTOP): Remove documentation for non-existing notes.
+
+	* reg-notes.def (REG_EH_CONTEXT): Remove unused note.
+
 2013-04-08  Teresa Johnson  <tejohnson@google.com>
 
 	* basic-block.h (GCOV_COMPUTE_SCALE): Define.
@@ -107,7 +202,7 @@
 2013-04-08  Jeff Law  <law@redhat.com>
 
 	* gimple.c (canonicalize_cond_expr_cond): Rewrite x ^ y into x != y.
-		        
+
 2013-04-08  Richard Biener  <rguenther@suse.de>
 
 	* gimple-pretty-print.c (debug_gimple_stmt): Do not print
