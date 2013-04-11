@@ -1,3 +1,74 @@
+2013-04-11  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/array23.adb: New test.
+	* gnat.dg/array23_pkg[123].ads: New helpers.
+
+2013-04-11  Jeff Law  <law@redhat.com>
+
+	PR tree-optimization/56900
+	* gcc.dg/tree-ssa/vrp87.c: Do not run test on various targets.
+
+2013-04-11  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/56913
+	* g++.dg/cpp0x/sfinae44.C: New.
+
+2013-04-11  Arnaud Charlet  <charlet@adacore.com>
+
+	* ada/acats/run_all.sh: Remove special handling of -gnat95 switch.
+	* ada/acats/ada95.lst: Remove special handling of -gnat95 switch.
+
+2013-04-11  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54216
+	* g++.dg/cpp0x/enum26.C: New.
+	* g++.old-deja/g++.pt/mangle1.C: Adjust.
+
+2013-04-11  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* gcc.target/aarch64/vect-fcm.x: Add check for zero forms of
+	inverse operands.
+	* gcc.target/aarch64/vect-fcm-eq-d.c: Check that new zero form
+	loop is vectorized.
+	* gcc.target/aarch64/vect-fcm-eq-f.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-ge-d.c: Check that new zero form
+	loop is vectorized and that the correct instruction is generated.
+	* gcc.target/aarch64/vect-fcm-ge-f.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-gt-d.c: Likewise.
+	* gcc.target/aarch64/vect-fcm-gt-f.c: Likewise.
+
+2013-04-11  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56899
+	* gcc.c-torture/execute/pr56899.c: New test.
+
+2013-04-10  David S. Miller  <davem@davemloft.net>
+
+	* gcc.target/sparc/setcc-4.c: New test.
+	* gcc.target/sparc/setcc-5.c: New test.
+
+2013-04-10  Richard Biener  <rguenther@suse.de>
+
+	* g++.dg/pr55604.C: Use -fdump-rtl-ira.
+
+2013-04-10  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/vect/slp-39.c: New testcase.
+
+2013-04-10  Joern Rennecke <joern.rennecke@embecosm.com>
+
+	PR tree-optimization/55524
+	* gcc.target/epiphany/fnma-1.c: New test.
+
+2013-04-10  Zhouyi Zhou <yizhouzhou@ict.ac.cn>
+
+	* gcc.dg/tree-ssa/inline-11.c: New test
+
+2013-04-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/56895
+	* g++.dg/template/arrow3.C: New test.
+
 2013-04-09  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* gcc.target/arm/minmax_minus.c: New test.
