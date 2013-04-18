@@ -1045,8 +1045,6 @@ combine_array_constructor (gfc_expr *e)
   newbase = NULL;
   e->expr_type = EXPR_ARRAY;
 
-  c = gfc_constructor_first (oldbase);
-
   for (c = gfc_constructor_first (oldbase); c;
        c = gfc_constructor_next (c))
     {
@@ -1075,6 +1073,7 @@ combine_array_constructor (gfc_expr *e)
 
   gfc_free_expr (op1);
   gfc_free_expr (op2);
+  gfc_free_expr (scalar);
 
   e->value.constructor = newbase;
   return true;
