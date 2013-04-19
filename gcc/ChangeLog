@@ -2,6 +2,97 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-04-19  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/56847
+	* lra-constraints.c (process_alt_operands): Discourage alternative
+	with non-matche doffsettable memory constraint fro memory with
+	known offset.
+
+2013-04-19  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/56982
+	* builtins.def (BUILT_IN_LONGJMP): longjmp is not a leaf
+	function.
+	* gimplify.c (gimplify_call_expr): Notice special calls.
+	(gimplify_modify_expr): Likewise.
+	* tree-cfg.c (make_abnormal_goto_edges): Handle setjmp-like
+	abnormal control flow receivers.
+	(call_can_make_abnormal_goto): Handle cfun->calls_setjmp
+	in the same way as cfun->has_nonlocal_labels.
+	(gimple_purge_dead_abnormal_call_edges): Likewise.
+	(stmt_starts_bb_p): Make setjmp-like abnormal control flow
+	receivers start a basic-block.
+
+2013-04-19  Richard Biener  <rguenther@suse.de>
+
+	* tree-vectorizer.h (struct _slp_instance): Move load_permutation
+	member ...
+	(struct _slp_tree): ... here.  Make it a vector of unsigned ints.
+	(SLP_INSTANCE_LOAD_PERMUTATION): Remove.
+	(SLP_TREE_LOAD_PERMUTATION): Add.
+	(vect_transform_slp_perm_load): Adjust prototype.
+	* tree-vect-slp.c (vect_free_slp_tree): Adjust.
+	(vect_free_slp_instance): Likewise.
+	(vect_create_new_slp_node): Likewise.
+	(vect_supported_slp_permutation_p): Remove.
+	(vect_slp_rearrange_stmts): Adjust.
+	(vect_supported_load_permutation_p): Likewise.  Inline
+	vect_supported_slp_permutation_p here.
+	(vect_analyze_slp_instance): Compute load permutations per
+	slp node instead of per instance.
+	(vect_get_slp_defs): Adjust.
+	(vect_transform_slp_perm_load): Likewise.
+	(vect_schedule_slp_instance): Remove redundant code.
+	(vect_schedule_slp): Remove hack for PR56270, add it ...
+	* tree-vect-stmts.c (vectorizable_load): ... here, do not
+	CSE loads for SLP.  Adjust.
+
+2013-04-19  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/arm.c (load_multiple_sequence, ldm_stm_operation_p): Fix
+	spelling in two comments.
+
+2013-04-19  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	PR target/56797
+	* config/arm/arm.c (load_multiple_sequence): Require SP
+	as base register for loads if SP is in the register list.
+
+2013-04-19  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/56718
+	* ipa-cp.c (ipa_value_from_known_type_jfunc): Moved...
+	* ipa-prop.c (ipa_binfo_from_known_type_jfunc): ...here, renamed
+	and made public.  Adjusted all callers.
+	(ipa_intraprocedural_devirtualization): New function.
+	* ipa-prop.h (ipa_binfo_from_known_type_jfunc): Declare.
+	(ipa_intraprocedural_devirtualization): Likewise.
+	* Makefile.in (tree-ssa-pre.o): Add ipa-prop.h to dependencies.
+
+2013-04-19  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/57000
+	* tree-ssa-reassoc.c (pass_reassoc): Add TODO_update_ssa_only_virtuals.
+
+2013-04-19  Terry Guo  <terry.guo@arm.com>
+
+	* config/arm/cortex-m4-fpu.md (cortex_m4_v): Delete cpu unit.
+	Replace with ...
+	(cortex_m4_v_a,  cortex_m4_v_b): ... new cpu units.
+	(cortex_m4_v, cortex_m4_exa_va, cortex_m4_exb_vb): New reservations.
+	(cortex_m4_fmacs): Use new reservations.
+	(cortex_m4_f_load, cortex_m4_f_store): Likewise.
+
+2013-04-18  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/56999
+	* lra-coalesce.c (coalescable_pseudo_p): Remove 2nd parameter and
+	related code.
+	(lra_coalesce): Remove split_origin_bitmap and related code.
+	* lra.c (lra): Coalesce after undoing inheritance.  Recreate live
+	ranges if necessary.
+
 2013-04-18  Uros Bizjak  <ubizjak@gmail.com>
 
 	* config/i386/i386.c (x86_64_ms_sysv_extra_clobbered_registers):

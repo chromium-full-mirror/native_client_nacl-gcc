@@ -10540,7 +10540,7 @@ ldm_stm_operation_p (rtx op, bool load, enum machine_mode mode,
 
   /* Don't allow SP to be loaded unless it is also the base register. It
      guarantees that SP is reset correctly when an LDM instruction
-     is interruptted. Otherwise, we might end up with a corrupt stack.  */
+     is interrupted. Otherwise, we might end up with a corrupt stack.  */
   if (load && (REGNO (reg) == SP_REGNUM) && (REGNO (addr) != SP_REGNUM))
     return false;
 
@@ -10803,6 +10803,13 @@ load_multiple_sequence (rtx *operands, int nops, int *regs, int *saved_order,
 	      || unsorted_regs[i] > 14
 	      || (i != nops - 1 && unsorted_regs[i] == base_reg))
 	    return 0;
+
+          /* Don't allow SP to be loaded unless it is also the base
+             register.  It guarantees that SP is reset correctly when
+             an LDM instruction is interrupted.  Otherwise, we might
+             end up with a corrupt stack.  */
+          if (unsorted_regs[i] == SP_REGNUM && base_reg != SP_REGNUM)
+            return 0;
 
 	  unsorted_offsets[i] = INTVAL (offset);
 	  if (i == 0 || unsorted_offsets[i] < unsorted_offsets[order[0]])
