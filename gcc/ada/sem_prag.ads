@@ -46,6 +46,12 @@ package Sem_Prag is
    --  expressions in the pragma as "spec expressions" (see section in Sem
    --  "Handling of Default and Per-Object Expressions...").
 
+   procedure Analyze_Depends_In_Decl_Part (N : Node_Id);
+   --  Perform full analysis of delayed pragma Depends
+
+   procedure Analyze_Global_In_Decl_Part (N : Node_Id);
+   --  Perform full analysis of delayed pragma Global
+
    procedure Analyze_PPC_In_Decl_Part (N : Node_Id; S : Entity_Id);
    --  Special analyze routine for precondition/postcondition pragma that
    --  appears within a declarative part where the pragma is associated
@@ -108,6 +114,16 @@ package Sem_Prag is
    --  Initializes data structures used for pragma processing. Must be called
    --  before analyzing each new main source program.
 
+   function Is_Config_Static_String (Arg : Node_Id) return Boolean;
+   --  This is called for a configuration pragma that requires either string
+   --  literal or a concatenation of string literals. We cannot use normal
+   --  static string processing because it is too early in the case of the
+   --  pragma appearing in a configuration pragmas file. If Arg is of an
+   --  appropriate form, then this call obtains the string (doing any necessary
+   --  concatenations) and places it in Name_Buffer, setting Name_Len to its
+   --  length, and then returns True. If it is not of the correct form, then an
+   --  appropriate error message is posted, and False is returned.
+
    function Is_Non_Significant_Pragma_Reference (N : Node_Id) return Boolean;
    --  The node N is a node for an entity and the issue is whether the
    --  occurrence is a reference for the purposes of giving warnings about
@@ -124,15 +140,12 @@ package Sem_Prag is
    --  False is returned, then the argument is treated as an entity reference
    --  to the operator.
 
-   function Is_Config_Static_String (Arg : Node_Id) return Boolean;
-   --  This is called for a configuration pragma that requires either string
-   --  literal or a concatenation of string literals. We cannot use normal
-   --  static string processing because it is too early in the case of the
-   --  pragma appearing in a configuration pragmas file. If Arg is of an
-   --  appropriate form, then this call obtains the string (doing any necessary
-   --  concatenations) and places it in Name_Buffer, setting Name_Len to its
-   --  length, and then returns True. If it is not of the correct form, then an
-   --  appropriate error message is posted, and False is returned.
+   function Is_Valid_Assertion_Kind (Nam : Name_Id) return Boolean;
+   --  Returns True if Nam is one of the names recognized as a valid assertion
+   --  kind by the Assertion_Policy pragma. Note that the 'Class cases are
+   --  represented by the corresponding special names Name_uPre, Name_uPost,
+   --  Name_uInviarnat, and Name_uType_Invariant (_Pre, _Post, _Invariant,
+   --  and _Type_Invariant).
 
    procedure Make_Aspect_For_PPC_In_Gen_Sub_Decl (Decl : Node_Id);
    --  This routine makes aspects from precondition or postcondition pragmas

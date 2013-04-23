@@ -43,6 +43,11 @@ package Sem_Util is
    --  Add A to the list of access types to process when expanding the
    --  freeze node of E.
 
+   procedure Add_Contract_Item (Item : Node_Id; Subp_Id : Entity_Id);
+   --  Add a contract item (pragma Precondition, Postcondition, Test_Case,
+   --  Contract_Cases, Global, Depends) to the contract of a subprogram. Item
+   --  denotes a pragma and Subp_Id is the related subprogram.
+
    procedure Add_Global_Declaration (N : Node_Id);
    --  These procedures adds a declaration N at the library level, to be
    --  elaborated before any other code in the unit. It is used for example
@@ -894,8 +899,9 @@ package Sem_Util is
    --  it is of protected, synchronized or task kind.
 
    function Is_Expression_Function (Subp : Entity_Id) return Boolean;
-   --  Predicate to determine whether a function entity comes from a rewritten
-   --  expression function, and should be inlined unconditionally.
+   --  Predicate to determine whether a scope entity comes from a rewritten
+   --  expression function call, and should be inlined unconditionally. Also
+   --  used to determine that such a call does not constitute a freeze point.
 
    function Is_False (U : Uint) return Boolean;
    pragma Inline (Is_False);

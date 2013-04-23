@@ -23,6 +23,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Aspects;  use Aspects;
 with Atree;    use Atree;
 with Checks;   use Checks;
 with Debug;    use Debug;
@@ -1707,19 +1708,46 @@ package body Exp_Ch6 is
             --  function, so it must be done explicitly after the call. Ditto
             --  if the actual is an entity of a predicated subtype.
 
-            if Is_By_Reference_Type (E_Formal)
-              and then Has_Predicates (E_Actual)
+            --  The rule refers to by-reference types, but a check is needed
+            --  for by-copy types as well. That check is subsumed by the rule
+            --  for subtype conversion on assignment, but we can generate the
+            --  required check now.
+
+            --  Note that this is needed only if the subtype of the actual has
+            --  an explicit predicate aspect, not if it inherits them from a
+            --  base type or ancestor. The check is also superfluous if the
+            --  subtype is elaborated before the body of the subprogram, but
+            --  this is harder to verify, and there may be a redundant check.
+
+            --  Note also that Subp may be either a subprogram entity for
+            --  direct calls, or a type entity for indirect calls, which must
+            --  be handled separately because the name does not denote an
+            --  overloadable entity.
+
+            --  If the formal is class-wide the corresponding postcondition
+            --  procedure does not include a predicate call, so it has to be
+            --  generated explicitly.
+
+            if (Has_Aspect (E_Actual, Aspect_Predicate)
+                  or else
+                Has_Aspect (E_Actual, Aspect_Dynamic_Predicate)
+                  or else
+                Has_Aspect (E_Actual, Aspect_Static_Predicate))
               and then not Is_Init_Proc (Subp)
             then
-               if Is_Derived_Type (E_Actual)
-                 and then Is_Inherited_Operation_For_Type (Subp, E_Actual)
+               if (Is_Derived_Type (E_Actual)
+                    and then Is_Overloadable (Subp)
+                    and then Is_Inherited_Operation_For_Type (Subp, E_Actual))
+                 or else Is_Entity_Name (Actual)
                then
-                  Append_To
-                    (Post_Call, Make_Predicate_Check (E_Actual, Actual));
+                  Append_To (Post_Call,
+                    Make_Predicate_Check (E_Actual, Actual));
 
-               elsif Is_Entity_Name (Actual) then
-                  Append_To
-                    (Post_Call, Make_Predicate_Check (E_Actual, Actual));
+               elsif Is_Class_Wide_Type (E_Formal)
+                 and then not Is_Class_Wide_Type (E_Actual)
+               then
+                  Append_To (Post_Call,
+                    Make_Predicate_Check (E_Actual, Actual));
                end if;
             end if;
 
@@ -6522,6 +6550,7 @@ package body Exp_Ch6 is
       if Init_Or_Norm_Scalars and then Is_Subprogram (Spec_Id) then
          declare
             F : Entity_Id;
+            A : Node_Id;
 
          begin
             --  Loop through formals
@@ -6536,12 +6565,15 @@ package body Exp_Ch6 is
                   --  Insert the initialization. We turn off validity checks
                   --  for this assignment, since we do not want any check on
                   --  the initial value itself (which may well be invalid).
+                  --  Predicate checks are disabled as well (RM 6.4.1 (13/3))
+
+                  A :=  Make_Assignment_Statement (Loc,
+                      Name       => New_Occurrence_Of (F, Loc),
+                      Expression => Get_Simple_Init_Val (Etype (F), N));
+                  Set_Suppress_Assignment_Checks (A);
 
                   Insert_Before_And_Analyze (First (L),
-                    Make_Assignment_Statement (Loc,
-                      Name       => New_Occurrence_Of (F, Loc),
-                      Expression => Get_Simple_Init_Val (Etype (F), N)),
-                    Suppress => Validity_Check);
+                    A, Suppress => Validity_Check);
                end if;
 
                Next_Formal (F);
