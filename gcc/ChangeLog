@@ -2,6 +2,266 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-05-02  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/57140
+	* tree-inline.c (copy_loops): Properly handle removed loops.
+	(copy_cfg_body): Mark destination loops for fixup if source
+	loops needed fixup.
+
+2013-05-02  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	PR target/56732
+	* config/arm/arm.c (arm_expand_epilogue): Check really_return before
+	generating simple_return for naked functions.
+
+2013-05-02  Martin Jambor  <mjambor@suse.cz>
+
+	PR middle-end/56988
+	* ipa-prop.h (ipa_agg_replacement_value): New flag by_ref.
+	* ipa-cp.c (ipa_get_indirect_edge_target_1): Also check that by_ref
+	flags match.
+	(find_aggregate_values_for_callers_subset): Fill in the by_ref flag of
+	ipa_agg_replacement_value structures.
+	(known_aggs_to_agg_replacement_list): Likewise.
+	* ipa-prop.c (write_agg_replacement_chain): Stream by_ref flag.
+	(read_agg_replacement_chain): Likewise.
+	(ipcp_transform_function): Also check that by_ref flags match.
+
+2013-05-02  Richard Biener  <rguenther@suse.de>
+
+	* graphds.h (struct graph): Add obstack member.
+	* graphds.c (new_graph): Initialize obstack and allocate
+	vertices from it.
+	(add_edge): Allocate edge from the obstack.
+	(free_graph): Free the obstack instead of all edges and
+	vertices.
+
+2013-05-02  Teresa Johnson  <tejohnson@google.com>
+
+	* loop-unswitch.c (unswitch_loop): Use helper routines with rounding
+	divides.
+	* cfg.c (update_bb_profile_for_threading): Ditto.
+	* tree-inline.c (copy_bb): Ditto.
+	(copy_edges_for_bb): Ditto.
+	(initialize_cfun): Ditto.
+	(copy_cfg_body): Ditto.
+	(expand_call_inline): Ditto.
+	* ipa-inline-analysis.c (estimate_edge_size_and_time): Ditto.
+	(estimate_node_size_and_time): Ditto.
+	(inline_merge_summary): Ditto.
+	* cgraphclones.c (cgraph_clone_edge): Ditto.
+	(cgraph_clone_node): Ditto.
+	* sched-rgn.c (compute_dom_prob_ps): Ditto.
+	(compute_trg_info): Ditto.
+
+2013-05-02  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (movsi_aarch64): Only allow to/from
+	S reg when fp attribute set.
+	(movdi_aarch64): Only allow to/from D reg when fp attribute set.
+
+2013-05-02  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (*and_one_cmpl<mode>3_compare0):
+	New pattern.
+	(*and_one_cmplsi3_compare0_uxtw): Likewise.
+	(*and_one_cmpl_<SHIFT:optab><mode>3_compare0): Likewise.
+	(*and_one_cmpl_<SHIFT:optab>si3_compare0_uxtw): Likewise.
+
+2013-05-02  Richard Biener  <rguenther@suse.de>
+
+	* tree-scalar-evolution.c (scev_info_hasher): Remove.
+	(struct instantiate_cache_entry): New type.
+	(struct instantiate_cache_entry_hasher): New hashtable descriptor.
+	(struct instantiate_cache_type): New type.
+	(set_instantiated_value, get_instantiated_value): Remove.
+	(get_instantiated_value_entry): New function.
+	(instantiate_scev_name): Use the new cache and adjust.
+	(instantiate_scev_poly): Adjust.
+	(instantiate_scev_binary): Likewise.
+	(instantiate_array_ref): Likewise.
+	(instantiate_scev_convert): Likewise.
+	(instantiate_scev_not): Likewise.
+	(instantiate_scev_3): Likewise.
+	(instantiate_scev_2): Likewise.
+	(instantiate_scev_r): Likewise.
+	(instantiate_scev): Likewise.
+	(resolve_mixers): Likewise.
+
+2013-05-01  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/57091
+	* lra-constraints.c (best_small_class_operands_num): Remove.
+	(process_alt_operands): Remove small_class_operands_num.  Take
+	small classes operands into losers and only if the operand is not
+	matched.  Modify debugging output.
+	(curr_insn_transform): Remove best_small_class_operands_num.
+	Print insn name.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_gimple_fold_builtin.c): Fold more modes for reduc_splus_.
+	* config/aarch64/aarch64-simd-builtins.def
+	(reduc_splus_): Add new modes.
+	(reduc_uplus_): New.
+	* config/aarch64/aarch64-simd.md (aarch64_addvv4sf): Remove.
+	(reduc_uplus_v4sf): Likewise.
+	(reduc_splus_v4sf): Likewise.
+	(aarch64_addv<mode>): Likewise.
+	(reduc_uplus_<mode>): Likewise.
+	(reduc_splus_<mode>): Likewise.
+	(aarch64_addvv2di): Likewise.
+	(reduc_uplus_v2di): Likewise.
+	(reduc_splus_v2di): Likewise.
+	(aarch64_addvv2si): Likewise.
+	(reduc_uplus_v2si): Likewise.
+	(reduc_splus_v2si): Likewise.
+	(reduc_<sur>plus_<mode>): New.
+	(reduc_<sur>plus_v2di): Likewise.
+	(reduc_<sur>plus_v2si): Likewise.
+	(reduc_<sur>plus_v4sf): Likewise.
+	(aarch64_addpv4sf): Likewise.
+	* config/aarch64/arm_neon.h
+	(vaddv<q>_<s,u,f><8, 16, 32, 64): Rewrite using builtins.
+	* config/aarch64/iterators.md (unspec): Remove UNSPEC_ADDV,
+	add UNSPEC_SADDV, UNSPEC_UADDV.
+	(SUADDV): New.
+	(sur): Add UNSPEC_SADDV, UNSPEC_UADDV.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/arm_neon.h
+	(v<max,min><nm><q><v>_<sfu><8, 16, 32, 64>): Rewrite using builtins.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-builtins
+	(aarch64_gimple_fold_builtin): Fold reduc_<su><maxmin>_ builtins.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd-builtins.def
+	(reduc_smax_): New.
+	(reduc_smin_): Likewise.
+	(reduc_umax_): Likewise.
+	(reduc_umin_): Likewise.
+	(reduc_smax_nan_): Likewise.
+	(reduc_smin_nan_): Likewise.
+	(fmax): Remove.
+	(fmin): Likewise.
+	(smax): Update for V2SF, V4SF and V2DF modes.
+	(smin): Likewise.
+	(smax_nan): New.
+	(smin_nan): Likewise.
+	* config/aarch64/aarch64-simd.md (<maxmin><mode>3): Rename to...
+	(<su><maxmin><mode>3): ...This, refactor.
+	(s<maxmin><mode>3): New.
+	(<maxmin_uns><mode>3): Likewise.
+	(reduc_<maxmin_uns>_<mode>): Refactor.
+	(reduc_<maxmin_uns>_v4sf): Likewise.
+	(reduc_<maxmin_uns>_v2si): Likewise.
+	(aarch64_<fmaxmin><mode>: Remove.
+	* config/aarch64/arm_neon.h (vmax<q>_f<32,64>): Rewrite to use
+	new builtin names.
+	(vmin<q>_f<32,64>): Likewise.
+	* config/iterators.md (unspec): Add UNSPEC_FMAXNMV, UNSPEC_FMINNMV.
+	(FMAXMIN): New.
+	(su): Add mappings for smax, smin, umax, umin.
+	(maxmin): New.
+	(FMAXMINV): Add UNSPEC_FMAXNMV, UNSPEC_FMINNMV.
+	(FMAXMIN): Rename as...
+	(FMAXMIN_UNS): ...This.
+	(maxminv): Remove.
+	(fmaxminv): Likewise.
+	(fmaxmin): Likewise.
+	(maxmin_uns): New.
+	(maxmin_uns_op): Likewise.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/arm_neon.h
+	(vac<ge, gt><sd>_f<32, 64>): Rename to...
+	(vca<ge, gt><sd>_f<32, 64>): ...this, reimpliment in C.
+	(vca<ge, gt, lt, le><q>_f<32, 64>): Reimpliment in C.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd.md (*aarch64_fac<optab><mode>): New.
+	* config/aarch64/iterators.md (FAC_COMPARISONS): New.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd.md
+	(vcond<mode>_internal): Handle special cases for constant masks.
+	(vcond<mode><mode>): Allow nonmemory_operands for outcome vectors.
+	(vcondu<mode><mode>): Likewise.
+	(vcond<v_cmp_result><mode>): New.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-builtins.c (BUILTIN_VALLDI): Define.
+	(aarch64_fold_builtin): Add folding for cm<eq,ge,gt,tst>.
+	* config/aarch64/aarch64-simd-builtins.def
+	(cmeq): Update to BUILTIN_VALLDI.
+	(cmgt): Likewise.
+	(cmge): Likewise.
+	(cmle): Likewise.
+	(cmlt): Likewise.
+	* config/aarch64/arm_neon.h
+	(vc<eq, lt, le, gt, ge, tst><z><qsd>_<fpsu><8,16,32,64>): Remap
+	to builtins or C as appropriate.
+
+2013-05-01  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd-builtins.def (cmhs): Rename to...
+	(cmgeu): ...This.
+	(cmhi): Rename to...
+	(cmgtu): ...This.
+	* config/aarch64/aarch64-simd.md
+	(simd_mode): Add SF.
+	(aarch64_vcond_internal): Use new names for unsigned comparison insns.
+	(aarch64_cm<optab><mode>): Rewrite to not use UNSPECs.
+	* config/aarch64/aarch64.md (*cstore<mode>_neg): Rename to...
+	(cstore<mode>_neg): ...This.
+	* config/aarch64/iterators.md
+	(VALLF): new.
+	(unspec): Remove UNSPEC_CM<EQ, LE, LT, GE, GT, HS, HI, TST>.
+	(COMPARISONS): New.
+	(UCOMPARISONS): Likewise.
+	(optab): Add missing comparisons.
+	(n_optab): New.
+	(cmp_1): Likewise.
+	(cmp_2): Likewise.
+	(CMP): Likewise.
+	(cmp): Remove.
+	(VCMP_S): Likewise.
+	(VCMP_U): Likewise.
+	(V_cmp_result): Add DF, SF modes.
+	(v_cmp_result): Likewise.
+	(v): Likewise.
+	(vmtype): Likewise.
+	* config/aarch64/predicates.md (aarch64_reg_or_fp_zero): New.
+
+2013-05-01  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/thumb2.md (thumb2_smaxsi3,thumb2_sminsi3): Convert
+	define_insn to define_insn_and_split.
+	(thumb32_umaxsi3,thumb2_uminsi3): Likewise.
+	(thumb2_negdi2,thumb2_abssi2,thumb2_neg_abssi2): Likewise.
+	(thumb2_mov_scc,thumb2_mov_negscc,thumb2_mov_notscc): Likewise.
+	(thumb2_movsicc_insn,thumb2_and_scc,thumb2_ior_scc): Likewise.
+	(thumb2_negscc): Likewise.
+
+2013-04-30  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/thumb2.md (thumb2_incscc, thumb2_decscc): Delete.
+
+2013-04-30  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* config/arm/thumb2.md: Remove trailing whitespaces.
+
 2013-04-30  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
 
 	* explow.c (plus_constant): Pass "mode" to immed_double_int_const.
@@ -1164,12 +1424,6 @@
 2013-04-23  Sofiane Naci  <sofiane.naci@arm.com>
 
 	* config/aarch64/aarch64.md (*mov<mode>_aarch64): Add simd attribute.
-
-2013-04-23  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
-
-	* config/s390/sjlj.S: New file.
-	* config/s390/target.h: New file.
-	* configure.tgt: Set options for S/390.
 
 2013-04-23  Andreas Schwab  <schwab@linux-m68k.org>
 
