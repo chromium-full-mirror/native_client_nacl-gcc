@@ -2,6 +2,17 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-05-02  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* lra-constraints.c (process_alt_operands): Add checking alt
+	number to choose the best alternative.
+
+2013-05-02  Richard Biener  <rguenther@suse.de>
+
+	* tree-eh.c (cleanup_empty_eh_merge_phis): Remove rename_virts
+	bitmap and its handling.
+	(pass_cleanup_eh): Set todo_flags_finish to TODO_verify_ssa.
+
 2013-05-02  Richard Biener  <rguenther@suse.de>
 
 	PR middle-end/57140
