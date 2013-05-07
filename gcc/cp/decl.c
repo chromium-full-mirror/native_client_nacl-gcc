@@ -6147,6 +6147,7 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
 						   auto_node);
       if (type == error_mark_node)
 	return;
+      cp_apply_type_quals_to_decl (cp_type_quals (type), decl);
     }
 
   if (!ensure_literal_type_for_constexpr_object (decl))
@@ -12847,8 +12848,8 @@ incremented enumerator value is too large for %<long%>");
           && TREE_CODE (value) == INTEGER_CST)
         {
 	  if (!int_fits_type_p (value, ENUM_UNDERLYING_TYPE (enumtype)))
-	    error ("enumerator value %E is too large for underlying type %<%T%>",
-		   value, ENUM_UNDERLYING_TYPE (enumtype));
+	    error ("enumerator value %E is outside the range of underlying "
+		   "type %<%T%>", value, ENUM_UNDERLYING_TYPE (enumtype));
 
           /* Convert the value to the appropriate type.  */
           value = convert (ENUM_UNDERLYING_TYPE (enumtype), value);
