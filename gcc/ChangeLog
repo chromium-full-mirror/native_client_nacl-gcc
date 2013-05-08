@@ -2,6 +2,113 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-05-08  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/mmx.md (*vec_extract* splitters): Simplify post-reload
+	splitter preparation statements.
+	* config/i386/sse.md (*vec_extract* splitters): Ditto.
+	(*avx_vperm_broadcast_<mode>): Use adjust_address instead of
+	adjust_address_nv.
+
+2013-05-08  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gimple-ssa-strength-reduction.c (count_candidates): Change
+	return value to int.
+	(analyze_candidates_and_replace): Change type of length to int.
+
+2013-05-08  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/sse.md (PEXTR_MODE, PEXTR_MODEx): Remove.
+	(*vec_extract<mode>): Use VI12_128 mode iterator.
+	(*vec_extract<mode>_mem): Ditto.
+	(*vec_extract*_mem splitters): Merge splitters using VI_128 mode
+	attribute.
+
+2013-05-08  Diego Novillo  <dnovillo@google.com>
+
+	PR bootstrap/54659
+
+	Revert:
+	2012-08-17  Diego Novillo  <dnovillo@google.com>
+
+	PR bootstrap/54281
+	* configure.ac: Add libintl.h to AC_CHECK_HEADERS list.
+	* config.in: Regenerate.
+	* configure: Regenerate.
+	* intl.h: Always include libintl.h if HAVE_LIBINTL_H is set.
+
+2013-05-08  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/54095
+	* cgraph.c (cgraph_make_node_local_1): Se unique_name.
+	* cgraph.h (symtab_node_base): Add unique_name.
+	* lto-cgraph.c (lto_output_node, lto_output_varpool_node,
+	input_overwrite_node, input_varpool_node): Stream unique_name.
+	* cgraphclones.c (cgraph_create_virtual_clone,
+	cgraph_function_versioning): Set unique_name.
+	* ipa.c (function_and_variable_visibility): Set unique_name.
+
+2013-05-08  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gimple-ssa-strength-reduction.c (find_phi_def): Revert former	"fix."
+	(alloc_cand_and_find_basis): Restrict conditional candidate
+	processing to CAND_MULTs.
+
+2013-05-08  Jan Hubicka  <jh@suse.cz>
+
+	PR lto/54095
+	lto-symtab.c (lto_symtab_symbol_p): New function.
+	(lto_symtab_resolve_can_prevail_p, lto_symtab_resolve_symbols,
+	lto_symtab_resolve_symbols, lto_symtab_merge_decls_2,
+	lto_symtab_merge_decls_1, lto_symtab_merge_cgraph_nodes_1):
+	Skip static symbols.
+
+2013-05-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR tree-optimization/57200
+	* tree-ssa-loop-niter.c (do_warn_aggressive_loop_optimizations):
+	Only call inform if the preceding warning_at returns true.
+
+2013-05-07  Han Shen  <shenhan@google.com>
+
+	* cfgexpand.c (record_or_union_type_has_array_p): New function.
+	(expand_used_vars): Add logic handling '-fstack-protector-strong'.
+	* common.opt (fstack-protector-strong): New option.
+	* doc/cpp.texi (__SSP_STRONG__): New builtin "__SSP_STRONG__".
+	* doc/invoke.texi (Optimization Options): Document
+	"-fstack-protector-strong".
+	* gcc.c (LINK_SSP_SPEC): Add 'fstack-protector-strong'.
+
+2013-05-06  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* config/mips/mips.c (mips_machine_reorg2): Return 0.
+
+2013-05-07  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* ira.c (update_equiv_regs): Add insn having equiv memory even if
+	it is not lhs of the insn.
+	(setup_reg_equiv): Remove insn having equiv memory which it is not
+	lhs of the insn.
+	* lra-constraints.c (process_address): Try to improve generation
+	code for address base + disp.
+	(lra_constraints): Make correct the code for checking insn setting
+	up backward equivalence.  Remove insn only if it is in the init
+	insn list.
+	* lra-eliminations.c (update_reg_eliminate): Change return value.
+	(lra_eliminate): Use the result.
+
+2013-05-07  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/sse.md (ssescalarnummask): New mode attribute.
+	(PEXTR_MODE, PEXTR_MODEx): New mode iterators.
+	(*vec_extract<mode>): Merge from *sse4_1_pextrb_memory and
+	*sse4_1_pextrw_memory using PEXTR_MODE mode iterator. Handle
+	register target operands.
+	(*vec_extractv8hi_sse2): New pattern.
+	(*vec_extractv16qi_zext): Rename from *sse4_1_pextrb_<mode>.
+	(*vec_extractv8hi_zext): Rename from *sse2_pextrw_<mode>.
+	(*vec_extract<mode>_mem): New insn and split pattern.
+
 2013-05-07  Christophe Lyon  <christophe.lyon@linaro.org>
 
 	* config/arm/arm.c (arm_asan_shadow_offset): New function.
@@ -1146,7 +1253,7 @@
 	instead of register_operand.
 	(vec_widen_<s>mult_odd_<mode>): Use general_vector_operand predicates.
 
-2013-04-28  Eric Botcazou  <ebotcazou@gcc.gnu.org>
+2013-04-28  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* stor-layout.c (finalize_size_functions): Allocate a structure and
 	reset cfun before dumping the functions.

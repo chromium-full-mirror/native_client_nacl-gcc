@@ -1,6 +1,17 @@
+2013-05-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51226
+	* g++.dg/cpp0x/pr51226.C: New.
+
+2013-04-16  Han Shen  <shenhan@google.com>
+
+	Test cases for '-fstack-protector-strong'.
+	* gcc.dg/fstack-protector-strong.c: New.
+	* g++.dg/fstack-protector-strong.C: New.
+
 2013-05-07  Ian Bolton  <ian.bolton@arm.com>
 
-	* gcc.target/aarch64/ands_1.c: New test. 
+	* gcc.target/aarch64/ands_1.c: New test.
 	* gcc.target/aarch64/ands_2.c: Likewise
 
 2013-05-07  Christophe Lyon  <christophe.lyon@linaro.org>
@@ -807,6 +818,7 @@
 
 	* gcc.target/aarch64/negs.c: New.
 
+>>>>>>> trunk
 2013-04-11  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c++/56895
