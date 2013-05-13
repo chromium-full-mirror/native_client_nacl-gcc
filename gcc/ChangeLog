@@ -2,6 +2,124 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-05-13  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/aarch64/aarch64-simd.md (aarch64_simd_mov<mode>): Group
+	similar switch cases.
+	(aarch64_simd_mov): Rename to aarch64_split_simd_mov. Update.
+	(aarch64_simd_mov_to_<mode>low): Delete.
+	(aarch64_simd_mov_to_<mode>high): Delete.
+	(move_lo_quad_<mode>): Add w<-r alternative.
+	(aarch64_simd_move_hi_quad_<mode>): Likewise.
+	(aarch64_simd_mov_from_*): Update type attribute.
+	* config/aarch64/aarch64.c (aarch64_split_simd_move): Refacror switch
+	statement.
+
+2013-05-13  Jan Hubicka  <jh@suse.cz>
+
+	* mode-switching.c (optimize_mode_switching): Set correct RTL profile.
+	* config/i386/i386.c (ix86_compute_frame_layout,
+	ix86_expand_epilogue, emit_i387_cw_initialization, ix86_expand_vector_move_misalign,
+	ix86_fp_comparison_strategy, ix86_local_alignment): Fix use of size/speed predicates.
+
+2013-05-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/45216
+	PR tree-optimization/57157
+	* tree-ssa-forwprop.c (simplify_rotate): Only recognize
+	the (-Y) & (B - 1) variant if OP is |.
+	* expmed.c (expand_shift_1): For rotations by const0_rtx just
+	return shifted.  Use (-op1) & (prec - 1) as other_amount
+	instead of prec - op1.
+
+2013-05-13  Martin Jambor  <mjambor@suse.cz>
+
+	PR middle-end/42371
+	* ipa-prop.h (IPA_UNDESCRIBED_USE): New macro.
+	(ipa_constant_data): New type.
+	(ipa_jump_func): Use ipa_constant_data to hold information about
+	constant jump functions.
+	(ipa_get_jf_constant): Adjust to jump function type changes.
+	(ipa_get_jf_constant_rdesc): New function.
+	(ipa_param_descriptor): New field controlled_uses.
+	(ipa_get_controlled_uses): New function.
+	(ipa_set_controlled_uses): Likewise.
+	* ipa-ref.h (ipa_find_reference): Declare.
+	* ipa-prop.c (ipa_cst_ref_desc): New type.
+	(ipa_print_node_jump_functions_for_edge): Adjust for jump function type
+	changes.
+	(ipa_set_jf_constant): Likewise.  Also create reference descriptions.
+	New parameter cs.  Adjust all callers.
+	(ipa_analyze_params_uses): Detect uncontrolled and controlled uses.
+	(remove_described_reference): New function.
+	(jfunc_rdesc_usable): Likewise.
+	(try_make_edge_direct_simple_call): Decrement controlled use count,
+	attempt to remove reference if it hits zero.
+	(combine_controlled_uses_counters): New function.
+	(propagate_controlled_uses): Likewise.
+	(ipa_propagate_indirect_call_infos): Call propagate_controlled_uses.
+	(ipa_edge_duplication_hook): Duplicate reference descriptions.
+	(ipa_print_node_params): Print described use counter.
+	(ipa_write_jump_function): Adjust to jump function type changes.
+	(ipa_read_jump_function): New parameter CS, pass it to
+	ipa_set_jf_constant.  Adjust caller.
+	(ipa_write_node_info): Stream controlled use count
+	(ipa_read_node_info): Likewise.
+	* cgraph.c (cgraph_mark_address_taken_node): Bail out instead of
+	asserting.
+	* ipa-cp.c (ipcp_discover_new_direct_edges): Decrement controlled use
+	count.  Remove cloning-added reference if it reaches zero.
+	* ipa-ref.c (ipa_find_reference): New function.
+
+2013-05-13  Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	* config/i386/i386.c (processor_target_table): Modified default 
+	alignment values for AMD BD and BT architectures.
+
+2013-05-13  Marc Glisse  <marc.glisse@inria.fr>
+
+	* tree-vect-generic.c (uniform_vector_p): Move ...
+	* tree.c (uniform_vector_p): ... here.
+	* tree.h (uniform_vector_p): Declare it.
+	* fold-const.c (fold_binary_loc) <shift>: Turn the second argument
+	into a scalar.
+
+2013-05-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/57230
+	* tree-ssa-strlen.c (handle_char_store): Record length for
+	array store from STRING_CST.
+
+	PR tree-optimization/57230
+	* tree-ssa-strlen.c (handle_char_store): Add missing integer_zerop
+	check.
+
+2013-05-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/epiphany.c (epiphany_init): Check size of
+	NUM_MODES_FOR_MODE_SWITCHING.
+	(epiphany_expand_prologue):
+	Remove CONFIG_REGNUM initial value handling code.
+	(epiphany_optimize_mode_switching): Handle EPIPHANY_MSW_ENTITY_CONFIG.
+	(epiphany_mode_needed, epiphany_mode_entry_exit): Likewise.
+	(emit_set_fp_mode, epiphany_mode_after): Likewise.
+	(epiphany_mode_needed) <Handle EPIPHANY_MSW_ENTITY_AND>:
+	Don't return 1 for FP_MODE_NONE.
+	* config/epiphany/epiphany.h (NUM_MODES_FOR_MODE_SWITCHING):
+	Add value for EPIPHANY_MSW_ENTITY_CONFIG.
+	(EPIPHANY_MSW_ENTITY_CONFIG, EPIPHANY_MSW_ENTITY_NUM): Define.
+	* config/epiphany/epiphany.md (save_config): New pattern.
+
+2013-05-12  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (*zero_extendsidi2): Add *x->?r alternative.
+
+2013-05-10  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.md (memory): Handle sseishft1.
+	* config/i386/sse.md (*vec_extractv4si): Remove memory attribute.
+	(*vec_extractv2di_1): Ditto.
+
 2013-05-10  Vladimir Makarov  <vmakarov@redhat.com>
 
 	* lra-assigns.c (find_hard_regno_for): Add 1 to the cost of call
