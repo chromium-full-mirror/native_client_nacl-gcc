@@ -9355,12 +9355,13 @@
   else
     {
       if (arm_arch5 || arm_arch4t)
-	return \" bx\\t%0\\t%@ indirect register sibling call\";
+	return \"%*bx\\t%0\\t%@ indirect register sibling call\";
       else
 	return \"mov%?\\t%|pc, %0\\t%@ indirect register sibling call\";
     }
   "
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_bx"))]
 )
 
 (define_insn "*sibcall_value_insn"
@@ -9376,12 +9377,13 @@
   else
     {
       if (arm_arch5 || arm_arch4t)
-	return \"bx\\t%1\";
+	return \"%*bx\\t%1\";
       else
 	return \"mov%?\\t%|pc, %1\\t@ indirect sibling call \";
     }
   "
-  [(set_attr "type" "call")]
+  [(set_attr "type" "call")
+   (set (attr "length") (attr "length_sfi_bx"))]
 )
 
 (define_expand "return"
