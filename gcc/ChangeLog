@@ -2,6 +2,109 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-05-29  Sandeep Kumar Singh  <Sandeep.Singh2@kpitcummins.com>
+
+	* rx/rx.h (TARGET_CPU_CPP_BUILTINS): Add macros for RX100, RX200,
+	and RX600.
+	* rx/rx.opt: Add macro for rx100 with string rx100 and value
+	RX100.
+	* rx/rx-opts.h (rx_cpu_types): Add new cpu type rx100.
+	* rx/t-rx: Add rx100 under multi library matches option for nofpu
+	option.
+
+2013-05-29  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	PR tree-optimization/57441
+	* gimple-ssa-strength-reduction.c (analyze_candidates_and_replace):
+	Don't limit size of incr_vec to number of candidates.
+
+2013-05-29  Steve Ellcey  <sellcey@imgtec.com>
+
+	* config/mips/mti-linux.h (SYSROOT_SUFFIX_SPEC): Add micromips
+	and mips16 directories.
+	* config/mips/t-mti-linux (MULTILIB_OPTIONS): Add micromips and
+	mips16.
+	(MULTILIB_DIRNAMES): Ditto.
+	(MULTILIB_EXCEPTIONS): Add new exceptions.
+	* config/mips/t-mti-elf (MULTILIB_OPTIONS): Add micromips.
+	(MULTILIB_DIRNAMES): Ditto.
+	(MULTILIB_EXCEPTIONS): Add new exceptions.
+
+2012-05-29  Chris Schlumberger-Socha <chris.schlumberger-socha@arm.com>
+	    Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* config/aarch64/aarch64-protos.h (aarch64_symbol_type): Define
+	SYMBOL_TINY_ABSOLUTE.
+	* config/aarch64/aarch64.c (aarch64_load_symref_appropriately): Handle
+	SYMBOL_TINY_ABSOLUTE.
+	(aarch64_expand_mov_immediate): Likewise.
+	(aarch64_classify_symbol): Likewise.
+	(aarch64_mov_operand_p): Remove ATTRIBUTE_UNUSED.
+	Permit SYMBOL_TINY_ABSOLUTE.
+	* config/aarch64/predicates.md (aarch64_mov_operand): Permit CONST.
+
+2013-05-29  Chris Schlumberger-Socha <chris.schlumberger-socha@arm.com>
+	    Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_classify_symbol): Remove comment.
+	Refactor if/switch.  Replace gcc_assert with if.
+
+2013-05-29  Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	* config/i386/i386.c (initial_ix86_tune_features): Enable
+	FP Reassociation for AMD bdver1 and bdver2.
+
+2013-05-29  Martin Jambor  <mjambor@suse.cz>
+
+	* tree-cfg.c (verify_expr): Verify that BIT_FIELD_REF, REALPART_EXPR
+	and IMAGPART_EXPR do not occur within other handled_components.
+
+2013-05-29  Richard Biener  <rguenther@suse.de>
+
+	* tree-vect-slp.c (vect_bb_slp_scalar_cost): Guard vinfo
+	access on whether the use is in the BB we currently try to
+	vectorize.
+	(vect_bb_vectorization_profitable_p): Pass the BB we currently
+	vectorize to vect_bb_slp_scalar_cost.
+
+2013-05-29  Richard Biener  <rguenther@suse.de>
+
+	* tree-vect-slp.c (vect_bb_slp_scalar_cost): New function
+	computing scalar cost offsetted by stmts that are kept live
+	by scalar uses.
+	(vect_bb_vectorization_profitable_p): Use vect_bb_slp_scalar_cost
+	for computation of scalar cost.
+
+2013-05-28  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips-cpus.def (mips32r2): Change processor type.
+
+2013-05-28  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	* doc/extend.texi (C Extensions): Added documentation about Cilk Plus
+	array notation built-in reduction functions.
+	* doc/passes.texi (Passes): Added documentation about changes done
+	for Cilk Plus.
+	* doc/invoke.texi (C Dialect Options): Added documentation about
+	the -fcilkplus flag.
+	* Makefile.in (C_COMMON_OBJS): Added c-family/array-notation-common.o.
+	(BUILTINS_DEF): Depend on cilkplus.def.
+	* builtins.def: Include cilkplus.def.  Define DEF_CILKPLUS_BUILTIN.
+	* builtin-types.def: Define BT_FN_INT_PTR_PTR_PTR.
+	* cilkplus.def: New file.
+
+2013-05-28  Joern Rennecke <joern.rennecke@embecosm.com>
+
+	PR rtl-optimization/57439
+	* postreload.c (move2add_use_add2_insn): Use gen_lowpart_common.
+
+2013-05-28  Easwaran Raman  <eraman@google.com>
+
+	PR tree-optimization/57337
+	* tree-ssa-reassoc.c (appears_later_in_bb): New function.
+	(find_insert_point): Correctly identify the insertion point
+	when two statements with the same UID is compared.
+
 2013-05-28  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/56787
@@ -150,7 +253,7 @@
 
 2013-05-24  Dehao Chen  <dehao@google.com>
 
-	* gcc/tree-cfg.c (locus_discrim_map): Fix the typo.
+	* tree-cfg.c (locus_discrim_map): Fix the typo.
 	(locus_discrim_hasher): Likewise.
 	(locus_discrim_hasher::hash): Likewise.
 	(locus_discrim_hasher::equal): Likewise.
@@ -182,11 +285,11 @@
 
 2013-05-24  Dehao Chen  <dehao@google.com>
 
-	* gcc/testsuite/gcc.dg/debug/dwarf2/discriminator.c: New Testcase.
-	* gcc/tree-cfg.c (locus_descrim_hasher::hash): Change discrminator
+	* testsuite/gcc.dg/debug/dwarf2/discriminator.c: New Testcase.
+	* tree-cfg.c (locus_descrim_hasher::hash): Change discriminator
 	hash function.
 	(locus_descrim_hasher::equal): Likewise.
-	(build_gimple_cfg): New discrminator assignmnet algorithm
+	(build_gimple_cfg): New discriminator assignment algorithm.
 	(make_edges): Likewise.
 	(next_discriminator_for_locus): Likewise.
 	(same_line_p): Likewise.
@@ -468,6 +571,7 @@
 	* config/rs6000/rs6000-opts.h (PROCESSOR_POWER8): Likewise.
 	(enum rs6000_vector): Add power8 vector support.
 
+>>>>>>> .r199383
 2013-05-22  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
 
 	PR target/19599
@@ -499,8 +603,8 @@
 2013-05-21  Easwaran Raman  <eraman@google.com>
 
 	PR tree-optimization/57322
-	* (build_and_add_sum): If a BB is empty, set the UID of the statement
-	added to the BB to be 1.
+	* tree-ssa-reassoc.c (build_and_add_sum): If a BB is empty, set the
+	UID of the statement added to the BB to be 1.
 
 2013-05-21  Jakub Jelinek  <jakub@redhat.com>
 
