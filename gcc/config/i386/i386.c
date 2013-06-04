@@ -17512,11 +17512,11 @@ ix86_lea_outperforms (rtx insn, unsigned int regno0, unsigned int regno1,
   if (ix86_tune == PROCESSOR_SLM)
     {
       if (has_scale)
-        return true;
+	return true;
       if (split_cost < 1)
-        return false;
+	return false;
       if (regno0 == regno1 || regno0 == regno2)
-        return false;
+	return false;
       return true;
     }
 
@@ -17710,7 +17710,7 @@ ix86_avoid_lea_for_addr (rtx insn, rtx operands[])
     }
 
   return !ix86_lea_outperforms (insn, regno0, regno1, regno2, split_cost,
-                                parts.scale > 1);
+				parts.scale > 1);
 }
 
 /* Emit x86 binary operand CODE in mode MODE, where the first operand
@@ -24527,7 +24527,7 @@ exact_dependency_1 (rtx addr, rtx insn)
     {
     case MEM:
       if (rtx_equal_p (addr, insn))
-        return true;
+	return true;
       break;
     case REG:
     CASE_CONST_ANY:
@@ -24545,17 +24545,17 @@ exact_dependency_1 (rtx addr, rtx insn)
   for (i = 0; i < GET_RTX_LENGTH (code); i++)
     {
       switch (*format_ptr++)
-       {
-       case 'e':
-         if (exact_dependency_1 (addr, XEXP (insn, i)))
-           return true;
-         break;
-       case 'E':
-         for (j = 0; j < XVECLEN (insn, i); j++)
-           if (exact_dependency_1 (addr, XVECEXP (insn, i, j)))
-             return true;
-         break;
-       }
+	{
+	case 'e':
+	  if (exact_dependency_1 (addr, XEXP (insn, i)))
+	    return true;
+	  break;
+	case 'E':
+	  for (j = 0; j < XVECLEN (insn, i); j++)
+	    if (exact_dependency_1 (addr, XVECEXP (insn, i, j)))
+	      return true;
+	    break;
+	}
     }
   return false;
 }
@@ -24735,35 +24735,35 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 
     case PROCESSOR_SLM:
       if (!reload_completed)
-        return cost;
+	return cost;
 
       /* Increase cost of integer loads.  */
       memory = get_attr_memory (dep_insn);
       if (memory == MEMORY_LOAD || memory == MEMORY_BOTH)
-        {
-          enum attr_unit unit = get_attr_unit (dep_insn);
-          if (unit == UNIT_INTEGER && cost == 1)
-            {
-              if (memory == MEMORY_LOAD)
-                cost = 3;
-              else
-                {
-                  /* Increase cost of ld/st for short int types only
-                     because of store forwarding issue.  */
-                  rtx set = single_set (dep_insn);
-                  if (set && (GET_MODE (SET_DEST (set)) == QImode
-                              || GET_MODE (SET_DEST (set)) == HImode))
-                    {
-                      /* Increase cost of store/load insn if exact
-                         dependence exists and it is load insn.  */
-                      enum attr_memory insn_memory = get_attr_memory (insn);
-                      if (insn_memory == MEMORY_LOAD
-                          && exact_store_load_dependency (dep_insn, insn))
-                        cost = 3;
-                    }
-                }
-            }
-        }
+	{
+	  enum attr_unit unit = get_attr_unit (dep_insn);
+	  if (unit == UNIT_INTEGER && cost == 1)
+	    {
+	      if (memory == MEMORY_LOAD)
+		cost = 3;
+	      else
+		{
+		  /* Increase cost of ld/st for short int types only
+		     because of store forwarding issue.  */
+		  rtx set = single_set (dep_insn);
+		  if (set && (GET_MODE (SET_DEST (set)) == QImode
+			      || GET_MODE (SET_DEST (set)) == HImode))
+		    {
+		      /* Increase cost of store/load insn if exact
+			 dependence exists and it is load insn.  */
+		      enum attr_memory insn_memory = get_attr_memory (insn);
+		      if (insn_memory == MEMORY_LOAD
+			  && exact_store_load_dependency (dep_insn, insn))
+			cost = 3;
+		    }
+		}
+	    }
+	}
 
     default:
       break;
@@ -24813,7 +24813,7 @@ ia32_multipass_dfa_lookahead (void)
        ready list.
    Return index of IMUL producer if it was found and -1 otherwise.  */
 static int
-do_reoder_for_imul(rtx *ready, int n_ready)
+do_reorder_for_imul (rtx *ready, int n_ready)
 {
   rtx insn, set, insn1, insn2;
   sd_iterator_def sd_it;
@@ -24822,10 +24822,6 @@ do_reoder_for_imul(rtx *ready, int n_ready)
   int i;
 
   if (ix86_tune != PROCESSOR_ATOM)
-    return index;
-
-  /* Do not perform ready list reodering for pre-reload schedule pass.  */
-  if (!reload_completed)
     return index;
 
   /* Check that IMUL instruction is on the top of ready list.  */
@@ -24838,7 +24834,7 @@ do_reoder_for_imul(rtx *ready, int n_ready)
     return index;
 
   /* Search for producer of independent IMUL instruction.  */
-  for (i = n_ready - 2; i>= 0; i--)
+  for (i = n_ready - 2; i >= 0; i--)
     {
       insn = ready[i];
       if (!NONDEBUG_INSN_P (insn))
@@ -24876,13 +24872,13 @@ do_reoder_for_imul(rtx *ready, int n_ready)
 		  pro = DEP_PRO (dep1);
 		  if (!NONDEBUG_INSN_P (pro))
 		    continue;
-                  if (pro != insn)
-                    index = -1;
-                }
-              if (index >= 0)
-                break;
-            }
-        }
+		  if (pro != insn)
+		    index = -1;
+		}
+	      if (index >= 0)
+		break;
+	    }
+	}
       if (index >= 0)
 	break;
     }
@@ -24894,7 +24890,7 @@ do_reoder_for_imul(rtx *ready, int n_ready)
    scheduled earlier. Applied for Silvermont only.
    Return true if top 2 insns must be interchanged.  */
 static bool
-swap_top_of_ready_list(rtx *ready, int n_ready)
+swap_top_of_ready_list (rtx *ready, int n_ready)
 {
   rtx top = ready[n_ready - 1];
   rtx next = ready[n_ready - 2];
@@ -24906,8 +24902,6 @@ swap_top_of_ready_list(rtx *ready, int n_ready)
   #define INSN_TICK(INSN) (HID (INSN)->tick)
 
   if (ix86_tune != PROCESSOR_SLM)
-    return false;
-  if (!reload_completed)
     return false;
 
   if (!NONDEBUG_INSN_P (top))
@@ -24928,37 +24922,37 @@ swap_top_of_ready_list(rtx *ready, int n_ready)
   if (INSN_PRIORITY_KNOWN (top) && INSN_PRIORITY_KNOWN (next))
     {
       if (INSN_PRIORITY (top) != INSN_PRIORITY (next))
-        return false;
+	return false;
       /* Determine winner more precise.  */
       FOR_EACH_DEP (top, SD_LIST_RES_BACK, sd_it, dep)
-        {
-          rtx pro;
-          pro = DEP_PRO (dep);
-          if (!NONDEBUG_INSN_P (pro))
-            continue;
-          if (INSN_TICK (pro) > clock1)
-            clock1 = INSN_TICK (pro);
-        }
+	{
+	  rtx pro;
+	  pro = DEP_PRO (dep);
+	  if (!NONDEBUG_INSN_P (pro))
+	    continue;
+	  if (INSN_TICK (pro) > clock1)
+	    clock1 = INSN_TICK (pro);
+	}
       FOR_EACH_DEP (next, SD_LIST_RES_BACK, sd_it, dep)
-        {
-          rtx pro;
-          pro = DEP_PRO (dep);
-          if (!NONDEBUG_INSN_P (pro))
-            continue;
-          if (INSN_TICK (pro) > clock2)
-            clock2 = INSN_TICK (pro);
-        }
+	{
+	  rtx pro;
+	  pro = DEP_PRO (dep);
+	  if (!NONDEBUG_INSN_P (pro))
+	    continue;
+	  if (INSN_TICK (pro) > clock2)
+	    clock2 = INSN_TICK (pro);
+	}
 
       if (clock1 == clock2)
-      {
-        /* Determine winner - load must win. */
-        enum attr_memory memory1, memory2;
-        memory1 = get_attr_memory (top);
-        memory2 = get_attr_memory (next);
-        if (memory2 == MEMORY_LOAD && memory1 != MEMORY_LOAD)
-          return true;
-      }
-      return (bool) (clock2 < clock1);
+	{
+	  /* Determine winner - load must win. */
+	  enum attr_memory memory1, memory2;
+	  memory1 = get_attr_memory (top);
+	  memory2 = get_attr_memory (next);
+	  if (memory2 == MEMORY_LOAD && memory1 != MEMORY_LOAD)
+	    return true;
+	}
+	return (bool) (clock2 < clock1);
     }
   return false;
   #undef INSN_TICK
@@ -24967,8 +24961,8 @@ swap_top_of_ready_list(rtx *ready, int n_ready)
 /* Perform possible reodering of ready list for Atom/Silvermont only.
    Return issue rate.  */
 static int
-ix86_sched_reorder(FILE *dump, int sched_verbose, rtx *ready, int *pn_ready,
-                   int clock_var)
+ix86_sched_reorder (FILE *dump, int sched_verbose, rtx *ready, int *pn_ready,
+		   int clock_var)
 {
   int issue_rate = -1;
   int n_ready = *pn_ready;
@@ -24977,7 +24971,7 @@ ix86_sched_reorder(FILE *dump, int sched_verbose, rtx *ready, int *pn_ready,
   int index = -1;
 
   /* Set up issue rate.  */
-  issue_rate = ix86_issue_rate();
+  issue_rate = ix86_issue_rate ();
 
   /* Do reodering for Atom/SLM only.  */
   if (ix86_tune != PROCESSOR_ATOM && ix86_tune != PROCESSOR_SLM)
@@ -24991,24 +24985,24 @@ ix86_sched_reorder(FILE *dump, int sched_verbose, rtx *ready, int *pn_ready,
   if (!reload_completed)
     return issue_rate;
 
-  if ((index = do_reoder_for_imul (ready, n_ready)) >= 0)
+  if ((index = do_reorder_for_imul (ready, n_ready)) >= 0)
     {
       if (sched_verbose > 1)
-        fprintf(dump, ";;\tatom sched_reorder: put %d insn on top\n",
-                INSN_UID (ready[index]));
+	fprintf (dump, ";;\tatom sched_reorder: put %d insn on top\n",
+		 INSN_UID (ready[index]));
 
       /* Put IMUL producer (ready[index]) at the top of ready list.  */
-      insn= ready[index];
+      insn = ready[index];
       for (i = index; i < n_ready - 1; i++)
-        ready[i] = ready[i + 1];
+	ready[i] = ready[i + 1];
       ready[n_ready - 1] = insn;
       return issue_rate;
     }
   if (clock_var != 0 && swap_top_of_ready_list (ready, n_ready))
     {
       if (sched_verbose > 1)
-        fprintf(dump, ";;\tslm sched_reorder: swap %d and %d insns\n",
-                INSN_UID (ready[n_ready - 1]), INSN_UID (ready[n_ready - 2]));
+	fprintf (dump, ";;\tslm sched_reorder: swap %d and %d insns\n",
+		 INSN_UID (ready[n_ready - 1]), INSN_UID (ready[n_ready - 2]));
       /* Swap 2 top elements of ready list.  */
       insn = ready[n_ready - 1];
       ready[n_ready - 1] = ready[n_ready - 2];
@@ -30179,11 +30173,11 @@ fold_builtin_cpu (tree fndecl, tree *args)
     M_AMD,
     M_CPU_TYPE_START,
     M_INTEL_ATOM,
-    M_INTEL_SLM,
     M_INTEL_CORE2,
     M_INTEL_COREI7,
     M_AMDFAM10H,
     M_AMDFAM15H,
+    M_INTEL_SLM,
     M_CPU_SUBTYPE_START,
     M_INTEL_COREI7_NEHALEM,
     M_INTEL_COREI7_WESTMERE,
