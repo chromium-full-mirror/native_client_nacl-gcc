@@ -1,9 +1,5 @@
-# Use a version of div0 which raises SIGFPE.
-# TODO(mcgrathr): Not doing this yet because there is no "raise" to call.
-# When we do it, it should probably be a special NaCl-specific version of
-# the calls (__aeabi_idiv0, alias __aeabi_ldiv0) rather than using "raise".
-# See http://code.google.com/p/nativeclient/issues/detail?id=2833
-#LIB1ASMFUNCS := $(filter-out _dvmd_tls,$(LIB1ASMFUNCS)) _dvmd_lnx
+# Use a version of div0 which causes a fatal trap.
+LIB1ASMFUNCS := $(filter-out _dvmd_tls,$(LIB1ASMFUNCS)) _dvmd_nacl
 
 # NaCl does not support Thumb or interworking at all.
 LIB1ASMFUNCS := $(filter-out _thumb1_% _call_via_rX _interwork_call_via_rX,\
