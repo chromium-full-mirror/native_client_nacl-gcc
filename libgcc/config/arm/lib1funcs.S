@@ -1387,6 +1387,24 @@ LSYM(Lover12):
 #endif
 
 #endif /* L_dvmd_lnx */
+#ifdef L_dvmd_nacl
+@ Native Client division-by-zero handler.  Used in place of L_dvmd_tls.
+
+#ifndef __ARM_EABI__
+#error "This is only for ARM Native Client, which is EABI-based"
+#endif
+	WEAK aeabi_idiv0
+	WEAK aeabi_ldiv0
+	ARM_FUNC_START aeabi_idiv0
+	ARM_FUNC_START aeabi_ldiv0
+
+	sfi_trap
+	sfi_bx lr
+
+	FUNC_END aeabi_ldiv0
+	FUNC_END aeabi_idiv0
+
+#endif /* L_dvmd_nacl */
 #ifdef L_clear_cache
 #if defined __ARM_EABI__ && defined __linux__
 @ EABI GNU/Linux call to cacheflush syscall.
