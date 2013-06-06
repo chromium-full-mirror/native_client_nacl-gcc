@@ -1,3 +1,37 @@
+2013-06-06  Teresa Johnson  <tejohnson@google.com>
+
+	PR c++/53743
+	* gcc.dg/tree-prof/va-arg-pack-1.c: Cloned from c-torture, made
+	into -freorder-blocks-and-partition test.
+	* gcc.dg/tree-prof/comp-goto-1.c: Ditto.
+	* gcc.dg/tree-prof/20041218-1.c: Ditto.
+	* gcc.dg/tree-prof/pr52027.c: Use -O2.
+	* gcc.dg/tree-prof/pr50907.c: Ditto.
+	* gcc.dg/tree-prof/pr45354.c: Ditto.
+	* g++.dg/tree-prof/partition2.C: Ditto.
+	* g++.dg/tree-prof/partition3.C: Ditto.
+
+2013-06-06  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/57542
+	* gfortran.dg/finalize_16.f90: New.
+
+2013-06-06  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* gcc.dg/vect/no-section-anchors-vect-68.c:
+	Add dg-skip-if aarch64_tiny.
+
+2013-06-05  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	PR C/57457
+	* c-c++-common/cilk-plus/AN/pr57457.c: New test.
+	* c-c++-common/cilk-plus/AN/pr57457-2.c: Likewise.
+
+2013-06-05  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51908
+	* g++.dg/cpp0x/decltype54.C: New.
+
 2013-06-05  James Greenhalgh  <james.greenhalgh@arm.com>
 
 	* gcc.dg/fshort-wchar.c: Add extra dg-options for

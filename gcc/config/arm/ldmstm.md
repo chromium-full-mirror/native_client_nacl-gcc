@@ -38,6 +38,7 @@
   "%b5ldm%(ia%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*thumb_ldm4_ia"
@@ -77,6 +78,7 @@
   "%b5ldm%(ia%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*thumb_ldm4_ia_update"
@@ -113,6 +115,7 @@
   "%b5stm%(ia%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*stm4_ia_update"
@@ -131,6 +134,7 @@
   "%b5stm%(ia%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*thumb_stm4_ia_update"
@@ -318,6 +322,7 @@
   "%b5ldm%(db%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*ldm4_db_update"
@@ -340,6 +345,7 @@
   "%b5ldm%(db%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*stm4_db"
@@ -356,6 +362,7 @@
   "%b5stm%(db%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_insn "*stm4_db_update"
@@ -374,6 +381,7 @@
   "%b5stm%(db%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op5"))])
 
 (define_peephole2
@@ -497,6 +505,7 @@
   "%b4ldm%(ia%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*thumb_ldm3_ia"
@@ -530,6 +539,7 @@
   "%b4ldm%(ia%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*thumb_ldm3_ia_update"
@@ -561,6 +571,7 @@
   "%b4stm%(ia%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*stm3_ia_update"
@@ -577,6 +588,7 @@
   "%b4stm%(ia%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*thumb_stm3_ia_update"
@@ -739,6 +751,7 @@
   "%b4ldm%(db%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*ldm3_db_update"
@@ -758,6 +771,7 @@
   "%b4ldm%(db%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*stm3_db"
@@ -772,6 +786,7 @@
   "%b4stm%(db%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_insn "*stm3_db_update"
@@ -788,6 +803,7 @@
   "%b4stm%(db%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op4"))])
 
 (define_peephole2
@@ -894,6 +910,7 @@
   "%b3ldm%(ia%)\t%3, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*thumb_ldm2_ia"
@@ -921,6 +938,7 @@
   "%b3ldm%(ia%)\t%3!, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*thumb_ldm2_ia_update"
@@ -947,6 +965,7 @@
   "%b3stm%(ia%)\t%3, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*stm2_ia_update"
@@ -961,6 +980,7 @@
   "%b3stm%(ia%)\t%3!, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*thumb_stm2_ia_update"
@@ -1098,6 +1118,7 @@
   "%b3ldm%(db%)\t%3, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*ldm2_db_update"
@@ -1114,6 +1135,7 @@
   "%b3ldm%(db%)\t%3!, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*stm2_db"
@@ -1126,6 +1148,7 @@
   "%b3stm%(db%)\t%3, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_insn "*stm2_db_update"
@@ -1140,6 +1163,7 @@
   "%b3stm%(db%)\t%3!, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
    (set (attr "length") (attr "length_breg_op3"))])
 
 (define_peephole2
