@@ -77,10 +77,11 @@
     if (model == MEMMODEL_RELAXED
         || model == MEMMODEL_CONSUME
         || model == MEMMODEL_RELEASE)
-      return \"ldr<sync_sfx>\\t%0, %1\";
+      return \"%b1ldr<sync_sfx>\\t%0, %1\";
     else
-      return \"lda<sync_sfx>\\t%0, %1\";
+      return \"%b1lda<sync_sfx>\\t%0, %1\";
   }
+  [(set (attr "length") (attr "length_breg_op1"))]
 )
 
 (define_insn "atomic_store<mode>"
@@ -95,10 +96,11 @@
     if (model == MEMMODEL_RELAXED
         || model == MEMMODEL_CONSUME
         || model == MEMMODEL_ACQUIRE)
-      return \"str<sync_sfx>\t%1, %0\";
+      return \"%b0str<sync_sfx>\t%1, %0\";
     else
-      return \"stl<sync_sfx>\t%1, %0\";
+      return \"%b0stl<sync_sfx>\t%1, %0\";
   }
+  [(set (attr "length") (attr "length_breg_op0"))]
 )
 
 ;; Note that ldrd and vldr are *not* guaranteed to be single-copy atomic,
@@ -123,9 +125,10 @@
 	(unspec:DI [(match_operand:DI 1 "mem_noofs_operand" "Ua")]
 		   UNSPEC_LL))]
   "TARGET_HAVE_LDREXD && ARM_DOUBLEWORD_ALIGN"
-  "ldrexd%?\t%0, %H0, %C1"
+  "%b1ldrexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
-   (set_attr "predicable_short_it" "no")])
+   (set_attr "predicable_short_it" "no")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_expand "atomic_compare_and_swap<mode>"
   [(match_operand:SI 0 "s_register_operand" "")		;; bool out
@@ -373,9 +376,10 @@
 	    [(match_operand:NARROW 1 "mem_noofs_operand" "Ua")]
 	    VUNSPEC_LAX)))]
   "TARGET_HAVE_LDACQ"
-  "ldaex<sync_sfx>%?\\t%0, %C1"
+  "%b1ldaex<sync_sfx>%?\\t%0, %C1"
   [(set_attr "predicable" "yes")
-   (set_attr "predicable_short_it" "no")])
+   (set_attr "predicable_short_it" "no")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_load_exclusivesi"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
@@ -394,9 +398,10 @@
 	  [(match_operand:SI 1 "mem_noofs_operand" "Ua")]
 	  VUNSPEC_LAX))]
   "TARGET_HAVE_LDACQ"
-  "ldaex%?\t%0, %C1"
+  "%b1ldaex%?\t%0, %C1"
   [(set_attr "predicable" "yes")
-   (set_attr "predicable_short_it" "no")])
+   (set_attr "predicable_short_it" "no")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_load_exclusivedi"
   [(set (match_operand:DI 0 "s_register_operand" "=r")
@@ -415,9 +420,10 @@
 	  [(match_operand:DI 1 "mem_noofs_operand" "Ua")]
 	  VUNSPEC_LAX))]
   "TARGET_HAVE_LDACQ && ARM_DOUBLEWORD_ALIGN"
-  "ldaexd%?\t%0, %H0, %C1"
+  "%b1ldaexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
-   (set_attr "predicable_short_it" "no")])
+   (set_attr "predicable_short_it" "no")
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_insn "arm_store_exclusive<mode>"
   [(set (match_operand:SI 0 "s_register_operand" "=&r")
