@@ -1,3 +1,34 @@
+2013-06-11  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/57535
+	* gfortran.dg/class_array_18.f90: New.
+
+2013-06-11  Jan Hubicka  <jh@suse.cz>
+
+	PR c++/57551
+	* g++.dg/ext/visibility/anon6.C: Update testcase.
+
+2013-06-10  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	PR c/57563
+	* c-c++-common/cilk-plus/AN/builtin_fn_mutating.c (main): Fixed a bug
+	in how we check __sec_reduce_mutating function's result.	
+
+2013-06-10  Michael Meissner  <meissner@linux.vnet.ibm.com>
+	    Pat Haugen <pthaugen@us.ibm.com>
+	    Peter Bergner <bergner@vnet.ibm.com>
+
+	* gcc.target/powerpc/direct-move-vint1.c: New tests for power8
+	direct move instructions.
+	* gcc.target/powerpc/direct-move-vint2.c: Likewise.
+	* gcc.target/powerpc/direct-move.h: Likewise.
+	* gcc.target/powerpc/direct-move-float1.c: Likewise.
+	* gcc.target/powerpc/direct-move-float2.c: Likewise.
+	* gcc.target/powerpc/direct-move-double1.c: Likewise.
+	* gcc.target/powerpc/direct-move-double2.c: Likewise.
+	* gcc.target/powerpc/direct-move-long1.c: Likewise.
+	* gcc.target/powerpc/direct-move-long2.c: Likewise.
+
 2013-06-10  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/52440
