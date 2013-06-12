@@ -2,6 +2,121 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-06-12  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/aarch64/aarch64-simd.md (aarch64_combine<mode>): convert to split.
+	(aarch64_simd_combine<mode>): New instruction expansion.
+	* config/aarch64/aarch64-protos.h (aarch64_split_simd_combine): New
+	function prototype.
+	* config/aarch64/aarch64.c (aarch64_split_combine): New function.
+	* config/aarch64/iterators.md (Vdbl): Add entry for DF.
+
+2013-06-12  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.c (verify_edge_corresponds_to_fndecl): Be lax about
+	decl has when in streaming stage.
+	* lto-symtab.c (lto_symtab_merge_symbols): Likewise.
+	* cgraph.h (cgraph_state): Add CGRAPH_LTO_STREAMING.
+
+2013-06-12  Roland Stigge <stigge@antcom.de>
+
+	PR target/57578
+	* config/rs6000/t-linux (MULTIARCH_DIRNAME): Fix SPE version detection.
+
+2013-06-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/57537
+	* tree-vect-patterns.c (vect_recog_widen_mult_pattern): If
+	vect_handle_widen_op_by_const, convert oprnd1 to half_type1.
+
+2013-06-12  Richard Biener  <rguenther@suse.de>
+
+	* data-streamer.h (streamer_write_char_stream): CSE
+	obs->current_pointer.
+	* data-streamer-out.c (streamer_write_uhwi_stream): Inline
+	streamer_write_char_stream manually and optimize the resulting loop.
+	(streamer_write_hwi_stream): Likewise.
+
+2013-06-12  Jan Hubicka  <jh@suse.cz>
+
+	* lto-symtab.c (lto_symtab_merge_symbols): Populate symtab hashtable.
+	* cgraph.h (varpool_create_empty_node): Declare.
+	* lto-cgraph.c (input_node, input_varpool_node): Forcingly create
+	duplicated nodes.
+	* symtab.c (symtab_unregister_node): Be lax about missin entries
+	in node hash.
+	(symtab_get_node): Update comment.
+	* varpool.c (varpool_create_empty_node): Break out from ...
+	(varpool_node_for_decl): ... here.
+	* lto-streamer.h (lto_file_decl_data): Add RESOLUTION_MAP.
+
+2013-06-12  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* expr.c (expand_expr_real_1) <TARGET_MEM_REF>: Use straight-line flow.
+	<MEM_REF>: Use 'type' instead of TREE_TYPE (exp) and tidy up the first
+	part.  Use straight-line flow at the end.
+	<COMPONENT_REF>: Remove superfluous else.
+	<VIEW_CONVERT_EXPR>: Use 'type' instead of TREE_TYPE (exp).
+
+2013-06-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/56564
+	* varasm.c (decl_binds_to_current_def_p): Call binds_local_p
+	target hook even for !TREE_PUBLIC decls.  If no resolution info
+	is available, return false for common and external decls.
+
+2013-06-12  Kaushik Phatak  <kaushik.phatak@kpitcummins.com>
+
+	* config/rl78/constraints.md (U): New constraint.
+	* config/rl78/rl78.md (*mulqi3_rl78,*mulhi3_rl78,*mulhi3_g13): Add
+	valloc attribute.
+
+2013-06-11  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	PR target/57589
+	* config/rs6000/driver-rs6000.c (elf_platform): Make buffer static
+	to allow returning address to AT_PLATFORM name.
+
+2013-06-11  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.c (cgraph_create_function_alias): Set weakref flag.
+	* cgraph.h (symtab_node_base): Add weakref flag.
+	* cgraphunit.c (cgraph_reset_node): Clear weakref flag.
+	(handle_alias_pairs): Set weakref flag, do not set DECL_EXTERNAL.
+	(output_weakrefs): Use weakref flag.
+	* fold-const.c (simple_operand_p): Handle WEAK.
+	* gimple-fold.c (can_refer_decl_in_current_unit_p): Drop weakref.
+	* ipa.c (varpool_externally_visible_p): Drop weakref.
+	(function_and_variable_visibility): Update comment; fix weakref
+	sanity checks; do not clear DECL_WEAK on them.
+	* lto-cgraph.c (lto_output_node): update.
+	(lto_output_varpool_node): Update.
+	(input_overwrite_node): Update.
+	(input_node): Update.
+	(input_varpool_node): Update.
+	* lto-symtab.c (lto_symtab_symbol_p): Do not special case weakrefs.
+	(lto_symtab_merge_symbols): Add sanity check.
+	(lto_symtab_prevailing_decl): Do not special case weakrefs.
+	* passes.c (rest_of_decl_compilation): Set static flag, too.
+	* symtab.c (dump_symtab_base): Dump weakref.
+	(verify_symtab_base): Sanity check weakrefs.
+	(symtab_make_decl_local): Remove duplicated code.
+	(symtab_alias_ultimate_target): Simplify.
+	* varpool.c (varpool_create_variable_alias): Set weakref flag.
+
+2013-06-11  DJ Delorie  <dj@redhat.com>
+
+	* config/rl78/rl78.c (TARGET_UNWIND_WORD_MODE): Define.
+	(rl78_unwind_word_mode): New.
+
+2013-06-11  David Malcolm  <dmalcolm@redhat.com>
+
+	* final.c (debug_prefix_maps): Make static.
+
+2013-06-11  David Malcolm  <dmalcolm@redhat.com>
+
+	* function.c (initial_trampoline): Remove stray copy.
+
 2013-06-11  Sofiane Naci  <sofiane.naci@arm.com>
 
 	* config/aarch64/aarch64-simd.md (move_lo_quad_<mode>): Update.

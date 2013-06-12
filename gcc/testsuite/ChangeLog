@@ -1,3 +1,24 @@
+2013-06-12  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* gcc.target/arm/unaligned-memcpy-4.c (src, dst): Initialize
+	to ensure alignment.
+	* gcc.target/arm/unaligned-memcpy-3.c (src): Likewise.
+
+2013-06-12  Tobias Burnus  <burnus@net-b.de>
+
+	* gfortran.dg/finalize_10.f90: Update scan-tree-dump.
+
+2013-06-12  Tobias Burnus  <burnus@net-b.de>
+	    Dominique d'Humieres  <dominiq@lps.ens.fr>
+
+	* gfortran.dg/finalize_10.f90: Update scan-tree-dump.
+
+2013-06-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/56564
+	* gcc.target/i386/pr56564-1.c: Skip on darwin, mingw and cygwin.
+	* gcc.target/i386/pr56564-3.c: Likewise.
+
 2013-06-11  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/57535
