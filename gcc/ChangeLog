@@ -2,6 +2,39 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-06-14  Vidya Praveen <vidyapraveen@arm.com>
+
+	* config/aarch64/aarch64-simd.md (aarch64_<su>mlal_lo<mode>):
+	New pattern.
+	(aarch64_<su>mlal_hi<mode>, aarch64_<su>mlsl_lo<mode>): Likewise.
+	(aarch64_<su>mlsl_hi<mode>, aarch64_<su>mlal<mode>): Likewise.
+	(aarch64_<su>mlsl<mode>): Likewise.
+
+2013-06-14  Mike Stump  <mikestump@comcast.net>
+
+	* Makefile.in (TARGET_H): Add insn-codes.h.
+
+2013-06-14  Alan Modra  <amodra@gmail.com>
+
+	PR middle-end/57134
+	PR middle-end/57586
+	* expr.c (expand_expr_real_1 <normal_inner_ref>): Pass
+	EXPAND_MEMORY and EXPAND_WRITE to recursive call.  Don't use
+	bitfield expansion when EXPAND_MEMORY.
+	(expand_expr_real_1 <VIEW_CONVERT_EXPR>): Pass modifier likewise.
+
+2013-06-13  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (rs6000_option_override_internal): Move
+	test for clearing quad memory on 32-bit later.
+
+2013-06-13  Marc Glisse  <marc.glisse@inria.fr>
+
+	* fold-const.c (negate_expr_p): Handle VECTOR_CST.
+	(fold_negate_expr): Likewise.
+	(fold_real_zero_addition_p): Handle vectors.
+	(fold_binary_loc) <PLUS_EXPR, MINUS_EXPR>: Likewise.
+
 2013-06-14  Alan Modra  <amodra@gmail.com>
 
 	* varasm.c (force_const_mem): Revert 2013-06-07 change.
