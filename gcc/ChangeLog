@@ -2,6 +2,144 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-06-17  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/aarch64/aarch64-simd.md (aarch64_dup_lane<mode>): Add r<-w
+	alternative and update.
+	(aarch64_dup_lanedi): Delete.
+	* config/aarch64/arm_neon.h (vdup<bhsd>_lane_*): Update.
+	* config/aarch64/aarch64-simd-builtins.def: Update.
+
+2013-06-17  Richard Biener  <rguenther@suse.de>
+
+	* lto-streamer.h (enum LTO_tags): Add LTO_tree_scc.
+	(lto_input_scc): Declare.
+	(lto_input_tree_1): Likewise.
+	(struct lto_stats_d): Add num_tree_bodies_output and
+	num_pickle_refs_output.
+	* lto-streamer-in.c (lto_read_body): Use streamer_tree_cache_get_tree.
+	(lto_read_tree_1): Split out from ...
+	(lto_read_tree): ... this.
+	(lto_input_scc): New function.
+	(lto_input_tree_1): Split out from ...
+	(lto_input_tree): ... this.  Handle LTO_tree_scc.
+	(lto_data_in_create): Create the streamer cache without hashes.
+	* lto-streamer-out.c (create_output_block): Create the streamer
+	cache with hashes when not doing WPA.
+	(lto_write_tree_1): Split out from ...
+	(lto_write_tree): ... this.
+	(get_symbol_initial_value): New function.
+	(lto_output_tree_1): Split out from ...
+	(lto_output_tree): ... this.  Write trees as series of SCCs
+	using a DFS walk via DFS_write_tree.
+	(struct sccs, struct scc_entry): New types.
+	(next_dfs_num, sccstack, sccstate, sccstate_obstack): New globals.
+	(DFS_write_tree_body): New function.
+	(DFS_write_tree): Likewise.
+	(hash_tree): Likewise.
+	(scc_entry_compare): Likewise.
+	(hash_scc): Likewise.
+	(tree_is_indexable): DEBUG_EXPR_DECLs are local entities.
+	* tree-streamer-in.c (lto_input_ts_list_tree_pointers): Stream
+	TREE_CHAIN as regular reference.
+	(streamer_read_integer_cst): Remove.
+	(streamer_get_pickled_tree): Adjust.
+	* tree-streamer-out.c (streamer_write_chain): Disable streaming
+	of DECL_EXTERNALs in BLOCK_VARS for now.
+	(write_ts_list_tree_pointers): Stream TREE_CHAIN as regular
+	reference.
+	* tree-streamer.c (streamer_tree_cache_add_to_node_array):
+	Add hash value argument and record that if hashes are recorded
+	in the cache.
+	(streamer_tree_cache_insert_1): Adjust.
+	(streamer_tree_cache_insert): Likewise.
+	(streamer_tree_cache_insert_at): Rename to ...
+	(streamer_tree_cache_replace_tree): ... this and adjust.
+	(streamer_tree_cache_append): Adjust.
+	(record_common_node): Likewise.
+	(streamer_tree_cache_create): Add argument whether to
+	record hash values together with trees.
+	(streamer_tree_cache_delete): Adjust.
+	* tree-streamer.h (struct streamer_tree_cache_d): Add
+	vector of hashes.
+	(streamer_read_integer_cst): Remove.
+	(streamer_tree_cache_insert): Adjust.
+	(streamer_tree_cache_append): Likewise.
+	(streamer_tree_cache_insert_at): Rename to ...
+	(streamer_tree_cache_replace_tree): ... this and adjust.
+	(streamer_tree_cache_create): Add argument whether to record hashes.
+	(streamer_tree_cache_get): Rename to ...
+	(streamer_tree_cache_get_tree): ... this.
+	(streamer_tree_cache_get_hash): New function.
+	* tree.c (cache_integer_cst): New function.
+	* tree.h (cache_integer_cst): Declare.
+	(ANON_AGGRNAME_FORMAT, ANON_AGGRNAME_P): Move here from cp/cp-tree.h.
+	* lto-symtab.c (lto_varpool_replace_node): Only release
+	DECL_INITIAL of non-prevailing decls.
+	* varpool.c (varpool_remove_initializer): Do not release
+	DECL_INITIAL when we are still in CGRAPH_LTO_STREAMING.
+
+2013-06-16  Jürgen Urban  <JuergenUrban@gmx.de>
+
+	* config/mips/mips.h (ISA_HAS_MUL3): Include TARGET_MIPS5900.
+	(ISA_HAS_MULT, ISA_HAS_DMULT, ISA_HAS_DIV, ISA_HAS_DDIV): New macros.
+	* config/mips/mips.md (mul<mode>3, mul<mode>3_internal)
+	(mul<mode>3_r4000): Require ISA_HAS_<D>MULT.
+	(mul<mode>3_mul3): Handle TARGET_MIPS5900.
+	(mulsidi3_64bit_dmul): Remove redundant TARGET_64BIT test.
+	(<su>muldi3_highpart, <su>muldi3_highpart_internal, <u>mulditi3)
+	(<u>mulditi3_internal, <u>mulditi3_r4000): Require ISA_HAS_DMULT
+	instead of TARGET_64BIT.
+	(divmod<mode>4, udivmod<mode>4, <u>divmod<GPR:mode>4_hilo_<HILO:mode>):
+	Require ISA_HAS_<D>DIV.
+
+2013-06-16  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config.gcc (mips*-mti-linux*, mips64*-*-linux*, mipsisa64*-*-linux*)
+	(mips*-*-linux*): Move default with_llsc setting to where other
+	defaults are set.
+	(mips*-*-vxworks*): Move with_arch default from with_cpu block to
+	with_arch block.
+	(mips64r5900-*-*, mips64r5900el-*-*, mipsr5900-*-*, mipsr5900el-*-*):
+	Likewise.  Remove default with_tune setting.  Move default float
+	setting to its own block.  Handle with_llsc in the same block as above.
+
+2013-06-16  Joern Rennecke <joern.rennecke@embecosm.com>
+
+	PR rtl-optimization/57425
+	PR rtl-optimization/57569
+	* alias.c (write_dependence_p): Add new parameters mem_size,
+	canon_mem_addr and mem_canonicalized.  Change type of writep to bool.
+	Changed all callers.
+	(canon_anti_dependence): New function.
+	* cse.c (check_dependence): Use canon_anti_dependence.
+	* cselib.c (cselib_invalidate_mem): Likewise.
+	* rtl.h (canon_anti_dependence): Declare.
+
+2013-06-16  Jürgen Urban  <JuergenUrban@gmx.de>
+
+	* config/mips/mips.h (ISA_HAS_LL_SC): Exclude TARGET_MIPS5900.
+	* config/mips/mips.c (mips_start_ll_sc_sync_block): Output
+	".set mips3" for 64-bit targets.
+
+2013-06-15  Dehao Chen  <dehao@google.com>
+
+	* tree-flow.h (gimple_check_call_matching_types): Add new argument.
+	* gimple-low.c (gimple_check_call_matching_types): Likewise.
+	(gimple_check_call_args): Likewise.
+	* value-prof.c (check_ic_target): Likewise.
+	* ipa-inline.c (early_inliner): Likewise.
+	* ipa-prop.c (update_indirect_edges_after_inlining): Likewise.
+	* cgraph.c (cgraph_create_edge_1): Likewise.
+	(cgraph_make_edge_direct): Likewise.
+
+2013-06-14  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	PR target/57615
+	* config/rs6000/rs6000.md (mov<mode>_ppc64): Call
+	rs6000_output_move_128bit to handle emitting quad memory
+	operations.  Set attribute length to 8 bytes.
+
 2013-06-14  Vidya Praveen <vidyapraveen@arm.com>
 
 	* config/aarch64/aarch64-simd.md (aarch64_<su>mlal_lo<mode>):
