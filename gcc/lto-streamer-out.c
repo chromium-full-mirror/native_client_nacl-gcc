@@ -71,7 +71,7 @@ create_output_block (enum lto_section_type section_type)
   ob->decl_state = lto_get_out_decl_state ();
   ob->main_stream = XCNEW (struct lto_output_stream);
   ob->string_stream = XCNEW (struct lto_output_stream);
-  ob->writer_cache = streamer_tree_cache_create (!flag_wpa);
+  ob->writer_cache = streamer_tree_cache_create (!flag_wpa, true);
 
   if (section_type == LTO_section_function_body)
     ob->cfg_stream = XCNEW (struct lto_output_stream);
@@ -1922,9 +1922,9 @@ copy_function (struct cgraph_node *node)
 	 So just copy the vector.  All the encoders in the in state
 	 must be empty where we reach here. */
       gcc_assert (lto_tree_ref_encoder_size (encoder) == 0);
+      encoder->trees.reserve_exact (n);
       for (j = 0; j < n; j++)
 	encoder->trees.safe_push (trees[j]);
-      encoder->next_index = n;
     }
 
   lto_free_section_data (file_data, LTO_section_function_body, name,
