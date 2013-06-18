@@ -264,7 +264,17 @@ _sfi_breg_dmask_define pld
 _sfi_breg_dmask_define pldw
 _sfi_breg_dmask_define pldi
 _sfi_breg_dmask_define vldr
-_sfi_breg_dmask_define vldm
+_sfi_breg_dmask_define vldr, .32
+_sfi_breg_dmask_define vldr, .64
+_sfi_breg_dmask_define vstr
+_sfi_breg_dmask_define vstr, .32
+_sfi_breg_dmask_define vstr, .64
+_sfi_breg_dmask_define_ldmstm vldm
+_sfi_breg_dmask_define_ldmstm vldm, .32
+_sfi_breg_dmask_define_ldmstm vldm, .64
+_sfi_breg_dmask_define_ldmstm vstm
+_sfi_breg_dmask_define_ldmstm vstm, .32
+_sfi_breg_dmask_define_ldmstm vstm, .64
 _sfi_breg_dmask_define fld, s
 _sfi_breg_dmask_define fld, d
 _sfi_breg_dmask_define fst, s
