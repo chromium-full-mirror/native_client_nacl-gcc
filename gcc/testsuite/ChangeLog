@@ -1,3 +1,32 @@
+2013-06-19  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+       * c-c++-common/cilk-plus/AN/builtin_fn_custom.c: Replaced all the
+       hard-coded values of array sizes with a #define.
+       * c-c++-common/cilk-plus/AN/builtin_fn_mutating.c: Likewise.
+       * c-c++-common/cilk-plus/AN/builtin_func_double2.c: Likewise.
+       * c-c++-common/cilk-plus/AN/gather_scatter.c: Likewise.
+       * c-c++-common/cilk-plus/AN/pr57577.c: Likewise.
+       * c-c++-common/cilk-plus/AN/sec_implicit_ex.c: Likewise.
+
+2013-06-19  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* gcc.dg/torture/stackalign/builtin-apply-2.c: set
+	STACK_ARGUMENTS_SIZE with 0 if __aarch64__ is defined.
+
+2013-06-19  Jeff Law  <law@redhat.com>
+
+	* gcc.dg/tree-ssa/forwprop-28.c: New test.
+
+2013-06-19  Manuel Lopez-Ibanez  <manu@gcc.gnu.org>
+
+	PR c++/57638
+	* g++.dg/template/error53.C: New.
+
+2013-06-19  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	PR target/55033
+	* gcc.target/powerpc/pr55033.c: Fix options.
+
 2013-06-18  Sriraman Tallam  <tmsriram@google.com>
 
 	* gcc.target/i386/inline_error.c: New test.
@@ -2255,7 +2284,6 @@
 
 	* gcc.target/aarch64/negs.c: New.
 
->>>>>>> trunk
 2013-04-11  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c++/56895
