@@ -2,6 +2,37 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-06-21  Andi Kleen  <ak@linux.intel.com>
+
+	* doc/extend.texi: Dont use __atomic_clear in HLE
+	example.  Fix typo.
+
+2013-06-21  Andi Kleen  <ak@linux.intel.com>
+
+	* doc/extend.texi: Document that __atomic_clear and
+	  __atomic_test_and_set should only be used with bool.
+
+2013-06-20  Jan Hubicka  <jh@suse.cz>
+
+	* gimple-fold.c (gimple_extract_devirt_binfo_from_cst): Use
+	types_same_for_odr.
+	* tree.c (decls_same_for_odr): New function.
+	(same_for_edr): New function.
+	(types_same_for_odr): New function.
+	(get_binfo_at_offset): Use it.
+	* tree.h (types_same_for_odr): Declare.
+
+2013-06-20  Oleg Endo <oleg.endo@t-online.de>
+	    Jason Merrill  <jason@redhat.com>
+
+	* system.h: Include <cstdlib> as well as <stdlib.h>.
+
+2013-06-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/57655
+	* config/i386/i386.c (construct_container): Report error if
+	long double is used with disabled x87 float returns.
+
 2013-06-20  Jan Hubicka  <jh@suse.cz>
 
 	* lto-cgraph.c (input_symtab): Do not set cgraph state.
