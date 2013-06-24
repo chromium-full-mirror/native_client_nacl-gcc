@@ -1,3 +1,22 @@
+2013-06-24  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	PR libstdc++/57691
+	* include/c_global/cstdlib (atexit, at_quick_exit): If !_GLIBCC_HOSTED,
+	declare per the letter of the C++ standard in terms of void.
+	* include/c_std/cstdlib: Likewise.
+
+2013-06-22  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR libstdc++/57674
+	* include/bits/random.h (binomial_distribution<>::_M_waiting):
+	Add double parameter.
+	* include/bits/random.tcc (binomial_distribution<>::operator()
+	(_UniformRandomNumberGenerator&, const param_type&)): Pass
+	__param._M_q to _M_waiting.
+	(_M_waiting): Adjust.
+	* testsuite/26_numerics/random/binomial_distribution/
+	operators/values.cc: Add tests.
+
 2013-06-21  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR libstdc++/57666
