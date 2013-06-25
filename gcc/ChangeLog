@@ -2,6 +2,40 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-06-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/57705
+	* tree-vect-loop.c (vect_is_simple_iv_evolution): Allow
+	SSA_NAME step, provided that it is not defined inside the loop.
+	(vect_analyze_scalar_cycles_1): Disallow SSA_NAME step in nested
+	loop.
+	(get_initial_def_for_induction): Handle SSA_NAME IV step.
+
+2013-06-25  Martin Jambor  <mjambor@suse.cz>
+
+	PR middle-end/57670
+	* cgraph.h (cgraph_indirect_call_info): New flag member_ptr.
+	* ipa-prop.c (ipa_print_node_jump_functions): Mark member pointer
+	calls in the dump.
+	(ipa_note_param_call): Initialize member_ptr flag.
+	(ipa_analyze_indirect_call_uses): Set member_ptr flag.
+	(ipa_make_edge_direct_to_target): Bail out if member_ptr is set.
+	(ipa_write_indirect_edge_info): Stream member_ptr flag.
+	(ipa_read_indirect_edge_info): Likewise.
+
+2013-06-25  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/56977
+	* passes.c (init_optimization_passes): Move pass_fold_builtins
+	and pass_dce earlier with -Og.
+
+2013-06-25  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* expr.c (expand_expr_real_1) <ARRAY_REF>: Fix formatting glitches.
+	<BIT_FIELD_REF>: Remove trailing TAB.
+	* varasm.c (output_constructor_bitfield): Fix formatting glitch and
+	remove blank line.
+
 2013-06-24  Martin Jambor  <mjambor@suse.cz>
 
 	PR tree-optimization/57358

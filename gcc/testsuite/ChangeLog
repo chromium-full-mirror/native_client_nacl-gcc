@@ -1,3 +1,19 @@
+2013-06-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/57705
+	* gcc.dg/vect/pr57705.c: New test.
+	* gcc.dg/vect/vect-iv-7.c: Add noclone attribute, remove xfail.
+
+2013-06-25  Martin Jambor  <mjambor@suse.cz>
+
+	PR middle-end/57670
+	* g++.dg/ipa/pr57670.C: New test.
+
+2013-06-25  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/56977
+	* gcc.dg/pr56977.c: New testcase.
+
 2013-06-24  Martin Jambor  <mjambor@suse.cz>
 
 	PR tree-optimization/57358
