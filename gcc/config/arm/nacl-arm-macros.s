@@ -252,6 +252,12 @@ _sfi_condify sfi_bx
 	_sfi_breg_dmask_define \insn, ib, \suffix
 	_sfi_breg_dmask_define \insn, ed, \suffix
 .endm
+.macro _sfi_breg_dmask_define_neon insn
+	_sfi_breg_dmask_define \insn, .8
+	_sfi_breg_dmask_define \insn, .16
+	_sfi_breg_dmask_define \insn, .32
+	_sfi_breg_dmask_define \insn, .64
+.endm
 _sfi_breg_dmask_define_ldst ldr
 _sfi_breg_dmask_define_ldst ldrex
 _sfi_breg_dmask_define_ldst ldc
@@ -263,12 +269,6 @@ _sfi_breg_dmask_define_ldmstm stm
 _sfi_breg_dmask_define pld
 _sfi_breg_dmask_define pldw
 _sfi_breg_dmask_define pldi
-_sfi_breg_dmask_define vldr
-_sfi_breg_dmask_define vldr, .32
-_sfi_breg_dmask_define vldr, .64
-_sfi_breg_dmask_define vstr
-_sfi_breg_dmask_define vstr, .32
-_sfi_breg_dmask_define vstr, .64
 _sfi_breg_dmask_define_ldmstm vldm
 _sfi_breg_dmask_define_ldmstm vldm, .32
 _sfi_breg_dmask_define_ldmstm vldm, .64
@@ -283,11 +283,26 @@ _sfi_breg_dmask_define_ldmstm fldm, s
 _sfi_breg_dmask_define_ldmstm fldm, d
 _sfi_breg_dmask_define_ldmstm fstm, s
 _sfi_breg_dmask_define_ldmstm fstm, d
+_sfi_breg_dmask_define vldr
+_sfi_breg_dmask_define vldr, .32
+_sfi_breg_dmask_define vldr, .64
+_sfi_breg_dmask_define vstr
+_sfi_breg_dmask_define vstr, .32
+_sfi_breg_dmask_define vstr, .64
+_sfi_breg_dmask_define_neon vld1
+_sfi_breg_dmask_define_neon vld2
+_sfi_breg_dmask_define_neon vld3
+_sfi_breg_dmask_define_neon vld4
+_sfi_breg_dmask_define_neon vst1
+_sfi_breg_dmask_define_neon vst2
+_sfi_breg_dmask_define_neon vst3
+_sfi_breg_dmask_define_neon vst4
 
 .purgem _sfi_breg_dmask_define
 .purgem _sfi_breg_dmask_define_1
 .purgem _sfi_breg_dmask_define_ldst
 .purgem _sfi_breg_dmask_define_ldmstm
+.purgem _sfi_breg_dmask_define_neon
 
 @ Macro to precede an instruction that touches sp.
 @ NB: GCC output uses this.

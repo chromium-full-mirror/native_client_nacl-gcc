@@ -15491,12 +15491,12 @@ output_move_neon (rtx *operands)
       /* We have to use vldm / vstm for too-large modes.  */
       if (nregs > 4)
 	{
-	  templ = "v%smia%%?\t%%0!, %%h1";
+	  templ = "%%b0v%smia%%?\t%%0!, %%h1";
 	  ops[0] = XEXP (addr, 0);
 	}
       else
 	{
-	  templ = "v%s1.64\t%%h1, %%A0";
+	  templ = "%%b0v%s1.64\t%%h1, %%A0";
 	  ops[0] = mem;
 	}
       ops[1] = reg;
@@ -15505,7 +15505,7 @@ output_move_neon (rtx *operands)
     case PRE_DEC:
       /* We have to use vldm / vstm in this case, since there is no
 	 pre-decrement form of the vld1 / vst1 instructions.  */
-      templ = "v%smdb%%?\t%%0!, %%h1";
+      templ = "%%b0v%smdb%%?\t%%0!, %%h1";
       ops[0] = XEXP (addr, 0);
       ops[1] = reg;
       break;
@@ -15531,7 +15531,7 @@ output_move_neon (rtx *operands)
 	      }
 	    else
 	      {
-		sprintf (buff, "v%sr%%?\t%%P0, %%1", load ? "ld" : "st");
+		sprintf (buff, "%%b1v%sr%%?\t%%P0, %%1", load ? "ld" : "st");
 		output_asm_insn (buff, ops);
 	      }
 	  }
@@ -15539,7 +15539,7 @@ output_move_neon (rtx *operands)
 	  {
 	    ops[0] = gen_rtx_REG (DImode, REGNO (reg) + 2 * overlap);
 	    ops[1] = adjust_address (mem, SImode, 8 * overlap);
-	    sprintf (buff, "v%sr%%?\t%%P0, %%1", load ? "ld" : "st");
+	    sprintf (buff, "%%b1v%sr%%?\t%%P0, %%1", load ? "ld" : "st");
 	    output_asm_insn (buff, ops);
 	  }
 
@@ -15549,9 +15549,9 @@ output_move_neon (rtx *operands)
     default:
       /* We have to use vldm / vstm for too-large modes.  */
       if (nregs > 4)
-	templ = "v%smia%%?\t%%m0, %%h1";
+	templ = "%%b0v%smia%%?\t%%m0, %%h1";
       else
-	templ = "v%s1.64\t%%h1, %%A0";
+	templ = "%%b0v%s1.64\t%%h1, %%A0";
 
       ops[0] = mem;
       ops[1] = reg;
@@ -15607,10 +15607,12 @@ arm_attr_length_move_neon (rtx insn)
   if (GET_CODE (addr) == LABEL_REF || GET_CODE (addr) == PLUS)
     {
       int insns = HARD_REGNO_NREGS (REGNO (reg), mode) / 2;
+      if (arm_sfi_breg_operand (mem))
+        insns *= 3;
       return insns * 4;
     }
   else
-    return 4;
+    return 4 * (arm_sfi_breg_operand (mem) ? 3 : 1);
 }
 
 /* Return nonzero if the offset in the address is an immediate.  Otherwise,
