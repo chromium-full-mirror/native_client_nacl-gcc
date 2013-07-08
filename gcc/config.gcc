@@ -689,9 +689,6 @@ case ${target} in
   default_gnu_indirect_function=yes
   use_gcc_tgmath=no
   use_gcc_stdint=wrap
-  case ${enable_threads} in
-    "" | yes | posix) thread_file='posix' ;;
-  esac
 #  native_system_header_dir=/include
   extra_options="$extra_options gnu-user.opt"
 #  extra_options="$extra_options nacl.opt"
