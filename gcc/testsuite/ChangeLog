@@ -1,3 +1,35 @@
+2013-07-09  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53094
+	* g++.dg/cpp0x/constexpr-53094-1.C: Adjust.
+	* g++.dg/ext/vector24.C: New testcase.
+
+2013-07-09  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53000
+	* g++.dg/cpp0x/decltype17.C: Adjust.
+
+2013-07-09  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51786
+	* g++.dg/cpp0x/pr51786.C: New.
+
+2013-07-08  Janis Johnson  <janisjo@codesourcery.com>
+
+	* gcc.target/powerpc/tfmode_off.c: Skip for EABI targets.
+
+	* gcc.target/powerpc/ppc-spe64-1.c: Update expected error message.
+
+	* gcc.target/powerpc/pr47197.c: Require powerpc_altivec_ok.
+
+	* gcc.target/powerpc/sd-vsx.c: Require dfp.
+	* gcc.target/powerpc/sd-pwr6.c: Likewise.
+
+2013-07-08  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/57834
+	* gfortran.dg/c_f_pointer_tests_8.f90: New.
+
 2013-07-08  Tobias Burnus  <burnus@net-b.de>
 
 	PR fortran/50554

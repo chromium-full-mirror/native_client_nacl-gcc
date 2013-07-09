@@ -1,3 +1,29 @@
+2013-07-09  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53094
+	* semantics.c (cxx_eval_bit_field_ref): Handle VECTOR_CST.
+
+2013-07-09  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR c++/53000
+	* call.c (build_conditional_expr_1): Preserve xvalues.
+
+2013-07-09  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51786
+	* parser.c (cp_parser_simple_declaration): Before calling shadow_tag
+	also check declares_class_or_enum.
+
+2013-07-08  Jason Merrill  <jason@redhat.com>
+
+	PR c++/57550
+	* pt.c (fn_type_unification): Only defer during substitution.
+	(type_unification_real): Defer during defarg substitution,
+	add checks parm to pass back deferred checks.
+	(unify, do_auto_deduction): Adjust.
+	* semantics.c (reopen_deferring_access_checks): New.
+	* cp-tree.h: Declare it.
+
 2013-07-06  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/28262
