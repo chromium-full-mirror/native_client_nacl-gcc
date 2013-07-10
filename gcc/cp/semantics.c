@@ -3056,15 +3056,15 @@ finish_id_expression (tree id_expression,
 
       /* Disallow uses of local variables from containing functions, except
 	 within lambda-expressions.  */
-      if (!outer_var_p (decl)
-	  /* It's not a use (3.2) if we're in an unevaluated context.  */
-	  || cp_unevaluated_operand)
-	/* OK.  */;
-      else if (TREE_STATIC (decl))
+      if (!outer_var_p (decl))
+	/* OK */;
+      else if (TREE_STATIC (decl)
+	       /* It's not a use (3.2) if we're in an unevaluated context.  */
+	       || cp_unevaluated_operand)
 	{
 	  if (processing_template_decl)
-	    /* For a use of an outer static var, return the identifier so
-	       that we'll look it up again in the instantiation.  */
+	    /* For a use of an outer static/unevaluated var, return the id
+	       so that we'll look it up again in the instantiation.  */
 	    return id_expression;
 	}
       else
@@ -7715,11 +7715,6 @@ cxx_eval_indirect_ref (const constexpr_call *call, tree t,
     {
       tree sub = op0;
       STRIP_NOPS (sub);
-      if (TREE_CODE (sub) == POINTER_PLUS_EXPR)
-	{
-	  sub = TREE_OPERAND (sub, 0);
-	  STRIP_NOPS (sub);
-	}
       if (TREE_CODE (sub) == ADDR_EXPR)
 	{
 	  /* We couldn't fold to a constant value.  Make sure it's not
@@ -9182,7 +9177,7 @@ lambda_capture_field_type (tree expr, bool explicit_init_p)
     }
   else
     type = non_reference (unlowered_expr_type (expr));
-  if (!type || WILDCARD_TYPE_P (type))
+  if (!type || WILDCARD_TYPE_P (type) || type_uses_auto (type))
     {
       type = cxx_make_type (DECLTYPE_TYPE);
       DECLTYPE_TYPE_EXPR (type) = expr;
