@@ -2,6 +2,75 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-07-12  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* config/mips/mips.c (mips_expand_call): Remove empty statement.
+
+2013-07-12  Michael Matz  <matz@suse.de>
+
+	PR middle-end/55771
+	* convert.c (convert_to_real): Reject non-float inner types.
+
+2013-07-12  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-protos.h
+	(aarch64_simd_immediate_valid_for_move): Remove.
+	* config/aarch64/aarch64.c (simd_immediate_info): New member.
+	(aarch64_simd_valid_immediate): Recognize idioms for shifting ones
+	cases.
+	(aarch64_output_simd_mov_immediate): Print the correct shift specifier.
+
+2013-07-11  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips.c (mips_conditional_register_usage): Do not
+	use t[0-7] registers in MIPS16 mode when optimizing for size.
+
+2013-07-11  Sriraman Tallam  <tmsriram@google.com>
+
+	* config/i386/i386.c (dispatch_function_versions): Fix array
+	indexing of function_version_info to match actual_versions.
+
+2013-07-11  Teresa Johnson  <tejohnson@google.com>
+
+	* vec.h (struct va_gc): Move release out-of-line.
+	(va_gc::release): Call ggc_free on released vec.
+
+2013-07-11  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+
+	* config/rs6000/rs6000.md (""*tls_gd_low<TLSmode:tls_abi_suffix>"):
+	Require GOT register as additional operand in UNSPEC.
+	("*tls_ld_low<TLSmode:tls_abi_suffix>"): Likewise.
+	("*tls_got_dtprel_low<TLSmode:tls_abi_suffix>"): Likewise.
+	("*tls_got_tprel_low<TLSmode:tls_abi_suffix>"): Likewise.
+	("*tls_gd<TLSmode:tls_abi_suffix>"): Update splitter.
+	("*tls_ld<TLSmode:tls_abi_suffix>"): Likewise.
+	("tls_got_dtprel_<TLSmode:tls_abi_suffix>"): Likewise.
+	("tls_got_tprel_<TLSmode:tls_abi_suffix>"): Likewise.
+
+2013-07-11  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/57631
+	* config/avr/avr.c (avr_set_current_function): Sanity-check signal
+	name seen by assembler/linker rather if available.
+
+2013-07-11  Andreas Schwab  <schwab@suse.de>
+
+	* config/aarch64/aarch64-linux.h (CPP_SPEC): Define.
+
+2013-07-10  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* lra-constraints.c (curr_insn_transform): Switch off optional
+	reloads.
+
+2013-07-10  Joseph Myers  <joseph@codesourcery.com>
+
+	* doc/tm.texi.in: Move hook documentation to ....
+	* target.def: ... here.
+
+	* doc/tm.texi.in (TARGET_CANONICALIZE_COMPARISON): Remove stray
+	text on @hook line.
+	* doc/tm.texi: Regenerate.
+
 2013-07-10  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/57869
