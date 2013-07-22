@@ -176,6 +176,7 @@ extern bool arm_pad_arg_upward (enum machine_mode, const_tree);
 extern bool arm_pad_reg_upward (enum machine_mode, tree, int);
 #endif
 extern int arm_apply_result_size (void);
+extern int arm_adjust_insn_length (rtx insn, int length);
 
 #endif /* RTX_CODE */
 

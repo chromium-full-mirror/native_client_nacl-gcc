@@ -5166,6 +5166,85 @@ arm_pass_by_reference (cumulative_args_t cum ATTRIBUTE_UNUSED,
 {
   return type && TREE_CODE (TYPE_SIZE (type)) != INTEGER_CST;
 }
+
+/* Return the proper "length" attribute for INSN.
+   LENGTH is the value computed from the .md files' set_attr uses.  */
+
+int
+arm_adjust_insn_length (rtx insn, int length)
+{
+  /* Add two bytes to the length of conditionally executed Thumb-2
+     instructions for the IT instruction.  */
+  if (TARGET_THUMB2 && GET_CODE (PATTERN (insn)) == COND_EXEC)
+    length += 2;
+
+  if (TARGET_SFI_NACL1)
+    {
+      extract_insn_cached (insn);
+      rtx *ops = recog_data.operand;
+
+      if (INSN_CODE (insn) != -1)
+        {
+          switch (get_attr_sfi_branch (insn))
+            {
+            case SFI_BRANCH_NONE:
+              break;
+
+            case SFI_BRANCH_BX:
+              /* We have replaced a single 'bx' instruction with a
+                 two-instruction bundle-locked sequence.  Hence the worst
+                 case is that it starts at the last spot of a bundle so
+                 it's pushed to the next bundle, making it three
+                 instructions.  */
+              length += 8;
+              break;
+
+            case SFI_BRANCH_BL:
+              /* We have replaced a single 'bl' instruction with two
+                 instructions (not bundle-locked) followed by alignment to
+                 the end of the bundle.  Hence the worst case is that it
+                 starts in the last spot in a bundle, so it takes one
+                 instruction plus a whole bundle (i.e. five instructions).  */
+              length += 16;
+              break;
+
+            case SFI_BRANCH_BLX:
+              /* We have replaced a single 'blx' instruction with one
+                 instruction, plus a two-instruction bundle-locked
+                 sequence, followed by alignment to the end of the bundle.
+                 Hence the worst case is that it starts at the
+                 second-to-last (third) spot of a bundle so the locked pair
+                 is pushed to the next bundle, making it two instructions
+                 plus a whole bundle (i.e. six instructions).  */
+              length += 20;
+              break;
+
+            default:
+              gcc_unreachable ();
+            }
+
+          int sp_op = get_attr_sfi_sp_operand (insn);
+          if (sp_op != MAX_RECOG_OPERANDS
+              && REGNO (ops[sp_op]) == SP_REGNUM)
+            /* We have replaced a single instruction with a two-instruction
+               bundle-locked sequence.  Hence the worst case is that it
+               starts at the last spot of a bundle so it's pushed to the
+               next bundle, making it three instructions.  */
+            length += 8 * get_attr_sfi_sp_ninsns (insn);
+
+          int breg_op = get_attr_sfi_breg_operand (insn);
+          if (breg_op != MAX_RECOG_OPERANDS
+              && arm_sfi_breg_operand (ops[breg_op]) != -1)
+            /* We have replaced a single instruction with a two-instruction
+               bundle-locked sequence.  Hence the worst case is that it
+               starts at the last spot of a bundle so it's pushed to the
+               next bundle, making it three instructions.  */
+            length += 8 * get_attr_sfi_breg_ninsns (insn);
+        }
+    }
+
+  return length;
+}
 
 /* Encode the current state of the #pragma [no_]long_calls.  */
 typedef enum

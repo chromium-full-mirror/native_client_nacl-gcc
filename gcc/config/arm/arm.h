@@ -2230,11 +2230,8 @@ extern int making_const_table;
     }
 #endif
 
-/* Add two bytes to the length of conditionally executed Thumb-2
-   instructions for the IT instruction.  */
-#define ADJUST_INSN_LENGTH(insn, length) \
-  if (TARGET_THUMB2 && GET_CODE (PATTERN (insn)) == COND_EXEC) \
-    length += 2;
+#define ADJUST_INSN_LENGTH(INSN, LENGTH) \
+  ((LENGTH) = arm_adjust_insn_length ((INSN), (LENGTH)))
 
 /* Only perform branch elimination (by making instructions conditional) if
    we're optimizing.  For Thumb-2 check if any IT instructions need

@@ -189,8 +189,7 @@ let write_pattern_1 name ls addrmode nregs write_set_fn update thumb =
     if addrmode == IA || addrmode == DB then
       Printf.printf "\n   (set_attr \"predicable_short_it\" \"no\")";
   end;
-  Printf.printf "\n   (set (attr \"length\") (attr \"length_breg_op%d\"))"
-    (nregs + 1);
+  Printf.printf "\n   (set_attr \"sfi_breg_operand\" \"%d\")" (nregs + 1);
   Printf.printf "])\n\n"
 
 let write_ldm_pattern addrmode nregs update =

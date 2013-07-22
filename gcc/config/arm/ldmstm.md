@@ -39,7 +39,7 @@
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*thumb_ldm4_ia"
   [(match_parallel 0 "load_multiple_operation"
@@ -57,7 +57,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 4"
   "%b5ldm%(ia%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -79,7 +79,7 @@
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*thumb_ldm4_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -99,7 +99,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 5"
   "%b5ldm%(ia%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_ia"
   [(match_parallel 0 "store_multiple_operation"
@@ -116,7 +116,7 @@
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -135,7 +135,7 @@
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*thumb_stm4_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -152,7 +152,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 5"
   "%b5stm%(ia%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_ib"
   [(match_parallel 0 "load_multiple_operation"
@@ -172,7 +172,7 @@
   "%b5ldm%(ib%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_ib_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -194,7 +194,7 @@
   "%b5ldm%(ib%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_ib"
   [(match_parallel 0 "store_multiple_operation"
@@ -210,7 +210,7 @@
   "%b5stm%(ib%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_ib_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -228,7 +228,7 @@
   "%b5stm%(ib%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_da"
   [(match_parallel 0 "load_multiple_operation"
@@ -247,7 +247,7 @@
   "%b5ldm%(da%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_da_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -268,7 +268,7 @@
   "%b5ldm%(da%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_da"
   [(match_parallel 0 "store_multiple_operation"
@@ -284,7 +284,7 @@
   "%b5stm%(da%)\t%5, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_da_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -302,7 +302,7 @@
   "%b5stm%(da%)\t%5!, {%1, %2, %3, %4}"
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_db"
   [(match_parallel 0 "load_multiple_operation"
@@ -323,7 +323,7 @@
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*ldm4_db_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -346,7 +346,7 @@
   [(set_attr "type" "load4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_db"
   [(match_parallel 0 "store_multiple_operation"
@@ -363,7 +363,7 @@
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_insn "*stm4_db_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -382,7 +382,7 @@
   [(set_attr "type" "store4")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op5"))])
+   (set_attr "sfi_breg_operand" "5")])
 
 (define_peephole2
   [(set (match_operand:SI 0 "s_register_operand" "")
@@ -506,7 +506,7 @@
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*thumb_ldm3_ia"
   [(match_parallel 0 "load_multiple_operation"
@@ -521,7 +521,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 3"
   "%b4ldm%(ia%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "load3")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -540,7 +540,7 @@
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*thumb_ldm3_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -557,7 +557,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 4"
   "%b4ldm%(ia%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "load3")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_ia"
   [(match_parallel 0 "store_multiple_operation"
@@ -572,7 +572,7 @@
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -589,7 +589,7 @@
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*thumb_stm3_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -604,7 +604,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 4"
   "%b4stm%(ia%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "store3")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_ib"
   [(match_parallel 0 "load_multiple_operation"
@@ -621,7 +621,7 @@
   "%b4ldm%(ib%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_ib_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -640,7 +640,7 @@
   "%b4ldm%(ib%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_ib"
   [(match_parallel 0 "store_multiple_operation"
@@ -654,7 +654,7 @@
   "%b4stm%(ib%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_ib_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -670,7 +670,7 @@
   "%b4stm%(ib%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_da"
   [(match_parallel 0 "load_multiple_operation"
@@ -686,7 +686,7 @@
   "%b4ldm%(da%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_da_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -704,7 +704,7 @@
   "%b4ldm%(da%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_da"
   [(match_parallel 0 "store_multiple_operation"
@@ -718,7 +718,7 @@
   "%b4stm%(da%)\t%4, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_da_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -734,7 +734,7 @@
   "%b4stm%(da%)\t%4!, {%1, %2, %3}"
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_db"
   [(match_parallel 0 "load_multiple_operation"
@@ -752,7 +752,7 @@
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*ldm3_db_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -772,7 +772,7 @@
   [(set_attr "type" "load3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_db"
   [(match_parallel 0 "store_multiple_operation"
@@ -787,7 +787,7 @@
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_insn "*stm3_db_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -804,7 +804,7 @@
   [(set_attr "type" "store3")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op4"))])
+   (set_attr "sfi_breg_operand" "4")])
 
 (define_peephole2
   [(set (match_operand:SI 0 "s_register_operand" "")
@@ -911,7 +911,7 @@
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*thumb_ldm2_ia"
   [(match_parallel 0 "load_multiple_operation"
@@ -923,7 +923,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 2"
   "%b3ldm%(ia%)\t%3, {%1, %2}"
   [(set_attr "type" "load2")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -939,7 +939,7 @@
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*thumb_ldm2_ia_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -953,7 +953,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 3"
   "%b3ldm%(ia%)\t%3!, {%1, %2}"
   [(set_attr "type" "load2")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_ia"
   [(match_parallel 0 "store_multiple_operation"
@@ -966,7 +966,7 @@
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -981,7 +981,7 @@
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*thumb_stm2_ia_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -994,7 +994,7 @@
   "TARGET_THUMB1 && XVECLEN (operands[0], 0) == 3"
   "%b3stm%(ia%)\t%3!, {%1, %2}"
   [(set_attr "type" "store2")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_ib"
   [(match_parallel 0 "load_multiple_operation"
@@ -1008,7 +1008,7 @@
   "%b3ldm%(ib%)\t%3, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_ib_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -1024,7 +1024,7 @@
   "%b3ldm%(ib%)\t%3!, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_ib"
   [(match_parallel 0 "store_multiple_operation"
@@ -1036,7 +1036,7 @@
   "%b3stm%(ib%)\t%3, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_ib_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -1050,7 +1050,7 @@
   "%b3stm%(ib%)\t%3!, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_da"
   [(match_parallel 0 "load_multiple_operation"
@@ -1063,7 +1063,7 @@
   "%b3ldm%(da%)\t%3, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_da_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -1078,7 +1078,7 @@
   "%b3ldm%(da%)\t%3!, {%1, %2}"
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_da"
   [(match_parallel 0 "store_multiple_operation"
@@ -1090,7 +1090,7 @@
   "%b3stm%(da%)\t%3, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_da_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -1104,7 +1104,7 @@
   "%b3stm%(da%)\t%3!, {%1, %2}"
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_db"
   [(match_parallel 0 "load_multiple_operation"
@@ -1119,7 +1119,7 @@
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*ldm2_db_update"
   [(match_parallel 0 "load_multiple_operation"
@@ -1136,7 +1136,7 @@
   [(set_attr "type" "load2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_db"
   [(match_parallel 0 "store_multiple_operation"
@@ -1149,7 +1149,7 @@
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_insn "*stm2_db_update"
   [(match_parallel 0 "store_multiple_operation"
@@ -1164,7 +1164,7 @@
   [(set_attr "type" "store2")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op3"))])
+   (set_attr "sfi_breg_operand" "3")])
 
 (define_peephole2
   [(set (match_operand:SI 0 "s_register_operand" "")

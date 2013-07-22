@@ -261,7 +261,7 @@
   "TARGET_NEON && !BYTES_BIG_ENDIAN"
   "%b0vst1.<V_sz_elem>\t{%P1}, %A0"
   [(set_attr "neon_type" "neon_vst1_1_2_regs_vst2_2_regs")
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_insn "*movmisalign<mode>_neon_load"
   [(set (match_operand:VDX 0 "s_register_operand"			"=w")
@@ -271,7 +271,7 @@
   "TARGET_NEON && !BYTES_BIG_ENDIAN"
   "%b1vld1.<V_sz_elem>\t{%P0}, %A1"
   [(set_attr "neon_type" "neon_vld1_1_2_regs")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "*movmisalign<mode>_neon_store"
   [(set (match_operand:VQX 0 "neon_permissive_struct_operand"  "=Um")
@@ -280,7 +280,7 @@
   "TARGET_NEON && !BYTES_BIG_ENDIAN"
   "%b0vst1.<V_sz_elem>\t{%q1}, %A0"
   [(set_attr "neon_type" "neon_vst1_1_2_regs_vst2_2_regs")
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_insn "*movmisalign<mode>_neon_load"
   [(set (match_operand:VQX 0 "s_register_operand"			"=w")
@@ -290,7 +290,7 @@
   "TARGET_NEON && !BYTES_BIG_ENDIAN"
   "%b1vld1.<V_sz_elem>\t{%q0}, %A1"
   [(set_attr "neon_type" "neon_vld1_1_2_regs")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "vec_set<mode>_internal"
   [(set (match_operand:VD 0 "s_register_operand" "=w,w")
@@ -312,9 +312,7 @@
     return "vmov.<V_sz_elem>\t%P0[%c2], %1";
 }
   [(set_attr "neon_type" "neon_vld1_vld2_lane,neon_mcr")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")]
-			      (const_string "*")))])
+   (set_attr "sfi_breg_operand" "1,*")])
 
 (define_insn "vec_set<mode>_internal"
   [(set (match_operand:VQ 0 "s_register_operand" "=w,w")
@@ -343,9 +341,7 @@
     return "vmov.<V_sz_elem>\t%P0[%c2], %1";
 }
   [(set_attr "neon_type" "neon_vld1_vld2_lane,neon_mcr")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "1,*")]
 )
 
 (define_insn "vec_setv2di_internal"
@@ -368,9 +364,7 @@
     return "vmov\t%P0, %Q1, %R1";
 }
   [(set_attr "neon_type" "neon_vld1_1_2_regs,neon_mcr_2_mcrr")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "1,*")]
 )
 
 (define_expand "vec_set<mode>"
@@ -405,9 +399,7 @@
     return "vmov.<V_uf_sclr>\t%0, %P1[%c2]";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane,neon_bp_simple")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "0,*")]
 )
 
 (define_insn "vec_extract<mode>"
@@ -434,9 +426,7 @@
     return "vmov.<V_uf_sclr>\t%0, %P1[%c2]";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane,neon_bp_simple")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "0,*")]
 )
 
 (define_insn "vec_extractv2di"
@@ -456,9 +446,7 @@
     return "vmov\t%Q0, %R0, %P1  @ v2di";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane,neon_int_1")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "0,*")]
 )
 
 (define_expand "vec_init<mode>"
@@ -1063,9 +1051,7 @@
    %b1vld1.32\t{%P0[0]}, %A1
    vmov.32\t%P0[0], %1"
   [(set_attr "neon_type" "neon_vld1_vld2_lane,neon_mcr")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")]
-			      (const_string "*")))]
+   (set_attr "sfi_breg_operand" "1,*")]
 )
 
 (define_insn "ashldi3_neon_noclobber"
@@ -4563,7 +4549,7 @@
   "TARGET_NEON"
   "%b1vld1.<V_sz_elem>\t%h0, %A1"
   [(set_attr "neon_type" "neon_vld1_1_2_regs")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld1_lane<mode>"
@@ -4587,7 +4573,7 @@
       (if_then_else (eq (const_string "<V_mode_nunits>") (const_int 2))
                     (const_string "neon_vld1_1_2_regs")
                     (const_string "neon_vld1_vld2_lane")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld1_lane<mode>"
@@ -4619,7 +4605,7 @@
       (if_then_else (eq (const_string "<V_mode_nunits>") (const_int 2))
                     (const_string "neon_vld1_1_2_regs")
                     (const_string "neon_vld1_vld2_lane")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld1_dup<mode>"
@@ -4636,7 +4622,7 @@
       (if_then_else (gt (const_string "<V_mode_nunits>") (const_string "1"))
                     (const_string "neon_vld2_2_regs_vld1_vld2_all_lanes")
                     (const_string "neon_vld1_1_2_regs")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld1_dup<mode>"
@@ -4647,7 +4633,7 @@
   return "%b1vld1.<V_sz_elem>\t{%e0[], %f0[]}, %A1";
 }
   [(set_attr "neon_type" "neon_vld2_2_regs_vld1_vld2_all_lanes")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn_and_split "neon_vld1_dupv2di"
@@ -4663,7 +4649,8 @@
     emit_move_insn (gen_highpart (DImode, operands[0]), tmprtx );
     DONE;
     }
-  [(set (attr "length") (attr "length_breg_op1_plus_1"))
+  [(set_attr "length" "8")
+   (set_attr "sfi_breg_operand" "1")
    (set_attr "neon_type" "neon_vld2_2_regs_vld1_vld2_all_lanes")]
 )
 
@@ -4680,7 +4667,7 @@
   "TARGET_NEON"
   "%b0vst1.<V_sz_elem>\t%h1, %A0"
   [(set_attr "neon_type" "neon_vst1_1_2_regs_vst2_2_regs")
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_insn "neon_vst1_lane<mode>"
   [(set (match_operand:<V_elem> 0 "neon_struct_operand" "=Um")
@@ -4703,7 +4690,7 @@
       (if_then_else (eq (const_string "<V_mode_nunits>") (const_int 1))
                     (const_string "neon_vst1_1_2_regs_vst2_2_regs")
                     (const_string "neon_vst1_vst2_lane")))
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_insn "neon_vst1_lane<mode>"
   [(set (match_operand:<V_elem> 0 "neon_struct_operand" "=Um")
@@ -4731,7 +4718,7 @@
     return "%b0vst1.<V_sz_elem>\t{%P1[%c2]}, %A0";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_expand "vec_load_lanesti<mode>"
@@ -4757,7 +4744,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vld1_1_2_regs")
                     (const_string "neon_vld2_2_regs_vld1_vld2_all_lanes")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_expand "vec_load_lanesoi<mode>"
@@ -4775,7 +4762,7 @@
   "TARGET_NEON"
   "%b1vld2.<V_sz_elem>\t%h0, %A1"
   [(set_attr "neon_type" "neon_vld2_2_regs_vld1_vld2_all_lanes")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "neon_vld2_lane<mode>"
   [(set (match_operand:TI 0 "s_register_operand" "=w")
@@ -4800,7 +4787,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld1_vld2_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld2_lane<mode>"
@@ -4831,7 +4818,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld1_vld2_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld2_dup<mode>"
@@ -4850,7 +4837,7 @@
       (if_then_else (gt (const_string "<V_mode_nunits>") (const_string "1"))
                     (const_string "neon_vld2_2_regs_vld1_vld2_all_lanes")
                     (const_string "neon_vld1_1_2_regs")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_expand "vec_store_lanesti<mode>"
@@ -4876,7 +4863,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vst1_1_2_regs_vst2_2_regs")
                     (const_string "neon_vst1_1_2_regs_vst2_2_regs")))
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_expand "vec_store_lanesoi<mode>"
@@ -4894,7 +4881,7 @@
   "TARGET_NEON"
   "%b0vst2.<V_sz_elem>\t%h1, %A0"
   [(set_attr "neon_type" "neon_vst1_1_2_regs_vst2_2_regs")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst2_lane<mode>"
@@ -4920,7 +4907,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst2_lane<mode>"
@@ -4951,7 +4938,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst1_vst2_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_expand "vec_load_lanesei<mode>"
@@ -4977,7 +4964,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vld1_1_2_regs")
                     (const_string "neon_vld3_vld4")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_expand "vec_load_lanesci<mode>"
@@ -5022,7 +5009,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld3qb<mode>"
@@ -5043,7 +5030,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld3_lane<mode>"
@@ -5071,7 +5058,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld3_lane<mode>"
@@ -5104,7 +5091,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld3_dup<mode>"
@@ -5132,7 +5119,7 @@
       (if_then_else (gt (const_string "<V_mode_nunits>") (const_string "1"))
                     (const_string "neon_vld3_vld4_all_lanes")
                     (const_string "neon_vld1_1_2_regs")))
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_expand "vec_store_lanesei<mode>"
   [(set (match_operand:EI 0 "neon_struct_operand")
@@ -5157,7 +5144,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vst1_1_2_regs_vst2_2_regs")
                     (const_string "neon_vst2_4_regs_vst3_vst4")))
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_expand "vec_store_lanesci<mode>"
   [(match_operand:CI 0 "neon_struct_operand")
@@ -5201,7 +5188,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst2_4_regs_vst3_vst4")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst3qb<mode>"
@@ -5221,7 +5208,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst2_4_regs_vst3_vst4")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst3_lane<mode>"
@@ -5249,7 +5236,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst3_vst4_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst3_lane<mode>"
@@ -5282,7 +5269,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst3_vst4_lane")
-   (set (attr "length") (attr "length_breg_op0"))])
+   (set_attr "sfi_breg_operand" "0")])
 
 (define_expand "vec_load_lanesoi<mode>"
   [(set (match_operand:OI 0 "s_register_operand")
@@ -5307,7 +5294,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vld1_1_2_regs")
                     (const_string "neon_vld3_vld4")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_expand "vec_load_lanesxi<mode>"
@@ -5353,7 +5340,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld4qb<mode>"
@@ -5375,7 +5362,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld4_lane<mode>"
@@ -5404,7 +5391,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld4_lane<mode>"
@@ -5438,7 +5425,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vld3_vld4_lane")
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "neon_vld4_dup<mode>"
@@ -5468,7 +5455,7 @@
       (if_then_else (gt (const_string "<V_mode_nunits>") (const_string "1"))
                     (const_string "neon_vld3_vld4_all_lanes")
                     (const_string "neon_vld1_1_2_regs")))
-   (set (attr "length") (attr "length_breg_op1"))]
+   (set_attr "sfi_breg_operand" "1")]
 )
 
 (define_expand "vec_store_lanesoi<mode>"
@@ -5494,7 +5481,7 @@
       (if_then_else (eq (const_string "<V_sz_elem>") (const_string "64"))
                     (const_string "neon_vst1_1_2_regs_vst2_2_regs")
                     (const_string "neon_vst2_4_regs_vst3_vst4")))
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_expand "vec_store_lanesxi<mode>"
@@ -5540,7 +5527,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst2_4_regs_vst3_vst4")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst4qb<mode>"
@@ -5561,7 +5548,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst2_4_regs_vst3_vst4")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst4_lane<mode>"
@@ -5590,7 +5577,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst3_vst4_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_insn "neon_vst4_lane<mode>"
@@ -5624,7 +5611,7 @@
   return "";
 }
   [(set_attr "neon_type" "neon_vst3_vst4_lane")
-   (set (attr "length") (attr "length_breg_op0"))]
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 (define_expand "neon_vand<mode>"

@@ -53,18 +53,13 @@
     }
   "
   [(set_attr "predicable" "yes")
+   (set_attr "sfi_sp_operand"   "0,0,0,0,0,1,*,*,*,*,*")
+   (set_attr "sfi_breg_operand" "*,*,*,*,1,0,*,*,*,1,0")
    (set_attr "type" "*,*,simple_alu_imm,simple_alu_imm,load1,store1,r_2_f,f_2_r,fcpys,f_loads,f_stores")
    (set_attr "neon_type" "*,*,*,*,*,*,neon_mcr,neon_mrc,neon_vmov,*,*")
    (set_attr "insn" "mov,mov,mvn,mov,*,*,*,*,*,*,*")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
-   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "0,1,2,3")
-			       (attr "length_sp_op0")
-			       (eq_attr "alternative" "4,9")
-			       (attr "length_breg_op1_sp_op0")
-			       (eq_attr "alternative" "5,10")
-			       (attr "length_breg_op0_sp_op1")]
-			      (const_int 4)))]
+   (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")]
 )
 
 ;; See thumb2.md:thumb2_movsi_insn for an explanation of the split
@@ -157,21 +152,16 @@
   "
   [(set_attr "type" "*,*,*,*,load2,load2,store2,r_2_f,f_2_r,ffarithd,f_loadd,f_stored")
    (set_attr "neon_type" "*,*,*,*,*,*,*,neon_mcr_2_mcrr,neon_mrrc,neon_vmov,*,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "1") (const_int 8)
-			       (eq_attr "alternative" "2") (const_int 12)
-			       (eq_attr "alternative" "3") (const_int 16)
-			       (eq_attr "alternative" "4,5")
-			       (attr "length_breg_op1_plus_1")
-			       (eq_attr "alternative" "6")
-			       (attr "length_breg_op0_plus_1")
-			       (eq_attr "alternative" "9")
+   (set (attr "length") (cond [(eq_attr "alternative" "1,4,5,6") (const_int 8)
+                              (eq_attr "alternative" "2") (const_int 12)
+                              (eq_attr "alternative" "3") (const_int 16)
+                              (eq_attr "alternative" "9")
                                (if_then_else
-				(match_test "TARGET_VFP_SINGLE")
-				(const_int 8)
-				(const_int 4))
-			       (eq_attr "alternative" "10")
-			       (attr "length_breg_op1")]
-                              (attr "length_breg_op0")))
+                                 (match_test "TARGET_VFP_SINGLE")
+                                 (const_int 8)
+                                 (const_int 4))]
+                              (const_int 4)))
+   (set_attr "sfi_breg_operand" "*,*,*,*,1,1,0,*,*,*,1,0")
    (set_attr "arm_pool_range"     "*,*,*,*,1020,4096,*,*,*,*,1020,*")
    (set_attr "thumb2_pool_range"     "*,*,*,*,1018,4094,*,*,*,*,1018,*")
    (set_attr "neg_pool_range" "*,*,*,*,1004,0,*,*,*,*,1004,*")
@@ -218,10 +208,9 @@
                                (eq_attr "alternative" "4,5,6")
 			       (symbol_ref
 				"arm_count_output_move_double_insns (operands) \
-                                 * 4")
-			       (eq_attr "alternative" "10")
-			       (attr "length_breg_op1")]
-                              (attr "length_breg_op0")))
+                                 * 4")]
+                              (const_int 4)))
+   (set_attr "sfi_breg_operand" "*,*,*,*,*,*,*,*,*,*,1,0")
    (set_attr "predicable"    "yes")
    (set_attr "arm_pool_range"     "*,*,*,*,1018,4094,*,*,*,*,1018,*")
    (set_attr "thumb2_pool_range"     "*,*,*,*,1018,4094,*,*,*,*,1018,*")
@@ -242,9 +231,9 @@
   switch (which_alternative)
     {
     case 0:     /* S register from memory */
-      return \"vld1.16\\t{%z0}, %A1\";
+      return \"%b1vld1.16\\t{%z0}, %A1\";
     case 1:     /* memory from S register */
-      return \"vst1.16\\t{%z1}, %A0\";
+      return \"%b0vst1.16\\t{%z1}, %A0\";
     case 2:     /* ARM register from memory */
       return \"%b1ldrh\\t%0, %1\\t%@ __fp16\";
     case 3:     /* memory from ARM register */
@@ -283,13 +272,8 @@
   [(set_attr "conds" "unconditional")
    (set_attr "type" "*,*,load1,store1,fcpys,*,r_2_f,f_2_r,*")
    (set_attr "neon_type" "neon_vld1_1_2_regs,neon_vst1_1_2_regs_vst2_2_regs,*,*,*,*,*,*,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "2")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "3")
-			       (attr "length_breg_op0")
-			       (eq_attr "alternative" "8")
-			       (const_int 8)]
-			      (const_int 4)))]
+   (set_attr "sfi_breg_operand" "1,0,1,0,*,*,*,*,*")
+   (set_attr "length" "4,4,4,4,4,4,4,4,8")]
 )
 
 ;; FP16 without element load/store instructions.
@@ -339,13 +323,8 @@
   "
   [(set_attr "conds" "unconditional")
    (set_attr "type" "load1,store1,fcpys,*,r_2_f,f_2_r,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "1")
-			       (attr "length_breg_op0")
-			       (eq_attr "alternative" "6")
-			       (const_int 8)]
-			      (const_int 4)))]
+   (set_attr "sfi_breg_operand" "1,0,*,*,*,*,*")
+   (set_attr "length" "4,4,4,4,4,4,8")]
 )
 
 
@@ -387,13 +366,9 @@
      "r_2_f,f_2_r,fconsts,f_loads,f_stores,load1,store1,fcpys,*")
    (set_attr "neon_type" "neon_mcr,neon_mrc,*,*,*,*,*,neon_vmov,*")
    (set_attr "insn" "*,*,*,*,*,*,*,*,mov")
+   (set_attr "sfi_breg_operand" "*,*,*,1,0,1,0,*,*")
    (set_attr "pool_range" "*,*,*,1020,*,4096,*,*,*")
-   (set_attr "neg_pool_range" "*,*,*,1008,*,4080,*,*,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "3,5")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "4,6")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))]
+   (set_attr "neg_pool_range" "*,*,*,1008,*,4080,*,*,*")]
 )
 
 (define_insn "*thumb2_movsf_vfp"
@@ -473,21 +448,14 @@
   [(set_attr "type"
      "r_2_f,f_2_r,fconstd,f_loadd,f_stored,load2,store2,ffarithd,*")
    (set_attr "neon_type" "neon_mcr_2_mcrr,neon_mrrc,*,*,*,*,*,neon_vmov,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "3")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "4")
-			       (attr "length_breg_op0")
-			       (eq_attr "alternative" "5,6")
-			       (symbol_ref
-				"arm_count_output_move_double_insns (operands) \
-                                 * 4")
+   (set (attr "length") (cond [(eq_attr "alternative" "5,6,8") (const_int 8)
 			       (eq_attr "alternative" "7")
-			       (if_then_else
-				(match_test "TARGET_VFP_SINGLE")
-				(const_int 8)
-				(const_int 4))
-			       (eq_attr "alternative" "8") (const_int 8)]
+				(if_then_else
+				 (match_test "TARGET_VFP_SINGLE")
+				 (const_int 8)
+				 (const_int 4))]
 			      (const_int 4)))
+   (set_attr "sfi_breg_operand" "*,*,*,1,0,*,*,*,*")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,*,*,1020,*,1020,*,*,*")
    (set_attr "neg_pool_range" "*,*,*,1004,*,1004,*,*,*")]

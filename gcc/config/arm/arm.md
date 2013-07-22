@@ -712,7 +712,11 @@
 (define_attr "ce_count" "" (const_int 1))
 
 ;; Attributes for TARGET_SFI_NACL1 stuff (%*, %b, and %j uses).
-(include "nacl-attrs.md")
+(define_attr "sfi_branch" "none,bx,bl,blx" (const_string "none")) ; for %*
+(define_attr "sfi_sp_operand" "" (symbol_ref "MAX_RECOG_OPERANDS")) ; for %j
+(define_attr "sfi_sp_ninsns" "" (const_int 1)) ; many %j's
+(define_attr "sfi_breg_operand" "" (symbol_ref "MAX_RECOG_OPERANDS")) ; for %b
+(define_attr "sfi_breg_ninsns" "" (const_int 1)) ; many %b's
 
 ;;---------------------------------------------------------------------------
 ;; Unspecs
@@ -967,9 +971,9 @@
 		      operands[1], 0);
   DONE;
   "
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "11")
-				      (attr "length_sp_op0_by_4")
-				      (attr "length_sp_op0")))
+  [(set_attr "length" "2,4,4,4,4,4,4,4,4,4,4,16")
+   (set_attr "sfi_sp_operand" "0")
+   (set_attr "sfi_sp_ninsns" "*,*,*,*,*,*,*,*,*,*,*,4")
    (set_attr "predicable" "yes")
    (set_attr "arch" "t2,*,*,*,t2,t2,*,*,a,t2,t2,*")
    (set (attr "type") (if_then_else (match_operand 2 "const_int_operand" "")
@@ -1055,7 +1059,7 @@
    %j0sub%.\\t%0, %1, #%n2
    %j0add%.\\t%0, %1, %2"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))
+   (set_attr "sfi_sp_operand" "0")
    (set_attr "type" "simple_alu_imm, simple_alu_imm, *")]
 )
 
@@ -1102,7 +1106,7 @@
    %j0add%.\\t%0, %1, %3
    %j0sub%.\\t%0, %1, #%n3"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))]
+   (set_attr "sfi_sp_operand" "0")]
 )
 
 ;; Convert the sequence
@@ -1160,7 +1164,7 @@
    %j0sub%.\\t%0, %1, #%n2
    %j0add%.\\t%0, %1, %2"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))
+   (set_attr "sfi_sp_operand" "0")
    (set_attr "type"  "simple_alu_imm,simple_alu_imm,*")]
 )
 
@@ -1178,7 +1182,7 @@
    %j0add%.\\t%0, %1, %2
    %j0sub%.\\t%0, %1, #%n2"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))
+   (set_attr "sfi_sp_operand" "0")
    (set_attr "type" "simple_alu_imm,simple_alu_imm,*")]
 )
 
@@ -1614,9 +1618,9 @@
                       INTVAL (operands[1]), operands[0], operands[2], 0);
   DONE;
   "
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "4")
-				      (attr "length_sp_op0_by_4")
-				      (attr "length_sp_op0")))
+  [(set_attr "length" "4,4,4,4,16")
+   (set_attr "sfi_sp_operand" "0")
+   (set_attr "sfi_sp_ninsns" "*,*,*,*,4")
    (set_attr "predicable" "yes")
    (set_attr "type"  "*,simple_alu_imm,*,*,*")]
 )
@@ -1648,7 +1652,7 @@
    %j0sub%.\\t%0, %1, %2
    %j0rsb%.\\t%0, %2, %1"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))
+   (set_attr "sfi_sp_operand" "0")
    (set_attr "type"  "simple_alu_imm,*,*")]
 )
 
@@ -1664,7 +1668,7 @@
    %j0sub%.\\t%0, %1, %2
    %j0rsb%.\\t%0, %2, %1"
   [(set_attr "conds" "set")
-   (set (attr "length") (attr "length_sp_op0"))
+   (set_attr "sfi_sp_operand" "0")
    (set_attr "type" "simple_alu_imm,*,*")]
 )
 
@@ -3925,7 +3929,9 @@
    (set (attr "length")
 	(if_then_else (eq_attr "is_thumb" "yes")
 		      (const_int 14)
-		      (attr "length_breg_op0_by_2_plus_1")))
+		      (const_int 12)))
+   (set_attr "sfi_breg_operand" "0")
+   (set_attr "sfi_breg_ninsns" "2")
    (set_attr "type" "store1")]
 )
 
@@ -3967,10 +3973,11 @@
     return \"\";
   }"
   [(set_attr "conds" "clob")
+   (set_attr "sfi_sp_operand" "0")
    (set (attr "length")
 	(if_then_else (eq_attr "is_thumb" "yes")
 		      (const_int 14)
-		      (attr "length_sp_op0_by_2_plus_1")))]
+		      (const_int 12)))]
 )
 
 ; Reject the frame pointer in operand[1], since reloading this after
@@ -4703,7 +4710,8 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%?\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
+   (set_attr "length" "2,4")
+   (set_attr "sfi_breg_operand" "1")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no")
    (set_attr "type" "load1")])
@@ -4716,7 +4724,8 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%(sh%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
+   (set_attr "length" "2,4")
+   (set_attr "sfi_breg_operand" "1")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no")
    (set_attr "type" "load_byte")])
@@ -4729,7 +4738,8 @@
   "unaligned_access && TARGET_32BIT"
   "%b1ldr%(h%)\t%0, %1\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set (attr "length") (attr "length_breg_op1_alt1_or_t2"))
+   (set_attr "length" "2,4")
+   (set_attr "sfi_breg_operand" "1")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no")
    (set_attr "type" "load_byte")])
@@ -4741,7 +4751,8 @@
   "unaligned_access && TARGET_32BIT"
   "%b0str%?\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set (attr "length") (attr "length_breg_op0_alt1_or_t2"))
+   (set_attr "length" "2,4")
+   (set_attr "sfi_breg_operand" "0")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no")
    (set_attr "type" "store1")])
@@ -4753,7 +4764,8 @@
   "unaligned_access && TARGET_32BIT"
   "%b0str%(h%)\t%1, %0\t@ unaligned"
   [(set_attr "arch" "t2,any")
-   (set (attr "length") (attr "length_breg_op0_alt1_or_t2"))
+   (set_attr "length" "2,4")
+   (set_attr "sfi_breg_operand" "0")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no")
    (set_attr "type" "store1")])
@@ -5560,9 +5572,7 @@
    #
    %b1ldr%(h%)\\t%0, %1"
   [(set_attr "type" "alu_shift,load_byte")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_string "*")
-				      (attr "length_breg_op1")))
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "predicable" "yes")]
 )
 
@@ -5574,9 +5584,7 @@
    uxth%?\\t%0, %1
    %b1ldr%(h%)\\t%0, %1"
   [(set_attr "predicable" "yes")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_string "*")
-				      (attr "length_breg_op1")))
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "type" "simple_alu_shift,load_byte")]
 )
 
@@ -5658,9 +5666,8 @@
   "@
    #
    %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_int 8)
-				      (attr "length_breg_op1")))
+  [(set_attr "length" "8,4")
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")]
 )
@@ -5673,9 +5680,7 @@
    uxtb%(%)\\t%0, %1
    %b1ldr%(b%)\\t%0, %1\\t%@ zero_extendqisi2"
   [(set_attr "type" "simple_alu_shift,load_byte")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_string "*")
-				      (attr "length_breg_op1")))
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "predicable" "yes")]
 )
 
@@ -5909,9 +5914,8 @@
   "@
    #
    %b1ldr%(sh%)\\t%0, %1"
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_int 8)
-				      (attr "length_breg_op1")))
+  [(set_attr "length" "8,4")
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -5927,9 +5931,7 @@
    sxth%?\\t%0, %1
    %b1ldr%(sh%)\\t%0, %1"
   [(set_attr "type" "simple_alu_shift,load_byte")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_string "*")
-				      (attr "length_breg_op1")))
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
    (set_attr "pool_range" "*,256")
@@ -5975,7 +5977,7 @@
   "TARGET_ARM && arm_arch4"
   "%b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "load_byte")
-   (set (attr "length") (attr "length_breg_op1"))
+   (set_attr "sfi_breg_operand" "1")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "256")
    (set_attr "neg_pool_range" "244")]
@@ -6016,9 +6018,8 @@
   "@
    #
    %b1ldr%(sb%)\\t%0, %1"
-  [(set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_int 8)
-				      (attr "length_breg_op1")))
+  [(set_attr "length" "8,4")
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "type" "alu_shift,load_byte")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
@@ -6034,9 +6035,7 @@
    sxtb%?\\t%0, %1
    %b1ldr%(sb%)\\t%0, %1"
   [(set_attr "type" "simple_alu_shift,load_byte")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_string "*")
-				      (attr "length_breg_op1")))
+   (set_attr "sfi_breg_operand" "*,1")
    (set_attr "predicable" "yes")
    (set_attr "pool_range" "*,256")
    (set_attr "neg_pool_range" "*,244")]
@@ -6528,11 +6527,7 @@
   [(set_attr "type" "*,simple_alu_imm,simple_alu_imm,simple_alu_imm,load1,store1")
    (set_attr "insn" "mov,mov,mvn,mov,*,*")
    (set_attr "predicable" "yes")
-   (set (attr "length") (cond [(eq_attr "alternative" "4")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "5")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))
+   (set_attr "sfi_breg_operand" "*,*,*,*,1,0")
    (set_attr "pool_range" "*,*,*,*,4096,*")
    (set_attr "neg_pool_range" "*,*,*,*,4084,*")]
 )
@@ -6727,7 +6722,7 @@
   "TARGET_32BIT && flag_pic"
   "%b1ldr%?\\t%0, %1"
   [(set_attr "type" "load1")
-   (set (attr "length") (attr "length_breg_op1"))
+   (set_attr "sfi_breg_operand" "1")
    (set (attr "pool_range")
 	(if_then_else (eq_attr "is_thumb" "no")
 		      (const_int 4096)
@@ -6807,7 +6802,8 @@
 	   \"%b0ldr%?\\t%0, [%0]\\t@ tls_load_dot_plus_eight_nacl\";
   "
   [(set_attr "predicable" "yes")
-   (set (attr "length") (attr  "length_breg_op0_plus_1"))]
+   (set_attr "length" "8")
+   (set_attr "sfi_breg_operand" "0")]
 )
 
 
@@ -6869,9 +6865,7 @@
    cmp%?\\t%0, #0
    %j0sub%.\\t%0, %1, #0"
   [(set_attr "conds" "set")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (const_int 4)
-				      (attr "length_sp_op0")))
+   (set_attr "sfi_sp_operand" "*,0")
    (set_attr "type" "simple_alu_imm,simple_alu_imm")]
 )
 
@@ -7287,11 +7281,7 @@
    %b1ldr%(h%)\\t%0, %1\\t%@ movhi"
   [(set_attr "predicable" "yes")
    (set_attr "insn" "mov,mvn,*,*")
-   (set (attr "length") (cond [(eq_attr "alternative" "2")
-			       (attr "length_breg_op0")
-			       (eq_attr "alternative" "3")
-			       (attr "length_breg_op1")]
-			      (const_string "*")))
+   (set_attr "sfi_breg_operand" "*,*,0,1")
    (set_attr "pool_range" "*,*,*,256")
    (set_attr "neg_pool_range" "*,*,*,244")
    (set_attr_alternative "type"
@@ -7457,16 +7447,8 @@
    (set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,yes,yes,no,no,no,no,no,no")
    (set_attr "arch" "t2,any,any,t2,any,t2,t2,any,any")
-   (set (attr "length") (cond [(ior (eq_attr "alternative" "0")
-				    (eq_attr "alternative" "3")
-				    (eq_attr "alternative" "5")
-				    (eq_attr "alternative" "6"))
-			       (const_int 2)
-			       (eq_attr "alternative" "7")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "8")
-			       (attr "length_breg_op0")]
-			      (const_int 4)))]
+   (set_attr "sfi_breg_operand" "*,*,*,*,*,*,*,1,0")
+   (set_attr "length" "2,4,4,2,4,2,2,4,4")]
 )
 
 (define_insn "*thumb1_movqi_insn"
@@ -7551,15 +7533,8 @@
   [(set_attr "conds" "unconditional")
    (set_attr "type" "load1,store1,*,*")
    (set_attr "insn" "*,*,mov,mov")
-   (set (attr "length") (cond [(eq_attr "alternative" "0")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "1")
-			       (attr "length_breg_op0")
-			       (eq_attr "alternative" "3")
-			       (if_then_else (match_test "arm_arch_thumb2")
-					     (const_int 4)
-					     (const_int 8))]
-			      (const_int 4)))
+   (set_attr "sfi_breg_operand" "1,0,*,*")
+   (set_attr "length" "4,4,4,8")
    (set_attr "predicable" "yes")]
 )
 
@@ -7648,11 +7623,7 @@
    %b1ldr%?\\t%0, %1\\t%@ float
    %b0str%?\\t%1, %0\\t%@ float"
   [(set_attr "predicable" "yes")
-   (set (attr "length") (cond [(eq_attr "alternative" "1")
-			       (attr "length_breg_op1")
-			       (eq_attr "alternative" "2")
-			       (attr "length_breg_op0")]
-			      (const_string "*")))
+   (set_attr "sfi_breg_operand" "*,1,0")
    (set_attr "type" "*,load1,store1")
    (set_attr "insn" "mov,*,*")
    (set_attr "arm_pool_range" "*,4096,*")
@@ -9406,7 +9377,7 @@
   "TARGET_ARM && arm_arch5 && !SIBLING_CALL_P (insn)"
   "%*blx%?\\t%0"
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_blx"))]
+   (set_attr "sfi_branch" "blx")]
 )
 
 (define_insn "*call_reg_arm"
@@ -9519,7 +9490,7 @@
   "TARGET_ARM && arm_arch5 && !SIBLING_CALL_P (insn)"
   "%*blx%?\\t%1"
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_blx"))]
+   (set_attr "sfi_branch" "blx")]
 )
 
 (define_insn "*call_value_reg_arm"
@@ -9603,7 +9574,7 @@
     return NEED_PLT_RELOC ? \"%*bl%?\\t%a0(PLT)\" : \"%*bl%?\\t%a0\";
   }"
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_bl"))]
+   (set_attr "sfi_branch" "bl")]
 )
 
 (define_insn "*call_value_symbol"
@@ -9621,7 +9592,7 @@
     return NEED_PLT_RELOC ? \"%*bl%?\\t%a1(PLT)\" : \"%*bl%?\\t%a1\";
   }"
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_bl"))]
+   (set_attr "sfi_branch" "bl")]
 )
 
 (define_insn "*call_insn"
@@ -9705,7 +9676,7 @@
     }
   "
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_bx"))]
+   (set_attr "sfi_branch" "bx")]
 )
 
 (define_insn "*sibcall_value_insn"
@@ -9727,7 +9698,7 @@
     }
   "
   [(set_attr "type" "call")
-   (set (attr "length") (attr "length_sfi_bx"))]
+   (set_attr "sfi_branch" "bx")]
 )
 
 (define_expand "<return_str>return"
@@ -9761,7 +9732,7 @@
     return output_return_instruction (const_true_rtx, true, false, false);
   }"
   [(set_attr "type" "load1")
-   (set (attr "length") (attr "length_sfi_bx_plus_2"))
+   (set_attr "sfi_branch" "bx")
    (set_attr "predicable" "yes")]
 )
 
@@ -9783,7 +9754,7 @@
 				      <return_simple_p>);
   }"
   [(set_attr "conds" "use")
-   (set (attr "length") (attr "length_sfi_bx_plus_2"))
+   (set_attr "sfi_branch" "bx")
    (set_attr "type" "load1")]
 )
 
@@ -9805,7 +9776,7 @@
 				      <return_simple_p>);
   }"
   [(set_attr "conds" "use")
-   (set (attr "length") (attr "length_sfi_bx_plus_2"))
+   (set_attr "sfi_branch" "bx")
    (set_attr "type" "load1")]
 )
 
@@ -9822,7 +9793,7 @@
     return output_return_instruction (const_true_rtx, true, false, true);
   }"
   [(set_attr "type" "branch")
-   (set (attr "length") (attr "length_sfi_bx"))
+   (set_attr "sfi_branch" "bx")
    (set_attr "predicable" "yes")]
 )
 
@@ -10102,7 +10073,7 @@
   return \"mov%?\\t%|pc, %0\\t%@ indirect register jump\";
   "
   [(set_attr "predicable" "yes")
-   (set (attr "length") (attr "length_sfi_bx"))]
+   (set_attr "sfi_branch" "bx")]
 )
 
 (define_insn "*load_indirect_jump"
@@ -10179,7 +10150,7 @@
 			   (match_operand:SI 3 "mult_operator" "")
 			   (const_string "no") (const_string "yes"))])
    (set_attr "type" "alu_shift,alu_shift,alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 (define_split
   [(set (match_operand:SI 0 "s_register_operand" "")
@@ -10217,7 +10188,7 @@
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
    (set_attr "type" "alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 (define_insn "*arith_shiftsi_compare0_scratch"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -10235,7 +10206,7 @@
    (set_attr "shift" "4")
    (set_attr "arch" "32,a")
    (set_attr "type" "alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 (define_insn "*sub_shiftsi"
   [(set (match_operand:SI 0 "s_register_operand" "=r,r")
@@ -10249,7 +10220,7 @@
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
    (set_attr "type" "alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 (define_insn "*sub_shiftsi_compare0"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -10268,7 +10239,7 @@
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
    (set_attr "type" "alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 (define_insn "*sub_shiftsi_compare0_scratch"
   [(set (reg:CC_NOOV CC_REGNUM)
@@ -10285,7 +10256,7 @@
    (set_attr "shift" "3")
    (set_attr "arch" "32,a")
    (set_attr "type" "alu_shift,alu_shift_reg")
-   (set (attr "length") (attr "length_sp_op0"))])
+   (set_attr "sfi_sp_operand" "0")])
 
 
 (define_insn_and_split "*and_scc"
@@ -10587,7 +10558,8 @@
     return \"%j0%i5%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
-   (set (attr "length") (attr "length_sp_op0_by_3"))]
+   (set_attr "sfi_sp_operand" "0")
+   (set_attr "length" "12")]
 )
 
 (define_insn "*cond_sub"
@@ -10605,9 +10577,8 @@
     return \"%j0sub%d4\\t%0, %1, #1\";
   "
   [(set_attr "conds" "clob")
-   (set (attr "length") (if_then_else (eq_attr "alternative" "0")
-				      (attr "length_sp_op0_plus_1")
-				      (attr "length_sp_op0_plus_2")))]
+   (set_attr "sfi_sp_operand" "0")
+   (set_attr "length" "8,12")]
 )
 
 (define_insn "*cmp_ite0"
@@ -11912,11 +11883,12 @@
     output_asm_insn (\"%I3%?\\t%0, %1, %2\", arith);
     return \"\";
   }"
-  ;; It's too hairy to compute which operands are involved in the loads,
-  ;; so just assume the worst case (see "length_breg_op0_by_2_plus_1").
-  [(set (attr "length") (if_then_else (match_test "TARGET_SFI_NACL1")
-				      (const_int 28) ; (12 * 2) + 4
-				      (const_int 12)))
+  [(set_attr "length" "12")
+   ;; Sometimes operand 4 (scratch register) is used as a base register
+   ;; in place of operand 2.  We can't easily represent that, but it's
+   ;; probably adequate to assume that operand 2 won't be sp in those cases.
+   (set_attr "sfi_breg_operand" "2")
+   (set_attr "sfi_breg_ninsns" "2")
    (set_attr "predicable" "yes")
    (set_attr "type" "load1")]
 )
@@ -12742,7 +12714,7 @@
   "TARGET_SOFT_TP"
   "%*bl\\t__aeabi_read_tp\\t@ load_tp_soft"
   [(set_attr "conds" "clob")
-   (set (attr "length") (attr "length_sfi_bl"))]
+   (set_attr "sfi_branch" "bl")]
 )
 
 ;; tls descriptor call
@@ -12761,7 +12733,7 @@
     return "%*bl\\t%c0(tlscall)";
   }
   [(set_attr "conds" "clob")
-   (set (attr "length") (attr "length_sfi_bl"))]
+   (set_attr "sfi_branch" "bl")]
 )
 
 ;; For thread pointer builtin

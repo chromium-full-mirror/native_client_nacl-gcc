@@ -81,7 +81,7 @@
     else
       return \"%b1lda<sync_sfx>\\t%0, %1\";
   }
-  [(set (attr "length") (attr "length_breg_op1"))]
+  [(set_attr "sfi_breg_operand" "1")]
 )
 
 (define_insn "atomic_store<mode>"
@@ -100,7 +100,7 @@
     else
       return \"%b0stl<sync_sfx>\t%1, %0\";
   }
-  [(set (attr "length") (attr "length_breg_op0"))]
+  [(set_attr "sfi_breg_operand" "0")]
 )
 
 ;; Note that ldrd and vldr are *not* guaranteed to be single-copy atomic,
@@ -128,7 +128,7 @@
   "%b1ldrexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_expand "atomic_compare_and_swap<mode>"
   [(match_operand:SI 0 "s_register_operand" "")		;; bool out
@@ -367,7 +367,7 @@
   "%b1ldrex<sync_sfx>%?\t%0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_load_acquire_exclusive<mode>"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
@@ -379,7 +379,7 @@
   "%b1ldaex<sync_sfx>%?\\t%0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_load_exclusivesi"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
@@ -390,7 +390,7 @@
   "%b1ldrex%?\t%0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_load_acquire_exclusivesi"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
@@ -401,7 +401,7 @@
   "%b1ldaex%?\t%0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_load_exclusivedi"
   [(set (match_operand:DI 0 "s_register_operand" "=r")
@@ -412,7 +412,7 @@
   "%b1ldrexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_load_acquire_exclusivedi"
   [(set (match_operand:DI 0 "s_register_operand" "=r")
@@ -423,7 +423,7 @@
   "%b1ldaexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_store_exclusive<mode>"
   [(set (match_operand:SI 0 "s_register_operand" "=&r")
@@ -449,7 +449,7 @@
   }
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_store_release_exclusivedi"
   [(set (match_operand:SI 0 "s_register_operand" "=&r")
@@ -468,7 +468,7 @@
   }
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
 
 (define_insn "arm_store_release_exclusive<mode>"
   [(set (match_operand:SI 0 "s_register_operand" "=&r")
@@ -481,4 +481,4 @@
   "%b1stlex<sync_sfx>%?\t%0, %2, %C1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set (attr "length") (attr "length_breg_op1"))])
+   (set_attr "sfi_breg_operand" "1")])
