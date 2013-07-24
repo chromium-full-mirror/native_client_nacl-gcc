@@ -2,6 +2,31 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-07-24  Bill Schmidt  <wschmidt@vnet.linux.ibm.com>
+	    Anton Blanchard <anton@au1.ibm.com>
+
+	* vector.md (vec_realign_load_<mode>): Reorder input operands to
+	vperm for little endian.
+	* rs6000.c (rs6000_expand_builtin): Use lvsr instead of lvsl to
+	create the control mask for a vperm for little endian.
+
+2013-07-23  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+	    Anton Blanchard <anton@au1.ibm.com>
+
+	* config/rs6000/rs6000.c (altivec_expand_vec_perm_const): Reverse
+	two operands for little-endian.
+
+2013-07-23  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips.c (mips_case_values_threshold): New.
+	(TARGET_CASE_VALUES_THRESHOLD): Define.
+
+2013-07-23  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+	    Anton Blanchard <anton@au1.ibm.com>
+
+	* config/rs6000/rs6000.c (altivec_expand_vec_perm_const): Correct
+	selection of field for vector splat in little endian mode.
+
 2013-07-23  Michael Meissner  <meissner@linux.vnet.ibm.com>
 
 	* config/rs6000/vector.md (xor<mode>3): Move 128-bit boolean
@@ -99,9 +124,11 @@
 
 2013-07-23  David Holsgrove <david.holsgrove@xilinx.com>
 
-	* config/microblaze/microblaze.c: Add microblaze_asm_output_mi_thunk
-	and define TARGET_ASM_OUTPUT_MI_THUNK and
-	TARGET_ASM_CAN_OUTPUT_MI_THUNK.
+	* config/microblaze/sync.md: New file.
+	* config/microblaze/microblaze.md: Include sync.md
+	* config/microblaze/microblaze.c: Add print_operand 'y'.
+	* config/microblaze/constraints.md: Add memory_contraint
+	'Q' which is a single register.
 
 2013-07-23  Eric Botcazou  <ebotcazou@adacore.com>
 
