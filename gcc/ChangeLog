@@ -2,6 +2,135 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-07-26  Ian Bolton  <ian.bolton@arm.com>
+
+	* config/aarch64/aarch64.md (neg<mode>2): Offer alternative that
+	uses vector registers.
+	* config/aarch64/iterators.md: Add attributes rtn and vas.
+
+2013-07-26  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+            Richard Earnshaw  <richard.earnshaw@arm.com>
+
+	* combine.c (simplify_comparison): Re-canonicalize operands
+	where appropriate.	
+	* config/arm/arm.md (movcond_addsi): New splitter.
+
+2013-07-25  Sterling Augustine  <saugustine@google.com>
+
+	* dwarf2out.c (size_of_pubnames): Move code to...
+	(include_pubname_in_output): ...here.  New.
+	(want_pubnames): Rearrange.
+	(output_pubnames): Call include_pubname_in_output.  Move assertion.
+
+2013-07-25  Cameron McInally  <cameron.mcinally@nyu.edu>
+
+	* doc/extend.texi: Fix return types for __builtin_ia32_cmp*s builtins.
+
+2013-07-25  Cameron McInally  <cameron.mcinally@nyu.edu>
+
+	PR target/38836
+	* doc/extend.texi: Remove obsolete builtins. Fix
+	typo for __builtin_ia32_loadss and __builtin_ia32_cmpnltss.
+
+2013-07-25  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.c (release_function_body): Break out from ...
+	(cgraph_release_function_body): ... this one; also release DECL_RESULT
+	and DECL_ARGUMENTS.
+	* ipa-cp.c (get_replacement_map): Add parm_num argument; do not set
+	old_tree in the map.
+	(create_specialized_node): Update.
+	* lto-cgraph.c (output_node_opt_summary): Do not translate old_tree
+	into index.
+	* cgraphclones.c (cgraph_create_virtual_clone): Do not copy
+	DECL_ARGUMENTS, DECL_INITIAL and DECL_RESULT.
+	* ipa-prop.c (ipa_populate_param_decls): Look for origin of clones.
+	* tree-inline.c (initialize_cfun): Initialize DECL_ARGUMENTS and
+	DECL_RESULT.
+
+2013-07-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (arm_addsi3, addsi3_carryin_<optab>,
+	addsi3_carryin_alt2_<optab>): Correct output template.
+
+2013-07-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm-fixed.md (ssmulsa3, usmulusa3):
+	Adjust for arm_restrict_it.
+	Remove trailing whitespace.
+
+2013-07-25  Mark Kettenis  <kettenis@openbsd.org>
+
+	* config/pa/pa.c (pa_trampoline_init): Emit __enable_execute_stack
+	libcall if HAVE_ENABLE_EXECUTE_STACK is defined.
+
+	* config.gcc (hppa-*-openbsd*): Don't set tmake_file.
+
+2013-07-25  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/57960
+	* lra-constraints.c (process_alt_operands): Use the right mode
+	when checking strict_low.
+
+2013-07-25  Jan Hubicka  <jh@suse.cz>
+
+	* lto-symtab.c (lto_cgraph_replace_node): Release function body.
+	* cgraph.c (cgraph_remove_node): Do not release function body
+	when in cgraph streaming.
+	* ipa.c (process_references, symtab_remove_unreachable_nodes): Objects
+	in other partitions are not considered reachable; fix handling of
+	clones.
+
+2013-07-25  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* config/arm/arm.md (*sibcall_insn): Remove unnecessary space.
+
+2013-07-25  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	PR target/19599
+	PR target/57731
+	PR target/57748
+	* config/arm/arm.md ("*sibcall_insn): Replace use of
+	Ss with US. Adjust output for v5 and v4t.
+	(*sibcall_value_insn): Likewise and loosen predicate on operand0.
+
+	* config/arm/constraints.md ("Ss"): Rename to US.
+
+2013-07-25  Terry Guo  <terry.guo@arm.com>
+
+	* config/arm/arm.c (thumb1_size_rtx_costs): Assign proper cost for
+	shift_add/shift_sub0/shift_sub1 RTXs.
+
+2013-07-24  Bill Schmidt  <wschmidt@linux.ibm.com>
+	    Anton Blanchard <anton@au1.ibm.com>
+
+	* config/rs6000/altivec.md (altivec_vpkpx): Handle little endian.
+	(altivec_vpks<VI_char>ss): Likewise.
+	(altivec_vpks<VI_char>us): Likewise.
+	(altivec_vpku<VI_char>us): Likewise.
+	(altivec_vpku<VI_char>um): Likewise.
+
+2013-07-24  David Malcolm  <dmalcolm@redhat.com>
+
+	Introduce context class.
+
+	* Makefile.in (CONTEXT_H): New.
+	(OBJS): Add context.o.
+	(toplev.o): Add CONTEXT_H to dependencies.
+	(context.o): New.
+
+	* toplev.c (general_init): Create the singleton gcc::context instance.
+
+	* context.c: New.
+
+	* context.h: New.
+
+2013-07-24  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	PR rtl-optimization/57968
+	* mode-switching.c (create_pre_exit): Allow instructions that
+	don't set a return register to need a non-exit mode.
+
 2013-07-24  Bill Schmidt  <wschmidt@vnet.linux.ibm.com>
 	    Anton Blanchard <anton@au1.ibm.com>
 
@@ -269,7 +398,7 @@
 	* dwarf2out.c (die_odr_checksum): New function to use
 	CHECKSUM_ macros and ULEB128 for DIE tag.
 	(generate_type_signature): Use.
-	
+
 2013-07-22  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* config.gcc (sparc*-*-*): Accept leon3 processor.

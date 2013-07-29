@@ -967,7 +967,7 @@
   "@
    %j0add%?\\t%0, %0, %2
    %j0add%?\\t%0, %1, %2
-   %j0add%?\\t%0, %2
+   %j0add%?\\t%0, %1, %2
    %j0add%?\\t%0, %1, %2
    %j0add%?\\t%0, %1, %2
    %j0add%?\\t%0, %1, %2
@@ -1260,7 +1260,7 @@
                  (LTUGEU:SI (reg:<cnb> CC_REGNUM) (const_int 0))))]
   "TARGET_32BIT"
   "@
-   adc%?\\t%0, %1
+   adc%?\\t%0, %1, %2
    adc%?\\t%0, %1, %2
    sbc%?\\t%0, %1, #%B2"
   [(set_attr "conds" "use")
@@ -1277,7 +1277,7 @@
                  (match_operand:SI 2 "arm_rhs_operand" "l,rI,K")))]
   "TARGET_32BIT"
   "@
-   adc%?\\t%0, %1
+   adc%?\\t%0, %1, %2
    adc%?\\t%0, %1, %2
    sbc%?\\t%0, %1, #%B2"
   [(set_attr "conds" "use")
@@ -9700,7 +9700,7 @@
 )
 
 (define_insn "*sibcall_insn"
- [(call (mem:SI (match_operand:SI 0 "call_insn_operand" "Cs,Ss"))
+ [(call (mem:SI (match_operand:SI 0 "call_insn_operand" "Cs, US"))
 	(match_operand 1 "" ""))
   (return)
   (use (match_operand 2 "" ""))]
@@ -9711,7 +9711,7 @@
   else
     {
       if (arm_arch5 || arm_arch4t)
-	return \"%*bx\\t%0\\t%@ indirect register sibling call\";
+	return \"%*bx%?\\t%0\\t%@ indirect register sibling call\";
       else
 	return \"mov%?\\t%|pc, %0\\t%@ indirect register sibling call\";
     }
@@ -9721,8 +9721,8 @@
 )
 
 (define_insn "*sibcall_value_insn"
- [(set (match_operand 0 "s_register_operand" "")
-       (call (mem:SI (match_operand:SI 1 "call_insn_operand" "Cs,Ss"))
+ [(set (match_operand 0 "" "")
+       (call (mem:SI (match_operand:SI 1 "call_insn_operand" "Cs,US"))
 	     (match_operand 2 "" "")))
   (return)
   (use (match_operand 3 "" ""))]
@@ -9733,7 +9733,7 @@
   else
     {
       if (arm_arch5 || arm_arch4t)
-	return \"%*bx\\t%1\";
+	return \"%*bx%?\\t%1\";
       else
 	return \"mov%?\\t%|pc, %1\\t@ indirect sibling call \";
     }
@@ -11205,6 +11205,44 @@
   }
   [(set_attr "conds" "clob")
    (set_attr "length" "12")]
+)
+
+(define_insn_and_split "movcond_addsi"
+  [(set (match_operand:SI 0 "s_register_operand" "=r,l,r")
+	(if_then_else:SI
+	 (match_operator 5 "comparison_operator"
+	  [(plus:SI (match_operand:SI 3 "s_register_operand" "r,r,r")
+	            (match_operand:SI 4 "arm_add_operand" "rIL,rIL,rIL"))
+            (const_int 0)])
+	 (match_operand:SI 1 "arm_rhs_operand" "rI,rPy,r")
+	 (match_operand:SI 2 "arm_rhs_operand" "rI,rPy,r")))
+   (clobber (reg:CC CC_REGNUM))]
+   "TARGET_32BIT"
+   "#"
+   "&& reload_completed"
+  [(set (reg:CC_NOOV CC_REGNUM)
+	(compare:CC_NOOV
+	 (plus:SI (match_dup 3)
+		  (match_dup 4))
+	 (const_int 0)))
+   (set (match_dup 0) (match_dup 1))
+   (cond_exec (match_dup 6)
+	      (set (match_dup 0) (match_dup 2)))]
+  "
+  {
+    enum machine_mode mode = SELECT_CC_MODE (GET_CODE (operands[5]),
+					     operands[3], operands[4]);
+    enum rtx_code rc = GET_CODE (operands[5]);
+
+    operands[6] = gen_rtx_REG (mode, CC_REGNUM);
+    gcc_assert (!(mode == CCFPmode || mode == CCFPEmode));
+    rc = reverse_condition (rc);
+
+    operands[6] = gen_rtx_fmt_ee (rc, VOIDmode, operands[6], const0_rtx);
+  }
+  "
+  [(set_attr "conds" "clob")
+   (set_attr "enabled_for_depr_it" "no,yes,yes")]
 )
 
 (define_insn "movcond"
