@@ -2,6 +2,223 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-07-31  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	* config/rs6000/predicates.md (fusion_gpr_addis): New predicates
+	to support power8 load fusion.
+	(fusion_gpr_mem_load): Likewise.
+
+	* config/rs6000/rs6000-modes.def (PTImode): Update a comment.
+
+	* config/rs6000/rs6000-protos.h (fusion_gpr_load_p): New
+	declarations for power8 load fusion.
+	(emit_fusion_gpr_load): Likewise.
+
+	* config/rs6000/rs6000.c (rs6000_option_override_internal): If
+	tuning for power8, turn on fusion mode by default.  Turn on sign
+	extending fusion mode if normal fusion mode is on, and we are at
+	-O2 or -O3.
+	(fusion_gpr_load_p): New function, return true if we can fuse an
+	addis instruction with a dependent load to a GPR.
+	(emit_fusion_gpr_load): Emit the instructions for power8 load
+	fusion to GPRs.
+
+	* config/rs6000/vsx.md (VSX_M2): New iterator for fusion
+	peepholes.
+	(VSX load fusion peepholes): New peepholes to fuse together an
+	addi instruction with a VSX load instruction.
+
+	* config/rs6000/rs6000.md (GPR load fusion peepholes): New
+	peepholes to fuse an addis instruction with a load to a GPR base
+	register.  If we are supporting sign extending fusions, convert
+	sign extending loads to zero extending loads and add an explicit
+	sign extension.
+
+2013-07-31  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config.gcc (arm*-*-*): Add aarch-common.o to extra_objs.  Add
+	aarch-common-protos.h to extra_headers.
+	(arm*-*-*): Add arm/aarch-common-protos.h to tm_p_file.
+	* config/arm/arm.c (arm_early_load_addr_dep): Move from here to ...
+	(arm_early_store_addr_dep): Likewise.
+	(arm_no_early_alu_shift_dep: Likewise.
+	(arm_no_early_alu_shift_value_dep: Likewise.
+	(arm_no_early_mul_dep: Likewise.
+	(arm_no_early_store_addr_dep: Likewise.
+	(arm_mac_accumulator_is_mul_result: Likewise.
+	(arm_mac_accumulator_is_result: Likewise.
+	* config/arm/aarch-common.c: ... here.  New file.
+	* config/arm/arm-protos.h (arm_early_load_addr_dep): Move from here to ...
+	(arm_early_store_addr_dep): Likewise.
+	(arm_no_early_alu_shift_dep: Likewise.
+	(arm_no_early_alu_shift_value_dep: Likewise.
+	(arm_no_early_mul_dep: Likewise.
+	(arm_no_early_store_addr_dep: Likewise.
+	(arm_mac_accumulator_is_mul_result: Likewise.
+	(arm_mac_accumulator_is_result: Likewise.
+	* config/arm/aarch-common-protos.h: ... here.  New file.
+	* config/arm/t-arm (aarch-common.o): Define.
+
+2013-07-31  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/arm/arm.md: Include new file "types.md".
+	(define_attr "type"): Move from here to ...
+	(define_attr "mul32"): Likewise.
+	(define_attr "mul64"): Likewise.
+	* config/arm/types.md: ... here.  New file.
+
+2013-07-31  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* config.gcc (*-*-rtems*): Use __cxa_atexit by default.
+	* config/rs6000/rtems.h (TARGET_LIBGCC_SDATA_SECTION): Define.
+
+2013-07-31  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
+	* gen-pass-instances.awk: Fix offset of substr().
+
+2013-07-31  David Malcolm  <dmalcolm@redhat.com>
+
+	* Makefile.in (pass-instances.def): New.
+	(passes.o): Replace dependency on passes.def with one on
+	pass-instances.def
+
+	* gen-pass-instances.awk: New.
+
+	* passes.c (pass_manager::pass_manager): Use pass-instances.def
+	rather than passes.def, updating local definition of NEXT_PASS
+	macro to add an extra NUM parameter (currently unused).
+
+2013-07-30  David Malcolm  <dmalcolm@redhat.com>
+
+	* Makefile.in (PASS_MANAGER_H): New.
+	(lto-cgraph.o): Depend on CONTEXT_H and PASS_MANAGER_H.
+	(passes.o): Likewise.
+	(statistics.o): Likewise.
+	(cgraphunit.o): Likewise.
+	(context.o): Depend on PASS_MANAGER_H.
+
+	* pass_manager.h: New.
+
+	* cgraphunit.c (cgraph_add_new_function): Update for moves
+	of globals to fields of pass_manager.
+	(analyze_function): Likewise.
+	(expand_function): Likewise.
+	(ipa_passes): Likewise.
+	(compile): Likewise.
+
+	* context.c (context::context): New.
+	* context.h  (context::context): New.
+	(context::get_passes): New.
+	(context::passes_): New.
+
+	* lto-cgraph.c (input_node): Update for moves of globals to
+	fields of pass_manager.
+
+	* passes.c (all_passes): Remove, in favor of a field of the
+	same name within the new class pass_manager.
+	(all_small_ipa_passes): Likewise.
+	(all_lowering_passes): Likewise.
+	(all_regular_ipa_passes): Likewise.
+	(all_late_ipa_passes): Likewise.
+	(all_lto_gen_passes): Likewise.
+	(passes_by_id): Likewise.
+	(passes_by_id_size): Likewise.
+	(gcc_pass_lists): Remove, in favor of "pass_lists" field within
+	the new class pass_manager.
+	(set_pass_for_id): Convert to...
+	(pass_manager::set_pass_for_id): ...method.
+	(get_pass_for_id): Convert to...
+	(pass_manager::get_pass_for_id): ...method.
+	(register_one_dump_file): Move body of implementation into...
+	(pass_manager::register_one_dump_file): ...here.
+	(register_dump_files_1): Convert to...
+	(pass_manager::register_dump_files_1): ...method.
+	(register_dump_files): Convert to...
+	(pass_manager::register_dump_files): ...method.
+	(create_pass_tab): Update for moves of globals to fields of
+	pass_manager.
+	(dump_passes): Move body of implementation into...
+	(pass_manager::dump_passes): ...here.
+	(register_pass): Move body of implementation into...
+	(pass_manager::register_pass): ...here.
+	(init_optimization_passes): Convert into...
+	(pass_manager::pass_manager): ...constructor for new
+	pass_manager class, and initialize the pass_lists array.
+	(check_profile_consistency): Update for moves of globals to
+	fields of pass_manager.
+	(dump_profile_report): Move body of implementation into...
+	(pass_manager::dump_profile_report): ...here.
+	(ipa_write_summaries_1): Update for moves of pass lists from
+	being globals to fields of pass_manager.
+	(ipa_write_optimization_summaries): Likewise.
+	(ipa_read_summaries):  Likewise.
+	(ipa_read_optimization_summaries): Likewise.
+	(execute_all_ipa_stmt_fixups): Likewise.
+
+	* statistics.c (statistics_fini): Update for moves of globals to
+	fields of pass_manager.
+
+	* toplev.c (general_init): Replace call to
+	init_optimization_passes with construction of the pass_manager
+	instance.
+
+	* tree-pass.h (all_passes): Remove, in favor of a field of the
+	same name within the new class pass_manager.
+	(all_small_ipa_passes): Likewise.
+	(all_lowering_passes): Likewise.
+	(all_regular_ipa_passes): Likewise.
+	(all_lto_gen_passes): Likewise.
+	(all_late_ipa_passes): Likewise.
+	(passes_by_id): Likewise.
+	(passes_by_id_size): Likewise.
+	(gcc_pass_lists): Remove, in favor of "pass_lists" field within
+	the new class pass_manager.
+	(get_pass_for_id): Remove.
+
+2013-07-30  Richard Earnshaw  <rearnsha@arm.com>
+
+	* config.gcc (arm): Require 64-bit host-wide-int for all ARM target
+	configs.
+
+2013-07-30  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.md (mulhi3): New expand pattern.
+
+2013-07-30  Jan Hubicka  <jh@suse.cz>
+	    Martin Liska  <marxin.liska@gmail.com>
+
+	* profile.c (compute_value_histograms): Do not ICE when
+	there is mismatch only on some counters.
+
+2013-07-30  Zhenqiang Chen  <zhenqiang.chen@linaro.org>
+
+	PR rtl-optimization/57637
+	* function.c (move_insn_for_shrink_wrap): Also check the
+	GEN set of the LIVE problem for the liveness analysis
+	if it exists, otherwise give up.
+
+2013-07-29  Bill Schmidt  <wschmidt@vnet.linux.ibm.com>
+
+	PR tree-optimization/57993
+	* gimple-ssa-strength-reduction.c (replace_mult_candidate): Record
+	replaced statement in the candidate table.
+	(phi_add_costs): Return infinite cost when the hidden basis does
+	not dominate all phis on which the candidate is dependent.
+	(replace_one_candidate): Record replaced statement in the
+	candidate table.
+
+2013-07-29  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/epiphany.md (*isub_i+2): New peephole.
+	(ashlv2si3): New expander.
+	(*ashlv2si3_i): New define_insn_and_split.
+	* predicates.md (float_operation): Allow patterns with three
+	basic sub-patterns.
+
+	PR rtl-optimization/58021
+	* mode-switching.c (create_pre_exit): Always split off preceding
+	insns if we are not at the basic block head.
+
 2013-07-29  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* config/mips/linux.h (GLIBC_DYNAMIC_LINKER): Handle `-mnan=2008'.

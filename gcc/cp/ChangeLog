@@ -1,3 +1,36 @@
+2013-07-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* parser.c (cp_parser_sizeof_pack): Check cp_parser_identifier
+	return value for error_mark_node.
+
+2013-07-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/57673
+	* parser.c (cp_parser_cache_defarg): In an NSDMI don't stop when
+	token->type == CPP_ELLIPSIS.
+
+2013-07-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/57947
+	* call.c (is_std_init_list): Return false if cxx_dialect == cxx98.
+
+2013-07-29  Jason Merrill  <jason@redhat.com>
+
+	PR c++/57901
+	* semantics.c (build_data_member_initialization, constexpr_fn_retval):
+	Use break_out_target_exprs instead of unshare_expr.
+
+2013-07-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/57948
+	* call.c (initialize_reference): Don't crash when reference_binding
+	returns a conv with conv->kind == ck_ambig.
+
+2013-07-29  Jason Merrill  <jason@redhat.com>
+
+	* mangle.c (write_name): Check for null context.
+	(write_unscoped_name): Allow PARM_DECL context.
+
 2013-07-25  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/57981
