@@ -2,6 +2,61 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-08-01  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.h (release_function_body): Declare.
+	* tree.c (free_lang_data_in_decl): Free, parameters and return values
+	of unused delcarations.
+
+2013-08-01  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (minmax_arithsi_non_canon): Emit canonical RTL form
+	when subtracting a constant.
+
+2013-08-01  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (peepholes for eq (reg1) (reg2/imm)):
+	Generate canonical plus rtx with negated immediate instead of minus
+	where appropriate.
+	* config/arm/arm.c (thumb2_reorg): Handle ADCS <Rd>, <Rn> case.
+
+2013-08-01  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.c (cgraph_release_function_body): Use used_as_abstract_origin.
+	(cgraph_release_function_body): Likewise.
+	(cgraph_can_remove_if_no_direct_calls_p): Likewise.
+	* cgraph.h (cgrpah_node): Rename abstract_and_needed
+	to used_as_abstract_origin.
+	* tree-inline-transfrom.c (can_remove_node_now_p_1): Do not remove
+	symbols used as abstract origins.
+	* cgraphunit.c (analyze_functions): Update.
+	* ipa.c (symtab_remove_unreachable_nodes): Recompute used_as_abstract_origin.
+	* tree-inline.c (tree_function_versioning): Update
+	used_as_abstract_origin; be ready for DECL_RESULT and DECL_ARGUMENTS to be
+	NULL.
+
+	* lto-symtab.c (lto_symtab_merge_symbols): Merge duplicated nodes for abstract functions.
+	* cgraph.h (symtab_real_symbol_p): Abstract declarations are not real symbols.
+
+2013-08-01  Jan Hubicka  <jh@suse.cz>
+
+	* profile.c (compute_value_histograms): Fix thinko.
+
+2013-08-01  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config.gcc (aarch64*-*-*): Add aarch-common.o to extra_objs.  Add
+	aarch-common-protos.h to extra_headers.
+	(aarch64*-*-*): Add arm/aarch-common-protos.h to tm_p_file.
+	* config/aarch64/aarch64.md: Include "../arm/cortex-a53.md".
+	* config/aarch64/t-aarch64 (aarch-common.o): Define.
+
+2013-08-01  Sofiane Naci  <sofiane.naci@arm.com>
+
+	* config/aarch64/aarch64.md (define_attr "type"): Delete.
+	Include "../arm/types.md".  Define "type" attribute for all patterns.
+	* config/aarch64/aarch64-simd.md (move_lo_quad_<mode>): Update for
+	attribute changes.
+
 2013-07-31  Michael Meissner  <meissner@linux.vnet.ibm.com>
 
 	* config/rs6000/predicates.md (fusion_gpr_addis): New predicates
