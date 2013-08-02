@@ -5665,7 +5665,7 @@
   "TARGET_32BIT && arm_arch6"
   "@
    sxth%?\\t%0, %1
-   ldr%(sh%)\\t%0, %1"
+   %b1ldr%(sh%)\\t%0, %1"
   [(set_attr "type" "extend,load_byte")
    (set_attr "sfi_breg_operand" "*,1")
    (set_attr "predicable" "yes")
