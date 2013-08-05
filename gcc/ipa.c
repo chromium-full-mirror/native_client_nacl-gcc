@@ -371,18 +371,26 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
 	  if (!pointer_set_contains (body_needed_for_clonning, node->symbol.decl))
 	    cgraph_release_function_body (node);
 	  else if (!node->clone_of)
-	    gcc_assert (DECL_RESULT (node->symbol.decl));
+	    gcc_assert (in_lto_p || DECL_RESULT (node->symbol.decl));
 	  if (node->symbol.definition)
 	    {
 	      if (file)
 		fprintf (file, " %s", cgraph_node_name (node));
-	      cgraph_reset_node (node);
+	      node->symbol.analyzed = false;
+	      node->symbol.definition = false;
+	      node->symbol.cpp_implicit_alias = false;
+	      node->symbol.alias = false;
+	      node->symbol.weakref = false;
+	      if (!node->symbol.in_other_partition)
+		node->local.local = false;
+	      cgraph_node_remove_callees (node);
+	      ipa_remove_all_references (&node->symbol.ref_list);
 	      changed = true;
 	    }
 	}
       else
 	gcc_assert (node->clone_of || !cgraph_function_with_gimple_body_p (node)
-		    || DECL_RESULT (node->symbol.decl));
+		    || in_lto_p || DECL_RESULT (node->symbol.decl));
     }
 
   /* Inline clones might be kept around so their materializing allows further
@@ -888,7 +896,7 @@ function_and_variable_visibility (bool whole_program)
     }
   FOR_EACH_DEFINED_FUNCTION (node)
     {
-      node->local.local = cgraph_local_node_p (node);
+      node->local.local |= cgraph_local_node_p (node);
 
       /* If we know that function can not be overwritten by a different semantics
 	 and moreover its section can not be discarded, replace all direct calls
