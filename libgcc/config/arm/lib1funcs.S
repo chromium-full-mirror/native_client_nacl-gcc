@@ -136,12 +136,14 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # define SUB_SP		sfi_sp sub sp, sp,
 # define PC_IN_POP	lr
 # define RET_TO_POP	sfi_bx	lr
+# define ARM_ALIGN	.p2align 4      /* 16-byte alignment required.  */
 #else
 # define SFI(insn)	insn
 # define ADD_SP		add sp, sp,
 # define SUB_SP		sub sp, sp,
 # define PC_IN_POP	pc
 # define RET_TO_POP	/* We loaded directly into the pc.  */
+# define ARM_ALIGN	.align 0
 #endif
 
 /* How to return from a function call depends on the architecture variant.  */
@@ -430,17 +432,19 @@ SYM (\name):
 # else
 #define THUMB_SYNTAX
 # endif
+#define THUMB_ALIGN .align 0
 #else
 #define THUMB_FUNC
 #define THUMB_CODE
 #define THUMB_SYNTAX
+#define THUMB_ALIGN ARM_ALIGN
 #endif
 
 .macro FUNC_START name
 	.text
 	.globl SYM (__\name)
 	TYPE (__\name)
-	.align 0
+	THUMB_ALIGN
 	THUMB_CODE
 	THUMB_FUNC
 	THUMB_SYNTAX
@@ -489,7 +493,7 @@ _L__\name:
 	.text
 	.globl SYM (__\name)
 	TYPE (__\name)
-	.align 0
+	ARM_ALIGN
 	.arm
 SYM (__\name):
 .endm
