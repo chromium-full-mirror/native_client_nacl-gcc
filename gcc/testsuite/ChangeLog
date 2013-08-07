@@ -1,3 +1,24 @@
+2013-08-07  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/46206
+	* g++.dg/lookup/typedef2.C: New.
+
+2013-08-07  David Malcolm  <dmalcolm@redhat.com>
+
+	* lib/plugin-support.exp (plugin-test-execute): Add -fno-rtti
+	to optstr when building plugins on darwin.
+
+2013-08-06  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/57539
+	* gcc.dg/ipa/pr57539.c: New test.
+
+2013-08-06  Martin Jambor  <mjambor@suse.cz>
+	    Bernd Edlinger <bernd.edlinger@hotmail.de>
+
+	* gcc.dg/torture/pr58041.c (foo): Accept z by reference.
+	(a): Fix constructor.
+
 2013-08-06  Martin Jambor  <mjambor@suse.cz>
 
 	PR fortran/57987

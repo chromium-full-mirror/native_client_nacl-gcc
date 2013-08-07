@@ -158,7 +158,7 @@ do
 	esac
 done
 IFS="$ac_save_IFS"
-                
+
 if test x$ac_checking != x ; then
   AC_DEFINE(ENABLE_CHECKING, 1,
 [Define if you want more run-time sanity checks.])
@@ -184,10 +184,7 @@ m4_changequote(,)
 case $target in
 	aarch64*-*-* | \
 	alpha*-*-* | \
-	arm*-*-*eabi* | \
-	arm*-*-nacl* | \
-	arm*-*-rtems* | \
-	arm*-*-symbianelf* | \
+	arm*-*-* | \
 	x86_64-*-* | \
 	ia64-*-* | \
 	hppa*64*-*-* | \

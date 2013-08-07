@@ -2,6 +2,92 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-08-07  David Malcolm  <dmalcolm@redhat.com>
+
+	* config/sparc/sparc.c (insert_pass_work_around_errata): Move
+	into...
+	(sparc_option_override): ...and port to new C++ pass API.
+	* config/sparc/t-sparc (sparc.o): Add dep on CONTEXT_H
+
+2013-08-07  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (htm_expand_builtin) <case 0>: Remove.
+
+2013-08-06  Caroline Tice  <cmtice@google.com>
+
+	* gcc.c (VTABLE_VERIFICATION_SPEC): New definition.
+	(LINK_COMMAND_SPEC): Add VTABLE_VERIFICATION_SPEC.
+	* tree-pass.h: Add pass_vtable_verify.
+	* varasm.c (assemble_variable): Add code to properly set the comdat
+	section and name for the .vtable_map_vars section.
+	(assemble_vtyv_preinit_initializer): New function.
+	(default_sectin_type_flags):  Make sure .vtable_map_vars section has
+	LINK_ONCE flag.
+	* output.h: Add function decl for assemble_vtv_preinit_initializer.
+	* vtable-verify.c: New file.
+	* vtable-verify.h: New file.
+	* flag-types.h (enum vtv_priority): Defintions for flag_vtable_verify
+	initialiation levels.
+	* timevar.def (TV_VTABLE_VERIFICATION): New definition.
+	* passes.def: Insert pass_vtable_verify.
+	* aclocal.m4: Reorder includes.
+	* doc/invoke.texi:  Document the -fvtable-verify=, -fvtv-debug, and
+	-fvtv-counts options.
+	* config/gnu-user.h (GNU_USER_TARGET_STARTFILE_SPEC): Add vtv_start*.o,
+	as appropriate, if -fvtable-verify=... is used.
+	(GNU_USER_TARGET_ENDFILE_SPEC): Add vtv_end*.o as appropriate, if
+	-fvtable-verify=... is used.
+	* Makefile.in (OBJS):  Add vtable-verify.o to list.
+	(vtable-verify.o): Add new build rule.
+	(GTFILES): Add vtable-verify.c to list.
+	* common.opt (fvtable-verify=): New flag.
+	(vtv_priority): Values for fvtable-verify= flag.
+	(fvtv-counts): New flag.
+	(fvtv-debug): New flag.
+	* tree.h (save_vtable_map_decl): New extern function decl.
+
+2013-08-07  David Malcolm  <dmalcolm@redhat.com>
+
+	* config/rl78/rl78.c (rl78_devirt_pass): Convert from a struct to...
+	(pass_rl78_devirt): ...new subclass of rtl_opt_pass along with...
+	(pass_data_rl78_devirt): ...new pass_data instance and...
+	(make_pass_rl78_devirt): ...new function.
+	(rl78_asm_file_start): Port pass registration to new C++ API.
+
+2013-08-07  David Malcolm  <dmalcolm@redhat.com>
+
+	* coretypes.h (rtl_opt_pass): Add.
+	(gcc::context): Add.
+	* config/epiphany/epiphany.c (pass_mode_switch_use): New.
+	(epiphany_init): Port to new C++ pass API.
+	(epiphany_optimize_mode_switching): Likewise.
+	* pass_manager.h (pass_manager::get_pass_split_all_insns): New.
+	(pass_manager::get_pass_mode_switching): New.
+	(pass_manager::get_pass_peephole2): New.
+	* mode-switching.c (pass_mode_switching): Add clone method.
+	* recog.c (pass_peephole2): Add clone method.
+	(pass_split_all_insns): Add clone method.
+
+2013-08-06  David Malcolm  <dmalcolm@redhat.com>
+
+	* config/mips/mips.c (insert_pass_mips_machine_reorg2): Move
+	into...
+	(mips_option_override): ...here, porting to new C++ API for
+	passes.
+
+2013-08-06  Jan Hubicka  <jh@suse.cz>
+
+	* cgraph.c (cgraph_get_body): New function based on lto.c
+	implementation.
+	* cgraph.h (cgraph_get_body): Declare.
+	* cgraphclones.c (cgraph_create_virtual_clone): Commonize WPA and LTO paths.
+	* cgraphunit.c (expand_function): Get body prior expanding.
+	* ipa.c (function_and_variable_visibility): Use gimple_has_body_p test.
+	* lto-cgraph.c (lto_output_node): Do not stream bodies we don't really need.
+	* passes.c (do_per_function_toporder): Get body.
+	* tree-inline.c (expand_call_inline): Get body prior inlining it.
+	* tree-ssa-structalias.c (ipa_pta_execute): Get body; skip clones.
+
 2013-08-06  Martin Jambor  <mjambor@suse.cz>
 
 	PR fortran/57987
