@@ -871,7 +871,8 @@ See RS/6000 and PowerPC Options.
 -msave-toc-indirect -mno-save-toc-indirect @gol
 -mpower8-fusion -mno-mpower8-fusion -mpower8-vector -mno-power8-vector @gol
 -mcrypto -mno-crypto -mdirect-move -mno-direct-move @gol
--mquad-memory -mno-quad-memory}
+-mquad-memory -mno-quad-memory @gol
+-mcompat-align-parm -mno-compat-align-parm}
 
 @emph{RX Options}
 @gccoptlist{-m64bit-doubles  -m32bit-doubles  -fpu  -nofpu@gol
@@ -1810,13 +1811,15 @@ have support for @option{-pthread}.
 @item -fcilkplus
 @opindex fcilkplus
 @cindex Enable Cilk Plus
-Enable the usage of Cilk Language extension features for C/C++.  When the flag
-@option{-fcilkplus} is specified, all the Cilk Plus components are converted 
-to the appropriate C/C++ code.  The present implementation follows ABI version 
-0.9.  There are four major parts to Cilk Plus language 
-extension: Array Notations, Cilk Keywords, SIMD annotations and elemental 
-functions.  Detailed information about Cilk Plus can be found at 
-@w{@uref{http://www.cilkplus.org}}. 
+Enable the usage of Cilk Plus language extension features for C/C++.
+When the option @option{-fcilkplus} is specified, enable the usage of
+the Cilk Plus Language extension features for C/C++.  The present
+implementation follows ABI version 0.9.  This is an experimental
+feature that is only partially complete, and whose interface may
+change in future versions of GCC as the official specification
+changes.  Currently only the array notation feature of the language
+specification has been implemented.  More features will be implemented
+in subsequent release cycles.
 
 @item -fgnu-tm
 @opindex fgnu-tm
@@ -18417,6 +18420,22 @@ stack location in the function prologue if the function calls through
 a pointer on AIX and 64-bit Linux systems.  If the TOC value is not
 saved in the prologue, it is saved just before the call through the
 pointer.  The @option{-mno-save-toc-indirect} option is the default.
+
+@item -mcompat-align-parm
+@itemx -mno-compat-align-parm
+@opindex mcompat-align-parm
+Generate (do not generate) code to pass structure parameters with a
+maximum alignment of 64 bits, for compatibility with older versions
+of GCC.
+
+Older versions of GCC (prior to 4.9.0) incorrectly did not align a
+structure parameter on a 128-bit boundary when that structure contained
+a member requiring 128-bit alignment.  This is corrected in more
+recent versions of GCC.  This option may be used to generate code
+that is compatible with functions compiled with older versions of
+GCC.
+
+The @option{-mno-compat-align-parm} option is the default.
 @end table
 
 @node RX Options
