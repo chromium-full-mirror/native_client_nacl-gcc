@@ -2,6 +2,57 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-08-23  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-utils.h (method_class_type): Declare.
+	* ipa-devirt.c (method_class_type): Export.
+
+	* cgraphunit.c (analyze_functions): Do basic devirtualization;
+	do not walk base classes of anonymous types.
+
+2013-08-23  Kaz Kojima  <kkojima@gcc.gnu.org>
+
+	PR rtl-optimization/58220
+	PR regression/58221
+	* final.c (reemit_insn_block_notes): Use NEXT_INSN to
+	handle SEQUENCE insns properly.
+
+2013-08-23  Gabriel Dos Reis  <gdr@integrable-solutions.net>
+
+	* pretty-print.h (pp_newline_and_flush): Declare.  Remove macro
+	definition.
+	(pp_newline_and_indent): Likewise.
+	(pp_separate_with): Likewise.
+	* pretty-print.c (pp_newline_and_flush): Define.
+	(pp_newline_and_indent): Likewise.
+	(pp_separate_with): Likewise.
+
+2013-08-23  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/58218
+	* config/i386/x86-64.h (TARGET_SECTION_TYPE_FLAGS): Define.
+	* config/i386/i386.c (x86_64_elf_section_type_flags): New function.
+
+2013-08-23  Kirill Yukhin  <kirill.yukhin@intel.com>
+
+	* gcc/config/i386/predicates.md (ext_sse_reg_operand): New.
+	* gcc/config/i386/i386.md (*movti_internal): Use
+	predicate to determine if EVEX is needed.
+	(*movsi_internal): Ditto.
+	(*movdf_internal): Ditto.
+	(*movsf_internal): Ditto.
+	* gcc/config/i386/mmx.md (*mov<mode>_internal): Ditto.
+
+2013-08-23  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/58209
+	* tree-tailcall.c (process_assignment): Handle POINTER_PLUS_EXPR.
+	(find_tail_calls): Give up for pointer result types if m is non-NULL.
+	(adjust_return_value_with_ops): For PLUS_EXPR and pointer result type
+	emit POINTER_PLUS_EXPR.
+	(create_tailcall_accumulator): For pointer result type accumulate in
+	sizetype type.
+
 2013-08-22  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	* configure.ac: Add backslashes missing from the last change.
