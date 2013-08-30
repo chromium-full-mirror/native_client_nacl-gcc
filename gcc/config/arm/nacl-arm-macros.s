@@ -326,7 +326,8 @@ _sfi_breg_dmask_define_neon vst4
 @ (and vice versa in big-endian Thumb-2).
 @ NB: GCC output uses this.
 .macro sfi_trap
-	.word 0xe7fedef0
+	@ .inst is like .word, but doesn't emit a $d mapping symbol.
+	.inst 0xe7fedef0
 .endm
 
 .purgem _sfi_for_each_cond
