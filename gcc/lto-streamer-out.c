@@ -124,8 +124,11 @@ output_type_ref (struct output_block *ob, tree node)
 static bool
 tree_is_indexable (tree t)
 {
+  /* Parameters and return values of functions of variably modified types
+     must go to global stream, because they may be used in the type
+     definition.  */
   if (TREE_CODE (t) == PARM_DECL || TREE_CODE (t) == RESULT_DECL)
-    return false;
+    return variably_modified_type_p (TREE_TYPE (DECL_CONTEXT (t)), NULL_TREE);
   else if (TREE_CODE (t) == VAR_DECL && decl_function_context (t)
 	   && !TREE_STATIC (t))
     return false;
@@ -795,6 +798,11 @@ hash_tree (struct streamer_tree_cache_d *cache, tree t)
 					    v);
 	  v = iterative_hash_host_wide_int (DECL_TLS_MODEL (t), v);
 	}
+      if (TREE_CODE (t) == FUNCTION_DECL)
+	v = iterative_hash_host_wide_int (DECL_FINAL_P (t)
+					  | (DECL_CXX_CONSTRUCTOR_P (t) << 1)
+					  | (DECL_CXX_DESTRUCTOR_P (t) << 2),
+					  v);
       if (VAR_OR_FUNCTION_DECL_P (t))
 	v = iterative_hash_host_wide_int (DECL_INIT_PRIORITY (t), v);
     }
@@ -835,7 +843,10 @@ hash_tree (struct streamer_tree_cache_d *cache, tree t)
 					| (TYPE_USER_ALIGN (t) << 5)
 					| (TYPE_READONLY (t) << 6), v);
       if (RECORD_OR_UNION_TYPE_P (t))
-	v = iterative_hash_host_wide_int (TYPE_TRANSPARENT_AGGR (t), v);
+	{
+	  v = iterative_hash_host_wide_int (TYPE_TRANSPARENT_AGGR (t)
+					    | (TYPE_FINAL_P (t) << 1), v);
+	}
       else if (code == ARRAY_TYPE)
 	v = iterative_hash_host_wide_int (TYPE_NONALIASED_COMPONENT (t), v);
       v = iterative_hash_host_wide_int (TYPE_PRECISION (t), v);
