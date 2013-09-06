@@ -1,3 +1,56 @@
+2013-09-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/stack_usage2.adb: New test.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* gcc.target/aarch64/table-intrinsics.c
+	(qtbl_tests8_< ,2,3,4>): Fix control vector parameter type.
+	(qtb_tests8_< ,2,3,4>): Likewise.
+	(qtblq_tests8_< ,2,3,4>): Likewise.
+	(qtbxq_tests8_< ,2,3,4>): Likewise.
+
+2013-09-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/warn10.ad[sb]: New test.
+	* gnat.dg/warn10_pkg.ads: New helper.
+
+2013-09-06  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.dg/ipa/ipa-pta-14.c (scan-ipa-dump) [keeps_null_pointer_checks]:
+	Don't expect NULL in foo.result set.
+	* gcc.dg/tree-ssa/pta-escape-1.c (scan-tree-dump): Don't expect NULL
+	in ESCAPED set.
+	* gcc.dg/tree-ssa/pta-escape-2.c: Likewise.
+	* gcc.dg/tree-ssa/pta-escape-3.c: Likewise.
+
+2013-09-06  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* gcc.target/s390/nearestint-1.c: New testcase.
+
+2013-09-06  Joern Rennecke  <joern.rennecke@embecosm.com>
+	    Vineet Gupta  <Vineet.Gupta@synopsys.com>
+
+	* gcc.c-torture/execute/20101011-1.c [__arc__] (DO_TEST): Define as 0.
+	* testsuite/gcc.target/arc: New directory.
+	* gcc.dg/torture/pr37868.c: Also skip for arc*-*-*.
+	* gcc.dg/stack-usage-1.c [__arc__] (SIZE): Define.
+	* testsuite/gcc.dg/torture/stackalign/builtin-apply-2.c
+	[__arc__] (STACK_ARGUMENTS_SIZE): Set to 0.
+	* testsuite/gcc.dg/builtin-apply2.c
+	[__arc__] (STACK_ARGUMENTS_SIZE): Set to 0.
+
+2013-09-04  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/58201
+	* g++.dg/torture/pr58201_0.C: New testcase.
+	* g++.dg/torture/pr58201_1.C: New testcase.
+	* g++.dg/torture/pr58201.h: New testcase.
+
+2013-09-05  Jan Hubicka  <jh@suse.cz>
+
+	* gcc.dg/autopar/pr49960.c: Disable partial inlining
+
 2013-09-05  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/58137

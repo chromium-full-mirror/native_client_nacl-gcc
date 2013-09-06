@@ -204,9 +204,6 @@ hash_type_name (tree t)
 	}
 
       v = DECL_ASSEMBLER_NAME (v);
-#ifdef ENABLE_CHECKING
-      gcc_assert (!strchr (IDENTIFIER_POINTER (v), '.'));
-#endif
       hash = iterative_hash_hashval_t (hash, htab_hash_pointer (v));
       return hash;
     }
@@ -1117,9 +1114,7 @@ ipa_devirt (void)
 static bool
 gate_ipa_devirt (void)
 {
-  /* FIXME: We should remove the optimize check after we ensure we never run
-     IPA passes when not optimizing.  */
-  return flag_devirtualize && !in_lto_p;
+  return flag_devirtualize && !in_lto_p && optimize;
 }
 
 namespace {

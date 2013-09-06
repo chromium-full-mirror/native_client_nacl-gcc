@@ -55,7 +55,7 @@
   [(set_attr "predicable" "yes")
    (set_attr "sfi_sp_operand"   "0,0,0,0,0,1,*,*,*,*,*")
    (set_attr "sfi_breg_operand" "*,*,*,*,1,0,*,*,*,1,0")
-   (set_attr "type" "mov_reg,mov_reg,mvn_imm,mov_imm,load1,store1,f_mcr,f_mrc,fcpys,f_loads,f_stores")
+   (set_attr "type" "mov_reg,mov_reg,mvn_imm,mov_imm,load1,store1,f_mcr,f_mrc,fmov,f_loads,f_stores")
    (set_attr "pool_range"     "*,*,*,*,4096,*,*,*,*,1020,*")
    (set_attr "neg_pool_range" "*,*,*,*,4084,*,*,*,*,1008,*")]
 )
@@ -102,7 +102,7 @@
   "
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "yes,no,yes,no,no,no,no,no,no,no,no,no,no,no")
-   (set_attr "type" "mov_reg,mov_reg,mov_reg,mvn_reg,mov_reg,load1,load1,store1,store1,f_mcr,f_mrc,fcpys,f_loads,f_stores")
+   (set_attr "type" "mov_reg,mov_reg,mov_reg,mvn_reg,mov_reg,load1,load1,store1,store1,f_mcr,f_mrc,fmov,f_loads,f_stores")
    (set_attr "length" "2,4,2,4,4,4,4,4,4,4,4,4,4,4")
    (set_attr "pool_range"     "*,*,*,*,*,1018,4094,*,*,*,*,*,1018,*")
    (set_attr "neg_pool_range" "*,*,*,*,*,   0,   0,*,*,*,*,*,1008,*")]
@@ -146,7 +146,7 @@
       gcc_unreachable ();
     }
   "
-  [(set_attr "type" "*,*,*,*,load2,load2,store2,f_mcrr,f_mrrc,ffarithd,f_loadd,f_stored")
+  [(set_attr "type" "multiple,multiple,multiple,multiple,load2,load2,store2,f_mcrr,f_mrrc,ffarithd,f_loadd,f_stored")
    (set (attr "length") (cond [(eq_attr "alternative" "1,4,5,6") (const_int 8)
                               (eq_attr "alternative" "2") (const_int 12)
                               (eq_attr "alternative" "3") (const_int 16)
@@ -195,7 +195,7 @@
       gcc_unreachable ();
     }
   "
-  [(set_attr "type" "*,*,*,*,load2,load2,store2,f_mcrr,f_mrrc,ffarithd,f_loadd,f_stored")
+  [(set_attr "type" "multiple,multiple,multiple,multiple,load2,load2,store2,f_mcrr,f_mrrc,ffarithd,f_loadd,f_stored")
    (set (attr "length") (cond [(eq_attr "alternative" "1") (const_int 8)
                                (eq_attr "alternative" "2") (const_int 12)
                                (eq_attr "alternative" "3") (const_int 16)
@@ -266,7 +266,7 @@
   [(set_attr "conds" "unconditional")
    (set_attr "sfi_breg_operand" "1,0,1,0,*,*,*,*,*")
    (set_attr "type" "neon_vld1_1_2_regs,neon_vst1_1_2_regs_vst2_2_regs,\
-                     load1,store1,fcpys,*,f_mcr,f_mrc,*")
+                     load1,store1,fmov,mov_reg,f_mcr,f_mrc,multiple")
    (set_attr "length" "4,4,4,4,4,4,4,4,8")]
 )
 
@@ -317,6 +317,7 @@
   "
   [(set_attr "conds" "unconditional")
    (set_attr "sfi_breg_operand" "1,0,*,*,*,*,*")
+   (set_attr "type" "load1,store1,fmov,mov_reg,f_mcr,f_mrc,multiple")
    (set_attr "length" "4,4,4,4,4,4,8")]
 )
 
@@ -357,7 +358,7 @@
   [(set_attr "predicable" "yes")
    (set_attr "sfi_breg_operand" "*,*,*,1,0,1,0,*,*")
    (set_attr "type"
-     "f_mcr,f_mrc,fconsts,f_loads,f_stores,load1,store1,fcpys,mov_reg")
+     "f_mcr,f_mrc,fconsts,f_loads,f_stores,load1,store1,fmov,mov_reg")
    (set_attr "pool_range" "*,*,*,1020,*,4096,*,*,*")
    (set_attr "neg_pool_range" "*,*,*,1008,*,4080,*,*,*")]
 )
@@ -394,7 +395,7 @@
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
    (set_attr "type"
-     "f_mcr,f_mrc,fconsts,f_loads,f_stores,load1,store1,fcpys,mov_reg")
+     "f_mcr,f_mrc,fconsts,f_loads,f_stores,load1,store1,fmov,mov_reg")
    (set_attr "pool_range" "*,*,*,1018,*,4090,*,*,*")
    (set_attr "neg_pool_range" "*,*,*,1008,*,0,*,*,*")]
 )
@@ -435,7 +436,7 @@
     }
   "
   [(set_attr "type" "f_mcrr,f_mrrc,fconstd,f_loadd,f_stored,\
-                     load2,store2,ffarithd,*")
+                     load2,store2,ffarithd,multiple")
    (set (attr "length") (cond [(eq_attr "alternative" "5,6,8") (const_int 8)
 			       (eq_attr "alternative" "7")
 				(if_then_else
@@ -481,7 +482,7 @@
     }
   "
   [(set_attr "type" "f_mcrr,f_mrrc,fconstd,f_loadd,\
-                     f_stored,load2,store2,ffarithd,*")
+                     f_stored,load2,store2,ffarithd,multiple")
    (set (attr "length") (cond [(eq_attr "alternative" "5,6,8") (const_int 8)
 			       (eq_attr "alternative" "7")
 				(if_then_else
@@ -516,7 +517,7 @@
    fmrs%D3\\t%0, %2\;fmrs%d3\\t%0, %1"
    [(set_attr "conds" "use")
     (set_attr "length" "4,4,8,4,4,8,4,4,8")
-    (set_attr "type" "fcpys,fcpys,fcpys,f_mcr,f_mcr,f_mcr,f_mrc,f_mrc,f_mrc")]
+    (set_attr "type" "fmov,fmov,fmov,f_mcr,f_mcr,f_mcr,f_mrc,f_mrc,f_mrc")]
 )
 
 (define_insn "*thumb2_movsfcc_vfp"
@@ -539,7 +540,7 @@
    ite\\t%D3\;fmrs%D3\\t%0, %2\;fmrs%d3\\t%0, %1"
    [(set_attr "conds" "use")
     (set_attr "length" "6,6,10,6,6,10,6,6,10")
-    (set_attr "type" "fcpys,fcpys,fcpys,f_mcr,f_mcr,f_mcr,f_mrc,f_mrc,f_mrc")]
+    (set_attr "type" "fmov,fmov,fmov,f_mcr,f_mcr,f_mcr,f_mrc,f_mrc,f_mrc")]
 )
 
 (define_insn "*movdfcc_vfp"
@@ -585,7 +586,7 @@
    ite\\t%D3\;fmrrd%D3\\t%Q0, %R0, %P2\;fmrrd%d3\\t%Q0, %R0, %P1"
    [(set_attr "conds" "use")
     (set_attr "length" "6,6,10,6,6,10,6,6,10")
-    (set_attr "type" "ffarithd,ffarithd,ffarithd,f_mcr,f_mcr,f_mcr,f_mrrc,f_mrrc,f_mrrc")]
+    (set_attr "type" "ffarithd,ffarithd,ffarithd,f_mcr,f_mcr,f_mcrr,f_mrrc,f_mrrc,f_mrrc")]
 )
 
 
@@ -998,7 +999,7 @@
   "ftosizs%?\\t%0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvtf2i")]
 )
 
 (define_insn "*truncsidf2_vfp"
@@ -1008,7 +1009,7 @@
   "ftosizd%?\\t%0, %P1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvtf2i")]
 )
 
 
@@ -1019,7 +1020,7 @@
   "ftouizs%?\\t%0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvtf2i")]
 )
 
 (define_insn "fixuns_truncdfsi2"
@@ -1029,7 +1030,7 @@
   "ftouizd%?\\t%0, %P1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvtf2i")]
 )
 
 
@@ -1040,7 +1041,7 @@
   "fsitos%?\\t%0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvti2f")]
 )
 
 (define_insn "*floatsidf2_vfp"
@@ -1050,7 +1051,7 @@
   "fsitod%?\\t%P0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvti2f")]
 )
 
 
@@ -1061,7 +1062,7 @@
   "fuitos%?\\t%0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvti2f")]
 )
 
 (define_insn "floatunssidf2"
@@ -1071,7 +1072,7 @@
   "fuitod%?\\t%P0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "f_cvt")]
+   (set_attr "type" "f_cvti2f")]
 )
 
 
@@ -1084,7 +1085,7 @@
   "fsqrts%?\\t%0, %1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "fdivs")]
+   (set_attr "type" "fsqrts")]
 )
 
 (define_insn "*sqrtdf2_vfp"
@@ -1094,7 +1095,7 @@
   "fsqrtd%?\\t%P0, %P1"
   [(set_attr "predicable" "yes")
    (set_attr "predicable_short_it" "no")
-   (set_attr "type" "fdivd")]
+   (set_attr "type" "fsqrtd")]
 )
 
 
@@ -1236,7 +1237,7 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math"
   "vcvt.f32.<FCVTI32typename>\\t%0, %1, %v2"
  [(set_attr "predicable" "no")
-  (set_attr "type" "f_cvt")]
+  (set_attr "type" "f_cvti2f")]
 )
 
 ;; Not the ideal way of implementing this. Ideally we would be able to split
@@ -1253,7 +1254,7 @@
   vmov.f32\\t%0, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2
   vmov.f64\\t%P0, %1, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2"
  [(set_attr "predicable" "no")
-  (set_attr "type" "f_cvt")
+  (set_attr "type" "f_cvti2f")
   (set_attr "length" "8")]
 )
 

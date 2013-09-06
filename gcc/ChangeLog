@@ -2,6 +2,575 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-09-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* toplev.c (output_stack_usage): Be prepared for suffixes created by
+	the compiler in the function names.
+
+2013-09-06  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/58094
+	* ipa-inline.c (has_caller_p): New function.
+	(want_inline_function_to_all_callers_p): Use it.
+	(sum_callers, inline_to_all_callers): Break out from ...
+	(ipa_inline): ... here.
+
+2013-09-06  Jan Hubicka  <jh@suse.cz>
+
+	* config/i386/i386.c (ix86_hard_regno_mode_ok): AVX modes are valid
+	only when AVX is enabled.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.md
+	(*movtf_aarch64): Use neon_<ls>dm_2 as type where v8type
+	is fpsimd_<load/store>2.
+	(load_pair<mode>): Likewise.
+	(store_pair<mode>): Likewise.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/types.md (type): Add "mrs" type.
+	* config/aarch64/aarch64.md
+	(aarch64_load_tp_hard): Make type "mrs".
+	* config/arm/arm.md
+	(load_tp_hard): Make type "mrs".
+	* config/arm/cortex-a15.md: Update with new attributes.
+	* config/arm/cortex-a5.md: Update with new attributes.
+	* config/arm/cortex-a53.md: Update with new attributes.
+	* config/arm/cortex-a7.md: Update with new attributes.
+	* config/arm/cortex-a8.md: Update with new attributes.
+	* config/arm/cortex-a9.md: Update with new attributes.
+	* config/arm/cortex-m4.md: Update with new attributes.
+	* config/arm/cortex-r4.md: Update with new attributes.
+	* config/arm/fa526.md: Update with new attributes.
+	* config/arm/fa606te.md: Update with new attributes.
+	* config/arm/fa626te.md: Update with new attributes.
+	* config/arm/fa726te.md: Update with new attributes.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.md
+	(*movti_aarch64): Use "multiple" for type where v8type is "move2".
+	(*movtf_aarch64): Likewise.
+	* config/arm/arm.md
+	(thumb1_movdi_insn): Use "multiple" for type where more than one
+	instruction is used for a move.
+	(*arm32_movhf): Likewise.
+	(*thumb_movdf_insn): Likewise.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/types.md (type): Rename fcpys to fmov.
+	* config/arm/vfp.md
+	(*arm_movsi_vfp): Rename type fcpys as fmov.
+	(*thumb2_movsi_vfp): Likewise
+	(*movhf_vfp_neon): Likewise
+	(*movhf_vfp): Likewise
+	(*movsf_vfp): Likewise
+	(*thumb2_movsf_vfp): Likewise
+	(*movsfcc_vfp): Likewise
+	(*thumb2_movsfcc_vfp): Likewise
+	* config/aarch64/aarch64-simd.md
+	(move_lo_quad_<mode>): Replace type mov_reg with fmovs.
+	* config/aarch64/aarch64.md
+	(*movsi_aarch64): Replace type mov_reg with fmovs.
+	(*movdi_aarch64): Likewise
+	(*movsf_aarch64): Likewise
+	(*movdf_aarch64): Likewise
+	* config/arm/arm.c
+	(cortexa7_older_only): Rename TYPE_FCPYS to TYPE_FMOV.
+	* config/arm/iwmmxt.md
+	(*iwmmxt_movsi_insn): Rename type fcpys as fmov.
+	* config/arm/arm1020e.md: Update with new attributes.
+	* config/arm/cortex-a15-neon.md: Update with new attributes.
+	* config/arm/cortex-a5.md: Update with new attributes.
+	* config/arm/cortex-a53.md: Update with new attributes.
+	* config/arm/cortex-a7.md: Update with new attributes.
+	* config/arm/cortex-a8-neon.md: Update with new attributes.
+	* config/arm/cortex-a9.md: Update with new attributes.
+	* config/arm/cortex-m4-fpu.md: Update with new attributes.
+	* config/arm/cortex-r4f.md: Update with new attributes.
+	* config/arm/marvell-pj4.md: Update with new attributes.
+	* config/arm/vfp11.md: Update with new attributes.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64.md
+	(*madd<mode>): Fix type attribute.
+	(*maddsi_uxtw): Likewise.
+	(*msub<mode>): Likewise.
+	(*msubsi_uxtw): Likewise.
+	(<su_optab>maddsidi4): Likewise.
+	(<su_optab>msubsidi4): Likewise.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/types.md: Split fdiv<sd> as fsqrt<sd>, fdiv<sd>.
+	* config/arm/arm.md (core_cycles): Remove fdiv.
+	* config/arm/vfp.md:
+	(*sqrtsf2_vfp): Update for attribute changes.
+	(*sqrtdf2_vfp): Likewise.
+	* config/aarch64/aarch64.md:
+	(sqrt<mode>2): Update for attribute changes.
+	* config/arm/arm1020e.md: Update with new attributes.
+	* config/arm/cortex-a15-neon.md: Update with new attributes.
+	* config/arm/cortex-a5.md: Update with new attributes.
+	* config/arm/cortex-a53.md: Update with new attributes.
+	* config/arm/cortex-a7.md: Update with new attributes.
+	* config/arm/cortex-a8-neon.md: Update with new attributes.
+	* config/arm/cortex-a9.md: Update with new attributes.
+	* config/arm/cortex-m4-fpu.md: Update with new attributes.
+	* config/arm/cortex-r4f.md: Update with new attributes.
+	* config/arm/marvell-pj4.md: Update with new attributes.
+	* config/arm/vfp11.md: Update with new attributes.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/types.md
+	(type): Split f_cvt as f_cvt, f_cvtf2i, f_cvti2f.
+	* config/aarch64/aarch64.md
+	(l<fcvt_pattern><su_optab><GPF:mode><GPI:mode>2): Update with
+	new attributes.
+	(fix_trunc<GPF:mode><GPI:mode>2): Likewise.
+	(fixuns_trunc<GPF:mode><GPI:mode>2): Likewise.
+	(float<GPI:mode><GPF:mode>2): Likewise.
+	* config/arm/vfp.md
+	(*truncsisf2_vfp): Update with new attributes.
+	(*truncsidf2_vfp): Likewise.
+	(fixuns_truncsfsi2): Likewise.
+	(fixuns_truncdfsi2): Likewise.
+	(*floatsisf2_vfp): Likewise.
+	(*floatsidf2_vfp): Likewise.
+	(floatunssisf2): Likewise.
+	(floatunssidf2): Likewise.
+	(*combine_vcvt_f32_<FCVTI32typename>): Likewise.
+	(*combine_vcvt_f64_<FCVTI32typename>): Likewise.
+	* config/arm/arm1020e.md: Update with new attributes.
+	* config/arm/cortex-a15-neon.md: Update with new attributes.
+	* config/arm/cortex-a5.md: Update with new attributes.
+	* config/arm/cortex-a53.md: Update with new attributes.
+	* config/arm/cortex-a7.md: Update with new attributes.
+	* config/arm/cortex-a8-neon.md: Update with new attributes.
+	* config/arm/cortex-a9.md: Update with new attributes.
+	* config/arm/cortex-m4-fpu.md: Update with new attributes.
+	* config/arm/cortex-r4f.md: Update with new attributes.
+	* config/arm/marvell-pj4.md: Update with new attributes.
+	* config/arm/vfp11.md: Update with new attributes.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/arm_neon.h
+	(vqtbl<1,2,3,4><q>_s8): Fix control vector parameter type.
+	(vqtbx<1,2,3,4><q>_s8): Likewise.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/types.md: Add "no_insn", "multiple" and "untyped"
+	types.
+	* config/arm/arm-fixed.md: Add type attribute to all insn
+	patterns.
+	(add<mode>3): Add type attribute.
+	(add<mode>3): Likewise.
+	(usadd<mode>3): Likewise.
+	(ssadd<mode>3): Likewise.
+	(sub<mode>3): Likewise.
+	(sub<mode>3): Likewise.
+	(ussub<mode>3): Likewise.
+	(sssub<mode>3): Likewise.
+	(ssmulsa3): Likewise.
+	(usmulusa3): Likewise.
+	(arm_usatsihi): Likewise.
+	* config/arm/vfp.md
+	(*movdi_vfp): Add types for all instructions.
+	(*movdi_vfp_cortexa8): Likewise.
+	(*movhf_vfp_neon): Likewise.
+	(*movhf_vfp): Likewise.
+	(*movdf_vfp): Likewise.
+	(*thumb2_movdf_vfp): Likewise.
+	(*thumb2_movdfcc_vfp): Likewise.
+	* config/arm/arm.md: Add type attribute to all insn patterns.
+	(*thumb1_adddi3): Add type attribute.
+	(*arm_adddi3): Likewise.
+	(*adddi_sesidi_di): Likewise.
+	(*adddi_zesidi_di): Likewise.
+	(*thumb1_addsi3): Likewise.
+	(addsi3_compare0): Likewise.
+	(*addsi3_compare0_scratch): Likewise.
+	(*compare_negsi_si): Likewise.
+	(cmpsi2_addneg): Likewise.
+	(*addsi3_carryin_<optab>): Likewise.
+	(*addsi3_carryin_alt2_<optab>): Likewise.
+	(*addsi3_carryin_clobercc_<optab>): Likewise.
+	(*subsi3_carryin): Likewise.
+	(*subsi3_carryin_const): Likewise.
+	(*subsi3_carryin_compare): Likewise.
+	(*subsi3_carryin_compare_const): Likewise.
+	(*arm_subdi3): Likewise.
+	(*thumb_subdi3): Likewise.
+	(*subdi_di_zesidi): Likewise.
+	(*subdi_di_sesidi): Likewise.
+	(*subdi_zesidi_di): Likewise.
+	(*subdi_sesidi_di): Likewise.
+	(*subdi_zesidi_ze): Likewise.
+	(thumb1_subsi3_insn): Likewise.
+	(*arm_subsi3_insn): Likewise.
+	(*anddi3_insn): Likewise.
+	(*anddi_zesidi_di): Likewise.
+	(*anddi_sesdi_di): Likewise.
+	(*ne_zeroextracts): Likewise.
+	(*ne_zeroextracts): Likewise.
+	(*ite_ne_zeroextr): Likewise.
+	(*ite_ne_zeroextr): Likewise.
+	(*anddi_notdi_di): Likewise.
+	(*anddi_notzesidi): Likewise.
+	(*anddi_notsesidi): Likewise.
+	(andsi_notsi_si): Likewise.
+	(thumb1_bicsi3): Likewise.
+	(*iordi3_insn): Likewise.
+	(*iordi_zesidi_di): Likewise.
+	(*iordi_sesidi_di): Likewise.
+	(*thumb1_iorsi3_insn): Likewise.
+	(*xordi3_insn): Likewise.
+	(*xordi_zesidi_di): Likewise.
+	(*xordi_sesidi_di): Likewise.
+	(*arm_xorsi3): Likewise.
+	(*andsi_iorsi3_no): Likewise.
+	(*smax_0): Likewise.
+	(*smax_m1): Likewise.
+	(*arm_smax_insn): Likewise.
+	(*smin_0): Likewise.
+	(*arm_smin_insn): Likewise.
+	(*arm_umaxsi3): Likewise.
+	(*arm_uminsi3): Likewise.
+	(*minmax_arithsi): Likewise.
+	(*minmax_arithsi_): Likewise.
+	(*satsi_<SAT:code>): Likewise.
+	(arm_ashldi3_1bit): Likewise.
+	(arm_ashrdi3_1bit): Likewise.
+	(arm_lshrdi3_1bit): Likewise.
+	(*arm_negdi2): Likewise.
+	(*thumb1_negdi2): Likewise.
+	(*arm_negsi2): Likewise.
+	(*thumb1_negsi2): Likewise.
+	(*negdi_extendsid): Likewise.
+	(*negdi_zero_extend): Likewise.
+	(*arm_abssi2): Likewise.
+	(*thumb1_abssi2): Likewise.
+	(*arm_neg_abssi2): Likewise.
+	(*thumb1_neg_abss): Likewise.
+	(one_cmpldi2): Likewise.
+	(extend<mode>di2): Likewise.
+	(*compareqi_eq0): Likewise.
+	(*arm_extendhisi2addsi): Likewise.
+	(*arm_movdi): Likewise.
+	(*thumb1_movdi_insn): Likewise.
+	(*arm_movt): Likewise.
+	(*thumb1_movsi_insn): Likewise.
+	(pic_add_dot_plus_four): Likewise.
+	(pic_add_dot_plus_eight): Likewise.
+	(tls_load_dot_plus_eight): Likewise.
+	(*thumb1_movhi_insn): Likewise.
+	(*thumb1_movsf_insn): Likewise.
+	(*movdf_soft_insn): Likewise.
+	(*thumb_movdf_insn): Likewise.
+	(cbranchsi4_insn): Likewise.
+	(cbranchsi4_scratch): Likewise.
+	(*negated_cbranchsi4): Likewise.
+	(*tbit_cbranch): Likewise.
+	(*tlobits_cbranch): Likewise.
+	(*tstsi3_cbranch): Likewise.
+	(*cbranchne_decr1): Likewise.
+	(*addsi3_cbranch): Likewise.
+	(*addsi3_cbranch_scratch): Likewise.
+	(*arm_cmpdi_insn): Likewise.
+	(*arm_cmpdi_unsig): Likewise.
+	(*arm_cmpdi_zero): Likewise.
+	(*thumb_cmpdi_zero): Likewise.
+	(*deleted_compare): Likewise.
+	(*mov_scc): Likewise.
+	(*mov_negscc): Likewise.
+	(*mov_notscc): Likewise.
+	(*cstoresi_eq0_thumb1_insn): Likewise.
+	(cstoresi_nltu_thumb1): Likewise.
+	(cstoresi_ltu_thu): Likewise.
+	(thumb1_addsi3_addgeu): Likewise.
+	(*arm_jump): Likewise.
+	(*thumb_jump): Likewise.
+	(*check_arch2): Likewise.
+	(arm_casesi_internal): Likewise.
+	(thumb1_casesi_dispatch): Likewise.
+	(*arm_indirect_jump): Likewise.
+	(*thumb1_indirect_jump): Likewise.
+	(nop): Likewise.
+	(*and_scc): Likewise.
+	(*ior_scc): Likewise.
+	(*compare_scc): Likewise.
+	(*cond_move): Likewise.
+	(*cond_arith): Likewise.
+	(*cond_sub): Likewise.
+	(*cmp_ite0): Likewise.
+	(*cmp_ite1): Likewise.
+	(*cmp_and): Likewise.
+	(*cmp_ior): Likewise.
+	(*ior_scc_scc): Likewise.
+	(*ior_scc_scc_cmp): Likewise.
+	(*and_scc_scc): Likewise.
+	(*and_scc_scc_cmp): Likewise.
+	(*and_scc_scc_nod): Likewise.
+	(*negscc): Likewise.
+	(movcond_addsi): Likewise.
+	(movcond): Likewise.
+	(*ifcompare_plus_move): Likewise.
+	(*if_plus_move): Likewise.
+	(*ifcompare_move_plus): Likewise.
+	(*if_move_plus): Likewise.
+	(*ifcompare_arith_arith): Likewise.
+	(*if_arith_arith): Likewise.
+	(*ifcompare_arith_move): Likewise.
+	(*if_arith_move): Likewise.
+	(*ifcompare_move_arith): Likewise.
+	(*if_move_arith): Likewise.
+	(*ifcompare_move_not): Likewise.
+	(*if_move_not): Likewise.
+	(*ifcompare_not_move): Likewise.
+	(*if_not_move): Likewise.
+	(*ifcompare_shift_move): Likewise.
+	(*if_shift_move): Likewise.
+	(*ifcompare_move_shift): Likewise.
+	(*if_move_shift): Likewise.
+	(*ifcompare_shift_shift): Likewise.
+	(*ifcompare_not_arith): Likewise.
+	(*ifcompare_arith_not): Likewise.
+	(*if_arith_not): Likewise.
+	(*ifcompare_neg_move): Likewise.
+	(*if_neg_move): Likewise.
+	(*ifcompare_move_neg): Likewise.
+	(*if_move_neg): Likewise.
+	(prologue_thumb1_interwork): Likewise.
+	(*cond_move_not): Likewise.
+	(*sign_extract_onebit): Likewise.
+	(*not_signextract_onebit): Likewise.
+	(stack_tie): Likewise.
+	(align_4): Likewise.
+	(align_8): Likewise.
+	(consttable_end): Likewise.
+	(consttable_1): Likewise.
+	(consttable_2): Likewise.
+	(consttable_4): Likewise.
+	(consttable_8): Likewise.
+	(consttable_16): Likewise.
+	(*thumb1_tablejump): Likewise.
+	(prefetch): Likewise.
+	(force_register_use): Likewise.
+	(thumb_eh_return): Likewise.
+	(load_tp_hard): Likewise.
+	(load_tp_soft): Likewise.
+	(tlscall): Likewise.
+	(*arm_movtas_ze): Likewise.
+	(*arm_rev): Likewise.
+	(*arm_revsh): Likewise.
+	(*arm_rev16): Likewise.
+	* config/arm/thumb2.md
+	(*thumb2_smaxsi3): Likewise.
+	(*thumb2_sminsi3): Likewise.
+	(*thumb32_umaxsi3): Likewise.
+	(*thumb2_uminsi3): Likewise.
+	(*thumb2_negdi2): Likewise.
+	(*thumb2_abssi2): Likewise.
+	(*thumb2_neg_abss): Likewise.
+	(*thumb2_movsi_insn): Likewise.
+	(tls_load_dot_plus_four): Likewise.
+	(*thumb2_movhi_insn): Likewise.
+	(*thumb2_mov_scc): Likewise.
+	(*thumb2_mov_negs): Likewise.
+	(*thumb2_mov_negs): Likewise.
+	(*thumb2_mov_nots): Likewise.
+	(*thumb2_mov_nots): Likewise.
+	(*thumb2_movsicc_): Likewise.
+	(*thumb2_movsfcc_soft_insn): Likewise.
+	(*thumb2_indirect_jump): Likewise.
+	(*thumb2_and_scc): Likewise.
+	(*thumb2_ior_scc): Likewise.
+	(*thumb2_ior_scc_strict_it): Likewise.
+	(*thumb2_cond_move): Likewise.
+	(*thumb2_cond_arith): Likewise.
+	(*thumb2_cond_ari): Likewise.
+	(*thumb2_cond_sub): Likewise.
+	(*thumb2_negscc): Likewise.
+	(*thumb2_movcond): Likewise.
+	(thumb2_casesi_internal): Likewise.
+	(thumb2_casesi_internal_pic): Likewise.
+	(*thumb2_alusi3_short): Likewise.
+	(*thumb2_mov<mode>_shortim): Likewise.
+	(*thumb2_addsi_short): Likewise.
+	(*thumb2_subsi_short): Likewise.
+	(thumb2_addsi3_compare0): Likewise.
+	(*thumb2_cbz): Likewise.
+	(*thumb2_cbnz): Likewise.
+	(*thumb2_one_cmplsi2_short): Likewise.
+	(*thumb2_negsi2_short): Likewise.
+	(*orsi_notsi_si): Likewise.
+	* config/arm/arm1020e.md: Update with new attributes.
+	* config/arm/arm1026ejs.md: Update with new attributes.
+	* config/arm/arm1136jfs.md: Update with new attributes.
+	* config/arm/arm926ejs.md: Update with new attributes.
+	* config/arm/cortex-a15.md: Update with new attributes.
+	* config/arm/cortex-a5.md: Update with new attributes.
+	* config/arm/cortex-a53.md: Update with new attributes.
+	* config/arm/cortex-a7.md: Update with new attributes.
+	* config/arm/cortex-a8.md: Update with new attributes.
+	* config/arm/cortex-a9.md: Update with new attributes.
+	* config/arm/cortex-m4.md: Update with new attributes.
+	* config/arm/cortex-r4.md: Update with new attributes.
+	* config/arm/fa526.md: Update with new attributes.
+	* config/arm/fa606te.md: Update with new attributes.
+	* config/arm/fa626te.md: Update with new attributes.
+	* config/arm/fa726te.md: Update with new attributes.
+
+2013-09-06  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-simd.md
+	(aarch64_sqdml<SBINQOPS:as>l_n<mode>_internal): Use
+	<vwx> iterator to ensure correct register choice.
+	(aarch64_sqdml<SBINQOPS:as>l2_n<mode>_internal): Likewise.
+	(aarch64_sqdmull_n<mode>): Likewise.
+	(aarch64_sqdmull2_n<mode>_internal): Likewise.
+	* config/aarch64/arm_neon.h
+	(vml<as><q>_lane<q>_<su>16): Use 'x' constraint for element vector.
+	(vml<as><q>_n_<su>16): Likewise.
+	(vml<as>l_high_lane<q>_<su>16): Likewise.
+	(vml<as>l_high_n_<su>16): Likewise.
+	(vml<as>l_lane<q>_<su>16): Likewise.
+	(vml<as>l_n_<su>16): Likewise.
+	(vmul<q>_lane<q>_<su>16): Likewise.
+	(vmul<q>_n_<su>16): Likewise.
+	(vmull_lane<q>_<su>16): Likewise.
+	(vmull_n_<su>16): Likewise.
+	(vmull_high_lane<q>_<su>16): Likewise.
+	(vmull_high_n_<su>16): Likewise.
+	(vqrdmulh<q>_n_s16): Likewise.
+
+2013-09-06  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/arm_neon.h: Fix all vdup<bhsd_lane<q> intrinsics to
+	have the correct lane parameter.
+
+2013-09-06  Richard Biener <rguenther@suse.de>
+
+	* cfganal.c (control_dependences::~control_dependences):
+	Properly free all of the vector.
+
+2013-09-06  Kirill Yukhin  <kirill.yukhin@intel.com>
+
+	PR target/58269
+	* config/i386/i386.c (ix86_conditional_register_usage):
+	Proper initialize extended SSE registers.
+
+2013-09-06  Jan Hubicka  <jh@suse.cz>
+
+	PR tree-optimization/58311
+	* ipa-devirt.c (gate_ipa_devirt): Only execute when optimizing.
+
+2013-09-06  Jan Hubicka  <jh@suse.cz>
+
+	* Makefile.in (tree-sra.o): Update dependencies.
+	* tree-sra.c: Include ipa-utils.h
+	(scan_function): Use recursive_call_p.
+	(has_caller_p): New function.
+	(cgraph_for_node_and_aliases): Count also callers of aliases.
+
+2013-09-06  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/58094
+	* cgraph.h (symtab_semantically_equivalent_p): Declare.
+	* tree-tailcall.c: Include ipa-utils.h.
+	(find_tail_calls): Use it.
+	* ipa-pure-const.c (check_call): Likewise.
+	* ipa-utils.c (recursive_call_p): New function.
+	* ipa-utils.h (recursive_call_p): Dclare.
+	* symtab.c (symtab_nonoverwritable_alias): Fix formatting.
+	(symtab_semantically_equivalent_p): New function.
+	* Makefile.in (tree-tailcall.o): Update dependencies.
+
+2013-09-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* ipa-split.c (split_function): Set DECL_NO_INLINE_WARNING_P on the
+	non-inlinable part.
+
+2013-09-06  Richard Biener  <rguenther@suse.de>
+
+	* lto-streamer.h (lto_global_var_decls): Remove.
+	* Makefile.in (OBJS): Remove lto-symtab.o.
+	(lto-symtab.o): Remove.
+	(GTFILES): Remove lto-symtab.c
+	* lto-symtab.c: Move to lto/
+
+2013-09-06  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.md (UNSPEC_FPINT_FLOOR, UNSPEC_FPINT_BTRUNC)
+	(UNSPEC_FPINT_ROUND, UNSPEC_FPINT_CEIL, UNSPEC_FPINT_NEARBYINT)
+	(UNSPEC_FPINT_RINT): New constant definitions.
+	(FPINT, fpint_name, fpint_roundingmode): New integer iterator
+	definition with 2 attributes.
+	("<FPINT:fpint_name><BFP:mode>2", "rint<BFP:mode>2")
+	("<FPINT:fpint_name><DFP:mode>2", "rint<DFP:mode>2"): New pattern
+	definitions.
+
+2013-09-06  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.md: Add "bcr_flush" value to mnemonic
+	attribute.
+	("mem_thread_fence_1"): Use bcr 14,0 for z196 and later.
+	Set the mnemonic attribute to "bcr_flush".  Set the "z196prop"
+	attribute to "z196_alone".
+	* config/s390/2827.md: Add "bcr_flush" to "ooo_groupalone" and
+	"zEC12_simple".
+
+2013-09-06  Richard Biener  <rguenther@suse.de>
+
+	* basic-block.h (class control_dependences): New.
+	* tree-ssa-dce.c (control_dependence_map): Remove.
+	(cd): New global.
+	(EXECUTE_IF_CONTROL_DEPENDENT): Remove.
+	(set_control_dependence_map_bit, clear_control_dependence_bitmap,
+	find_pdom, find_control_dependence, find_all_control_dependences):
+	Move to cfganal.c.
+	(mark_control_dependent_edges_necessary, find_obviously_necessary_stmts,
+	propagate_necessity, tree_dce_init, tree_dce_done,
+	perform_tree_ssa_dce): Adjust.
+	* cfganal.c (set_control_dependence_map_bit,
+	clear_control_dependence_bitmap, find_pdom, find_control_dependence,
+	find_all_control_dependences): Move from tree-ssa-dce.c and
+	implement as methods of control_dependences class.
+	(control_dependences::control_dependences): New.
+	(control_dependences::~control_dependences): Likewise.
+	(control_dependences::get_edges_dependent_on): Likewise.
+	(control_dependences::get_edge): Likewise.
+
+2013-09-04  Jan Hubicka  <jh@suse.cz>
+
+	* tree.c (types_same_for_odr): Drop overactive check.
+	* ipa-devirt.c (hash_type_name): Likewise.
+
+2013-09-04  Jan Hubicka  <jh@suse.cz>
+
+	* cgraphunit.c (walk_polymorphic_call_targets): Break out from ...
+	(analyze_functions): ... here.
+
+2013-09-04  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/58201
+	* cgraphunit.c (analyze_functions): Clear AUX fields
+	after processing; initialize assembler name has.
+
+2013-09-05  Jeff Law  <law@redhat.com>
+
+	* tree-ssa-threadedge.c (thread_around_empty_blocks): Renamed
+	from thread_around_empty_block.  Record threading path into PATH.
+	Recurse if threading through the initial block is successful.
+	(thread_across_edge): Corresponding changes to slightly simplify.
+
 2013-09-05  James Greenhalgh  <james.greenhalgh@arm.com>
 
 	* config/aarch64/aarch64.md

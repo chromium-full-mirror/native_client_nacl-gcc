@@ -831,7 +831,7 @@
    fmov\\t%s0, %s1"
   [(set_attr "v8type" "move,move,move,alu,load1,load1,store1,store1,adr,adr,fmov,fmov,fmov")
    (set_attr "type" "mov_reg,mov_reg,mov_reg,mov_imm,load1,load1,store1,store1,\
-                     adr,adr,mov_reg,mov_reg,mov_reg")
+                     adr,adr,fmov,fmov,fmov")
    (set_attr "mode" "SI")
    (set_attr "fp" "*,*,*,*,*,yes,*,yes,*,*,yes,yes,yes")]
 )
@@ -858,7 +858,7 @@
    movi\\t%d0, %1"
   [(set_attr "v8type" "move,move,move,alu,load1,load1,store1,store1,adr,adr,fmov,fmov,fmov,fmov")
    (set_attr "type" "mov_reg,mov_reg,mov_reg,mov_imm,load1,load1,store1,store1,\
-                     adr,adr,mov_reg,mov_reg,mov_reg,mov_reg")
+                     adr,adr,fmov,fmov,fmov,fmov")
    (set_attr "mode" "DI")
    (set_attr "fp" "*,*,*,*,*,yes,*,yes,*,*,yes,yes,yes,*")
    (set_attr "simd" "*,*,*,*,*,*,*,*,*,*,*,*,*,yes")]
@@ -906,7 +906,7 @@
    str\\t%q1, %0"
   [(set_attr "v8type" "move2,fmovi2f,fmovf2i,*, \
 		       load2,store2,store2,fpsimd_load,fpsimd_store")
-   (set_attr "type" "mov_reg,f_mcr,f_mrc,*, \
+   (set_attr "type" "multiple,f_mcr,f_mrc,*, \
 		             load2,store2,store2,f_loadd,f_stored")
    (set_attr "simd_type" "*,*,*,simd_move,*,*,*,*,*")
    (set_attr "mode" "DI,DI,DI,TI,DI,DI,DI,TI,TI")
@@ -961,8 +961,8 @@
   [(set_attr "v8type" "fmovi2f,fmovf2i,\
 		       fmov,fconst,fpsimd_load,\
 		       fpsimd_store,fpsimd_load,fpsimd_store,fmov")
-   (set_attr "type" "f_mcr,f_mrc,mov_reg,fconsts,\
-                     f_loads,f_stores,f_loads,f_stores,mov_reg")
+   (set_attr "type" "f_mcr,f_mrc,fmov,fconsts,\
+                     f_loads,f_stores,f_loads,f_stores,fmov")
    (set_attr "mode" "SF")]
 )
 
@@ -984,7 +984,7 @@
   [(set_attr "v8type" "fmovi2f,fmovf2i,\
 		       fmov,fconst,fpsimd_load,\
 		       fpsimd_store,fpsimd_load,fpsimd_store,move")
-   (set_attr "type" "f_mcr,f_mrc,mov_reg,fconstd,\
+   (set_attr "type" "f_mcr,f_mrc,fmov,fconstd,\
                      f_loadd,f_stored,f_loadd,f_stored,mov_reg")
    (set_attr "mode" "DF")]
 )
@@ -1024,8 +1024,8 @@
    ldp\\t%0, %H0, %1
    stp\\t%1, %H1, %0"
   [(set_attr "v8type" "logic,move2,fmovi2f,fmovf2i,fconst,fconst,fpsimd_load,fpsimd_store,fpsimd_load2,fpsimd_store2")
-   (set_attr "type" "logic_reg,mov_reg,f_mcr,f_mrc,fconstd,fconstd,\
-                     f_loadd,f_stored,f_loadd,f_stored")
+   (set_attr "type" "logic_reg,multiple,f_mcr,f_mrc,fconstd,fconstd,\
+                     f_loadd,f_stored,neon_ldm_2,neon_stm_2")
    (set_attr "mode" "DF,DF,DF,DF,DF,DF,TF,TF,DF,DF")
    (set_attr "length" "4,8,8,8,4,4,4,4,4,4")
    (set_attr "fp" "*,*,yes,yes,*,yes,yes,yes,*,*")
@@ -1090,7 +1090,7 @@
 			       GET_MODE_SIZE (<MODE>mode)))"
   "ldp\\t%<w>0, %<w>2, %1"
   [(set_attr "v8type" "fpsimd_load2")
-   (set_attr "type" "f_load<s>")
+   (set_attr "type" "neon_ldm_2")
    (set_attr "mode" "<MODE>")]
 )
 
@@ -1106,8 +1106,8 @@
 			       XEXP (operands[0], 0),
 			       GET_MODE_SIZE (<MODE>mode)))"
   "stp\\t%<w>1, %<w>3, %0"
-  [(set_attr "v8type" "fpsimd_load2")
-   (set_attr "type" "f_load<s>")
+  [(set_attr "v8type" "fpsimd_store2")
+   (set_attr "type" "neon_stm_2")
    (set_attr "mode" "<MODE>")]
 )
 
@@ -2281,7 +2281,7 @@
   ""
   "madd\\t%<w>0, %<w>1, %<w>2, %<w>3"
   [(set_attr "v8type" "madd")
-   (set_attr "type" "mul")
+   (set_attr "type" "mla")
    (set_attr "mode" "<MODE>")]
 )
 
@@ -2295,7 +2295,7 @@
   ""
   "madd\\t%w0, %w1, %w2, %w3"
   [(set_attr "v8type" "madd")
-   (set_attr "type" "mul")
+   (set_attr "type" "mla")
    (set_attr "mode" "SI")]
 )
 
@@ -2308,7 +2308,7 @@
   ""
   "msub\\t%<w>0, %<w>1, %<w>2, %<w>3"
   [(set_attr "v8type" "madd")
-   (set_attr "type" "mul")
+   (set_attr "type" "mla")
    (set_attr "mode" "<MODE>")]
 )
 
@@ -2323,7 +2323,7 @@
   ""
   "msub\\t%w0, %w1, %w2, %w3"
   [(set_attr "v8type" "madd")
-   (set_attr "type" "mul")
+   (set_attr "type" "mla")
    (set_attr "mode" "SI")]
 )
 
@@ -2373,7 +2373,7 @@
   ""
   "<su>maddl\\t%0, %w1, %w2, %3"
   [(set_attr "v8type" "maddl")
-   (set_attr "type" "mul")
+   (set_attr "type" "<su>mlal")
    (set_attr "mode" "DI")]
 )
 
@@ -2387,7 +2387,7 @@
   ""
   "<su>msubl\\t%0, %w1, %w2, %3"
   [(set_attr "v8type" "maddl")
-   (set_attr "type" "mul")
+   (set_attr "type" "<su>mlal")
    (set_attr "mode" "DI")]
 )
 
@@ -3685,7 +3685,7 @@
   "TARGET_FLOAT"
   "fcvt<frint_suffix><su>\\t%<GPI:w>0, %<GPF:s>1"
   [(set_attr "v8type" "fcvtf2i")
-   (set_attr "type" "f_cvt")
+   (set_attr "type" "f_cvtf2i")
    (set_attr "mode" "<GPF:MODE>")
    (set_attr "mode2" "<GPI:MODE>")]
 )
@@ -3785,7 +3785,7 @@
   "TARGET_FLOAT"
   "fcvtzs\\t%<GPI:w>0, %<GPF:s>1"
   [(set_attr "v8type" "fcvtf2i")
-   (set_attr "type" "f_cvt")
+   (set_attr "type" "f_cvtf2i")
    (set_attr "mode" "<GPF:MODE>")
    (set_attr "mode2" "<GPI:MODE>")]
 )
@@ -3796,7 +3796,7 @@
   "TARGET_FLOAT"
   "fcvtzu\\t%<GPI:w>0, %<GPF:s>1"
   [(set_attr "v8type" "fcvtf2i")
-   (set_attr "type" "f_cvt")
+   (set_attr "type" "f_cvtf2i")
    (set_attr "mode" "<GPF:MODE>")
    (set_attr "mode2" "<GPI:MODE>")]
 )
@@ -3807,7 +3807,7 @@
   "TARGET_FLOAT"
   "scvtf\\t%<GPF:s>0, %<GPI:w>1"
   [(set_attr "v8type" "fcvti2f")
-   (set_attr "type" "f_cvt")
+   (set_attr "type" "f_cvti2f")
    (set_attr "mode" "<GPF:MODE>")
    (set_attr "mode2" "<GPI:MODE>")]
 )
@@ -3903,7 +3903,7 @@
   "TARGET_FLOAT"
   "fsqrt\\t%<s>0, %<s>1"
   [(set_attr "v8type" "fsqrt")
-   (set_attr "type" "fdiv<s>")
+   (set_attr "type" "fsqrt<s>")
    (set_attr "mode" "<MODE>")]
 )
 
@@ -4134,7 +4134,7 @@
   ""
   "mrs\\t%0, tpidr_el0"
   [(set_attr "v8type" "mrs")
-   (set_attr "type" "mov_reg")
+   (set_attr "type" "mrs")
    (set_attr "mode" "DI")]
 )
 
