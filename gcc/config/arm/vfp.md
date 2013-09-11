@@ -1235,9 +1235,10 @@
 		 (match_operand 2
 			"const_double_vcvt_power_of_two_reciprocal" "Dt")))]
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math"
-  "vcvt.f32.<FCVTI32typename>\\t%0, %1, %v2"
- [(set_attr "predicable" "no")
-  (set_attr "type" "f_cvti2f")]
+  "vcvt%?.f32.<FCVTI32typename>\\t%0, %1, %v2"
+  [(set_attr "predicable" "yes")
+   (set_attr "predicable_short_it" "no")
+   (set_attr "type" "f_cvti2f")]
 )
 
 ;; Not the ideal way of implementing this. Ideally we would be able to split
@@ -1250,12 +1251,14 @@
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP3 && !flag_rounding_math
   && !TARGET_VFP_SINGLE"
   "@
-  vmov.f32\\t%0, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2
-  vmov.f32\\t%0, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2
-  vmov.f64\\t%P0, %1, %1\;vcvt.f64.<FCVTI32typename>\\t%P0, %P0, %v2"
- [(set_attr "predicable" "no")
-  (set_attr "type" "f_cvti2f")
-  (set_attr "length" "8")]
+  vmov%?.f32\\t%0, %1\;vcvt%?.f64.<FCVTI32typename>\\t%P0, %P0, %v2
+  vmov%?.f32\\t%0, %1\;vcvt%?.f64.<FCVTI32typename>\\t%P0, %P0, %v2
+  vmov%?.f64\\t%P0, %1, %1\;vcvt%?.f64.<FCVTI32typename>\\t%P0, %P0, %v2"
+  [(set_attr "predicable" "yes")
+   (set_attr "ce_count" "2")
+   (set_attr "predicable_short_it" "no")
+   (set_attr "type" "f_cvti2f")
+   (set_attr "length" "8")]
 )
 
 ;; Store multiple insn used in function prologue.
