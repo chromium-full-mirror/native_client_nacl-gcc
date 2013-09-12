@@ -1,3 +1,33 @@
+2013-09-12  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* g++.dg/torture/pr58380.C: Suppress warnings with "-w".
+
+2013-09-12  Martin Jambor  <mjambor@suse.cz>
+
+	PR ipa/58389
+	* g++.dg/pr58389.C: New test.
+
+2013-09-12  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* g++.dg/template/pseudodtor2.C: Add column number to dg-error
+	strings.
+	* g++.dg/template/pseudodtor3.C: Likewise.
+
+2013-09-12  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/58404
+	* g++.dg/tree-ssa/pr58404.C: New testcase.
+
+2013-09-12  Martin Jambor  <mjambor@suse.cz>
+
+	PR ipa/58371
+	* g++.dg/ipa/pr58371.C: New test.
+
+2013-09-12  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/ldist-4.c: Remove undefined behavior.  Adjust
+	expected outcome and comment why that happens.
+
 2013-09-11  Richard Biener  <rguenther@suse.de>
 
 	PR middle-end/58377

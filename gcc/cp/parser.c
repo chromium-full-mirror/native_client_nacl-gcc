@@ -5533,6 +5533,7 @@ cp_parser_postfix_expression (cp_parser *parser, bool address_p, bool cast_p,
 			      cp_id_kind * pidk_return)
 {
   cp_token *token;
+  location_t loc;
   enum rid keyword;
   cp_id_kind idk = CP_ID_KIND_NONE;
   tree postfix_expression = NULL_TREE;
@@ -5540,6 +5541,7 @@ cp_parser_postfix_expression (cp_parser *parser, bool address_p, bool cast_p,
 
   /* Peek at the next token.  */
   token = cp_lexer_peek_token (parser->lexer);
+  loc = token->location;
   /* Some of the productions are determined by keywords.  */
   keyword = token->keyword;
   switch (keyword)
@@ -5685,7 +5687,6 @@ cp_parser_postfix_expression (cp_parser *parser, bool address_p, bool cast_p,
 	vec<tree, va_gc> *vec;
 	unsigned int i;
 	tree p;
-	location_t loc = token->location;
 
 	cp_lexer_consume_token (parser->lexer);
 	vec = cp_parser_parenthesized_expression_list (parser, non_attr,
@@ -6018,8 +6019,7 @@ cp_parser_postfix_expression (cp_parser *parser, bool address_p, bool cast_p,
 	  postfix_expression
 	    = cp_parser_postfix_dot_deref_expression (parser, token->type,
 						      postfix_expression,
-						      false, &idk,
-						      token->location);
+						      false, &idk, loc);
 
           is_member_access = true;
 	  break;
@@ -6338,7 +6338,7 @@ cp_parser_postfix_dot_deref_expression (cp_parser *parser,
 	  pseudo_destructor_p = true;
 	  postfix_expression
 	    = finish_pseudo_destructor_expr (postfix_expression,
-					     s, type);
+					     s, type, location);
 	}
     }
 
@@ -8783,6 +8783,7 @@ cp_parser_lambda_introducer (cp_parser* parser, tree lambda_expr)
 /* Parse the (optional) middle of a lambda expression.
 
    lambda-declarator:
+     < template-parameter-list [opt] >
      ( parameter-declaration-clause [opt] )
        attribute-specifier [opt]
        mutable [opt]
@@ -8802,9 +8803,30 @@ cp_parser_lambda_declarator_opt (cp_parser* parser, tree lambda_expr)
   tree param_list = void_list_node;
   tree attributes = NULL_TREE;
   tree exception_spec = NULL_TREE;
+  tree template_param_list = NULL_TREE;
 
-  /* The lambda-declarator is optional, but must begin with an opening
-     parenthesis if present.  */
+  /* The template-parameter-list is optional, but must begin with
+     an opening angle if present.  */
+  if (cp_lexer_next_token_is (parser->lexer, CPP_LESS))
+    {
+      if (cxx_dialect < cxx1y)
+	pedwarn (parser->lexer->next_token->location, 0,
+		 "lambda templates are only available with "
+		 "-std=c++1y or -std=gnu++1y");
+
+      cp_lexer_consume_token (parser->lexer);
+
+      template_param_list = cp_parser_template_parameter_list (parser);
+
+      cp_parser_skip_to_end_of_template_parameter_list (parser);
+
+      /* We just processed one more parameter list.  */
+      ++parser->num_template_parameter_lists;
+    }
+
+  /* The parameter-declaration-clause is optional (unless
+     template-parameter-list was given), but must begin with an
+     opening parenthesis if present.  */
   if (cp_lexer_next_token_is (parser->lexer, CPP_OPEN_PAREN))
     {
       cp_lexer_consume_token (parser->lexer);
@@ -8847,6 +8869,8 @@ cp_parser_lambda_declarator_opt (cp_parser* parser, tree lambda_expr)
          trailing-return-type in case of decltype.  */
       pop_bindings_and_leave_scope ();
     }
+  else if (template_param_list != NULL_TREE) // generate diagnostic
+    cp_parser_require (parser, CPP_OPEN_PAREN, RT_OPEN_PAREN);
 
   /* Create the function call operator.
 
@@ -8890,6 +8914,12 @@ cp_parser_lambda_declarator_opt (cp_parser* parser, tree lambda_expr)
 	DECL_ARTIFICIAL (fco) = 1;
 	/* Give the object parameter a different name.  */
 	DECL_NAME (DECL_ARGUMENTS (fco)) = get_identifier ("__closure");
+	if (template_param_list)
+	  {
+	    fco = finish_member_template_decl (fco);
+	    finish_template_decl (template_param_list);
+	    --parser->num_template_parameter_lists;
+	  }
       }
 
     finish_member_declaration (fco);
@@ -9012,7 +9042,11 @@ cp_parser_lambda_body (cp_parser* parser, tree lambda_expr)
     finish_lambda_scope ();
 
     /* Finish the function and generate code for it if necessary.  */
-    expand_or_defer_fn (finish_function (/*inline*/2));
+    tree fn = finish_function (/*inline*/2);
+
+    /* Only expand if the call op is not a template.  */
+    if (!DECL_TEMPLATE_INFO (fco))
+      expand_or_defer_fn (fn);
   }
 
   parser->local_variables_forbidden_p = local_variables_forbidden_p;
