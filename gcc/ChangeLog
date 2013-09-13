@@ -2,6 +2,138 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-09-13  Jacek Caban  <jacek@codeweavers.com>
+
+	* config.gcc: Use new winnt-c.c target hooks
+	* config/t-winnt: New file
+	* config/winnt-c.c: New file
+	* doc/tm.texi.in: Document new hook
+	* doc/tm.texi: Regenerated
+
+2013-09-13  Jan Hubicka  <jh@suse.cz>
+
+	PR middle-end/58094
+	* ipa-inline.c (check_callers): New function.
+	(check_caller_edge): Remove.
+	(want_inline_function_to_all_callers_p): Also permit alises that are
+	called dirrectly.
+	(inline_to_all_callers): Terminate the walk when devirtualization
+	introduce new calls.
+
+2013-09-13  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline-analysis.c (struct growth_data): Add node.
+	(do_estimate_growth_1): Fix detection of recursion.
+
+2013-09-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/58392
+	* tree-cfg.c (move_sese_region_to_fn): Rename loop variable
+	to avoid shadowing of outer loop variable.  If
+	saved_cfun->has_simduid_loops or saved_cfun->has_force_vect_loops,
+	replace_by_duplicate_decl simduid of loops that have it set and
+	set dest_cfun->has_simduid_loops and/or
+	dest_cfun->has_force_vect_loops.
+	* omp-low.c (build_outer_var_ref): Call maybe_lookup_decl_in_outer_ctx
+	instead of maybe_lookup_decl.
+	* tree-inline.c (copy_loops): Change blocks_to_copy argument to id.
+	Use id->blocks_to_copy instead of blocks_to_copy.  Adjust recursive
+	call.  Copy over force_vect and copy and remap simduid.  Set
+	cfun->has_simduid_loops and/or cfun->has_force_vect_loops.
+	(copy_cfg_body): Remove blocks_to_copy argument.  Use
+	id->blocks_to_copy instead of blocks_to_copy.  Adjust copy_loops
+	caller.  Don't set cfun->has_simduid_loops and/or
+	cfun->has_force_vect_loops here.
+	(copy_body): Remove blocks_to_copy argument.  Adjust copy_cfg_body
+	caller.
+	(expand_call_inline, tree_function_versioning): Adjust copy_body
+	callers.
+
+2013-09-13  Martin Jambor  <mjambor@suse.cz>
+
+	PR bootstrap/58388
+	* ipa-prop.c (try_make_edge_direct_simple_call): Be less strict in
+	the assert if the edge was a speculative one.
+
+2013-09-13  Richard Biener  <rguenther@suse.de>
+
+	* tree-data-ref.h (known_dependences_p): Move here ...
+	* tree-loop-distribution.c (known_dependences_p): ... from here.
+	(dump_rdg_component, debug_rdg_component): Remove.
+	(dump_rdg): Adjust.
+	(generate_loops_for_partition): Use gimple_uid instead of
+	relying on matching stmt visit order.
+	(rdg_build_partitions): Take starting stmt vector.
+	(ldist_gen): Merge into ...
+	(distribute_loop): ... this function.  Do not compute starting
+	vertices vector.
+	* tree-cfg.c (gimple_duplicate_bb): Copy UID for PHIs.
+
+2013-09-13  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.md (arm_cmpsi_insn): Split rI alternative.
+	Set type attribute correctly. Set predicable_short_it attribute.
+	(cmpsi_shiftsi): Remove %? from output template.
+
+2013-09-13  Richard Biener  <rguenther@suse.de>
+
+	* tree-loop-distribution.c (struct rdg_component,
+	rdg_defs_used_in_other_loops_p, free_rdg_components,
+	rdg_build_components): Remove.
+	(stmts_from_loop): Do not record virtual PHIs.
+	(generate_loops_for_partition): Skip virtual PHIs.
+	(build_rdg_partition_for_component): Rename to ...
+	(build_rdg_partition_for_vertex): ... this and adjust.
+	(rdg_build_partitions): Take a vector of starting vertices
+	instead of components.  Remove unnecessary leftover handling.
+	(ldist_gen): Do not build components or record other stores.
+	(distribute_loop): Do not distribute loops containing stmts
+	with side-effects.
+
+2013-09-13  Christian Bruel  <christian.bruel@st.com>
+
+	PR target/58314
+	* config/sh/sh.md (mov<mode>_reg_reg): Allow memory reloads.
+
+2013-09-13  Kai Tietz  <ktietz@redhat.com>
+
+	* config.gcc: Separate cases for mingw and cygwin targets,
+	and add 64-bit cygwin target case.
+
+	* config/i386/winnt-cxx.c (i386_pe_type_dllexport_p): Don't
+	dll-export inline-functions.
+	* config/i386/winnt.c (i386_pe_determine_dllexport_p): Likewise.
+
+
+2013-09-13  Jeff Law  <law@redhat.com>
+
+	PR middle-end/58387
+	Revert:
+	2013-09-06  Jeff Law  <law@redhat.com>
+
+	* tree-ssa-dom.c (cprop_into_successor_phis): Also propagate
+	edge implied equivalences into successor phis.
+
+2013-09-12  DJ Delorie  <dj@redhat.com>
+
+	* config/rl78/rl78-virt.md: Change from | to \; for asm line
+	separators.
+
+2013-09-12  Brooks Moses  <bmoses@google.com>
+
+	PR driver/42955
+	* Makefile.in: Do not install driver binaries in $(target)/bin.
+
+2013-09-12  DJ Delorie  <dj@redhat.com>
+
+	* config/rl78/rl78.opt (mrelax): New.
+	* config/rl78/rl78.h (ASM_SPEC): New, pass on -mrelax to gas.
+	* config/rl78/rl78.h (LINK_SPEC): New, pass on -mrelax to ld.
+
+	* config/rl78/rl78.c (rl78_expand_prologue): Use AX to copy
+	between SP and FP.
+	(rl78_expand_epilogue): Likewise.
+
 2013-09-12  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR middle-end/58335
