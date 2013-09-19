@@ -1,3 +1,28 @@
+2013-09-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/57697
+	* gfortran.dg/defined_assignment_11.f90: New.
+
+2013-09-18  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/58438
+	* g++.dg/pr58438.C: New test.
+
+2013-09-18  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/43366
+	* gfortran.dg/class_39.f03: Update dg-error.
+	* gfortran.dg/class_5.f03: Ditto.
+	* gfortran.dg/class_53.f90: Ditto.
+	* gfortran.dg/realloc_on_assign_20.f90: New.
+	* gfortran.dg/realloc_on_assign_21.f90: New.
+	* gfortran.dg/realloc_on_assign_22.f90: New.
+
+2013-09-18  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58457
+	* g++.dg/parse/using4.C: New.
+
 2013-09-18  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* gcc.c-torture/execute/pr58419.c (b): Change type to signed char.
