@@ -265,7 +265,7 @@
   "
   [(set_attr "conds" "unconditional")
    (set_attr "sfi_breg_operand" "1,0,1,0,*,*,*,*,*")
-   (set_attr "type" "neon_vld1_1_2_regs,neon_vst1_1_2_regs_vst2_2_regs,\
+   (set_attr "type" "neon_load1_1reg,neon_store1_1reg,\
                      load1,store1,fmov,mov_reg,f_mcr,f_mrc,multiple")
    (set_attr "length" "4,4,4,4,4,4,4,4,8")]
 )
