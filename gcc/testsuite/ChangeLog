@@ -1,3 +1,64 @@
+2013-10-25  Tobias Burnus  <burnus@net-b.de>
+
+	* g++.dg/vect/pr33426-ivdep.cc: Use dg-options.
+	* gfortran.dg/vect/vect-do-concurrent-1.f90: Ditto.
+	* testsuite/gcc.dg/vect/vect-ivdep-1.c: Ditto.
+
+2013-10-25  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* gcc.dg/wmul-1.c: New test.
+
+2013-10-25  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58878
+	* g++.dg/template/pr58878.C: New.
+
+2013-10-25  Marc Glisse  <marc.glisse@inria.fr>
+
+	* gcc.dg/tree-ssa/alias-23.c: New file.
+
+2013-10-25  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/58626
+	* gcc.dg/torture/pr58626.c: New testcase.
+
+2013-10-25  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54812
+	* g++.dg/cpp0x/defaulted47.C: New.
+
+2013-10-25  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.c-torture/execute/pr58831.c: New test.
+
+2013-10-25  Nick Clifton  <nickc@redhat.com>
+
+	* c-c++-common/pr57793.c: Add expected error messages for
+	targets with small integers.
+	* gcc.dg/c99-stdint-1.c: Only run on 32-bit plus targets.
+	* gcc.dg/c99-stdint-2.c: Likewise.
+	* gcc.dg/cdce1.c: Likewise.
+	* gcc.dg/fold-overflow-1.c: Likewise.
+	* gcc.dg/utf-cvt.c: Likewise.
+	* gcc.dg/ftrapv-1.c: Only run on targets that support trapping
+	arithmetic.
+	* gcc.dg/ftrapv-2.c: Likewise.
+	* gcc.dg/pr30286.c: Likewise.
+	* gcc.dg/pr19340.c: Only run on targets that support
+	scheduling.
+	* lib/target-supports.exp (check_effective_target_trapping): New
+	proc.  Returns true if the target supports trapping arithmetic.
+
+2013-10-25  Tobias Burnus  <burnus@net-b.de>
+
+	* g++.dg/parse/ivdep.C: New.
+	* g++.dg/vect/pr33426-ivdep.cc: New.
+
+2013-10-24  Richard Henderson  <rth@redhat.com>
+
+	PR rtl/58542
+	* gcc.dg/atomic-store-6.c: New.
+
 2013-10-24  Ian Lance Taylor  <iant@google.com>
 
 	* go.test/go-test.exp (errchk): Combine quoted strings in
