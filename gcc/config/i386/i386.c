@@ -8967,15 +8967,16 @@ ix86_code_end (void)
 
       xops[0] = gen_rtx_REG (Pmode, regno);
       xops[1] = gen_rtx_MEM (Pmode, stack_pointer_rtx);
-      output_asm_insn ("mov%z0\t{%1, %0|%0, %1}", xops);
       if (TARGET_SFI_CFLOW_NACL1)
-        {
-          /* TODO(mcgrathr): insufficient */
-          gcc_assert (regno != CX_REG);
-          output_asm_insn ("%!naclret", NULL);
-        }
+        /* The NaCl replacement for the return instruction needs a scratch
+           register.  Fortunately, the value it puts in that register is
+           exactly the one we're trying to extract here.  */
+	output_asm_insn ("%!naclret\t%0", xops);
       else
-        output_asm_insn ("%!ret", NULL);
+	{
+	  output_asm_insn ("mov%z0\t{%1, %0|%0, %1}", xops);
+          output_asm_insn ("%!ret", NULL);
+        }
       final_end_function ();
       init_insn_lengths ();
       free_after_compilation (cfun);
