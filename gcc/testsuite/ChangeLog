@@ -1,3 +1,41 @@
+2013-10-28   Claudiu Zissulescu  <claziss@synopsys.com>
+	     Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* gcc.target/arc/jump-around-jump.c: New test.
+
+2013-10-27  Tom de Vries  <tom@codesourcery.com>
+
+	* gcc.target/arm/require-pic-register-loc.c: New test.
+
+2013-10-27  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/58679
+	* gcc.target/i386/pr58679-1.c: New test.
+	* gcc.target/i386/pr58679-2.c: Ditto.
+
+2013-10-27  Tobias Burnus  <burnus@net-b.de>
+
+	PR other/33426
+	* gcc.dg/vect/vect-ivdep-2.c: New.
+
+2013-10-26  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/52483
+	* gcc.target/sh/pr52483-1.c: Add tests for memory stores.
+	* gcc.target/sh/pr52483-2.c: Likewise.
+	* gcc.target/sh/pr52483-3.c: Likewise.
+	* gcc.target/sh/pr52483-4.c: Likewise.
+
+2013-10-26  Jeff Law  <law@redhat.com>
+
+	* g++.dg/torture/pr49309.C: Removed.
+	* gcc.dg/dfp/pr35739.c: Removed.
+
+2013-10-25  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/58759
+	* gcc.target/i386/pr58759.c: New.
+
 2013-10-25  Tobias Burnus  <burnus@net-b.de>
 
 	* g++.dg/vect/pr33426-ivdep.cc: Use dg-options.
@@ -44,8 +82,7 @@
 	arithmetic.
 	* gcc.dg/ftrapv-2.c: Likewise.
 	* gcc.dg/pr30286.c: Likewise.
-	* gcc.dg/pr19340.c: Only run on targets that support
-	scheduling.
+	* gcc.dg/pr19340.c: Only run on targets that support scheduling.
 	* lib/target-supports.exp (check_effective_target_trapping): New
 	proc.  Returns true if the target supports trapping arithmetic.
 
@@ -61,8 +98,7 @@
 
 2013-10-24  Ian Lance Taylor  <iant@google.com>
 
-	* go.test/go-test.exp (errchk): Combine quoted strings in
-	comments.
+	* go.test/go-test.exp (errchk): Combine quoted strings in comments.
 
 2013-10-24  Cong Hou  <congh@google.com>
 
