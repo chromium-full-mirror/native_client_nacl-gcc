@@ -2,6 +2,112 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-10-31  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* lra-constraints (process_alt_operands): Use the result
+	elimination register for operand when matching constraints.
+
+2013-10-31  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-vrp.c (maybe_set_nonzero_bits): New function.
+	(remove_range_assertions): Call it.
+
+	* tree.c (tree_ctz): New function.
+	* tree.h (tree_ctz): New prototype.
+	* tree-ssanames.h (get_range_info, get_nonzero_bits): Change
+	first argument from tree to const_tree.
+	* tree-ssanames.c (get_range_info, get_nonzero_bits): Likewise.
+	* tree-vectorizer.h (vect_generate_tmps_on_preheader): New prototype.
+	* tree-vect-loop-manip.c (vect_generate_tmps_on_preheader): No longer
+	static.
+	* expr.c (highest_pow2_factor): Reimplemented using tree_ctz.
+	* tree-vect-loop.c (vect_analyze_loop_operations,
+	vect_transform_loop): Don't force scalar loop for bound just because
+	number of iterations is unknown, only do it if it is not known to be
+	a multiple of vectorization_factor.
+	* builtins.c (get_object_alignment_2): Use tree_ctz on offset.
+
+	* gimple-pretty-print.c (dump_ssaname_info): Print newline also
+	in case of VR_VARYING.  Print get_nonzero_bits if not all ones.
+	* tree-ssanames.h (struct range_info_def): Add nonzero_bits field.
+	(set_nonzero_bits, get_nonzero_bits): New prototypes.
+	* tree-ssa-ccp.c (get_default_value): Use get_range_info to see if
+	a default def isn't partially constant.
+	(ccp_finalize): If after IPA, set_range_info if integral SSA_NAME
+	is known to be partially zero.
+	(evaluate_stmt): If we'd return otherwise VARYING, use get_range_info
+	to see if a default def isn't partially constant.
+	* tree-ssanames.c (set_range_info): Initialize nonzero_bits upon
+	creation of a range, if VR_RANGE, try to improve nonzero_bits from
+	the range.
+	(set_nonzero_bits, get_nonzero_bits): New functions.
+
+	* tree-cfg.c (assert_unreachable_fallthru_edge_p): New function.
+	* tree-cfg.h (assert_unreachable_fallthru_edge_p): New prototype.
+	* tree-vrp.c (all_imm_uses_in_stmt_or_feed_cond): New function.
+	(remove_range_assertions): If ASSERT_EXPR_VAR has no other immediate
+	uses but in the condition and ASSERT_EXPR and the other successor of
+	the predecessor bb is __builtin_unreachable (), set_range_info of the
+	ASSERT_EXPR_VAR to the range info of the ASSERT_EXPR's lhs.
+
+2013-10-31  Martin Jambor  <mjambor@suse.cz>
+
+	PR rtl-optimization/58934
+	Revert:
+	2013-10-30  Martin Jambor  <mjambor@suse.cz>
+	PR rtl-optimization/10474
+	* ira.c (find_moveable_pseudos): Do not calculate dominance info
+	nor df analysis.
+	(interesting_dest_for_shprep): New function.
+	(split_live_ranges_for_shrink_wrap): Likewise.
+	(ira): Calculate dominance info and df analysis. Call
+	split_live_ranges_for_shrink_wrap.
+
+2013-10-31  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
+	    Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/58543
+	* asan.c (asan_clear_shadow): Allocate a new vreg for temporary
+	shadow pointer to avoid clobbering the main one.
+
+2013-10-31  Zhenqiang Chen  <zhenqiang.chen@linaro.org>
+
+	* lower-subreg.c (resolve_simple_move): Copy REG_INC note.
+
+2013-10-30  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR bootstrap/58933
+	* ira-color.c (update_costs_from_copies): Add new parameter.  Use
+	it for calling update_costs_from_allocno.
+	(assign_hard_reg): Call restore_costs_from_copies only for
+	!retry_p.  Pass new argument to update_costs_from_copies.
+	(color_pass): Pass new argument to update_costs_from_copies.
+	(ira_mark_allocation_change): Ditto.
+
+2013-10-30  Sharad Singhai  <singhai@google.com>
+
+	PR middle-end/58134
+	* opts.c (common_handle_option): Remove deprecated option
+	-ftree-vectorizer-verbose.
+	* doc/invoke.texi (Debugging Options): Ditto.
+	* opts-global.c (handle_common_deferred_options): Ditto.
+	(dump_remap_tree_vectorizer_verbose): Delete.
+	* common.opt: Set -ftree-vectorizer-verbose as an ignored option.
+
+2013-10-30  DJ Delorie  <dj@redhat.com>
+
+	* config/rx/rx.c (ADD_RX_BUILTIN0): New macro, used for builtins
+	that take no arguments.
+
+2013-10-30  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	PR other/58545
+	* reload1.c (update_eliminables_and_spill): New function, broken
+	out of reload.
+	(reload): Use it.  Check for frame size change after frame
+	size alignment, and call update_eliminables_and_spill first
+	if continue-ing.
+
 2013-10-30  Cong Hou  <congh@google.com>
 
 	PR target/58762

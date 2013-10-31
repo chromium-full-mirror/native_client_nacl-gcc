@@ -1,3 +1,35 @@
+2013-10-31  Jason Merrill  <jason@redhat.com>
+
+	* semantics.c (cxx_eval_call_expression): Handle trivial
+	value-initialization.
+	* typeck2.c (store_init_value): Call maybe_constant_init after
+	cxx_constant_value.
+
+	* decl.c (cxx_maybe_build_cleanup): Always set LOOKUP_NONVIRTUAL.
+	* decl2.c (build_cleanup): Just call cxx_maybe_build_cleanup.
+
+	PR c++/58162
+	* parser.c (cp_parser_late_parse_one_default_arg): Set
+	TARGET_EXPR_DIRECT_INIT_P.
+
+	* class.c (type_build_ctor_call): Return early in C++98 mode.
+	(type_build_dtor_call): Likewise.
+
+2013-10-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58932
+	Revert:
+	2013-10-18  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58466
+	* pt.c (most_specialized_class): Bump processing_template_decl for
+	get_class_bindings.
+
+2013-10-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58581
+	* call.c (build_over_call): Check return value of mark_used.
+
 2013-10-30  Jason Merrill  <jason@redhat.com>
 
 	* semantics.c (finish_compound_literal): Don't create a static variable

@@ -1,3 +1,65 @@
+2013-10-31  Edward Smith-Rowland  <3dw4rd@verizon.net>
+
+        Implement C++14 digit separators.
+	* g++.dg/cpp1y/digit-sep.C: New.
+	* g++.dg/cpp1y/digit-sep-neg.C: New.
+	* g++.dg/cpp1y/digit-sep-cxx11-neg.C: New.
+
+2013-10-31  Jakub Jelinek  <jakub@redhat.com>
+
+	* gcc.dg/vect/vect-align-3.c: New test.
+
+	* g++.dg/warn/pr33738.C (main): Initialize a2 again to make sure
+	we warn about it already during VRP1 pass.
+
+2013-10-31  Martin Jambor  <mjambor@suse.cz>
+
+	PR rtl-optimization/58934
+	Revert:
+	2013-10-30  Martin Jambor  <mjambor@suse.cz>
+	PR rtl-optimization/10474
+	* gcc.dg/pr10474.c: New testcase.
+	* gcc.dg/ira-shrinkwrap-prep-1.c: Likewise.
+	* gcc.dg/ira-shrinkwrap-prep-2.c: Likewise.
+
+2013-10-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58932
+	Revert:
+	2013-10-18  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58466
+The Velvet Underground and Nico Full album vinyl LP
+vinylanalog vinylanalog·13 videos
+581
+150,561
+Like 1,087     Dislike 6
+
+Published on Jun 18, 2013
+
+The Velvet Underground and Nico legendary debut record produced by Andy Warhol (1967) presented in a non-modified recording of Verve V6-5008 vinyl LP. All efforts were made to realistically reproduce the natural vinyl stereo LP sound, so record levels were restrained and album noise is present.
+
+NOTE: THIS VIDEO IS FOR EDUCATION PURPOSES. ANY AND ALL COPYRIGHTS BELONG TO THE RIGHTFUL ARTISTS AND OWNERS.
+
+
+	* g++.dg/cpp0x/variadic145.C: New.
+
+	* g++.dg/cpp0x/sfinae49.C: New.
+
+2013-10-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58581
+	* g++.dg/cpp0x/deleted1.C: New.
+
+2013-10-31  Zhenqiang Chen  <zhenqiang.chen@linaro.org>
+
+	* gcc.target/arm/lp1243022.c: New test.
+
+2013-10-30  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	PR other/58545
+	* gcc.target/avr/pr58545.c: New test.
+
 2013-10-30  Tobias Burnus  <burnus@net-b.de>
 
 	Revert:

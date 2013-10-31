@@ -49,6 +49,7 @@ AC_PROG_CC
 # AC_CONFIG_MACRO_DIR([..])
 AC_CONFIG_FILES([Makefile])
 AM_ENABLE_MULTILIB(, ..)
+AC_FUNC_ALLOCA
 
 # Get target configury.
 . ${srcdir}/configure.tgt
@@ -114,7 +115,7 @@ case "${target}" in
     config_dir="x86"
     ;;
 
-  i[456]86-*-*)
+  i?86-*-*)
     config_dir="x86"
     ;;
 
