@@ -161,6 +161,9 @@
   ;; (unspec [OFFSET ANCHOR] UNSPEC_PCREL_SYMOFF) == OFFSET - (ANCHOR - .).
   (UNSPEC_PCREL_SYMOFF	46)
 
+  ;; Misc builtins
+  (UNSPEC_BUILTIN_STRLEN 47)
+
   ;; These are used with unspec_volatile.
   (UNSPECV_BLOCKAGE	0)
   (UNSPECV_ALIGN	1)
@@ -10827,7 +10830,7 @@ label:
    (clobber (match_scratch:SI 3 "=X,1"))]
   "TARGET_SH1"
 {
-  rtx diff_vec = PATTERN (next_active_insn (operands[2]));
+  rtx diff_vec = PATTERN (NEXT_INSN (operands[2]));
 
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
@@ -10861,7 +10864,7 @@ label:
    (clobber (match_operand:SI 4 "" "=X,1"))]
   "TARGET_SH2 && reload_completed && flag_pic"
 {
-  rtx diff_vec = PATTERN (next_active_insn (operands[2]));
+  rtx diff_vec = PATTERN (NEXT_INSN (operands[2]));
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
   switch (GET_MODE (diff_vec))
@@ -10899,7 +10902,7 @@ label:
 		    UNSPEC_CASESI)))]
   "TARGET_SHMEDIA"
 {
-  rtx diff_vec = PATTERN (next_active_insn (operands[2]));
+  rtx diff_vec = PATTERN (NEXT_INSN (operands[2]));
 
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
@@ -10926,7 +10929,7 @@ label:
 		      (label_ref:DI (match_operand 3 "" ""))] UNSPEC_CASESI)))]
   "TARGET_SHMEDIA"
 {
-  rtx diff_vec = PATTERN (next_active_insn (operands[3]));
+  rtx diff_vec = PATTERN (NEXT_INSN (operands[3]));
 
   gcc_assert (GET_CODE (diff_vec) == ADDR_DIFF_VEC);
 
@@ -12059,7 +12062,7 @@ label:
 	(compare:SI (match_operand:BLK 1 "memory_operand")
 		    (match_operand:BLK 2 "memory_operand")))
    (use (match_operand 3 "immediate_operand"))]
-  "TARGET_SH1"
+  "TARGET_SH1 && optimize"
 {
   if (! optimize_insn_for_size_p () && sh_expand_cmpstr (operands))
     DONE;
@@ -12073,12 +12076,26 @@ label:
 		    (match_operand:BLK 2 "memory_operand")))
    (use (match_operand:SI 3 "immediate_operand"))
    (use (match_operand:SI 4 "immediate_operand"))]
-  "TARGET_SH1"
+  "TARGET_SH1 && optimize"
 {
   if (! optimize_insn_for_size_p () && sh_expand_cmpnstr (operands))
     DONE;
   else
     FAIL;
+})
+
+(define_expand "strlensi"
+  [(set (match_operand:SI 0 "register_operand")
+	(unspec:SI [(match_operand:BLK 1 "memory_operand")
+		   (match_operand:SI 2 "immediate_operand")
+		   (match_operand:SI 3 "immediate_operand")]
+		  UNSPEC_BUILTIN_STRLEN))]
+  "TARGET_SH1 && optimize"
+{
+ if (! optimize_insn_for_size_p () && sh_expand_strlen (operands))
+   DONE;
+ else
+   FAIL;
 })
 
 
