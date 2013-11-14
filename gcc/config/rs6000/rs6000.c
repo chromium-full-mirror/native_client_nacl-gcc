@@ -51,7 +51,9 @@
 #include "reload.h"
 #include "cfgloop.h"
 #include "sched-int.h"
-#include "gimple.h"
+#include "gimplify.h"
+#include "gimple-iterator.h"
+#include "gimple-walk.h"
 #include "intl.h"
 #include "params.h"
 #include "tm-constrs.h"
@@ -3672,7 +3674,7 @@ rs6000_option_override_internal (bool global_init_p)
 
       /* We should always be splitting complex arguments, but we can't break
 	 Linux and Darwin ABIs at the moment.  For now, only AIX is fixed.  */
-      if (DEFAULT_ABI != ABI_AIX)
+      if (DEFAULT_ABI == ABI_V4 || DEFAULT_ABI == ABI_DARWIN)
 	targetm.calls.split_complex_arg = NULL;
     }
 
@@ -6387,7 +6389,7 @@ legitimate_lo_sum_address_p (enum machine_mode mode, rtx x, int strict)
     {
       bool large_toc_ok;
 
-      if (DEFAULT_ABI != ABI_AIX && DEFAULT_ABI != ABI_DARWIN && flag_pic)
+      if (DEFAULT_ABI == ABI_V4 && flag_pic)
 	return false;
       /* LRA don't use LEGITIMIZE_RELOAD_ADDRESS as it usually calls
 	 push_reload from reload pass code.  LEGITIMIZE_RELOAD_ADDRESS
@@ -8437,13 +8439,13 @@ rs6000_member_type_forces_blk (const_tree field, enum machine_mode mode)
 }
 
 /* Nonzero if we can use a floating-point register to pass this arg.  */
-#define USE_FP_FOR_ARG_P(CUM,MODE,TYPE)		\
+#define USE_FP_FOR_ARG_P(CUM,MODE)		\
   (SCALAR_FLOAT_MODE_P (MODE)			\
    && (CUM)->fregno <= FP_ARG_MAX_REG		\
    && TARGET_HARD_FLOAT && TARGET_FPRS)
 
 /* Nonzero if we can use an AltiVec register to pass this arg.  */
-#define USE_ALTIVEC_FOR_ARG_P(CUM,MODE,TYPE,NAMED)		\
+#define USE_ALTIVEC_FOR_ARG_P(CUM,MODE,NAMED)			\
   (ALTIVEC_OR_VSX_VECTOR_MODE (MODE)				\
    && (CUM)->vregno <= ALTIVEC_ARG_MAX_REG			\
    && TARGET_ALTIVEC_ABI					\
@@ -8892,7 +8894,7 @@ rs6000_darwin64_record_arg_advance_recurse (CUMULATIVE_ARGS *cum,
 
 	if (TREE_CODE (ftype) == RECORD_TYPE)
 	  rs6000_darwin64_record_arg_advance_recurse (cum, ftype, bitpos);
-	else if (USE_FP_FOR_ARG_P (cum, mode, ftype))
+	else if (USE_FP_FOR_ARG_P (cum, mode))
 	  {
 	    unsigned n_fpregs = (GET_MODE_SIZE (mode) + 7) >> 3;
 	    rs6000_darwin64_record_arg_advance_flush (cum, bitpos, 0);
@@ -8933,7 +8935,7 @@ rs6000_darwin64_record_arg_advance_recurse (CUMULATIVE_ARGS *cum,
 	    else
 	      cum->words += n_fpregs;
 	  }
-	else if (USE_ALTIVEC_FOR_ARG_P (cum, mode, type, 1))
+	else if (USE_ALTIVEC_FOR_ARG_P (cum, mode, 1))
 	  {
 	    rs6000_darwin64_record_arg_advance_flush (cum, bitpos, 0);
 	    cum->vregno++;
@@ -8996,7 +8998,7 @@ rs6000_function_arg_advance_1 (CUMULATIVE_ARGS *cum, enum machine_mode mode,
     {
       bool stack = false;
 
-      if (USE_ALTIVEC_FOR_ARG_P (cum, mode, type, named))
+      if (USE_ALTIVEC_FOR_ARG_P (cum, mode, named))
 	{
 	  cum->vregno++;
 	  if (!TARGET_ALTIVEC)
@@ -9369,7 +9371,7 @@ rs6000_darwin64_record_arg_recurse (CUMULATIVE_ARGS *cum, const_tree type,
 
 	if (TREE_CODE (ftype) == RECORD_TYPE)
 	  rs6000_darwin64_record_arg_recurse (cum, ftype, bitpos, rvec, k);
-	else if (cum->named && USE_FP_FOR_ARG_P (cum, mode, ftype))
+	else if (cum->named && USE_FP_FOR_ARG_P (cum, mode))
 	  {
 	    unsigned n_fpreg = (GET_MODE_SIZE (mode) + 7) >> 3;
 #if 0
@@ -9397,7 +9399,7 @@ rs6000_darwin64_record_arg_recurse (CUMULATIVE_ARGS *cum, const_tree type,
 	    if (mode == TFmode || mode == TDmode)
 	      cum->fregno++;
 	  }
-	else if (cum->named && USE_ALTIVEC_FOR_ARG_P (cum, mode, ftype, 1))
+	else if (cum->named && USE_ALTIVEC_FOR_ARG_P (cum, mode, 1))
 	  {
 	    rs6000_darwin64_record_arg_flush (cum, bitpos, rvec, k);
 	    rvec[(*k)++]
@@ -9514,6 +9516,83 @@ rs6000_mixed_function_arg (enum machine_mode mode, const_tree type,
   return gen_rtx_PARALLEL (mode, gen_rtvec_v (k, rvec));
 }
 
+/* We have an argument of MODE and TYPE that goes into FPRs or VRs,
+   but must also be copied into the parameter save area starting at
+   offset ALIGN_WORDS.  Fill in RVEC with the elements corresponding
+   to the GPRs and/or memory.  Return the number of elements used.  */
+
+static int
+rs6000_psave_function_arg (enum machine_mode mode, const_tree type,
+			   int align_words, rtx *rvec)
+{
+  int k = 0;
+
+  if (align_words < GP_ARG_NUM_REG)
+    {
+      int n_words = rs6000_arg_size (mode, type);
+
+      if (align_words + n_words > GP_ARG_NUM_REG
+	  || (TARGET_32BIT && TARGET_POWERPC64))
+	{
+	  /* If this is partially on the stack, then we only
+	     include the portion actually in registers here.  */
+	  enum machine_mode rmode = TARGET_32BIT ? SImode : DImode;
+	  int i = 0;
+
+	  if (align_words + n_words > GP_ARG_NUM_REG)
+	    {
+	      /* Not all of the arg fits in gprs.  Say that it goes in memory
+		 too, using a magic NULL_RTX component.  Also see comment in
+		 rs6000_mixed_function_arg for why the normal
+		 function_arg_partial_nregs scheme doesn't work in this case. */
+	      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, NULL_RTX, const0_rtx);
+	    }
+
+	  do
+	    {
+	      rtx r = gen_rtx_REG (rmode, GP_ARG_MIN_REG + align_words);
+	      rtx off = GEN_INT (i++ * GET_MODE_SIZE (rmode));
+	      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, off);
+	    }
+	  while (++align_words < GP_ARG_NUM_REG && --n_words != 0);
+	}
+      else
+	{
+	  /* The whole arg fits in gprs.  */
+	  rtx r = gen_rtx_REG (mode, GP_ARG_MIN_REG + align_words);
+	  rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, const0_rtx);
+	}
+    }
+  else
+    {
+      /* It's entirely in memory.  */
+      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, NULL_RTX, const0_rtx);
+    }
+
+  return k;
+}
+
+/* RVEC is a vector of K components of an argument of mode MODE.
+   Construct the final function_arg return value from it.  */
+
+static rtx
+rs6000_finish_function_arg (enum machine_mode mode, rtx *rvec, int k)
+{
+  gcc_assert (k >= 1);
+
+  /* Avoid returning a PARALLEL in the trivial cases.  */
+  if (k == 1)
+    {
+      if (XEXP (rvec[0], 0) == NULL_RTX)
+	return NULL_RTX;
+
+      if (GET_MODE (XEXP (rvec[0], 0)) == mode)
+	return XEXP (rvec[0], 0);
+    }
+
+  return gen_rtx_PARALLEL (mode, gen_rtvec_v (k, rvec));
+}
+
 /* Determine where to put an argument to a function.
    Value is zero to push the argument on the stack,
    or a hard register in which to store the argument.
@@ -9582,33 +9661,26 @@ rs6000_function_arg (cumulative_args_t cum_v, enum machine_mode mode,
       /* Else fall through to usual handling.  */
     }
 
-  if (USE_ALTIVEC_FOR_ARG_P (cum, mode, type, named))
-    if (TARGET_64BIT && ! cum->prototype)
-      {
-	/* Vector parameters get passed in vector register
-	   and also in GPRs or memory, in absence of prototype.  */
-	int align_words;
-	rtx slot;
-	align_words = (cum->words + 1) & ~1;
+  if (USE_ALTIVEC_FOR_ARG_P (cum, mode, named))
+    {
+      rtx rvec[GP_ARG_NUM_REG + 1];
+      rtx r;
+      int k = 0;
 
-	if (align_words >= GP_ARG_NUM_REG)
-	  {
-	    slot = NULL_RTX;
-	  }
-	else
-	  {
-	    slot = gen_rtx_REG (mode, GP_ARG_MIN_REG + align_words);
-	  }
-	return gen_rtx_PARALLEL (mode,
-		 gen_rtvec (2,
-			    gen_rtx_EXPR_LIST (VOIDmode,
-					       slot, const0_rtx),
-			    gen_rtx_EXPR_LIST (VOIDmode,
-					       gen_rtx_REG (mode, cum->vregno),
-					       const0_rtx)));
-      }
-    else
-      return gen_rtx_REG (mode, cum->vregno);
+      /* Do we also need to pass this argument in the parameter
+	 save area?  */
+      if (TARGET_64BIT && ! cum->prototype)
+	{
+	  int align_words = (cum->words + 1) & ~1;
+	  k = rs6000_psave_function_arg (mode, type, align_words, rvec);
+	}
+
+      /* Describe where this argument goes in the vector registers.  */
+      r = gen_rtx_REG (mode, cum->vregno);
+      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, const0_rtx);
+
+      return rs6000_finish_function_arg (mode, rvec, k);
+    }
   else if (TARGET_ALTIVEC_ABI
 	   && (ALTIVEC_OR_VSX_VECTOR_MODE (mode)
 	       || (type && TREE_CODE (type) == VECTOR_TYPE
@@ -9710,89 +9782,37 @@ rs6000_function_arg (cumulative_args_t cum_v, enum machine_mode mode,
       if (mode == TDmode && (cum->fregno % 2) == 1)
 	cum->fregno++;
 
-      if (USE_FP_FOR_ARG_P (cum, mode, type))
+      if (USE_FP_FOR_ARG_P (cum, mode))
 	{
 	  rtx rvec[GP_ARG_NUM_REG + 1];
 	  rtx r;
-	  int k;
-	  bool needs_psave;
+	  int k = 0;
 	  enum machine_mode fmode = mode;
 	  unsigned long n_fpreg = (GET_MODE_SIZE (mode) + 7) >> 3;
 
+	  /* Do we also need to pass this argument in the parameter
+	     save area?  */
+	  if (type && (cum->nargs_prototype <= 0
+		       || (DEFAULT_ABI == ABI_AIX
+			   && TARGET_XL_COMPAT
+			   && align_words >= GP_ARG_NUM_REG)))
+	    k = rs6000_psave_function_arg (mode, type, align_words, rvec);
+
+	  /* Describe where this argument goes in the fprs.  */
+
+	  /* Check if the argument is split over registers and memory.
+	     This can only ever happen for long double or _Decimal128;
+	     complex types are handled via split_complex_arg.  */
 	  if (cum->fregno + n_fpreg > FP_ARG_MAX_REG + 1)
 	    {
-	      /* Currently, we only ever need one reg here because complex
-		 doubles are split.  */
-	      gcc_assert (cum->fregno == FP_ARG_MAX_REG
-			  && (fmode == TFmode || fmode == TDmode));
-
-	      /* Long double or _Decimal128 split over regs and memory.  */
+	      gcc_assert (fmode == TFmode || fmode == TDmode);
 	      fmode = DECIMAL_FLOAT_MODE_P (fmode) ? DDmode : DFmode;
 	    }
 
-	  /* Do we also need to pass this arg in the parameter save
-	     area?  */
-	  needs_psave = (type
-			 && (cum->nargs_prototype <= 0
-			     || (DEFAULT_ABI == ABI_AIX
-				 && TARGET_XL_COMPAT
-				 && align_words >= GP_ARG_NUM_REG)));
-
-	  if (!needs_psave && mode == fmode)
-	    return gen_rtx_REG (fmode, cum->fregno);
-
-	  k = 0;
-	  if (needs_psave)
-	    {
-	      /* Describe the part that goes in gprs or the stack.
-		 This piece must come first, before the fprs.  */
-	      if (align_words < GP_ARG_NUM_REG)
-		{
-		  unsigned long n_words = rs6000_arg_size (mode, type);
-
-		  if (align_words + n_words > GP_ARG_NUM_REG
-		      || (TARGET_32BIT && TARGET_POWERPC64))
-		    {
-		      /* If this is partially on the stack, then we only
-			 include the portion actually in registers here.  */
-		      enum machine_mode rmode = TARGET_32BIT ? SImode : DImode;
-		      rtx off;
-		      int i = 0;
-		      if (align_words + n_words > GP_ARG_NUM_REG)
-			/* Not all of the arg fits in gprs.  Say that it
-			   goes in memory too, using a magic NULL_RTX
-			   component.  Also see comment in
-			   rs6000_mixed_function_arg for why the normal
-			   function_arg_partial_nregs scheme doesn't work
-			   in this case. */
-			rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, NULL_RTX,
-						       const0_rtx);
-		      do
-			{
-			  r = gen_rtx_REG (rmode,
-					   GP_ARG_MIN_REG + align_words);
-			  off = GEN_INT (i++ * GET_MODE_SIZE (rmode));
-			  rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, off);
-			}
-		      while (++align_words < GP_ARG_NUM_REG && --n_words != 0);
-		    }
-		  else
-		    {
-		      /* The whole arg fits in gprs.  */
-		      r = gen_rtx_REG (mode, GP_ARG_MIN_REG + align_words);
-		      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, const0_rtx);
-		    }
-		}
-	      else
-		/* It's entirely in memory.  */
-		rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, NULL_RTX, const0_rtx);
-	    }
-
-	  /* Describe where this piece goes in the fprs.  */
 	  r = gen_rtx_REG (fmode, cum->fregno);
 	  rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, const0_rtx);
 
-	  return gen_rtx_PARALLEL (mode, gen_rtvec_v (k, rvec));
+	  return rs6000_finish_function_arg (mode, rvec, k);
 	}
       else if (align_words < GP_ARG_NUM_REG)
 	{
@@ -9820,15 +9840,25 @@ rs6000_arg_partial_bytes (cumulative_args_t cum_v, enum machine_mode mode,
 			  tree type, bool named)
 {
   CUMULATIVE_ARGS *cum = get_cumulative_args (cum_v);
+  bool passed_in_gprs = true;
   int ret = 0;
   int align_words;
 
   if (DEFAULT_ABI == ABI_V4)
     return 0;
 
-  if (USE_ALTIVEC_FOR_ARG_P (cum, mode, type, named)
-      && cum->nargs_prototype >= 0)
-    return 0;
+  if (USE_ALTIVEC_FOR_ARG_P (cum, mode, named))
+    {
+      /* If we are passing this arg in the fixed parameter save area
+         (gprs or memory) as well as VRs, we do not use the partial
+	 bytes mechanism; instead, rs6000_function_arg will return a
+	 PARALLEL including a memory element as necessary.  */
+      if (TARGET_64BIT && ! cum->prototype)
+	return 0;
+
+      /* Otherwise, we pass in VRs only.  No partial copy possible.  */
+      passed_in_gprs = false;
+    }
 
   /* In this complicated case we just disable the partial_nregs code.  */
   if (TARGET_MACHO && rs6000_darwin64_struct_check_p (mode, type))
@@ -9836,26 +9866,29 @@ rs6000_arg_partial_bytes (cumulative_args_t cum_v, enum machine_mode mode,
 
   align_words = rs6000_parm_start (mode, type, cum->words);
 
-  if (USE_FP_FOR_ARG_P (cum, mode, type))
+  if (USE_FP_FOR_ARG_P (cum, mode))
     {
+      unsigned long n_fpreg = (GET_MODE_SIZE (mode) + 7) >> 3;
+
       /* If we are passing this arg in the fixed parameter save area
-	 (gprs or memory) as well as fprs, then this function should
-	 return the number of partial bytes passed in the parameter
-	 save area rather than partial bytes passed in fprs.  */
+         (gprs or memory) as well as FPRs, we do not use the partial
+	 bytes mechanism; instead, rs6000_function_arg will return a
+	 PARALLEL including a memory element as necessary.  */
       if (type
 	  && (cum->nargs_prototype <= 0
 	      || (DEFAULT_ABI == ABI_AIX
 		  && TARGET_XL_COMPAT
 		  && align_words >= GP_ARG_NUM_REG)))
 	return 0;
-      else if (cum->fregno + ((GET_MODE_SIZE (mode) + 7) >> 3)
-	       > FP_ARG_MAX_REG + 1)
+
+      /* Otherwise, we pass in FPRs only.  Check for partial copies.  */
+      passed_in_gprs = false;
+      if (cum->fregno + n_fpreg > FP_ARG_MAX_REG + 1)
 	ret = (FP_ARG_MAX_REG + 1 - cum->fregno) * 8;
-      else if (cum->nargs_prototype >= 0)
-	return 0;
     }
 
-  if (align_words < GP_ARG_NUM_REG
+  if (passed_in_gprs
+      && align_words < GP_ARG_NUM_REG
       && GP_ARG_NUM_REG < align_words + rs6000_arg_size (mode, type))
     ret = (GP_ARG_NUM_REG - align_words) * (TARGET_32BIT ? 4 : 8);
 
@@ -19608,7 +19641,8 @@ rs6000_savres_strategy (rs6000_stack_t *info,
      by the static chain.  It would require too much fiddling and the
      static chain is rarely used anyway.  FPRs are saved w.r.t the stack
      pointer on Darwin, and AIX uses r1 or r12.  */
-  if (using_static_chain_p && DEFAULT_ABI != ABI_AIX)
+  if (using_static_chain_p
+      && (DEFAULT_ABI == ABI_V4 || DEFAULT_ABI == ABI_DARWIN))
     strategy |= ((DEFAULT_ABI == ABI_DARWIN ? 0 : SAVE_INLINE_FPRS)
 		 | SAVE_INLINE_GPRS
 		 | SAVE_INLINE_VRS | REST_INLINE_VRS);
@@ -20304,7 +20338,8 @@ rs6000_return_addr (int count, rtx frame)
   /* Currently we don't optimize very well between prolog and body
      code and for PIC code the code can be actually quite bad, so
      don't try to be too clever here.  */
-  if (count != 0 || (DEFAULT_ABI != ABI_AIX && flag_pic))
+  if (count != 0
+      || ((DEFAULT_ABI == ABI_V4 || DEFAULT_ABI == ABI_DARWIN) && flag_pic))
     {
       cfun->machine->ra_needs_full_frame = 1;
 
@@ -20452,7 +20487,7 @@ rs6000_emit_load_toc_table (int fromprolog)
   rtx dest;
   dest = gen_rtx_REG (Pmode, RS6000_PIC_OFFSET_TABLE_REGNUM);
 
-  if (TARGET_ELF && TARGET_SECURE_PLT && DEFAULT_ABI != ABI_AIX && flag_pic)
+  if (TARGET_ELF && TARGET_SECURE_PLT && DEFAULT_ABI == ABI_V4 && flag_pic)
     {
       char buf[30];
       rtx lab, tmp1, tmp2, got;
@@ -20480,7 +20515,7 @@ rs6000_emit_load_toc_table (int fromprolog)
       emit_insn (gen_load_toc_v4_pic_si ());
       emit_move_insn (dest, gen_rtx_REG (Pmode, LR_REGNO));
     }
-  else if (TARGET_ELF && DEFAULT_ABI != ABI_AIX && flag_pic == 2)
+  else if (TARGET_ELF && DEFAULT_ABI == ABI_V4 && flag_pic == 2)
     {
       char buf[30];
       rtx temp0 = (fromprolog
@@ -21764,21 +21799,9 @@ rs6000_emit_prologue (void)
       && REGNO (frame_reg_rtx) != cr_save_regno
       && !(using_static_chain_p && cr_save_regno == 11))
     {
-      rtx set;
-
       cr_save_rtx = gen_rtx_REG (SImode, cr_save_regno);
       START_USE (cr_save_regno);
-      insn = emit_insn (gen_movesi_from_cr (cr_save_rtx));
-      RTX_FRAME_RELATED_P (insn) = 1;
-      /* Now, there's no way that dwarf2out_frame_debug_expr is going
-	 to understand '(unspec:SI [(reg:CC 68) ...] UNSPEC_MOVESI_FROM_CR)'.
-	 But that's OK.  All we have to do is specify that _one_ condition
-	 code register is saved in this stack slot.  The thrower's epilogue
-	 will then restore all the call-saved registers.
-	 We use CR2_REGNO (70) to be compatible with gcc-2.95 on Linux.  */
-      set = gen_rtx_SET (VOIDmode, cr_save_rtx,
-			 gen_rtx_REG (SImode, CR2_REGNO));
-      add_reg_note (insn, REG_FRAME_RELATED_EXPR, set);
+      emit_insn (gen_movesi_from_cr (cr_save_rtx));
     }
 
   /* Do any required saving of fpr's.  If only one or two to save, do
@@ -22089,26 +22112,62 @@ rs6000_emit_prologue (void)
       rtx addr = gen_rtx_PLUS (Pmode, frame_reg_rtx,
 			       GEN_INT (info->cr_save_offset + frame_off));
       rtx mem = gen_frame_mem (SImode, addr);
-      /* See the large comment above about why CR2_REGNO is used.  */
-      rtx magic_eh_cr_reg = gen_rtx_REG (SImode, CR2_REGNO);
 
       /* If we didn't copy cr before, do so now using r0.  */
       if (cr_save_rtx == NULL_RTX)
 	{
-	  rtx set;
-
 	  START_USE (0);
 	  cr_save_rtx = gen_rtx_REG (SImode, 0);
-	  insn = emit_insn (gen_movesi_from_cr (cr_save_rtx));
-	  RTX_FRAME_RELATED_P (insn) = 1;
-	  set = gen_rtx_SET (VOIDmode, cr_save_rtx, magic_eh_cr_reg);
-	  add_reg_note (insn, REG_FRAME_RELATED_EXPR, set);
+	  emit_insn (gen_movesi_from_cr (cr_save_rtx));
 	}
-      insn = emit_move_insn (mem, cr_save_rtx);
+
+      /* Saving CR requires a two-instruction sequence: one instruction
+	 to move the CR to a general-purpose register, and a second
+	 instruction that stores the GPR to memory.
+
+	 We do not emit any DWARF CFI records for the first of these,
+	 because we cannot properly represent the fact that CR is saved in
+	 a register.  One reason is that we cannot express that multiple
+	 CR fields are saved; another reason is that on 64-bit, the size
+	 of the CR register in DWARF (4 bytes) differs from the size of
+	 a general-purpose register.
+
+	 This means if any intervening instruction were to clobber one of
+	 the call-saved CR fields, we'd have incorrect CFI.  To prevent
+	 this from happening, we mark the store to memory as a use of
+	 those CR fields, which prevents any such instruction from being
+	 scheduled in between the two instructions.  */
+      rtx crsave_v[9];
+      int n_crsave = 0;
+      int i;
+
+      crsave_v[n_crsave++] = gen_rtx_SET (VOIDmode, mem, cr_save_rtx);
+      for (i = 0; i < 8; i++)
+	if (save_reg_p (CR0_REGNO + i))
+	  crsave_v[n_crsave++]
+	    = gen_rtx_USE (VOIDmode, gen_rtx_REG (CCmode, CR0_REGNO + i));
+
+      insn = emit_insn (gen_rtx_PARALLEL (VOIDmode,
+					  gen_rtvec_v (n_crsave, crsave_v)));
       END_USE (REGNO (cr_save_rtx));
 
-      rs6000_frame_related (insn, frame_reg_rtx, sp_off - frame_off,
-			    NULL_RTX, NULL_RTX);
+      /* Now, there's no way that dwarf2out_frame_debug_expr is going to
+	 understand '(unspec:SI [(reg:CC 68) ...] UNSPEC_MOVESI_FROM_CR)',
+	 so we need to construct a frame expression manually.  */
+      RTX_FRAME_RELATED_P (insn) = 1;
+
+      /* Update address to be stack-pointer relative, like
+	 rs6000_frame_related would do.  */
+      addr = gen_rtx_PLUS (Pmode, gen_rtx_REG (Pmode, STACK_POINTER_REGNUM),
+			   GEN_INT (info->cr_save_offset + sp_off));
+      mem = gen_frame_mem (SImode, addr);
+
+      /* We still cannot express that multiple CR fields are saved in the
+	 CR save slot.  By convention, we use a single CR regnum to represent
+	 the fact that all call-saved CR fields are saved.  We use CR2_REGNO
+	 to be compatible with gcc-2.95 on Linux.  */
+      rtx set = gen_rtx_SET (VOIDmode, mem, gen_rtx_REG (SImode, CR2_REGNO));
+      add_reg_note (insn, REG_FRAME_RELATED_EXPR, set);
     }
 
   /* Update stack and set back pointer unless this is V.4,
@@ -22286,7 +22345,7 @@ rs6000_emit_prologue (void)
 	 can use register 0.  This allows us to use a plain 'blr' to return
 	 from the procedure more often.  */
       int save_LR_around_toc_setup = (TARGET_ELF
-				      && DEFAULT_ABI != ABI_AIX
+				      && DEFAULT_ABI == ABI_V4
 				      && flag_pic
 				      && ! info->lr_save_p
 				      && EDGE_COUNT (EXIT_BLOCK_PTR->preds) > 0);
@@ -27594,8 +27653,7 @@ rs6000_elf_declare_function_name (FILE *file, const char *name, tree decl)
       fprintf (file, "%s:\n", desc_name);
       fprintf (file, "\t.long %s\n", orig_name);
       fputs ("\t.long _GLOBAL_OFFSET_TABLE_\n", file);
-      if (DEFAULT_ABI == ABI_AIX)
-	fputs ("\t.long 0\n", file);
+      fputs ("\t.long 0\n", file);
       fprintf (file, "\t.previous\n");
     }
   ASM_OUTPUT_LABEL (file, name);
@@ -30578,118 +30636,138 @@ rs6000_legitimate_constant_p (enum machine_mode mode, rtx x)
 }
 
 
-/* A function pointer under AIX is a pointer to a data area whose first word
-   contains the actual address of the function, whose second word contains a
-   pointer to its TOC, and whose third word contains a value to place in the
-   static chain register (r11).  Note that if we load the static chain, our
-   "trampoline" need not have any executable code.  */
+
+/* Expand code to perform a call under the AIX ABI.  */
 
 void
-rs6000_call_indirect_aix (rtx value, rtx func_desc, rtx flag)
+rs6000_call_aix (rtx value, rtx func_desc, rtx flag, rtx cookie)
 {
+  rtx toc_reg = gen_rtx_REG (Pmode, TOC_REGNUM);
+  rtx toc_load = NULL_RTX;
+  rtx toc_restore = NULL_RTX;
   rtx func_addr;
-  rtx toc_reg;
-  rtx sc_reg;
-  rtx stack_ptr;
-  rtx stack_toc_offset;
-  rtx stack_toc_mem;
-  rtx func_toc_offset;
-  rtx func_toc_mem;
-  rtx func_sc_offset;
-  rtx func_sc_mem;
+  rtx abi_reg = NULL_RTX;
+  rtx call[4];
+  int n_call;
   rtx insn;
-  rtx (*call_func) (rtx, rtx, rtx, rtx);
-  rtx (*call_value_func) (rtx, rtx, rtx, rtx, rtx);
 
-  stack_ptr = gen_rtx_REG (Pmode, STACK_POINTER_REGNUM);
-  toc_reg = gen_rtx_REG (Pmode, TOC_REGNUM);
+  /* Handle longcall attributes.  */
+  if (INTVAL (cookie) & CALL_LONG)
+    func_desc = rs6000_longcall_ref (func_desc);
 
-  /* Load up address of the actual function.  */
-  func_desc = force_reg (Pmode, func_desc);
-  func_addr = gen_reg_rtx (Pmode);
-  emit_move_insn (func_addr, gen_rtx_MEM (Pmode, func_desc));
-
-  if (TARGET_32BIT)
+  /* Handle indirect calls.  */
+  if (GET_CODE (func_desc) != SYMBOL_REF
+      || !SYMBOL_REF_FUNCTION_P (func_desc))
     {
+      /* Save the TOC into its reserved slot before the call,
+	 and prepare to restore it after the call.  */
+      rtx stack_ptr = gen_rtx_REG (Pmode, STACK_POINTER_REGNUM);
+      rtx stack_toc_offset = GEN_INT (5 * GET_MODE_SIZE (Pmode));
+      rtx stack_toc_mem = gen_frame_mem (Pmode,
+					 gen_rtx_PLUS (Pmode, stack_ptr,
+						       stack_toc_offset));
+      toc_restore = gen_rtx_SET (VOIDmode, toc_reg, stack_toc_mem);
 
-      stack_toc_offset = GEN_INT (TOC_SAVE_OFFSET_32BIT);
-      func_toc_offset = GEN_INT (AIX_FUNC_DESC_TOC_32BIT);
-      func_sc_offset = GEN_INT (AIX_FUNC_DESC_SC_32BIT);
-      if (TARGET_POINTERS_TO_NESTED_FUNCTIONS)
-	{
-	  call_func = gen_call_indirect_aix32bit;
-	  call_value_func = gen_call_value_indirect_aix32bit;
-	}
+      /* Can we optimize saving the TOC in the prologue or
+	 do we need to do it at every call?  */
+      if (TARGET_SAVE_TOC_INDIRECT && !cfun->calls_alloca)
+	cfun->machine->save_toc_in_prologue = true;
       else
 	{
-	  call_func = gen_call_indirect_aix32bit_nor11;
-	  call_value_func = gen_call_value_indirect_aix32bit_nor11;
+	  MEM_VOLATILE_P (stack_toc_mem) = 1;
+	  emit_move_insn (stack_toc_mem, toc_reg);
+	}
+
+      /* A function pointer under AIX is a pointer to a data area whose
+	 first word contains the actual address of the function, whose
+	 second word contains a pointer to its TOC, and whose third word
+	 contains a value to place in the static chain register (r11).
+	 Note that if we load the static chain, our "trampoline" need
+	 not have any executable code.  */
+
+      /* Load up address of the actual function.  */
+      func_desc = force_reg (Pmode, func_desc);
+      func_addr = gen_reg_rtx (Pmode);
+      emit_move_insn (func_addr, gen_rtx_MEM (Pmode, func_desc));
+
+      /* Prepare to load the TOC of the called function.  Note that the
+	 TOC load must happen immediately before the actual call so
+	 that unwinding the TOC registers works correctly.  See the
+	 comment in frob_update_context.  */
+      rtx func_toc_offset = GEN_INT (GET_MODE_SIZE (Pmode));
+      rtx func_toc_mem = gen_rtx_MEM (Pmode,
+				      gen_rtx_PLUS (Pmode, func_desc,
+						    func_toc_offset));
+      toc_load = gen_rtx_USE (VOIDmode, func_toc_mem);
+
+      /* If we have a static chain, load it up.  */
+      if (TARGET_POINTERS_TO_NESTED_FUNCTIONS)
+	{
+	  rtx sc_reg = gen_rtx_REG (Pmode, STATIC_CHAIN_REGNUM);
+	  rtx func_sc_offset = GEN_INT (2 * GET_MODE_SIZE (Pmode));
+	  rtx func_sc_mem = gen_rtx_MEM (Pmode,
+					 gen_rtx_PLUS (Pmode, func_desc,
+						       func_sc_offset));
+	  emit_move_insn (sc_reg, func_sc_mem);
+	  abi_reg = sc_reg;
 	}
     }
   else
     {
-      stack_toc_offset = GEN_INT (TOC_SAVE_OFFSET_64BIT);
-      func_toc_offset = GEN_INT (AIX_FUNC_DESC_TOC_64BIT);
-      func_sc_offset = GEN_INT (AIX_FUNC_DESC_SC_64BIT);
-      if (TARGET_POINTERS_TO_NESTED_FUNCTIONS)
-	{
-	  call_func = gen_call_indirect_aix64bit;
-	  call_value_func = gen_call_value_indirect_aix64bit;
-	}
-      else
-	{
-	  call_func = gen_call_indirect_aix64bit_nor11;
-	  call_value_func = gen_call_value_indirect_aix64bit_nor11;
-	}
-    }
-
-  /* Reserved spot to store the TOC.  */
-  stack_toc_mem = gen_frame_mem (Pmode,
-				 gen_rtx_PLUS (Pmode,
-					       stack_ptr,
-					       stack_toc_offset));
-
-  gcc_assert (cfun);
-  gcc_assert (cfun->machine);
-
-  /* Can we optimize saving the TOC in the prologue or do we need to do it at
-     every call?  */
-  if (TARGET_SAVE_TOC_INDIRECT && !cfun->calls_alloca)
-    cfun->machine->save_toc_in_prologue = true;
-
-  else
-    {
-      MEM_VOLATILE_P (stack_toc_mem) = 1;
-      emit_move_insn (stack_toc_mem, toc_reg);
-    }
-
-  /* Calculate the address to load the TOC of the called function.  We don't
-     actually load this until the split after reload.  */
-  func_toc_mem = gen_rtx_MEM (Pmode,
-			      gen_rtx_PLUS (Pmode,
-					    func_desc,
-					    func_toc_offset));
-
-  /* If we have a static chain, load it up.  */
-  if (TARGET_POINTERS_TO_NESTED_FUNCTIONS)
-    {
-      func_sc_mem = gen_rtx_MEM (Pmode,
-				 gen_rtx_PLUS (Pmode,
-					       func_desc,
-					       func_sc_offset));
-
-      sc_reg = gen_rtx_REG (Pmode, STATIC_CHAIN_REGNUM);
-      emit_move_insn (sc_reg, func_sc_mem);
+      /* Direct calls use the TOC: for local calls, the callee will
+	 assume the TOC register is set; for non-local calls, the
+	 PLT stub needs the TOC register.  */
+      abi_reg = toc_reg;
+      func_addr = func_desc;
     }
 
   /* Create the call.  */
-  if (value)
-    insn = call_value_func (value, func_addr, flag, func_toc_mem,
-			    stack_toc_mem);
-  else
-    insn = call_func (func_addr, flag, func_toc_mem, stack_toc_mem);
+  call[0] = gen_rtx_CALL (VOIDmode, gen_rtx_MEM (SImode, func_addr), flag);
+  if (value != NULL_RTX)
+    call[0] = gen_rtx_SET (VOIDmode, value, call[0]);
+  n_call = 1;
 
-  emit_call_insn (insn);
+  if (toc_load)
+    call[n_call++] = toc_load;
+  if (toc_restore)
+    call[n_call++] = toc_restore;
+
+  call[n_call++] = gen_rtx_CLOBBER (VOIDmode, gen_rtx_REG (Pmode, LR_REGNO));
+
+  insn = gen_rtx_PARALLEL (VOIDmode, gen_rtvec_v (n_call, call));
+  insn = emit_call_insn (insn);
+
+  /* Mention all registers defined by the ABI to hold information
+     as uses in CALL_INSN_FUNCTION_USAGE.  */
+  if (abi_reg)
+    use_reg (&CALL_INSN_FUNCTION_USAGE (insn), abi_reg);
+}
+
+/* Expand code to perform a sibling call under the AIX ABI.  */
+
+void
+rs6000_sibcall_aix (rtx value, rtx func_desc, rtx flag, rtx cookie)
+{
+  rtx call[2];
+  rtx insn;
+
+  gcc_assert (INTVAL (cookie) == 0);
+
+  /* Create the call.  */
+  call[0] = gen_rtx_CALL (VOIDmode, gen_rtx_MEM (SImode, func_desc), flag);
+  if (value != NULL_RTX)
+    call[0] = gen_rtx_SET (VOIDmode, value, call[0]);
+
+  call[1] = simple_return_rtx;
+
+  insn = gen_rtx_PARALLEL (VOIDmode, gen_rtvec_v (2, call));
+  insn = emit_call_insn (insn);
+
+  /* Note use of the TOC register.  */
+  use_reg (&CALL_INSN_FUNCTION_USAGE (insn), gen_rtx_REG (Pmode, TOC_REGNUM));
+  /* We need to also mark a use of the link register since the function we
+     sibling-call to will use it to return to our caller.  */
+  use_reg (&CALL_INSN_FUNCTION_USAGE (insn), gen_rtx_REG (Pmode, LR_REGNO));
 }
 
 /* Return whether we need to always update the saved TOC pointer when we update

@@ -770,7 +770,11 @@ else
 if LIBGO_IS_DARWIN
 go_net_tcpsockopt_file = go/net/tcpsockopt_darwin.go
 else
+if LIBGO_IS_SOLARIS
+go_net_tcpsockopt_file = go/net/tcpsockopt_solaris.go
+else
 go_net_tcpsockopt_file =  go/net/tcpsockopt_unix.go
+endif
 endif
 endif
 
@@ -1296,7 +1300,7 @@ go_go_build_files = \
 	go/go/build/build.go \
 	go/go/build/doc.go \
 	go/go/build/read.go \
-	syslist.go
+	go/go/build/syslist.go
 go_go_doc_files = \
 	go/go/doc/comment.go \
 	go/go/doc/doc.go \
@@ -2772,15 +2776,6 @@ go/build.lo: $(go_go_build_files)
 go/build/check: $(CHECK_DEPS)
 	@$(CHECK)
 .PHONY: go/build/check
-
-syslist.go: s-syslist; @true
-s-syslist: Makefile
-	echo '// Generated automatically by make.' >syslist.go.tmp
-	echo 'package build' >>syslist.go.tmp
-	echo 'const goosList = "$(GOOS)"' >>syslist.go.tmp
-	echo 'const goarchList = "$(GOARCH)"' >>syslist.go.tmp
-	$(SHELL) $(srcdir)/../move-if-change syslist.go.tmp syslist.go
-	$(STAMP) $@
 
 @go_include@ go/doc.lo.dep
 go/doc.lo.dep: $(go_go_doc_files)
