@@ -23,6 +23,10 @@ along with GCC; see the file COPYING3.  If not see
 #include "coretypes.h"
 #include "tm.h"
 #include "tree.h"
+#include "stringpool.h"
+#include "expr.h"
+#include "stmt.h"
+#include "stor-layout.h"
 #include "flags.h"
 #include "function.h"
 #include "dumpfile.h"
@@ -3063,7 +3067,7 @@ fold_const_aggregate_ref_1 (tree t, tree (*valueize) (tree))
 		  doffset.fits_shwi ()))
 	    {
 	      offset = doffset.to_shwi ();
-	      offset *= TREE_INT_CST_LOW (unit_size);
+	      offset *= tree_to_uhwi (unit_size);
 	      offset *= BITS_PER_UNIT;
 
 	      base = TREE_OPERAND (t, 0);
@@ -3079,7 +3083,7 @@ fold_const_aggregate_ref_1 (tree t, tree (*valueize) (tree))
 	      if (!ctor)
 		return NULL_TREE;
 	      return fold_ctor_reference (TREE_TYPE (t), ctor, offset,
-					  TREE_INT_CST_LOW (unit_size)
+					  tree_to_uhwi (unit_size)
 					  * BITS_PER_UNIT,
 					  base);
 	    }
