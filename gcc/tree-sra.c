@@ -78,6 +78,13 @@ along with GCC; see the file COPYING3.  If not see
 #include "alloc-pool.h"
 #include "tm.h"
 #include "tree.h"
+#include "pointer-set.h"
+#include "basic-block.h"
+#include "tree-ssa-alias.h"
+#include "internal-fn.h"
+#include "tree-eh.h"
+#include "gimple-expr.h"
+#include "is-a.h"
 #include "gimple.h"
 #include "stor-layout.h"
 #include "gimplify.h"
@@ -3784,10 +3791,9 @@ analyze_modified_params (vec<access_p> representatives)
 static void
 propagate_dereference_distances (void)
 {
-  vec<basic_block> queue;
   basic_block bb;
 
-  queue.create (last_basic_block_for_function (cfun));
+  auto_vec<basic_block> queue (last_basic_block_for_function (cfun));
   queue.quick_push (ENTRY_BLOCK_PTR_FOR_FN (cfun));
   FOR_EACH_BB (bb)
     {
@@ -3847,8 +3853,6 @@ propagate_dereference_distances (void)
 	    queue.quick_push (e->src);
 	  }
     }
-
-  queue.release ();
 }
 
 /* Dump a dereferences TABLE with heading STR to file F.  */
