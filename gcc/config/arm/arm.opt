@@ -278,6 +278,10 @@ mneon-for-64bits
 Target Report RejectNegative Var(use_neon_for_64bits) Init(0)
 Use Neon to perform 64-bits operations rather than core registers.
 
+mslow-flash-data
+Target Report Var(target_slow_flash_data) Init(0)
+Assume loading data from flash is slower than fetching instructions.
+
 msfi-nacl1
 Target Report Mask(SFI_NACL1)
 Generate code for Native Client software fault isolation

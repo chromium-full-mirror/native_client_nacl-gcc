@@ -2,6 +2,276 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-11-25  Jeff Law  <law@redhat.com>
+
+	* tree-ssa-threadupdate.c (thread_through_all_blocks): Selectively
+	invalidate loop information.
+
+2013-11-25  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* config/sh/sh.md (doloop_end_split): Add missing SI mode.
+
+2013-11-25  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/53976
+	PR target/59243
+	* config/sh/sh_optimize_sett_clrt.cc (struct ccreg_value): Update
+	comments.
+	(sh_optimize_sett_clrt::find_last_ccreg_values): Check stack of
+	previously visited basic blocks before recursing instead of only one
+	basic block.
+
+2013-11-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/aarch64/aarch64.c (cortexa53_tuning): New struct.
+	* config/aarch64/aarch64-cores.def (cortex-a53):
+	Use cortexa53 tuning struct.
+
+2013-11-25  Andrew Macleod  <amacleod@redhat.com>
+
+	PR bootstrap/59260
+	* fold-const.c: Include hash-table.h.
+
+2013-11-25  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/59258
+	* ubsan.c (ubsan_create_data): Increase the size of the fields array.
+
+2013-11-25  Richard Biener  <rguenther@suse.de>
+
+	* tree-dfa.c: Remove unused convert.h include.
+
+2013-11-25  Terry Guo  <terry.guo@arm.com>
+
+	* doc/invoke.texi (-mslow-flash-data): Document new option.
+	* config/arm/arm.opt (mslow-flash-data): New option.
+	* config/arm/arm-protos.h (arm_max_const_double_inline_cost): Declare
+	it.
+	* config/arm/arm.h (TARGET_USE_MOVT): Always true when literal pools
+	are disabled.
+	(arm_disable_literal_pool): Declare it.
+	* config/arm/arm.c (arm_disable_literal_pool): New variable.
+	(arm_option_override): Handle new option.
+	(thumb2_legitimate_address_p): Don't allow symbol references when
+	literal pools are disabled.
+	(arm_max_const_double_inline_cost): New function.
+	* config/arm/arm.md (types.md): Include it before ...
+	(use_literal_pool): New attribute.
+	(enabled): Use new attribute.
+	(split pattern): Replace symbol+offset with MOVW/MOVT.
+
+2013-11-24  Steven Bosscher  <steven@gcc.gnu.org>
+
+	PR bootstrap/59279
+	Revert previous commit.
+
+2013-11-24  Steven Bosscher  <steven@gcc.gnu.org>
+
+	* jump.c (reset_insn_reg_label_operand_notes): New function,
+	split out from ...
+	(init_label_info): ... here.  Reset LABEL_NUSES in cfglayout mode.
+	* cfgcleanup.c (delete_dead_jump_tables_between): New function,
+	split out from ...
+	(delete_dead_jumptables): ... here.  Handle cfglayout mode.
+	(cleanup_cfg): Delete dead jump tables in cfglayout mode if an
+	expensive CFG cleanup is called for.
+	* cfgrtl.c (fixup_reorder_chain): Remove BARRIERs from fallthru paths.
+	(cfg_layout_finalize): Delete dead jump tables before re-building
+	the insns chain.
+	* ira.c (ira): Rebuild jump labels *after* deleting unreachable
+	basic blocks, not before.
+	* loop-init.c (rtl_loop_done): Call for an expensive CFG cleanup.
+
+	* modulo-sched.c (sms_schedule): Do not look for BARRIERs in the
+	insns chain of a scheduling extended basic block, they cannot appear
+	there in cfglayout mode.
+
+2013-11-24  Tobias Burnus  <burnus@net-b.de>
+
+	* doc/invoke.texi (-fsanitize=leak): Add link to the wiki page.
+
+2013-11-24  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (rs6000_expand_vec_perm_const_1): Correct
+	for little endian.
+
+2013-11-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* graphite-sese-to-poly.c: Don't include extra "expr.h".
+
+2013-11-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* cilk-common.c (expand_builtin_cilk_detach): Dereference worker.
+
+2013-11-23  David Edelson  <dje.gcc@gmail.com>
+	    Andrew Dixie  <andrewd@gentrack.com>
+
+	PR target/33704
+	* config/rs6000/aix.h (COLLECT_SHARED_INIT_FUNC): Define.
+	(COLLECT_SHARED_FINI_FUNC): Define.
+
+	* collect2.c (aix_shared_initname): Declare.
+	(aix_shared_fininame): Declare.
+	(symkind): Add SYM_AIXI and SYM_AIXD.
+	(scanfilter_masks): Add SCAN_AIXI and SCAN_AIXD.
+	(struct names special): Add GLOBAL__AIXI_ and GLOBAL__AIXD_.
+	(aixlazy_flag): Parse.
+	(extract_init_priority): SYM_AIXI and SYM_AIXD have highest priority.
+	(scan_prog_file, COFF): Handle SYM_AIXI and SYM_AIXD.
+
+2013-11-23  David Edelsohn  <dje.gcc@gmail.com>
+
+	* config/rs6000/rs6000.c (IN_NAMED_SECTION): New macro.
+	(rs6000_xcoff_select_section): Place decls with stricter alignment
+	into named sections.
+	(rs6000_xcoff_unique_section): Allow unique sections for
+	uninitialized data with strict alignment.
+
+2013-11-23  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59154
+	* tree-ssa-reassoc.c (maybe_optimize_range_tests): When changing
+	rhs1 of a cast and new_op is invariant, fold_convert it.
+	* tree-ssa-forwprop.c (ssa_forward_propagate_and_combine): Only call
+	simplify_conversion_from_bitmask if rhs1 is a SSA_NAME.
+
+2013-11-23  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/56788
+	* config/i386/i386.c (bdesc_multi_arg) <IX86_BUILTIN_VFRCZSS>:
+	Declare as MULTI_ARG_1_SF instruction.
+	<IX86_BUILTIN_VFRCZSD>: Decleare as MULTI_ARG_1_DF instruction.
+	* config/i386/sse.md (*xop_vmfrcz<mode>2): Rename
+	from *xop_vmfrcz_<mode>.
+	* config/i386/xopintrin.h (_mm_frcz_ss): Use __builtin_ia32_movss
+	to merge scalar result with __A.
+	(_mm_frcz_sd): Use __builtin_ia32_movsd to merge scalar
+	result with __A.
+
+2013-11-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gimplify.h (recalculate_side_effects): Delete.
+	* gimplify.c (recalculate_side_effects): Make static and add comment.
+
+2013-11-23  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/sh/sh.md: Use nonimmediate_operand rather than general_operand
+	for the destination of a define_peephole2.  Likewise register_operand
+	rather than arith_reg_operand.  Remove constraints from
+	define_peephole2s.
+
+2013-11-23  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/mn10300/mn10300-protos.h (mn10300_store_multiple_operation):
+	Delete.
+	(mn10300_store_multiple_operation_p): Declare.
+	* config/mn10300/mn10300.c (mn10300_store_multiple_operation):
+	Rename to...
+	(mn10300_store_multiple_operation_p): ...this and remove mode
+	argument.
+	* config/mn10300/predicates.md (mn10300_store_multiple_operation):
+	Define.
+
+2013-11-23  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/bfin/bfin-protos.h (push_multiple_operation): Delete.
+	(pop_multiple_operation): Delete.
+	(analyze_push_multiple_operation): Declare.
+	(analyze_pop_multiple_operation): Declare.
+	* config/bfin/bfin.c (push_multiple_operation): Rename to...
+	(analyze_push_multiple_operation): ...this and remove mode argument.
+	(pop_multiple_operation): Rename to...
+	(analyze_pop_multiple_operation): ...this and remove mode argument.
+	* config/bfin/predicates.md (push_multiple_operation): Define.
+	(pop_multiple_operation): Likewise.
+
+2013-11-23  Alan Modra  <amodra@gmail.com>
+
+	* config/rs6000/vsx.md (fusion peepholes): Disable when !TARGET_VSX.
+
+2013-11-22  Jakub Jelinek  <jakub@redhat.com>
+
+	PR sanitizer/59061
+	* common.opt (static-liblsan): Add.
+	* config/gnu-user.h (STATIC_LIBLSAN_LIBS, STATIC_LIBUBSAN_LIBS):
+	Define.
+	* flag-types.h (enum sanitize_code): Add SANITIZE_LEAK.  Renumber
+	SANITIZE_SHIFT, SANITIZE_DIVIDE, SANITIZE_UNREACHABLE, SANITIZE_VLA,
+	SANITIZE_RETURN.
+	* opts.c (common_handle_option): Handle -fsanitize=leak.
+	* gcc.c (ADD_STATIC_LIBLSAN_LIBS, LIBLSAN_SPEC): Define.
+	(LIBUBSAN_SPEC): Don't test LIBUBSAN_EARLY_SPEC.
+	(LIBUBSAN_EARLY_SPEC): Remove.
+	(SANITIZER_EARLY_SPEC): Don't do anything for libubsan.
+	(SANITIZER_SPEC): Add -fsanitize=leak handling.
+	(sanitize_spec_function): Handle %sanitize(leak).
+	* doc/invoke.texi (-static-liblsan, -fsanitize=leak): Document.
+
+2013-11-22  Aldy Hernandez  <aldyh@redhat.com>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	* ipa.c (symtab_remove_unreachable_nodes): Fix up comment typos.
+	* ipa-prop.c (get_vector_of_formal_parm_types): Renamed to ...
+	(ipa_get_vector_of_formal_parm_types): ... this.  No longer static.
+	(ipa_modify_formal_parameters): Adjust caller.  Remove
+	synth_parm_prefix argument.  Use operator enum instead of bit fields.
+	Add assert for properly handling vector of references.  Handle
+	creating brand new parameters.
+	(ipa_modify_call_arguments): Use operator enum instead of bit
+	fields.
+	(ipa_combine_adjustments): Same.  Assert that IPA_PARM_OP_NEW is not
+	used.
+	(ipa_modify_expr, get_ssa_base_param, ipa_get_adjustment_candidate):
+	New functions.
+	(ipa_dump_param_adjustments): Rename reduction to new_decl.
+	Use operator enum instead of bit fields.
+	* ipa-prop.h (enum ipa_parm_op): New.
+	(struct ipa_parm_adjustment): New field op.  Rename reduction
+	to new_decl, new_arg_prefix to arg_prefix and remove remove_param
+	and copy_param.
+	(ipa_modify_formal_parameters): Remove last argument.
+	(ipa_get_vector_of_formal_parm_types, ipa_modify_expr,
+	ipa_get_adjustment_candidate): New prototypes.
+	* tree-sra.c (turn_representatives_into_adjustments): Use operator
+	enum.  Set arg_prefix.
+	(get_adjustment_for_base): Use operator enum.
+	(sra_ipa_modify_expr): Rename to ipa_modify_expr and move to
+	ipa-prop.c.
+	(sra_ipa_modify_assign): Rename sra_ipa_modify_expr to ipa_modify_expr.
+	(ipa_sra_modify_function_body): Same.  No longer static.
+	(sra_ipa_reset_debug_stmts): Use operator enum.
+	(modify_function): Do not pass prefix argument.
+
+2013-11-22  Jakub Jelinek  <jakub@redhat.com>
+
+	* ubsan.c (ubsan_source_location): Don't crash on unknown locations.
+	(ubsan_pass): Ignore clobber stmts.
+
+	* sanitizer.def (BUILT_IN_UBSAN_HANDLE_MISSING_RETURN): New built-in.
+	* opts.c (common_handle_option): Add -fsanitize=return.
+	* flag-types.h (enum sanitize_code): Add SANITIZE_RETURN and
+	or it into SANITIZE_UNDEFINED.
+
+	* sanitizer.def (BUILT_IN_ASAN_BEFORE_DYNAMIC_INIT,
+	BUILT_IN_ASAN_AFTER_DYNAMIC_INIT): New.
+	* asan.c (instrument_derefs): Handle also VAR_DECL loads/stores.
+	Don't instrument accesses to VAR_DECLs which are known to fit
+	into their bounds and the vars are known to have shadow bytes
+	indicating allowed access.
+	(asan_dynamic_init_call): New function.
+	(asan_add_global): If vnode->dynamically_initialized,
+	set __has_dynamic_init to 1 instead of 0.
+	(initialize_sanitizer_builtins): Add BT_FN_VOID_CONST_PTR var.
+	* asan.h (asan_dynamic_init_call): New prototype.
+	* cgraph.h (varpool_node): Add dynamically_initialized bitfield.
+
+2013-11-22  Martin Jambor  <mjambor@suse.cz>
+
+	PR rtl-optimization/10474
+	* ira.c (interesting_dest_for_shprep_1): New function.
+	(interesting_dest_for_shprep): Use interesting_dest_for_shprep_1,
+	also check parallels.
+
 2013-11-22  Jeff Law  <law@redhat.com>
 
 	* tree-ssa-threadedge.c (record_temporary_equivalence): Handle
@@ -14,8 +284,7 @@
 	(cond_arg_set_in_b): Remove.
 	(record_temporary_equivalences_from_stmts_at_dest): New bitmap
 	arguments and a boolean indicating if we have passed a backedge.
-	If we have passed a backedge, then perform invalidations as
-	needed.
+	If we have passed a backedge, then perform invalidations as needed.
 	(thread_around_empty_blocks): If we have seen a backedge, then
 	use the dummy simplify routine.
 	(thread_through_normal_block): Likewise.  Pass bitmaps and
@@ -296,7 +565,8 @@
 2013-11-22  Tejas Belagod  <tejas.belagod@arm.com>
 
 	* config/aarch64/aarch64-simd.md (vec_pack_trunc_<mode>,
-	vec_pack_trunc_v2df, vec_pack_trunc_df): Swap source ops for big-endian.
+	vec_pack_trunc_v2df, vec_pack_trunc_df): Swap source ops for
+	big-endian.
 
 2013-11-22  Tejas Belagod  <tejas.belagod@arm.com>
 
