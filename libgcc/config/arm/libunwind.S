@@ -22,7 +22,7 @@
    <http://www.gnu.org/licenses/>.  */
 
 /* An executable stack is *not* required for these functions.  */
-#if defined(__ELF__) && defined(__linux__)
+#if defined(__ELF__) && (defined(__linux__) || defined(__native_client__))
 .section .note.GNU-stack,"",%progbits
 .previous
 #endif
@@ -36,6 +36,11 @@
 	   alignment in any callee.  */
 	.eabi_attribute 25, 1
 #endif /* __ARM_EABI__ */
+
+#ifdef __native_client__
+/* On Native Client targets, we'll use some VFP instructions directly.  */
+	.fpu vfpv3
+#endif
 
 #ifndef __symbian__
 
@@ -178,6 +183,7 @@ ARM_FUNC_START restore_core_regs
 	   last 3 registers onto the top of the current stack to achieve
 	   this.  */
 	add r1, r0, #52
+	SFI_BREG(r1) \
 	ldmia r1, {r3, r4, r5}  /* {sp, lr, pc}.  */
 #if defined(__thumb2__)
 	/* Thumb-2 doesn't allow sp in a load-multiple instruction, so push
@@ -194,6 +200,7 @@ ARM_FUNC_START restore_core_regs
 	stmfd sp!, {r3, r4, r5}
 #endif
 	/* Don't bother restoring ip.  */
+#ifndef __native_client__
 	ldmia r0, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp}
 #if defined(__thumb2__)
 	/* Pop the return address off the target stack.  */
@@ -206,50 +213,84 @@ ARM_FUNC_START restore_core_regs
 #else
 	ldmfd sp, {sp, lr, pc}
 #endif
+#else
+	/* The Native Client ABI rules do not allow touching r9 at all.
+	   So we must split up the load into r0-r8 and the higher regs.
+	   To keep the struct layout consistent and straightforward, we
+	   leave the slot for r9 in the struct and just reuse it as
+	   another copy of r8.  */
+	mov ip, r0
+	sfi_breg ip, ldmia \B!, {r0-r8}
+	sfi_breg ip, ldmia \B, {r8, sl, fp}
+	ldr ip, [sp, #8]
+	sfi_sp ldmfd sp, {sp, lr}
+	sfi_bx ip
+#endif
 	FUNC_END restore_core_regs
 	UNPREFIX restore_core_regs
 
 /* Load VFP registers d0-d15 from the address in r0.
    Use this to load from FSTMX format.  */
 ARM_FUNC_START gnu_Unwind_Restore_VFP
+#ifndef __native_client__
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on soft-float targets.  */
 	ldc   p11,cr0,[r0],{0x21} /* fldmiax r0, {d0-d15} */
+#else
+	/* Native Client targets always support VFP, but do not support
+	   the deprecated "fldmiax" instruction form.  */
+	sfi_breg r0, vldm.64 \B, {d0-d15}
+#endif
 	RET
 
 /* Store VFP registers d0-d15 to the address in r0.
    Use this to store in FSTMX format.  */
 ARM_FUNC_START gnu_Unwind_Save_VFP
+#ifndef __native_client__
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on soft-float targets.  */
 	stc   p11,cr0,[r0],{0x21} /* fstmiax r0, {d0-d15} */
+#else
+	/* Native Client targets always support VFP, but do not support
+	   the deprecated "fstmiax" instruction form.  */
+	sfi_breg r0, vstm.64 \B, {d0-d15}
+#endif
 	RET
 
 /* Load VFP registers d0-d15 from the address in r0.
    Use this to load from FSTMD format.  */
 ARM_FUNC_START gnu_Unwind_Restore_VFP_D
+	SFI_BREG(r0) \
 	ldc   p11,cr0,[r0],{0x20} /* fldmiad r0, {d0-d15} */
 	RET
 
 /* Store VFP registers d0-d15 to the address in r0.
    Use this to store in FLDMD format.  */
 ARM_FUNC_START gnu_Unwind_Save_VFP_D
+	SFI_BREG(r0) \
 	stc   p11,cr0,[r0],{0x20} /* fstmiad r0, {d0-d15} */
 	RET
 
 /* Load VFP registers d16-d31 from the address in r0.
    Use this to load from FSTMD (=VSTM) format.  Needs VFPv3.  */
 ARM_FUNC_START gnu_Unwind_Restore_VFP_D_16_to_31
+	SFI_BREG(r0) \
 	ldcl  p11,cr0,[r0],{0x20} /* vldm r0, {d16-d31} */
 	RET
 
 /* Store VFP registers d16-d31 to the address in r0.
    Use this to store in FLDMD (=VLDM) format.  Needs VFPv3.  */
 ARM_FUNC_START gnu_Unwind_Save_VFP_D_16_to_31
+	SFI_BREG(r0) \
 	stcl  p11,cr0,[r0],{0x20} /* vstm r0, {d16-d31} */
 	RET
 
 ARM_FUNC_START gnu_Unwind_Restore_WMMXD
+#ifdef __native_client__
+	/* Native Client does not allow iWMMXt instructions at all.
+	   This should never be called.  */
+	sfi_trap
+#else
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on non-iWMMXt targets.  */
 	ldcl  p1, cr0, [r0], #8 /* wldrd wr0, [r0], #8 */
@@ -268,9 +309,15 @@ ARM_FUNC_START gnu_Unwind_Restore_WMMXD
 	ldcl  p1, cr13, [r0], #8 /* wldrd wr13, [r0], #8 */
 	ldcl  p1, cr14, [r0], #8 /* wldrd wr14, [r0], #8 */
 	ldcl  p1, cr15, [r0], #8 /* wldrd wr15, [r0], #8 */
+#endif
 	RET
 
 ARM_FUNC_START gnu_Unwind_Save_WMMXD
+#ifdef __native_client__
+	/* Native Client does not allow iWMMXt instructions at all.
+	   This should never be called.  */
+	sfi_trap
+#else
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on non-iWMMXt targets.  */
 	stcl  p1, cr0, [r0], #8 /* wstrd wr0, [r0], #8 */
@@ -289,24 +336,37 @@ ARM_FUNC_START gnu_Unwind_Save_WMMXD
 	stcl  p1, cr13, [r0], #8 /* wstrd wr13, [r0], #8 */
 	stcl  p1, cr14, [r0], #8 /* wstrd wr14, [r0], #8 */
 	stcl  p1, cr15, [r0], #8 /* wstrd wr15, [r0], #8 */
+#endif
 	RET
 
 ARM_FUNC_START gnu_Unwind_Restore_WMMXC
+#ifdef __native_client__
+	/* Native Client does not allow iWMMXt instructions at all.
+	   This should never be called.  */
+	sfi_trap
+#else
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on non-iWMMXt targets.  */
 	ldc2  p1, cr8, [r0], #4 /* wldrw wcgr0, [r0], #4 */
 	ldc2  p1, cr9, [r0], #4 /* wldrw wcgr1, [r0], #4 */
 	ldc2  p1, cr10, [r0], #4 /* wldrw wcgr2, [r0], #4 */
 	ldc2  p1, cr11, [r0], #4 /* wldrw wcgr3, [r0], #4 */
+#endif
 	RET
 
 ARM_FUNC_START gnu_Unwind_Save_WMMXC
+#ifdef __native_client__
+	/* Native Client does not allow iWMMXt instructions at all.
+	   This should never be called.  */
+	sfi_trap
+#else
 	/* Use the generic coprocessor form so that gas doesn't complain
 	   on non-iWMMXt targets.  */
 	stc2  p1, cr8, [r0], #4 /* wstrw wcgr0, [r0], #4 */
 	stc2  p1, cr9, [r0], #4 /* wstrw wcgr1, [r0], #4 */
 	stc2  p1, cr10, [r0], #4 /* wstrw wcgr2, [r0], #4 */
 	stc2  p1, cr11, [r0], #4 /* wstrw wcgr3, [r0], #4 */
+#endif
 	RET
 
 /* Wrappers to save core registers, then call the real routine.   */
@@ -322,8 +382,14 @@ ARM_FUNC_START gnu_Unwind_Save_WMMXC
 #else
 	stmfd sp!, {sp, lr, pc}
 #endif
+#ifndef __native_client__
 	stmfd sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip}
-	
+#else
+	/* See the comment in restore_core_regs (above) about r8/r9.  */
+	stmfd sp!, {r8, sl, fp, ip}
+	stmfd sp!, {r0-r8}
+#endif
+
 	/* Demand-save flags, plus an extra word for alignment.  */
 	mov r3, #0
 	stmfd sp!, {r2, r3}
@@ -342,9 +408,9 @@ ARM_FUNC_START gnu_Unwind_Save_WMMXC
 	add sp, #72
 	bx r3
 #else
-	bl SYM (__gnu\name) __PLT__
+	SFI(bl) SYM (__gnu\name) __PLT__
 	ldr lr, [sp, #64]
-	add sp, sp, #72
+	ADD_SP #72
 	RET
 #endif
 	FUNC_END \name

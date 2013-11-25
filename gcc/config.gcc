@@ -998,16 +998,16 @@ arm-wrs-vxworks)
 	tmake_file="${tmake_file} arm/t-arm arm/t-vxworks"
 	;;
 arm*-*-nacl*)
-	tm_file="dbxelf.h elfos.h gnu-user.h nacl.h glibc-stdint.h arm/elf.h arm/linux-elf.h arm/bpabi.h arm/linux-eabi.h arm/aout.h arm/nacl.h arm/arm.h"
+	tm_file="dbxelf.h elfos.h gnu-user.h nacl.h glibc-stdint.h arm/elf.h arm/linux-elf.h"
 	case $target in
 	arm*b-*-nacl*)
 		tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
 		;;
 	esac
-	tmake_file="${tmake_file} arm/t-arm arm/t-nacl t-nacl"
-	# See comment below under arm*-*-linux-* about why we force
-	# HOST_WIDE_INT to be 64 bits for this 32-bit target.
-	need_64bit_hwint=yes
+	tmake_file="${tmake_file} arm/t-arm arm/t-bpabi arm/t-nacl t-nacl"
+	tm_file="$tm_file arm/bpabi.h arm/linux-eabi.h arm/aout.h arm/nacl.h arm/arm.h"
+	# The EABI requires the use of __cxa_atexit.
+	default_use_cxa_atexit=yes
 	with_tls=${with_tls:-gnu}
 	;;
 arm*-*-netbsdelf*)
