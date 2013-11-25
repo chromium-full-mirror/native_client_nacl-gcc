@@ -69,7 +69,7 @@ __cxa_type_match(_Unwind_Exception* ue_header,
       // here, so there's no backwards compatibility problem.
       thrown_ptr = __get_object_from_ue (ue_header);
     }
-  
+
   __cxa_type_match_result result = ctm_succeeded;
 
   // Pointer types need to adjust the actual pointer, not
@@ -155,6 +155,12 @@ __gnu_end_cleanup(void)
   return &header->unwindHeader;
 }
 
+#ifdef __native_client__
+# define CALL_INSN "sfi_bl"
+#else
+# define CALL_INSN "bl"
+#endif
+
 #ifdef __TMS320C6X__
 // Assembly wrapper to call __gnu_end_cleanup without clobbering
 // function arguments to _Unwind_Resume.
@@ -217,9 +223,9 @@ asm ("  .pushsection .text.__cxa_end_cleanup\n"
 "	.type __cxa_end_cleanup, \"function\"\n"
 "__cxa_end_cleanup:\n"
 "	stmfd\tsp!, {r1, r2, r3, r4}\n"
-"	bl\t__gnu_end_cleanup\n"
+"	" CALL_INSN "\t__gnu_end_cleanup\n"
 "	ldmfd\tsp!, {r1, r2, r3, r4}\n"
-"	bl\t_Unwind_Resume @ Never returns\n"
+"	" CALL_INSN "\t_Unwind_Resume @ Never returns\n"
 "	.popsection\n");
 #endif
 #endif

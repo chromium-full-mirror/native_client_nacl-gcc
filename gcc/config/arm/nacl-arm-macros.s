@@ -297,6 +297,8 @@ _sfi_breg_dmask_define_neon vst1
 _sfi_breg_dmask_define_neon vst2
 _sfi_breg_dmask_define_neon vst3
 _sfi_breg_dmask_define_neon vst4
+_sfi_breg_dmask_define ldcl
+_sfi_breg_dmask_define stcl
 
 .purgem _sfi_breg_dmask_define
 .purgem _sfi_breg_dmask_define_1

@@ -132,6 +132,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    on certain instructions.  */
 #ifdef __native_client__
 # define SFI(insn)	CONCAT2 (sfi_, insn)
+# define SFI_BREG(reg)	sfi_breg reg,
 # define ADD_SP		sfi_sp add sp, sp,
 # define SUB_SP		sfi_sp sub sp, sp,
 # define PC_IN_POP	lr
@@ -139,6 +140,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # define ARM_ALIGN	.p2align 4      /* 16-byte alignment required.  */
 #else
 # define SFI(insn)	insn
+# define SFI_BREG(reg)	/* No special prefix on the instruction.  */
 # define ADD_SP		add sp, sp,
 # define SUB_SP		sub sp, sp,
 # define PC_IN_POP	pc
