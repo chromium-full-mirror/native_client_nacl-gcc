@@ -1704,25 +1704,47 @@ duplicate_decls (tree newdecl, tree olddecl, bool newdecl_is_friend)
 	  if (TREE_CODE (TREE_TYPE (newdecl)) == METHOD_TYPE)
 	    t1 = TREE_CHAIN (t1), t2 = TREE_CHAIN (t2);
 
-	  for (; t1 && t1 != void_list_node;
-	       t1 = TREE_CHAIN (t1), t2 = TREE_CHAIN (t2), i++)
-	    if (TREE_PURPOSE (t1) && TREE_PURPOSE (t2))
-	      {
-		if (1 == simple_cst_equal (TREE_PURPOSE (t1),
-					   TREE_PURPOSE (t2)))
+	  if (TREE_CODE (TREE_TYPE (newdecl)) == METHOD_TYPE
+	      && CLASSTYPE_TEMPLATE_INFO (CP_DECL_CONTEXT (newdecl)))
+	    {
+	      /* C++11 8.3.6/6.
+		 Default arguments for a member function of a class template
+		 shall be specified on the initial declaration of the member
+		 function within the class template.  */
+	      for (; t2 && t2 != void_list_node; t2 = TREE_CHAIN (t2))
+		if (TREE_PURPOSE (t2))
 		  {
-		    permerror (input_location, "default argument given for parameter %d of %q#D",
-			       i, newdecl);
-		    permerror (input_location, "after previous specification in %q+#D", olddecl);
+		    permerror (input_location,
+			       "redeclaration of %q#D may not have default "
+			       "arguments", newdecl);
+		    break;
 		  }
-		else
+	    }
+	  else
+	    {
+	      for (; t1 && t1 != void_list_node;
+		   t1 = TREE_CHAIN (t1), t2 = TREE_CHAIN (t2), i++)
+		if (TREE_PURPOSE (t1) && TREE_PURPOSE (t2))
 		  {
-		    error ("default argument given for parameter %d of %q#D",
-			   i, newdecl);
-		    error ("after previous specification in %q+#D",
-				 olddecl);
+		    if (1 == simple_cst_equal (TREE_PURPOSE (t1),
+					       TREE_PURPOSE (t2)))
+		      {
+			permerror (input_location,
+				   "default argument given for parameter %d "
+				   "of %q#D", i, newdecl);
+			permerror (input_location,
+				   "after previous specification in %q+#D",
+				   olddecl);
+		      }
+		    else
+		      {
+			error ("default argument given for parameter %d "
+			       "of %q#D", i, newdecl);
+			error ("after previous specification in %q+#D",
+			       olddecl);
+		      }
 		  }
-	      }
+	    }
 	}
     }
 
@@ -10615,7 +10637,9 @@ grokdeclarator (const cp_declarator *declarator,
 	      {
 		/* C++ allows static class members.  All other work
 		   for this is done by grokfield.  */
-		decl = build_lang_decl_loc (declarator->id_loc,
+		decl = build_lang_decl_loc (declarator
+					    ? declarator->id_loc
+					    : input_location,
 					    VAR_DECL, unqualified_id, type);
 		set_linkage_for_static_data_member (decl);
 		/* Even if there is an in-class initialization, DECL

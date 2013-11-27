@@ -6030,7 +6030,8 @@ require_pic_register (void)
   if (!crtl->uses_pic_offset_table)
     {
       gcc_assert (can_create_pseudo_p ());
-      if (arm_pic_register != INVALID_REGNUM)
+      if (arm_pic_register != INVALID_REGNUM
+	  && !(TARGET_THUMB1 && arm_pic_register > LAST_LO_REGNUM))
 	{
 	  if (!cfun->machine->pic_reg)
 	    cfun->machine->pic_reg = gen_rtx_REG (Pmode, arm_pic_register);
@@ -6056,7 +6057,12 @@ require_pic_register (void)
 	      crtl->uses_pic_offset_table = 1;
 	      start_sequence ();
 
-	      arm_load_pic_register (0UL);
+	      if (TARGET_THUMB1 && arm_pic_register != INVALID_REGNUM
+		  && arm_pic_register > LAST_LO_REGNUM)
+		emit_move_insn (cfun->machine->pic_reg,
+				gen_rtx_REG (Pmode, arm_pic_register));
+	      else
+		arm_load_pic_register (0UL);
 
 	      seq = get_insns ();
 	      end_sequence ();
@@ -6314,6 +6320,14 @@ arm_load_pic_register (unsigned long saved_regs ATTRIBUTE_UNUSED)
 	      emit_insn (gen_pic_load_addr_thumb1 (pic_tmp, pic_rtx));
 	      emit_insn (gen_movsi (pic_offset_table_rtx, pic_tmp));
 	      emit_insn (gen_pic_add_dot_plus_four (pic_reg, pic_reg, labelno));
+	    }
+	  else if (arm_pic_register != INVALID_REGNUM
+		   && arm_pic_register > LAST_LO_REGNUM
+		   && REGNO (pic_reg) <= LAST_LO_REGNUM)
+	    {
+	      emit_insn (gen_pic_load_addr_unified (pic_reg, pic_rtx, labelno));
+	      emit_move_insn (gen_rtx_REG (Pmode, arm_pic_register), pic_reg);
+	      emit_use (gen_rtx_REG (Pmode, arm_pic_register));
 	    }
 	  else
 	    emit_insn (gen_pic_load_addr_unified (pic_reg, pic_rtx, labelno));
@@ -7232,7 +7246,8 @@ arm_legitimize_address (rtx x, rtx orig_x, enum machine_mode mode)
       if (CONSTANT_P (xop0) && !symbol_mentioned_p (xop0))
 	xop0 = force_reg (SImode, xop0);
 
-      if (CONSTANT_P (xop1) && !symbol_mentioned_p (xop1))
+      if (CONSTANT_P (xop1) && !CONST_INT_P (xop1)
+	  && !symbol_mentioned_p (xop1))
 	xop1 = force_reg (SImode, xop1);
 
       if (ARM_BASE_REGISTER_RTX_P (xop0)
@@ -10244,6 +10259,8 @@ arm_new_rtx_costs (rtx x, enum rtx_code code, enum rtx_code outer_code,
 	  if (speed_p)
 	    *cost += 2 * extra_cost->alu.shift;
 	}
+      else  /* GET_MODE (XEXP (x, 0)) == SImode.  */
+        *cost = COSTS_N_INSNS (1);
 
       /* Widening beyond 32-bits requires one more insn.  */
       if (mode == DImode)
