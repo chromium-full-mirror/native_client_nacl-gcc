@@ -2,6 +2,606 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-02  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59139
+	* tree-ssa-loop-niter.c (chain_of_csts_start): Properly match
+	code in get_val_for.
+	(get_val_for): Use gcc_checking_asserts.
+
+2013-12-02  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/59199
+	* tree-ssa-operands.c (opf_implicit): Remove.
+	(opf_address_taken): New flag.
+	(get_expr_operands): Remove early out, pass down
+	opf_address_taken for ADDR_EXPRs, add a use operand only
+	for non-opf_address_taken bases.
+	(get_indirect_ref_operands): Rename to ...
+	(get_mem_ref_operands): ... this.
+	(get_asm_expr_operands): Rename to ...
+	(get_asm_stmt_operands): ... this.
+
+2013-12-02  Yuri Rumyantsev  <ysrumyan@gmail.com>
+
+	* ipa-inline.c (check_callers): Add missed pointer de-reference.
+
+2013-12-02  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR tree-optimization/59356
+	* tree-dfa.h (get_addr_base_and_unit_offset_1) <case ARRAY_REF>: Do the
+	offset computation using the precision of the index type.
+
+2013-12-02  Yvan Roux  <yvan.roux@linaro.org>
+
+	PR target/58785
+	* config/arm/arm.c (arm_preferred_reload_class): Only return LO_REGS
+	when rclass is GENERAL_REGS.
+
+2013-12-02 Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	* loop-unroll.c (decide_unroll_constant_iterations): Check macro 
+	TARGET_LOOP_UNROLL_ADJUST while deciding unroll factor.
+
+2013-12-01  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/i386/winnt.c (i386_pe_asm_named_section): Be prepared for an
+	identifier node.
+
+2013-12-01  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	* expr.c (emit_group_store): Fix off-by-one BITFIELD_END argument.
+
+2013-11-30  Paulo Matos  <pmatos@broadcom.com>
+	    Eric Botcazou  <ebotcazou@adacore.com>
+
+	* combine.c (reg_nonzero_bits_for_combine): Apply mask transformation
+	as applied to nonzero_sign_valid when last_set_mode has less precision
+	than mode.
+
+2013-11-30  Tobias Burnus  <burnus@net-b.de>
+
+	PR sanitizer/59275
+	* doc/invoke.texi (-fsanitize=address,leak): Mention the associated
+	environment variable and link to a list with flags.
+	(-fsanitize=thread): Ditto and update link.
+
+2013-11-29  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/59340
+	* lra.c (check_rtl): Use recog_memoized instead of insn_invalid_p.
+
+	Revert
+	2013-11-20  Robert Suchanek  <Robert.Suchanek@imgtec.com>
+
+	* lra.c (lra): Set lra_in_progress before check_rtl call.
+	* recog.c (insn_invalid_p): Add !lra_in_progress to prevent
+	adding clobber regs when LRA is running.
+
+2013-11-29  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/59289
+	* config/arm/arm.c (cortexa15_extra_costs): Adjust costs.
+
+2013-11-29  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/59208
+	* tree-ssa-operands.h (fini_ssa_operands, verify_ssa_operands,
+	free_stmt_operands, update_stmt_operands): Add struct function
+	argument.
+	* tree-ssa-operands.c: Remove uses of cfun, propagate struct
+	function argument from fini_ssa_operands, verify_ssa_operands,
+	free_stmt_operands and update_stmt_operands everywhere.
+	* tree-ssanames.h (release_ssa_name_fn): New.
+	(release_ssa_name): Inline wrapper around release_ssa_name_fn.
+	* tree-ssanames.c (release_ssa_name): Rename to ...
+	(release_ssa_name_fn): ... this and add struct function argument.
+	* gimple-ssa.h (update_stmt, update_stmt_if_modified): Adjust.
+	(update_stmt_fn): New function.
+	* tree-cfg.c (move_block_to_fn): Adjust.
+	* tree-if-conv.c (free_bb_predicate): Likewise.
+	* tree-ssa.c (verify_ssa): Likewise.
+	(delete_tree_ssa): Likewise.
+	* gimple-pretty-print.c (dump_gimple_mem_ops): Remove guard.
+	* cgraph.c (cgraph_redirect_edge_call_stmt_to_callee): Call
+	update_stmt_fn instead of update_stmt.
+
+2013-11-29  Yvan Roux  <yvan.roux@linaro.org>
+
+	* config/arm/arm.h (THUMB_SECONDARY_INPUT_RELOAD_CLASS): Return NO_REGS
+	for LRA.
+
+2013-11-29  Yvan Roux  <yvan.roux@linaro.org>
+
+	 * config/arm/arm.md (store_minmaxsi): Use only when
+	optimize_function_for_size_p.
+
+2013-11-29  Jakub Jelinek  <jakub@redhat.com>
+	    Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/59063
+	* config/gnu-user.h: Removed old code for setting up sanitizer
+	libs.
+	* gcc.c: Using libsanitizer spec instead of explicit libs.
+
+2013-11-29  Ilya Enkovich  <ilya.enkovich@intel.com>
+
+	Reverted:
+	2013-11-20  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* cgraph.h (varpool_node): Add need_bounds_init field.
+	* lto-cgraph.c (lto_output_varpool_node): Output
+	need_bounds_init value.
+	(input_varpool_node): Read need_bounds_init value.
+	* varpool.c (dump_varpool_node): Dump need_bounds_init field.
+
+	Reverted:
+	2013-11-20  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* dbxout.c (dbxout_type): Ignore POINTER_BOUNDS_TYPE.
+	* dwarf2out.c (gen_subprogram_die): Ignore bound args.
+	(gen_type_die_with_usage): Skip pointer bounds.
+	(dwarf2out_global_decl): Likewise.
+
+	Reverted:
+	2013-11-18  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* builtin-types.def (BT_FN_PTR_CONST_PTR_VAR): New.
+	* chkp-builtins.def (BUILT_IN_CHKP_BIND_BOUNDS): New.
+	* cfgexpand.c (expand_call_stmt): Expand BUILT_IN_CHKP_BIND_BOUNDS.
+	* gimple.c (gimple_call_get_nobnd_arg_index): Remove.
+	* gimple.h (gf_mask): Add GF_CALL_WITH_BOUNDS.
+	(gimple_call_with_bounds_p): New.
+	(gimple_call_set_with_bounds): New.
+	(gimple_call_num_nobnd_args): Remove.
+	(gimple_call_nobnd_arg): Remove.
+	* tree.h (CALL_WITH_BOUNDS_P): New.
+	* rtl.h (CALL_EXPR_WITH_BOUNDS_P): New.
+
+	Reverted:
+	2013-11-08  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* common.opt (fcheck-pointer-bounds): Move to ...
+	* c-family/c.opt: ... here.
+	* langhooks-def.h (LANG_HOOKS_CHKP_SUPPORTED): Remove.
+	(LANG_HOOKS_INITIALIZER): Remove LANG_HOOKS_CHKP_SUPPORTED.
+	* langhooks.h (lang_hooks): Remove chkp_supported field.
+	* toplev.c (process_options): Remove chkp_supported check.
+
+	Reverted:
+	2013-10-30  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* tree-core.h (tree_index): Add TI_POINTER_BOUNDS_TYPE.
+	* tree.h (POINTER_BOUNDS_P): New.
+	(BOUNDED_TYPE_P): New.
+	(BOUNDED_P): New.
+	(pointer_bounds_type_node): New.
+	* tree.c (build_common_tree_nodes): Initialize
+	pointer_bounds_type_node.
+	* gimple.h (gimple_call_get_nobnd_arg_index): New.
+	(gimple_call_num_nobnd_args): New.
+	(gimple_call_nobnd_arg): New.
+	(gimple_return_retbnd): New.
+	(gimple_return_set_retbnd): New
+	* gimple.c (gimple_build_return): Increase number of ops
+	for return statement.
+	(gimple_call_get_nobnd_arg_index): New.
+	* gimple-pretty-print.c (dump_gimple_return): Print second op.
+
+	Reverted:
+	2013-10-30  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* ipa.c (cgraph_build_static_cdtor_1): Support contructors
+	with "chkp ctor" and "bnd_legacy" attributes.
+	* gimplify.c (gimplify_init_constructor): Avoid infinite
+	loop during gimplification of bounds initializer.
+
+	Reverted:
+	2013-10-30  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* c-family/c-common.c (handle_bnd_variable_size_attribute): New.
+	(handle_bnd_legacy): New.
+	(c_common_attribute_table): Add bnd_variable_size and bnd_legacy.
+	* doc/extend.texi: Document bnd_variable_size and bnd_legacy
+	attributes.
+
+	Reverted:
+	2013-10-29  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* builtin-types.def (BT_FN_VOID_CONST_PTR): New.
+	(BT_FN_PTR_CONST_PTR): New.
+	(BT_FN_CONST_PTR_CONST_PTR): New.
+	(BT_FN_PTR_CONST_PTR_SIZE): New.
+	(BT_FN_PTR_CONST_PTR_CONST_PTR): New.
+	(BT_FN_VOID_PTRPTR_CONST_PTR): New.
+	(BT_FN_VOID_CONST_PTR_SIZE): New.
+	(BT_FN_PTR_CONST_PTR_CONST_PTR_SIZE): New.
+	* chkp-builtins.def: New.
+	* builtins.def: include chkp-builtins.def.
+	(DEF_CHKP_BUILTIN): New.
+	* builtins.c (expand_builtin): Support BUILT_IN_CHKP_INIT_PTR_BOUNDS,
+	BUILT_IN_CHKP_NULL_PTR_BOUNDS, BUILT_IN_CHKP_COPY_PTR_BOUNDS,
+	BUILT_IN_CHKP_CHECK_PTR_LBOUNDS, BUILT_IN_CHKP_CHECK_PTR_UBOUNDS,
+	BUILT_IN_CHKP_CHECK_PTR_BOUNDS, BUILT_IN_CHKP_SET_PTR_BOUNDS,
+	BUILT_IN_CHKP_NARROW_PTR_BOUNDS, BUILT_IN_CHKP_STORE_PTR_BOUNDS,
+	BUILT_IN_CHKP_GET_PTR_LBOUND, BUILT_IN_CHKP_GET_PTR_UBOUND,
+	BUILT_IN_CHKP_BNDMK, BUILT_IN_CHKP_BNDSTX, BUILT_IN_CHKP_BNDCL,
+	BUILT_IN_CHKP_BNDCU, BUILT_IN_CHKP_BNDLDX, BUILT_IN_CHKP_BNDRET,
+	BUILT_IN_CHKP_INTERSECT, BUILT_IN_CHKP_ARG_BND, BUILT_IN_CHKP_NARROW,
+	BUILT_IN_CHKP_EXTRACT_LOWER, BUILT_IN_CHKP_EXTRACT_UPPER.
+	* common.opt (fcheck-pointer-bounds): New.
+	* toplev.c (process_options): Check Pointer Bounds Checker is
+	supported.
+	* doc/extend.texi: Document Pointer Bounds Checker built-in functions.
+
+	Reverted:
+	2013-10-30  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* target.def (builtin_chkp_function): New.
+	(chkp_bound_type): New.
+	(chkp_bound_mode): New.
+	(fn_abi_va_list_bounds_size): New.
+	(load_bounds_for_arg): New.
+	(store_bounds_for_arg): New.
+	* targhooks.h (default_load_bounds_for_arg): New.
+	(default_store_bounds_for_arg): New.
+	(default_fn_abi_va_list_bounds_size): New.
+	(default_chkp_bound_type): New.
+	(default_chkp_bound_mode): New.
+	(default_builtin_chkp_function): New.
+	* targhooks.c (default_load_bounds_for_arg): New.
+	(default_store_bounds_for_arg): New.
+	(default_fn_abi_va_list_bounds_size): New.
+	(default_chkp_bound_type): New.
+	(default_chkp_bound_mode); New.
+	(default_builtin_chkp_function): New.
+	* doc/tm.texi.in (TARGET_FN_ABI_VA_LIST_BOUNDS_SIZE): New.
+	(TARGET_LOAD_BOUNDS_FOR_ARG): New.
+	(TARGET_STORE_BOUNDS_FOR_ARG): New.
+	(TARGET_BUILTIN_CHKP_FUNCTION): New.
+	(TARGET_CHKP_BOUND_TYPE): New.
+	(TARGET_CHKP_BOUND_MODE): New.
+	* doc/tm.texi: Regenerated.
+	* langhooks.h (lang_hooks): Add chkp_supported field.
+	* langhooks-def.h (LANG_HOOKS_CHKP_SUPPORTED): New.
+	(LANG_HOOKS_INITIALIZER); Add LANG_HOOKS_CHKP_SUPPORTED.
+
+	Reverted:
+	2013-10-24  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* config/i386/constraints.md (B): New.
+	(Ti): New.
+	(Tb): New.
+	* config/i386/i386-c.c (ix86_target_macros_internal): Add __MPX__.
+	* config/i386/i386-modes.def (BND32): New.
+	(BND64): New.
+	* config/i386/i386-protos.h (ix86_bnd_prefixed_insn_p): New.
+	* config/i386/i386.c (isa_opts): Add mmpx.
+	(regclass_map): Add bound registers.
+	(dbx_register_map): Likewise.
+	(dbx64_register_map): Likewise.
+	(svr4_dbx_register_map): Likewise.
+	(PTA_MPX): New.
+	(ix86_option_override_internal): Support MPX ISA.
+	(ix86_conditional_register_usage): Support bound registers.
+	(print_reg): Likewise.
+	(ix86_code_end): Add MPX bnd prefix.
+	(output_set_got): Likewise.
+	(ix86_output_call_insn): Likewise.
+	(ix86_print_operand): Add '!' (MPX bnd) print prefix support.
+	(ix86_print_operand_punct_valid_p): Likewise.
+	(ix86_print_operand_address): Support UNSPEC_BNDMK_ADDR and
+	UNSPEC_BNDMK_ADDR.
+	(ix86_class_likely_spilled_p): Add bound regs support.
+	(ix86_hard_regno_mode_ok): Likewise.
+	(x86_order_regs_for_local_alloc): Likewise.
+	(ix86_bnd_prefixed_insn_p): New.
+	* config/i386/i386.h (FIRST_PSEUDO_REGISTER): Fix to new value.
+	(FIXED_REGISTERS): Add bound registers.
+	(CALL_USED_REGISTERS): Likewise.
+	(REG_ALLOC_ORDER): Likewise.
+	(HARD_REGNO_NREGS): Likewise.
+	(TARGET_MPX): New.
+	(VALID_BND_REG_MODE): New.
+	(FIRST_BND_REG): New.
+	(LAST_BND_REG): New.
+	(reg_class): Add BND_REGS.
+	(REG_CLASS_NAMES): Likewise.
+	(REG_CLASS_CONTENTS): Likewise.
+	(BND_REGNO_P): New.
+	(ANY_BND_REG_P): New.
+	(BNDmode): New.
+	(HI_REGISTER_NAMES): Add bound registers.
+	* config/i386/i386.md (UNSPEC_BNDMK): New.
+	(UNSPEC_BNDMK_ADDR): New.
+	(UNSPEC_BNDSTX): New.
+	(UNSPEC_BNDLDX): New.
+	(UNSPEC_BNDLDX_ADDR): New.
+	(UNSPEC_BNDCL): New.
+	(UNSPEC_BNDCU): New.
+	(UNSPEC_BNDCN): New.
+	(UNSPEC_MPX_FENCE): New.
+	(BND0_REG): New.
+	(BND1_REG): New.
+	(type): Add mpxmov, mpxmk, mpxchk, mpxld, mpxst.
+	(length_immediate): Likewise.
+	(prefix_0f): Likewise.
+	(memory): Likewise.
+	(prefix_rep): Check for bnd prefix.
+	(length_nobnd): New.
+	(length): Use length_nobnd if specified.
+	(BND): New.
+	(bnd_ptr): New.
+	(BNDCHECK): New.
+	(bndcheck): New.
+	(*jcc_1): Add bnd prefix and rename length attr to length_nobnd.
+	(*jcc_2): Likewise.
+	(jump): Likewise.
+	(simple_return_internal): Likewise.
+	(simple_return_pop_internal): Likewise.
+	(*indirect_jump): Add MPX bnd prefix.
+	(*tablejump_1): Likewise.
+	(simple_return_internal_long): Likewise.
+	(simple_return_indirect_internal): Likewise.
+	(<mode>_mk): New.
+	(*<mode>_mk): New.
+	(mov<mode>): New.
+	(*mov<mode>_internal_mpx): New.
+	(<mode>_<bndcheck>): New.
+	(*<mode>_<bndcheck>): New.
+	(<mode>_ldx): New.
+	(*<mode>_ldx): New.
+	(<mode>_stx): New.
+	(*<mode>_stx): New.
+	* config/i386/predicates.md (lea_address_operand): Rename to...
+	(address_no_seg_operand): ... this.
+	(address_mpx_no_base_operand): New.
+	(address_mpx_no_index_operand): New.
+	(bnd_mem_operator): New.
+	* config/i386/i386.opt (mmpx): New.
+	* doc/invoke.texi: Add documentation for the flags -mmpx, -mno-mpx.
+	* doc/rtl.texi Add documentation for BND32mode and BND64mode.
+
+	Reverted:
+	2013-10-24  Ilya Enkovich  <ilya.enkovich@intel.com>
+	* mode-classes.def (MODE_POINTER_BOUNDS): New.
+	* tree.def (POINTER_BOUNDS_TYPE): New.
+	* genmodes.c (complete_mode): Support MODE_POINTER_BOUNDS.
+	(POINTER_BOUNDS_MODE): New.
+	(make_pointer_bounds_mode): New.
+	* machmode.h (POINTER_BOUNDS_MODE_P): New.
+	* stor-layout.c (int_mode_for_mode): Support MODE_POINTER_BOUNDS.
+	(layout_type): Support POINTER_BOUNDS_TYPE.
+	* tree-pretty-print.c (dump_generic_node): Support POINTER_BOUNDS_TYPE.
+	* tree.c (build_int_cst_wide): Support POINTER_BOUNDS_TYPE.
+	(type_contains_placeholder_1): Likewise.
+	* tree.h (POINTER_BOUNDS_TYPE_P): New.
+	* varasm.c (output_constant): Support POINTER_BOUNDS_TYPE.
+	* doc/rtl.texi (MODE_POINTER_BOUNDS): New.
+
+2013-11-29  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/59338
+	* tree-cfg.c (verify_expr): Restrict bounds verification of
+	BIT_FIELD_REF arguments to non-aggregate typed base objects.
+
+2013-11-29  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59334
+	* tree-ssa-dce.c (eliminate_unnecessary_stmts): Fix bug
+	in previous commit.
+
+2013-11-29  Jakub Jelinek  <jakub@redhat.com>
+	    Richard Biener  <rguenther@suse.de>
+
+	PR lto/59326
+	* omp-low.c (simd_clone_create): Return NULL if for definition
+	!cgraph_function_with_gimple_body_p (old_node).  Call cgraph_get_body
+	before calling cgraph_function_versioning.
+	(expand_simd_clones): Look for "omp declare simd" attribute first.
+	Don't check targetm.simd_clone.compute_vecsize_and_simdlen here.
+	Punt if node->global.inlined_to.
+	(pass_omp_simd_clone::gate): Also enable if in_lto_p && !flag_wpa.
+	Disable pass if targetm.simd_clone.compute_vecsize_and_simdlen is NULL.
+	* lto-streamer-out.c (hash_tree): Handle OMP_CLAUSE.
+
+2013-11-29  Jakub Jelinek  <jakub@redhat.com>
+
+	PR lto/59326
+	* tree-core.h (enum omp_clause_schedule_kind): Add
+	OMP_CLAUSE_SCHEDULE_LAST.
+	(enum omp_clause_default_kind): Add OMP_CLAUSE_DEFAULT_LAST.
+	(enum omp_clause_depend_kind): Add OMP_CLAUSE_DEPEND_LAST.
+	(enum omp_clause_map_kind): Add OMP_CLAUSE_MAP_LAST.
+	(enum omp_clause_proc_bind_kind): Add OMP_CLAUSE_PROC_BIND_LAST.
+	* lto-streamer-out.c (lto_is_streamable): Allow streaming
+	OMP_CLAUSE.
+	(DFS_write_tree_body): Handle OMP_CLAUSE.
+	* tree-streamer-out.c (pack_ts_omp_clause_value_fields): New
+	function.
+	(streamer_pack_tree_bitfields): Call it for OMP_CLAUSE.
+	(write_ts_omp_clause_tree_pointers): New function.
+	(streamer_write_tree_body): Call it for OMP_CLAUSE.
+	(streamer_write_tree_header): For OMP_CLAUSE stream OMP_CLAUSE_CODE.
+	* tree-streamer-in.c (unpack_ts_omp_clause_value_fields): New
+	function.
+	(unpack_value_fields): Call it for OMP_CLAUSE.
+	(streamer_alloc_tree): Handle OMP_CLAUSE.
+	(lto_input_ts_omp_clause_tree_pointers): New function.
+	(streamer_read_tree_body): Call it for OMP_CLAUSE.
+
+2013-11-29  Joseph Myers  <joseph@codesourcery.com>
+
+	* doc/implement-c.texi: Document C11 implementation-defined
+	behavior.  Refer to -ffp-contract=fast for contraction behavior.
+	* doc/invoke.texi (-std=c99, std=c11): Update description of
+	completeness.
+	(-std=gnu99): Don't mention as future default.
+	(-std=gnu11): Mention as intended future default.
+	* doc/standards.texi: Update descriptions of C99 and C11 support.
+	Limit statement about C99 facilities for freestanding
+	implementations to some platforms only.
+
+2013-11-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/59327
+	* cfgexpand.c (expand_used_vars): Avoid warning on 32-bit
+	HWI hosts.
+
+2013-11-28  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/57293
+	* ira.h (ira_setup_eliminable_regset): Remove parameter.
+	* ira.c (ira_setup_eliminable_regset): Ditto.  Add
+	SUPPORTS_STACK_ALIGNMENT for crtl->stack_realign_needed.
+	Don't call lra_init_elimination.
+	(ira): Call ira_setup_eliminable_regset without arguments.
+	* loop-invariant.c (calculate_loop_reg_pressure): Remove argument
+	from ira_setup_eliminable_regset call.
+	* gcse.c (calculate_bb_reg_pressure): Ditto.
+	* haifa-sched.c (sched_init): Ditto.
+	* lra.h (lra_init_elimination): Remove the prototype.
+	* lra-int.h (lra_insn_recog_data): New member sp_offset.  Move
+	used_insn_alternative upper.
+	(lra_eliminate_regs_1): Add one more parameter.
+	(lra-eliminate): Ditto.
+	* lra.c (lra_invalidate_insn_data): Set sp_offset.
+	(setup_sp_offset): New.
+	(lra_process_new_insns): Call setup_sp_offset.
+	(lra): Add argument to lra_eliminate calls.
+	* lra-constraints.c (get_equiv_substitution): Rename to get_equiv.
+	(get_equiv_with_elimination): New.
+	(process_addr_reg): Call get_equiv_with_elimination instead of
+	get_equiv_substitution.
+	(equiv_address_substitution): Ditto.
+	(loc_equivalence_change_p): Ditto.
+	(loc_equivalence_callback, lra_constraints): Ditto.
+	(curr_insn_transform): Ditto.  Print the sp offset
+	(process_alt_operands): Prevent stack pointer reloads.
+	(lra_constraints): Remove one argument from lra_eliminate call.
+	Move it up.  Mark used hard regs bfore it.  Use
+	get_equiv_with_elimination instead of get_equiv_substitution.
+	* lra-eliminations.c (lra_eliminate_regs_1): Add parameter and
+	assert for param values combination.  Use sp offset.  Add argument
+	to lra_eliminate_regs_1 calls.
+	(lra_eliminate_regs): Add argument to lra_eliminate_regs_1 call.
+	(curr_sp_change): New static var.
+	(mark_not_eliminable): Add parameter.  Update curr_sp_change.
+	Don't prevent elimination to sp if we can calculate its change.
+	Pass the argument to mark_not_eliminable calls.
+	(eliminate_regs_in_insn): Add a parameter.  Use sp offset.  Add
+	argument to lra_eliminate_regs_1 call.
+	(update_reg_eliminate): Move calculation of hard regs for spill
+	lower.  Switch off lra_in_progress temporarily to generate regs
+	involved into elimination.
+	(lra_init_elimination): Rename to init_elimination.  Make it
+	static.  Set up insn sp offset, check the offsets at the end of
+	BBs.
+	(process_insn_for_elimination): Add parameter.  Pass its value to
+	eliminate_regs_in_insn.
+	(lra_eliminate): : Add parameter.  Pass its value to
+	process_insn_for_elimination.  Add assert for param values
+	combination.  Call init_elimination.  Don't update offsets in
+	equivalence substitutions.
+	* lra-spills.c (assign_mem_slot): Don't call lra_eliminate_regs_1
+	for created stack slot.
+	(remove_pseudos): Call lra_eliminate_regs_1 before changing memory
+	onto stack slot.
+
+2013-11-28  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/iterators.md (vrint_conds): New int attribute.
+	* config/arm/vfp.md (<vrint_pattern><SDF:mode>2): Set conds attribute.
+	(smax<mode>3): Likewise.
+	(smin<mode>3): Likewise.
+
+2013-11-28  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* tree-core.h (tree_base): Document use of static_flag for SSA_NAME.
+	* tree.h (SSA_NAME_ANTI_RANGE_P, SSA_NAME_RANGE_TYPE): New macros.
+	* tree-ssanames.h (set_range_info): Add range_type argument.
+	(duplicate_ssa_name_range_info): Likewise.
+	* tree-ssanames.c (set_range_info): Take the range type as argument
+	and store it in SSA_NAME_ANTI_RANGE_P.
+	(duplicate_ssa_name_range_info): Likewise.
+	(get_range_info): Use SSA_NAME_ANTI_RANGE_P.
+	(set_nonzero_bits): Update call to set_range_info.
+	(duplicate_ssa_name_fn): Update call to duplicate_ssa_name_range_info.
+	* tree-ssa-copy.c (fini_copy_prop): Likewise.
+	* tree-vrp.c (remove_range_assertions): Update call to set_range_info.
+	(vrp_finalize): Likewise, passing anti-ranges directly.
+
+2013-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59330
+	* tree-ssa-dce.c (eliminate_unnecessary_stmts): Simplify
+	and fix delayed marking of free calls not necessary.
+
+2013-11-28  Andrew MacLeod  <amacleod@redhat.com>
+
+	* tree-ssa-propagate.c (valid_gimple_call_p): Pass TREE_TYPE to
+	is_gimple_reg_type.
+	* ipa-prop.c (determine_known_aggregate_parts): Likewise.
+
+2013-11-28  Terry Guo  <terry.guo@arm.com>
+
+	* config/arm/arm.c (v7m_extra_costs): New table.
+	(arm_v7m_tune): Use it.
+
+2013-11-28  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* config/sol2.h (TIME_LIBRARY): Define.
+
+2013-11-28  Richard Biener  <rguenther@suse.de>
+
+	PR lto/59323
+	* lto-streamer-out.c (tree_is_indexable): TYPE_DECLs and
+	CONST_DECLs in function context are not indexable.
+
+2013-11-28  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/nds32.c (nds32_rtx_costs): Adjust MULT cost if it is
+	not optimized for size.
+
+2013-11-28  Jakub Jelinek  <jakub@redhat.com>
+
+	* cfgexpand.c (struct stack_vars_data): Add asan_base and asan_alignb
+	fields.
+	(expand_stack_vars): For -fsanitize=address, use (and set initially)
+	data->asan_base as base for vars and update asan_alignb.
+	(expand_used_vars): Initialize data.asan_base and data.asan_alignb.
+	Pass them to asan_emit_stack_protection.
+	* asan.c (asan_detect_stack_use_after_return): New variable.
+	(asan_emit_stack_protection): Add pbase and alignb arguments.
+	Implement use after return sanitization.
+	* asan.h (asan_emit_stack_protection): Adjust prototype.
+	(ASAN_STACK_MAGIC_USE_AFTER_RET, ASAN_STACK_RETIRED_MAGIC): Define.
+
+2013-11-28  Sergey Ostanevich  <sergos.gnu@gmail.com>
+
+	* common.opt: Introduced a new option -fsimd-cost-model.
+	* doc/invoke.texi: Introduced a new openmp-simd warning and
+	a new -fsimd-cost-model option.
+	* tree-vectorizer.h (unlimited_cost_model): Interface updated
+	to rely on the particular loop info.
+	* tree-vect-data-refs.c (vect_peeling_hash_insert): Ditto.
+	(vect_peeling_hash_choose_best_peeling): Ditto.
+	(vect_enhance_data_refs_alignment): Ditto.
+	* tree-vect-slp.c (vect_slp_analyze_bb_1): Ditto.
+	* tree-vect-loop.c (vect_estimate_min_profitable_iters): Ditto
+	plus added openmp-simd warining.
+
+2013-11-27   H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR rtl-optimization/59311
+	* dwarf2cfi.c (dwf_regno): Assert reg isn't pseudo register.
+	* lra-spills.c (spill_pseudos): Handle REG_XXX notes.
+
+2013-11-27  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* var-tracking.c (track_expr_p): Do not track declarations for parts
+	of tracked parameters.
+	(add_stores): Do not track values for tracked parameters passed in
+	multiple locations.
+	(vt_get_decl_and_offset): Handle PARALLEL.
+	(vt_add_function_parameter): Handle parameters with incoming PARALLEL.
+
+2013-11-27  Jeff Law  <law@redhat.com>
+
+	* tree-ssa-threadupdate.c (thread_through_all_blocks): Do not
+	clobber the loop structure thread_block was unsuccessful.  If
+	thread_block was unsuccessful, cleanup appropriately.
+
 2013-11-27  Chen Liqin <liqin.gcc@gmail.com>
 
 	* config/score/score.h (REG_CLASS_FROM_LETTER): Delete.
@@ -9,9 +609,8 @@
 
 2013-11-27  Kenneth Zadeck  <zadeck@naturalbridge.com>
 
-	* fold-const.c
-	(int_const_binop_1): Make INT_MIN % -1 return 0 with the overflow
-	bit set.
+	* fold-const.c (int_const_binop_1): Make INT_MIN % -1 return 0 with the
+	overflow bit set.
 
 2013-11-27  Richard Biener  <rguenther@suse.de>
 
