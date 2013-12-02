@@ -885,6 +885,9 @@ arm*-*-nacl*)
 	esac
 	tmake_file="${tmake_file} arm/t-arm arm/t-bpabi arm/t-nacl t-nacl"
 	tm_file="$tm_file arm/bpabi.h arm/linux-eabi.h arm/aout.h arm/nacl.h arm/arm.h"
+	# See comment below under arm*-*-linux-* about why we force
+	# HOST_WIDE_INT to be 64 bits for this 32-bit target.
+	need_64bit_hwint=yes
 	# The EABI requires the use of __cxa_atexit.
 	default_use_cxa_atexit=yes
 	with_tls=${with_tls:-gnu}
