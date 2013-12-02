@@ -2,6 +2,31 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-02  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/59353
+	* doc/invoke.texi: Document -fsanitize=return.
+
+2013-12-02  Tobias Burnus  <burnus@net-b.de>
+	    Manuel López-Ibáñez  <manu@gcc.gnu.org>
+
+	PR middle-end/59257
+	* doc/invoke.texi: Add missing @opindex.
+	(-fsanitize=): Use @gcctabopt instead of @itemize.
+
+2013-12-02  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	Fix C++0x memory model for unaligned fields in packed, aligned(4)
+	structures with -fno-strict-volatile-bitfields on STRICT_ALIGNMENT
+	targets like arm-none-eabi.
+	* expr.c (expand_assignment): Handle normal fields like bit regions.
+
+2013-12-02  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	PR target/58115
+	* function.c (invoke_set_current_function_hook): Call
+	targetm.set_current_function after setting this_fn_optabs.
+
 2013-12-02  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/59139
