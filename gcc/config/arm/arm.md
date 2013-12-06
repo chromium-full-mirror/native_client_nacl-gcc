@@ -10018,6 +10018,8 @@
   [(trap_if (const_int 1) (const_int 0))]
   ""
   "*
+  if (TARGET_SFI_NACL1)
+    return \"sfi_trap\";
   if (TARGET_ARM)
     return \".inst\\t0xe7f000f0\";
   else
@@ -13029,11 +13031,6 @@
   "
   [(set_attr "predicable" "yes")]
 )
-
-(define_insn "trap"
-  [(trap_if (const_int 1) (const_int 0))]
-  "TARGET_SFI_NACL1"
-  "sfi_trap")
 
 ;; Vector bits common to IWMMXT and Neon
 (include "vec-common.md")
