@@ -1,3 +1,36 @@
+2013-12-06  Ian Bolton  <ian.bolton@arm.com>
+            Mark Mitchell  <mark@codesourcery.com>
+
+	PR target/59091
+	* gcc.target/arm/builtin-trap.c: New test.
+	* gcc.target/arm/thumb-builtin-trap.c: Likewise.
+
+2013-12-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.target/sparc/pdistn.c: New test.
+	* gcc.target/sparc/pdistn-2.c: Likewise.
+
+2013-12-06  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59058
+	* gcc.dg/torture/pr59058.c: New testcase.
+
+2013-12-05  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* g++.dg/warn/pr15774-1.C: Adjust expected message.
+
+2013-12-05  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/59317
+	* testsuite/gcc.target/mips/pr59317.c: New.
+
+2013-12-05  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/59333
+	PR sanitizer/59397
+	* c-c++-common/ubsan/pr59333.c: New test.
+	* c-c++-common/ubsan/pr59397.c: New test.
+
 2013-12-05  Tejas Belagod  <tejas.belagod@arm.com>
 
 	* gcc.dg/vect/vect-nop-move.c: New test.
@@ -15,7 +48,7 @@
 	* c-c++-common/tsan/thread_leak2.c: New test.
 	* c-c++-common/tsan/tiny_race.c: New test.
 	* c-c++-common/tsan/tls_race.c: New test.
-	* c-c++-common/tsan/write_in_reader_lock.c: New test.	
+	* c-c++-common/tsan/write_in_reader_lock.c: New test.
 	* lib/tsan-dg.exp: New file.
 	* gcc.dg/tsan/tsan.exp: New file.
 	* g++.dg/tsan/tsan.exp: New file.

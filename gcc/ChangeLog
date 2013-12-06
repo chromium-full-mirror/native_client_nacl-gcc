@@ -2,6 +2,154 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-06  Ian Bolton  <ian.bolton@arm.com>
+	    Mark Mitchell  <mark@codesourcery.com>
+
+	PR target/59091
+	* config/arm/arm.md (trap): New pattern.
+	* config/arm/types.md: Added a type for trap.
+
+2013-12-06  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	* expr.c (expand_assignment): Update bitregion_start and
+	bitregion_end.
+
+2013-12-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR target/59316
+	* config/sparc/sparc.h (SPARC_LOW_FE_EXCEPT_VALUES): Define.
+	* config/sparc/sol2.h (SPARC_LOW_FE_EXCEPT_VALUES): Redefine.
+	* config/sparc/sparc.c (TARGET_INIT_BUILTINS): Move around.
+	(TARGET_BUILTIN_DECL): Define.
+	(TARGET_ATOMIC_ASSIGN_EXPAND_FENV): Likewise.
+	(sparc32_initialize_trampoline): Adjust call to gen_flush.
+	(enum sparc_builtins): New enumeral type.
+	(sparc_builtins): New static array.
+	(sparc_builtins_icode): Likewise.
+	(def_builtin): Accept a separate icode and save the result.
+	(def_builtin_const): Likewise.
+	(sparc_fpu_init_builtins): New function.
+	(sparc_vis_init_builtins): Pass the builtin code.
+	(sparc_init_builtins): Call it if TARGET_FPU.
+	(sparc_builtin_decl): New function.
+	(sparc_expand_builtin): Deal with SPARC_BUILTIN_{LD,ST}FSR.
+	(sparc_handle_vis_mul8x16): Use the builtin code.
+	(sparc_fold_builtin): Likewise.  Deal with SPARC_BUILTIN_{LD,ST}FSR
+	and SPARC_BUILTIN_PDISTN.
+	(compound_expr): New helper function.
+	(sparc_atomic_assign_expand_fenv): New function.
+	* config/sparc/sparc.md (unspecv): Reorder values, add UNSPECV_LDFSR
+	and UNSPECV_STFSR.
+	(flush, flushdi): Merge into single pattern.
+	(ldfsr): New instruction.
+	(stfsr): Likewise.
+
+2013-12-06  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* asan.c: Remove struct tags when referring to class varpool_node.
+	* cgraph.h: Likewise.
+	* cgraphbuild.c: Likewise.
+	* cgraphunit.c: Likewise.
+	* dbxout.c: Likewise.
+	* dwarf2out.c: Likewise.
+	* gimple-fold.c: Likewise.
+	* ipa-devirt.c: Likewise.
+	* ipa-ref-inline.h: Likewise.
+	* ipa-ref.h: Likewise.
+	* ipa-reference.c: Likewise.
+	* ipa-utils.c: Likewise.
+	* ipa.c: Likewise.
+	* lto-cgraph.c: Likewise.
+	* lto-streamer-out.c: Likewise.
+	* lto-streamer.h: Likewise.
+	* passes.c: Likewise.
+	* toplev.c: Likewise.
+	* tree-eh.c: Likewise.
+	* tree-emutls.c: Likewise.
+	* tree-pass.h: Likewise.
+	* tree-ssa-structalias.c: Likewise.
+	* tree-vectorizer.c: Likewise.
+	* tree.c: Likewise.
+	* varasm.c: Likewise.
+	* varpool.c: Likewise.
+
+2013-12-06  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	* cgraphunit.c: Remove struct tags when referring to class
+	ipa_opt_pass_d or class opt_pass.
+	* function.h: Likewise.
+	* lto-cgraph.c: Likewise.
+	* pass_manager.h: Likewise.
+	* passes.c: Likewise.
+	* tree-pass.h: Likewise.
+
+2013-12-06  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59058
+	* tree-vectorizer.h (struct _loop_vec_info): Add num_itersm1
+	member.
+	(LOOP_VINFO_NITERSM1): New macro.
+	* tree-vect-loop-manip.c (slpeel_tree_peel_loop_to_edge): Express
+	the vector loop entry test in terms of scalar latch executions.
+	(vect_do_peeling_for_alignment): Update LOOP_VINFO_NITERSM1.
+	* tree-vect-loop.c (vect_get_loop_niters): Also return the
+	number of latch executions.
+	(new_loop_vec_info): Initialize LOOP_VINFO_NITERSM1.
+	(vect_analyze_loop_form): Likewise.
+	(vect_generate_tmps_on_preheader): Compute the number of
+	vectorized iterations differently.
+
+2013-12-05  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
+	* config/score/score.c (score_force_temporary): Delete function.
+	(score_split_symbol): Ditto.
+	* config/score/score.h (ASM_OUTPUT_ADDR_DIFF_ELT): Add extra
+	parentheses to silence ambiguity warning and reindent.
+
+2013-12-05  Marek Polacek  <polacek@redhat.com>
+
+	* doc/invoke.texi: Document -fsanitize=signed-integer-overflow.
+
+2013-12-05  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config.gcc: Support --with-cpu=ia.
+
+	* config/i386/i386.c (cpu_names): Add "ia".
+	(processor_alias_table): Likewise.
+	(ix86_option_override_internal): Disallow -march=ia.
+	* config/i386/i386.h (target_cpu_default): Add
+	TARGET_CPU_DEFAULT_ia.
+
+	* doc/invoke.texi: Document -mtune=ia.
+
+2013-12-05  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/59317
+	* lra-constraints.c (in_class_p): Don't ignore insn with constant
+	as a source.
+
+2013-12-05  Martin Jambor  <mjambor@suse.cz>
+
+	PR ipa/58253
+	* ipa-prop.c (ipa_modify_formal_parameters): Create decls of
+	non-BLKmode in their naturally aligned type.
+
+2013-12-05  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/59333
+	PR sanitizer/59397
+	* ubsan.c: Include rtl.h and expr.h.
+	(ubsan_encode_value): Add new parameter.  If expanding, assign
+	a stack slot for DECL_RTL of the temporary and call expand_assignment.
+	Handle BOOLEAN_TYPE and ENUMERAL_TYPE.
+	(ubsan_build_overflow_builtin): Adjust ubsan_encode_value call.
+	* ubsan.h (ubsan_encode_value): Adjust declaration.
+	* internal-fn.c (ubsan_expand_si_overflow_addsub_check): Move
+	ubsan_build_overflow_builtin above expand_normal call.  Surround this call
+	with push_temp_slots and pop_temp_slots.
+	(ubsan_expand_si_overflow_neg_check): Likewise.
+	(ubsan_expand_si_overflow_mul_check): Likewise.
+
 2013-12-05  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* gimple-ssa-strength-reduction.c (find_basis_for_candidate): Guard
