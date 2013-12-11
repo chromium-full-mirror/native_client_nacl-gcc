@@ -1,3 +1,123 @@
+2013-12-11  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+
+	PR middle-end/59134
+	* gcc.c-torture/compile/pr59134.c: New test.
+	* gnat.dg/misaligned_volatile.adb: New test.
+
+2013-12-11  Bernd Edlinger  <bernd.edlinger@hotmail.de>
+	    Sandra Loosemore  <sandra@codesourcery.com>
+
+	* gcc.dg/pr23623.c: Update to test interaction with C++
+	memory model.
+
+2013-12-11  Sandra Loosemore  <sandra@codesourcery.com>
+
+	PR middle-end/23623
+	PR middle-end/48784
+	PR middle-end/56341
+	PR middle-end/56997
+	* gcc.dg/pr23623.c: New test.
+	* gcc.dg/pr48784-1.c: New test.
+	* gcc.dg/pr48784-2.c: New test.
+	* gcc.dg/pr56341-1.c: New test.
+	* gcc.dg/pr56341-2.c: New test.
+	* gcc.dg/pr56997-1.c: New test.
+	* gcc.dg/pr56997-2.c: New test.
+	* gcc.dg/pr56997-3.c: New test.
+
+2013-12-11  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/58916
+	* gfortran.dg/allocate_with_source_4.f90: New.
+
+2013-12-11  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59417
+	* gcc.c-torture/compile/pr59417.c: New test.
+
+	PR tree-optimization/59386
+	* gcc.c-torture/compile/pr59386.c: New test.
+
+2013-12-11  Bin Cheng  <bin.cheng@arm.com>
+
+	Reverted:
+	2013-12-10  Bin Cheng  <bin.cheng@arm.com>
+	PR tree-optimization/41488
+	* gcc.dg/tree-ssa/scev-7.c: New test.
+	* gcc.dg/pr41488.c: New test.
+
+2013-12-10  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/35831
+	* gfortran.dg/c_by_val_5.f90: Modified.
+	* gfortran.dg/dummy_procedure_10.f90: New.
+
+2013-12-10  Yury Gribov  <y.gribov@samsung.com>
+
+	* gcc-dg/tsan/tsan.exp: Added missing call to torture-finish.
+	* g++-dg/tsan/tsan.exp: Likewise.
+
+2013-12-10  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/38474
+	* gcc.dg/ipa/ipa-pta-14.c: Un-XFAIL.
+
+2013-12-10  Jakub Jelinek  <jakub@redhat.com>
+
+	* gcc.dg/vect/vect-cond-11.c: New test.
+	* gcc.target/i386/vect-cond-1.c: New test.
+	* gcc.target/i386/avx2-gather-5.c: New test.
+	* gcc.target/i386/avx2-gather-6.c: New test.
+	* gcc.dg/vect/vect-mask-loadstore-1.c: New test.
+	* gcc.dg/vect/vect-mask-load-1.c: New test.
+
+2013-12-09  Marek Polacek  <polacek@redhat.com>
+
+	PR sanitizer/59437
+	* g++.dg/ubsan/pr59437.C: New test.
+
+2013-12-10  Max Ostapenko  <m.ostapenko@partner.samsung.com>
+
+	* c-c++-common/tsan/thread_leak2.c: `dg-skip-if' removed.
+	* gcc-dg/tsan/tsan.exp: Run only with '-O0' and '-O2' options.
+	* g++-dg/tsan/tsan.exp: Likewise.
+
+2013-12-10  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/vect/pr58508.c: XFAIL for vect_no_align.
+	* gcc.dg/vect/vect-reduc-pattern-3.c: Require vect_int_mult.
+
+2013-12-10  Bin Cheng  <bin.cheng@arm.com>
+
+	PR tree-optimization/41488
+	* gcc.dg/tree-ssa/scev-7.c: New test.
+	* gcc.dg/pr41488.c: New test.
+
+2013-12-09  Joseph Myers  <joseph@codesourcery.com>
+
+	PR preprocessor/55715
+	* gcc.dg/cpp/expr-overflow-1.c: New test.
+
+2013-12-10  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/59428
+	PR fortran/58099
+	PR fortran/58676
+	PR fortran/41724
+	* gfortran.dg/proc_ptr_result_4.f90: Fix proc-ptr interface.
+
+2013-12-09  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59435
+	* g++.dg/cpp0x/variadic-sizeof3.C: New.
+
+2013-12-09  David Malcolm  <dmalcolm@redhat.com>
+
+	* g++.dg/plugin/selfassign.c (execute_warn_self_assign): Eliminate
+	use of FOR_EACH_BB in favor of FOR_EACH_BB_FN, to make use of cfun
+	explicit.
+	* gcc.dg/plugin/selfassign.c (execute_warn_self_assign): Likewise.
+
 2013-12-09  Richard Earnshaw  <rearnsha@arm.com>
 
 	* gcc.target/arm/ldrd-strd-offset.c: New.
