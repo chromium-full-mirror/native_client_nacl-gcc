@@ -2,6 +2,120 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-17  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ipa-devirt.c (get_polymorphic_call_info): Fix offset calculatoin
+	in contains_type_p query.
+
+2013-12-17  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* omp-low.c (tmp_ompfn_id_num): Remove leftover variable
+	definition.
+
+	* tree-pass.h (make_pass_expand_omp_ssa): Remove leftover function
+	declaration.
+
+	* omp-low.c: Remove leftover comment.
+
+	* omp-low.c (check_combined_parallel): Reflect reality in comment.
+
+	* doc/cfg.texi (Control Flow): Refer to passes.def instead of
+	passes.c.
+	* doc/passes.texi (Pass manager): Refer to passes.def.
+
+	* doc/gccint.texi (Top): Fix inclusion order.
+
+2013-12-17  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm-cores.def (cortex-a12): Use cortexa15 scheduling.
+	* config/arm/arm.c (arm_issue_rate): Handle cortexa12.
+	* config/arm/arm.md (generic_vfp): Remove cortexa12.
+
+2013-12-17  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/arm-cores.def (cortex-a57.cortex-a53): New.
+	* doc/invoke.texi: Document -mcpu=cortex-a57.cortex-a53.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/bpabi.h
+	(BE8_LINK_SPEC): Handle -mcpu=cortex-a57.cortex-a53.
+
+2013-12-17  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/arm-cores.def (cortex-a57): New.
+	* doc/invoke.texi: Document -mcpu=cortex-a57.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/bpabi.h (BE8_LINK_SPEC): Handle -mcpu=cortex-a57.
+
+2013-12-17  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/arm-cores.def (cortex-a15.cortex-a7): New.
+	* doc/invoke.texi: Document -mcpu=cortex-a15.cortex-a7.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/bpabi.h
+	(BE8_LINK_SPEC): Handle -mcpu=cortex-a5.cortex-a7.
+
+2013-12-17  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/arm-cores.def: Add new column for TUNE_IDENT.
+	* config/arm/genopt.sh: Improve layout.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm-opts.h (ARM_CORE): Modify macro for TUNE_IDENT.
+	* config/arm/arm.c (ARM_CORE): Modify macro for TUNE_IDENT.
+	(arm_option_override): When a CPU is chosen, that should also
+	form the tune target.
+	* config/arm/arm.h (ARM_CORE): Modify macro for TUNE_IDENT.
+
+2013-12-17  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* common/config/arm/arm-common.c (arm_rewrite_selected_cpu): New.
+	(arm_rewrite_mcpu): Likewise.
+	* config/arm/arm-protos.h (arm_rewrite_selected_cpu): New.
+	* config/arm/arm.h (BIG_LITTLE_SPEC): New.
+	(BIG_LITTLE_SPEC_FUNCTIONS): Likewise.
+	(EXTRA_SPEC_FUNCTIONS): Include BIG_LITTLE_SPEC_FUNCTIONS.
+	(ASM_CPU_SPEC): Include BIG_LITTLE_SPEC.
+	* config/arm/arm.c (arm_file_start): Rewrite arm_selecetd_cpu values.
+
+2013-12-17  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* expmed.c (lowpart_bit_field_p): Fix comment.
+	(store_bit_field_using_insv): Fix formatting.
+	(store_bit_field): Likewise.
+	(store_fixed_bit_field): More declaration and remove return.
+	(store_fixed_bit_field_1): Fix formatting.
+	(extract_fixed_bit_field): Move declaration.
+	(extract_fixed_bit_field_1): Simplify.
+
+2013-12-17  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ipa-utils.h (possible_polymorphic_call_targets): Determine context of
+	the call.
+	* gimple-fold.c (gimple_fold_call): Use ipa-devirt to devirtualize.
+
+2013-12-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* expr.c (convert_modes): For SUBREG_PROMOTED_VAR_P use SUBREG_REG (x)
+	instead of x as last gen_lowpart argument.
+
+2013-12-16  Jakub Jelinek  <jakub@redhat.com>
+
+	* predict.h (PROB_LIKELY): Fix the value.
+	* internal-fn.c (ubsan_expand_si_overflow_mul_check): Add support
+	for overflow checking for modes without 2xwider supported mode,
+	if the mode has 2xnarrower mode.
+
+	* internal-fn.c: Include stringpool.h and tree-ssanames.h.
+	(ubsan_expand_si_overflow_addsub_check): In the generic expansion,
+	try to improve generated code if one of the arguments is constant
+	or get_range_info says that one of the argument is always
+	negative or always non-negative.
+	* tree-vrp.c (simplify_internal_call_using_ranges): New function.
+	(simplify_stmt_using_ranges): Call it.
+
 2013-12-16  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR rtl-optimization/59466

@@ -1742,7 +1742,7 @@ const struct tune_params arm_fa726te_tune =
 static const struct processors all_cores[] =
 {
   /* ARM Cores */
-#define ARM_CORE(NAME, IDENT, ARCH, FLAGS, COSTS) \
+#define ARM_CORE(NAME, X, IDENT, ARCH, FLAGS, COSTS) \
   {NAME, IDENT, #ARCH, BASE_ARCH_##ARCH,	  \
     FLAGS | FL_FOR_ARCH##ARCH, &arm_##COSTS##_tune},
 #include "arm-cores.def"
@@ -2277,7 +2277,10 @@ arm_option_override (void)
     arm_selected_arch = &all_architectures[arm_arch_option];
 
   if (global_options_set.x_arm_cpu_option)
-    arm_selected_cpu = &all_cores[(int) arm_cpu_option];
+    {
+      arm_selected_cpu = &all_cores[(int) arm_cpu_option];
+      arm_selected_tune = &all_cores[(int) arm_cpu_option];
+    }
 
   if (global_options_set.x_arm_tune_option)
     arm_selected_tune = &all_cores[(int) arm_tune_option];
@@ -28058,7 +28061,11 @@ arm_file_start (void)
       else if (strncmp (arm_selected_cpu->name, "generic", 7) == 0)
 	asm_fprintf (asm_out_file, "\t.arch %s\n", arm_selected_cpu->name + 8);
       else
-	asm_fprintf (asm_out_file, "\t.cpu %s\n", arm_selected_cpu->name);
+	{
+	  const char* truncated_name
+	    = arm_rewrite_selected_cpu (arm_selected_cpu->name);
+	  asm_fprintf (asm_out_file, "\t.cpu %s\n", truncated_name);
+	}
 
       if (TARGET_SOFT_FLOAT)
 	{
@@ -29514,6 +29521,7 @@ arm_issue_rate (void)
     case cortexa7:
     case cortexa8:
     case cortexa9:
+    case cortexa12:
     case cortexa53:
     case fa726te:
     case marvell_pj4:

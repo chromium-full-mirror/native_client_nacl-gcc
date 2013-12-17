@@ -294,4 +294,7 @@ extern int arm_sfi_breg_operand (rtx x);
 
 extern int get_attr_length_arm_multireg_pop (rtx *operands);
 
+/* Defined in gcc/common/config/arm-common.c.  */
+extern const char *arm_rewrite_selected_cpu (const char *name);
+
 #endif /* ! GCC_ARM_PROTOS_H */
