@@ -1,3 +1,31 @@
+2013-12-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/59539
+	* gcc.target/i386/pr59539-1.c: New test.
+	* gcc.target/i386/pr59539-2.c: New test.
+
+2013-12-18  Nick Clifton  <nickc@redhat.com>
+
+	* gcc.dg/pr32912-2.c: Fix for 16-bit targets.
+
+2013-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/pr59418.c: New test.
+
+2013-12-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59523
+	* gcc.dg/pr59523.c: New test.
+
+2013-12-17  Marek Polacek  <polacek@redhat.com>
+
+	* c-c++-common/ubsan/overflow-int128.c: New test.
+
+2013-12-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR ipa/58290
+	* gfortran.dg/pr58290.f90: New test.
+
 2013-12-17  Thomas Schwinge  <thomas@codesourcery.com>
 
 	* gcc.dg/dfp/wtr-conversion-1.c (testfunc1): Fix typo.

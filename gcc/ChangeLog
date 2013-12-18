@@ -2,6 +2,145 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-18  Aldy Hernandez  <aldyh@redhat.com>
+
+	* passes.c (execute_function_dump): Set graph_dump_initialized
+	appropriately.
+	(pass_init_dump_file): Similarly.
+	(execute_one_pass): Pass new argument to do_per_function.
+	* tree-pass.h (class opt_pass): New field graph_dump_initialized.
+
+2013-12-18  Aldy Hernandez  <aldyh@redhat.com>
+
+	* doc/tree-ssa.texi (SSA Operands): Remove reference to
+	SSA_OP_VMAYUSE.
+	Synchronize SSA_OP* definitions with source.
+	* ssa-iterators.h: Fix comment for FOR_EACH_IMM_USE_STMT.
+	Add not to SSA_OP* macro definitions.
+
+2013-12-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/59539
+	* config/i386/sse.md
+	(<sse>_loadu<ssemodesuffix><avxsizesuffix><mask_name>,
+	<sse2_avx_avx512f>_loaddqu<mode><mask_name>): New expanders,
+	prefix existing define_insn names with *.
+
+2013-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/arm/arm.c (arm_expand_epilogue_apcs_frame): Fix thinko.
+
+2013-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+              Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/t-aprofile: Add cortex-a15.cortex-a7, cortex-a12,
+	cortex-a57, cortex-a57.cortex-a53.
+
+2013-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR debug/59418
+	* dwarf2cfi.c (dwarf2out_frame_debug_cfa_offset): Fix comment and tidy.
+	(dwarf2out_frame_debug_cfa_restore): Handle TARGET_DWARF_REGISTER_SPAN.
+	(dwarf2out_frame_debug_expr): Tidy.
+
+2013-12-18  Alexander Ivchenko  <alexander.ivchenko@intel.com>
+	    Maxim Kuznetsov  <maxim.kuznetsov@intel.com>
+	    Sergey Lega  <sergey.s.lega@intel.com>
+	    Anna Tikhonova  <anna.tikhonova@intel.com>
+	    Ilya Tocar  <ilya.tocar@intel.com>
+	    Andrey Turetskiy  <andrey.turetskiy@intel.com>
+	    Ilya Verbin  <ilya.verbin@intel.com>
+	    Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Michael Zolotukhin  <michael.v.zolotukhin@intel.com>
+
+	* config/i386/sse.md (*fma_fmadd_<mode>): Extend to support masking.
+	(*fma_fmsub_<mode>): Ditto.
+	(*fma_fnmadd_<mode>): Ditto.
+	(*fma_fnmsub_<mode>): Ditto.
+	(*fma_fmaddsub_<mode>): Ditto.
+	(*fma_fmsubadd_<mode>): Ditto.
+	(avx512f_vternlog<mode>): Ditto.
+	(avx512f_fixupimm<mode>): Ditto.
+	(avx512f_sfixupimm<mode>): Ditto.
+	(avx512f_vpermi2var<mode>3): Ditto.
+	(avx512f_vpermt2var<mode>3): Ditto.
+	(avx512f_fmaddsub_<mode>_maskz): New.
+	(avx512f_vternlog<mode>_maskz): Ditto.
+	(avx512f_fixupimm<mode>_maskz): Ditto.
+	(avx512f_sfixupimm<mode>_maskz): Ditto.
+	(avx512f_vpermi2var<mode>3_maskz): Ditto.
+	(avx512f_vpermt2var<mode>3_maskz): Ditto.
+	(avx512f_expand<mode>_maskz): Ditto.
+	* config/i386/subst.md (sd_maskz_name): Ditto.
+	(sd_mask_op4): Ditto.
+	(sd_mask_op5): Ditto.
+	(sd_mask_codefor): Ditto.
+	(sd_mask_mode512bit_condition): Ditto.
+	(sd): Ditto.
+
+2013-12-18  Alexander Ivchenko  <alexander.ivchenko@intel.com>
+	    Maxim Kuznetsov  <maxim.kuznetsov@intel.com>
+	    Sergey Lega  <sergey.s.lega@intel.com>
+	    Anna Tikhonova  <anna.tikhonova@intel.com>
+	    Ilya Tocar  <ilya.tocar@intel.com>
+	    Andrey Turetskiy  <andrey.turetskiy@intel.com>
+	    Ilya Verbin  <ilya.verbin@intel.com>
+	    Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Michael Zolotukhin  <michael.v.zolotukhin@intel.com>
+
+	* config/i386/sse.md (avx512f_cmp<mode>3): Extend to support masking.
+	(avx512f_ucmp<mode>3): Ditto.
+	(avx512f_eq<mode>3): Ditto.
+	(avx512f_gt<mode>3): Ditto.
+	(avx512f_testm<mode>3): Ditto.
+	(avx512f_testnm<mode>3): Ditto.
+	* config/i386/subst.md (SUBST_S): New.
+	(mask_scalar_merge_name): Ditto.
+	(mask_scalar_merge_operand3): Ditto.
+	(mask_scalar_merge_operand4): Ditto.
+	(mask_scalar_merge): Ditto.
+
+2013-12-17  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR middle-end/35545
+	* gimple-fold.c (fold_gimple_assign): Attempt to devirtualize
+	OBJ_TYPE_REF.
+	(gimple_fold_stmt_to_constant_1): Bypass OBJ_TYPE_REF wrappers.
+
+2013-12-17  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR middle-end/35545
+	* tree-vrp.c (extract_range_from_unary_expr_1): Handle OBJ_TYPE_REF.
+
+2013-12-17  Teresa Johnson  <tejohnson@google.com>
+
+	PR gcov-profile/59527
+	* cfgrtl.c (fixup_reorder_chain): Handle a region-crossing
+	branch, which can't be eliminated.
+
+2013-12-18  Martin Liska  <marxin.liska@gmail.com>
+	    Jan Hubicka  <jh@suse.cz>
+
+	* cgraphunit.c (node_cmp): New function.
+	(expand_all_functions): Function ordering added.
+	* common.opt: New profile based function reordering flag introduced.
+	* lto-partition.c: Support for time profile added.
+	* lto.c: Likewise.
+	* predict.c (handle_missing_profiles): Time profile handled in
+	  missing profiles.
+
+2013-12-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59523
+	* tree-vectorizer.c (fold_loop_vectorized_call): Call update_stmt
+	on updated stmts.
+
+2013-12-17  Aldy Hernandez  <aldyh@redhat.com>
+
+	* ipa-inline.c (gate_ipa_inline): Remove.
+	(const pass_data pass_data_ipa_inline): Unset has_gate.
+	(class pass_ipa_inline): Remove gate() method.
+
 2013-12-17  Jan Hubicka  <hubicka@ucw.cz>
 
 	* ipa-devirt.c (get_polymorphic_call_info): Fix offset calculatoin
