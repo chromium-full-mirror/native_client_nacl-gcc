@@ -2,6 +2,191 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-19  Charles Baylis  <charles.baylis@linaro.org>
+
+	PR target/59142
+	* config/arm/arm-ldmstm.ml: Use low_register_operand for Thumb
+	patterns.
+	* config/arm/ldmstm.md: Regenerate.
+
+2013-12-19  Charles Baylis  <charles.baylis@linaro.org>
+
+	PR target/59142
+	* config/arm/predicates.md (arm_hard_general_register_operand):
+	New predicate.
+	(arm_hard_register_operand): Remove.
+	* config/arm/arm-ldmstm.ml: Use arm_hard_general_register_operand
+	for all patterns.
+	* config/arm/ldmstm.md: Regenerate.
+
+2013-12-19  Charles Baylis  <charles.baylis@linaro.org>
+
+	PR target/59142
+	* config/arm/predicates.md (vfp_hard_register_operand): New predicate.
+	* config/arm/arm.md (vfp_pop_multiple_with_writeback): Use
+	vfp_hard_register_operand.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-builtins.c (aarch64_init_simd_builtins):
+	Define builtin types for poly64_t poly128_t.
+	(TYPES_BINOPP, aarch64_types_binopp_qualifiers): New.
+	* aarch64/aarch64-simd-builtins.def: Update builtins table.
+	* config/aarch64/aarch64-simd.md (aarch64_crypto_pmulldi,
+	aarch64_crypto_pmullv2di): New.
+	* config/aarch64/aarch64.c (aarch64_simd_mangle_map): Update table for
+	poly64x2_t mangler.
+	* config/aarch64/arm_neon.h (poly64x2_t, poly64_t, poly128_t): Define.
+	(vmull_p64, vmull_high_p64): New.
+	* config/aarch64/iterators.md (UNSPEC_PMULL<2>): New.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-simd-builtins.def: Update builtins table.
+	* config/aarch64/aarch64-simd.md (aarch64_crypto_sha256h<sha256_op>v4si,
+	aarch64_crypto_sha256su0v4si, aarch64_crypto_sha256su1v4si): New.
+	* config/aarch64/arm_neon.h (vsha256hq_u32, vsha256h2q_u32,
+	vsha256su0q_u32, vsha256su1q_u32): New.
+	* config/aarch64/iterators.md (UNSPEC_SHA256H<2>, UNSPEC_SHA256SU<01>):
+	New.
+	(CRYPTO_SHA256): New int iterator.
+	(sha256_op): New int attribute.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-simd-builtins.def: Update builtins table.
+	* config/aarch64/aarch64-builtins.c (aarch64_types_ternopu_qualifiers,
+	TYPES_TERNOPU): New.
+	* config/aarch64/aarch64-simd.md (aarch64_crypto_sha1hsi,
+	aarch64_crypto_sha1su1v4si, aarch64_crypto_sha1<sha1_op>v4si,
+	aarch64_crypto_sha1su0v4si): New.
+	* config/aarch64/arm_neon.h (vsha1cq_u32, sha1mq_u32, vsha1pq_u32,
+	vsha1h_u32, vsha1su0q_u32, vsha1su1q_u32): New.
+	* config/aarch64/iterators.md (UNSPEC_SHA1<CPMH>, UNSPEC_SHA1SU<01>):
+	New.
+	(CRYPTO_SHA1): New int iterator.
+	(sha1_op): New int attribute.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64-simd-builtins.def: Update builtins table.
+	* config/aarch64/aarch64-builtins.c (aarch64_types_binopu_qualifiers,
+	TYPES_BINOPU): New.
+	* config/aarch64/aarch64-simd.md (aarch64_crypto_aes<aes_op>v16qi,
+	aarch64_crypto_aes<aesmc_op>v16qi): New.
+	* config/aarch64/arm_neon.h (vaeseq_u8, vaesdq_u8, vaesmcq_u8,
+	vaesimcq_u8): New.
+	* config/aarch64/iterators.md (UNSPEC_AESE, UNSPEC_AESD, UNSPEC_AESMC,
+	UNSPEC_AESIMC): New.
+	(CRYPTO_AES, CRYPTO_AESMC): New int iterators.
+	(aes_op, aesmc_op): New int attributes.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/arm/types.md (neon_mul_d_long, crypto_aes, crypto_sha1_xor,
+	crypto_sha1_fast, crypto_sha1_slow, crypto_sha256_fast,
+	crypto_sha256_slow): New.
+
+2013-12-19  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* config/aarch64/aarch64.h (TARGET_CRYPTO): New.
+	(__ARM_FEATURE_CRYPTO): Define if TARGET_CRYPTO is true.
+
+2013-12-19  Dominik Vogt  <vogt@linux.vnet.ibm.com>
+	    Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.c (s390_hotpatch_trampoline_halfwords_default): New
+	constant
+	(s390_hotpatch_trampoline_halfwords_max): New constant
+	(s390_hotpatch_trampoline_halfwords): New static variable
+	(get_hotpatch_attribute): New function
+	(s390_handle_hotpatch_attribute): New function
+	(s390_attribute_table): New target specific attribute table to implement
+	the hotpatch attribute
+	(s390_option_override): Parse hotpatch options
+	(s390_function_num_hotpatch_trampoline_halfwords): New function
+	(s390_can_inline_p): Implement target hook to
+	suppress hotpatching for explicitly inlined functions
+	(s390_asm_output_function_label): Generate hotpatch prologue
+	(TARGET_ATTRIBUTE_TABLE): Define to implement target attribute table
+	(TARGET_CAN_INLINE_P): Define to implement target hook
+	* config/s390/s390.opt (mhotpatch): New options -mhotpatch, -mhotpatch=
+	* config/s390/s390-protos.h (s390_asm_output_function_label): Add
+	prototype
+	* config/s390/s390.h (ASM_OUTPUT_FUNCTION_LABEL): Target specific
+	function label generation for hotpatching
+	(FUNCTION_BOUNDARY): Align functions to eight bytes
+	* doc/extend.texi: Document hotpatch attribute
+	* doc/invoke.texi: Document -mhotpatch option
+
+2013-12-19  Ganesh Gopalasubramanian  <Ganesh.Gopalasubramanian@amd.com>
+
+	* config/i386/i386.c: Include cfgloop.h. 
+	(ix86_loop_memcount): New function.
+	(ix86_loop_unroll_adjust): New function.
+	(TARGET_LOOP_UNROLL_ADJUST): Define.
+	* config/i386/i386.h
+	(TARGET_ADJUST_UNROLL): Define.
+	* config/i386/x86-tune.def
+	(X86_TUNE_ADJUST_UNROLL): Define.
+
+2013-12-19  Marek Polacek  <polacek@redhat.com>
+
+	* config/i386/i386.c (ix86_parse_stringop_strategy_string): Remove
+	variable alg.  Use index variable i directly.
+
+2013-12-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* print-tree.c (print_node) <case tcc_type>: Print no_force_blk_flag
+	for all types.
+
+2013-12-19  Monk Chiang  <sh.chiang04@gmail.com>
+
+	* common/config/nds32/nds32-common.c (TARGET_DEFAULT_TARGET_FLAGS):
+	Consider TARGET_CPU_DEFAULT settings.
+
+2013-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-cores.def: Add support for
+	-mcpu=cortex-a57.cortex-a53.
+	* config/aarch64/aarch64-tune.md: Regenerate.
+	* doc/invoke.texi: Document -mcpu=cortex-a57.cortex-a53.
+
+2013-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-cores.def: Add new column for
+	SCHEDULER_IDENT.
+	* config/aarch64/aarch64-opts.h (AARCH64_CORE): Handle
+	SCHEDULER_IDENT.
+	* config/aarch64/aarch64.c (AARCH64_CORE): Handle
+	SCHEDULER_IDENT.
+	(aarch64_parse_cpu): mcpu implies a default value for mtune.
+	* config/aarch64/aarch64.h (AARCH64_CORE): Handle
+	SCHEDULER_IDENT.
+
+2013-12-18  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* common/config/aarch64/aarch64-common.c
+	(aarch64_rewrite_selected_cpu): New.
+	(aarch64_rewrite_mcpu): New.
+	* config/aarch64/aarch64-protos.h
+	(aarch64_rewrite_selected_cpu): New.
+	* config/aarch64/aarch64.h (BIG_LITTLE_SPEC): New.
+	(BIG_LITTLE_SPEC_FUNCTIONS): Likewise.
+	(ASM_CPU_SPEC): Likewise.
+	(EXTRA_SPEC_FUNCTIONS): Likewise.
+	(EXTRA_SPECS): Likewise.
+	(ASM_SPEC): Likewise.
+	* config/aarch64/aarch64.c (aarch64_start_file): Rewrite target
+	CPU name.
+
+2013-12-18  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	* omp-low.c (simd_clone_clauses_extract): Replaced the string
+	"cilk simd elemental" with "cilk simd function."
+	* config/i386/i386.c (ix86_simd_clone_compute_vecsize_and_simdlen): 
+	Removed a carriage-return from a warning string.
+	
 2013-12-18  Aldy Hernandez  <aldyh@redhat.com>
 
 	* passes.c (execute_function_dump): Set graph_dump_initialized

@@ -64,6 +64,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "is-a.h"
 #include "gimple.h"
 #include "gimplify.h"
+#include "cfgloop.h"
 #include "dwarf2.h"
 #include "df.h"
 #include "tm-constrs.h"
@@ -2856,7 +2857,6 @@ ix86_parse_stringop_strategy_string (char *strategy_str, bool is_memset)
   do
     {
       int maxs;
-      stringop_alg alg;
       char alg_name[128];
       char align[16];
       next_range_str = strchr (curr_range_str, ',');
@@ -2879,13 +2879,8 @@ ix86_parse_stringop_strategy_string (char *strategy_str, bool is_memset)
         }
 
       for (i = 0; i < last_alg; i++)
-        {
-          if (!strcmp (alg_name, stringop_alg_names[i]))
-            {
-              alg = (stringop_alg) i;
-              break;
-            }
-        }
+	if (!strcmp (alg_name, stringop_alg_names[i]))
+	  break;
 
       if (i == last_alg)
         {
@@ -2896,7 +2891,7 @@ ix86_parse_stringop_strategy_string (char *strategy_str, bool is_memset)
         }
 
       input_ranges[n].max = maxs;
-      input_ranges[n].alg = alg;
+      input_ranges[n].alg = (stringop_alg) i;
       if (!strcmp (align, "align"))
         input_ranges[n].noalign = false;
       else if (!strcmp (align, "noalign"))
@@ -43990,7 +43985,7 @@ ix86_simd_clone_compute_vecsize_and_simdlen (struct cgraph_node *node,
 	  || (clonei->simdlen & (clonei->simdlen - 1)) != 0))
     {
       warning_at (DECL_SOURCE_LOCATION (node->decl), 0,
-		  "unsupported simdlen %d\n", clonei->simdlen);
+		  "unsupported simdlen %d", clonei->simdlen);
       return 0;
     }
 
@@ -44149,6 +44144,64 @@ ix86_simd_clone_usable (struct cgraph_node *node)
       gcc_unreachable ();
     }
 }
+
+/* This function gives out the number of memory references.
+   This value determines the unrolling factor for
+   bdver3 and bdver4 architectures. */
+
+static int
+ix86_loop_memcount (rtx *x, unsigned *mem_count)
+{
+  if (*x != NULL_RTX && MEM_P (*x))
+   {
+     enum machine_mode mode;
+     unsigned int n_words;
+
+     mode = GET_MODE (*x);
+     n_words = GET_MODE_SIZE (mode) / UNITS_PER_WORD;
+
+    if (n_words > 4)
+       (*mem_count)+=2;
+    else
+       (*mem_count)+=1;
+   }
+  return 0;
+}
+
+/* This function adjusts the unroll factor based on
+   the hardware capabilities. For ex, bdver3 has
+   a loop buffer which makes unrolling of smaller
+   loops less important. This function decides the
+   unroll factor using number of memory references
+   (value 32 is used) as a heuristic. */
+
+static unsigned
+ix86_loop_unroll_adjust (unsigned nunroll, struct loop *loop)
+{
+  basic_block *bbs;
+  rtx insn;
+  unsigned i;
+  unsigned mem_count = 0;
+
+  if (!TARGET_ADJUST_UNROLL)
+     return nunroll;
+
+  /* Count the number of memory references within the loop body.  */
+  bbs = get_loop_body (loop);
+  for (i = 0; i < loop->num_nodes; i++)
+    {
+      for (insn = BB_HEAD (bbs[i]); insn != BB_END (bbs[i]); insn = NEXT_INSN (insn))
+        if (NONDEBUG_INSN_P (insn))
+            for_each_rtx (&insn, (rtx_function) ix86_loop_memcount, &mem_count);
+    }
+  free (bbs);
+
+  if (mem_count && mem_count <=32)
+    return 32/mem_count;
+
+  return nunroll;
+}
+
 
 /* Implement TARGET_FLOAT_EXCEPTIONS_ROUNDING_SUPPORTED_P.  */
 
@@ -44634,6 +44687,9 @@ ix86_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
 #undef TARGET_INIT_LIBFUNCS
 #define TARGET_INIT_LIBFUNCS darwin_rename_builtins
 #endif
+
+#undef TARGET_LOOP_UNROLL_ADJUST
+#define TARGET_LOOP_UNROLL_ADJUST ix86_loop_unroll_adjust
 
 #undef TARGET_SPILL_CLASS
 #define TARGET_SPILL_CLASS ix86_spill_class
