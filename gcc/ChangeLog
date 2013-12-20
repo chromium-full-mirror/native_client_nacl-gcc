@@ -2,6 +2,194 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2013-12-20  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/arm/arm.c (arm_expand_prologue): In a nested APCS frame with
+	arguments to push onto the stack and no varargs, save ip into the last
+	stack slot if r3 isn't available on entry.
+
+2013-12-20  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/neon.ml (crypto_intrinsics): Add vceq_64 and vtst_p64.
+	* config/arm/arm_neon.h: Regenerate.
+	* config/arm/neon-docgen.ml: Add vceq_p64 and vtst_p64.
+	* doc/arm-neon-intrinsics.texi: Regenerate.
+
+2013-12-20  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* config/arm/arm.h (THUMB_SECONDARY_OUTPUT_RELOAD_CLASS): Return NO_REGS
+	for LRA.
+
+2013-12-20  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm_acle.h: Add underscores before variables.
+
+2013-12-20  Bingfeng Mei  <bmei@broadcom.com>
+
+	PR tree-optimization/59544
+	* tree-vect-stmts.c (perm_mask_for_reverse): Move before
+	vectorizable_store. 
+	(vectorizable_store): Handle negative step.
+
+2013-12-20  Tocar Ilya  <ilya.tocar@intel.com>
+
+	* config.gcc: Support march=broadwell.
+	* config/i386/driver-i386.c (host_detect_local_cpu): Detect Broadwell.
+	* config/i386/i386.c (ix86_option_override_internal): Add broadwell.
+	* doc/invoke.texi: Document march=broadwell.
+
+2013-12-20  Jakub Jelinek  <jakub@redhat.com>
+
+	* ubsan.c: Include tree-ssanames.h, asan.h and gimplify-me.h.
+	(ubsan_type_descriptor): Handle BOOLEAN_TYPE and ENUMERAL_TYPE
+	like INTEGER_TYPE.
+	(instrument_bool_enum_load): New function.
+	(ubsan_pass): Call it.
+	(gate_ubsan): Also enable for SANITIZE_BOOL or SANITIZE_ENUM.
+	* asan.c (create_cond_insert_point): No longer static.
+	* asan.h (create_cond_insert_point): Declare.
+	* sanitizer.def (BUILT_IN_UBSAN_HANDLE_LOAD_INVALID_VALUE): New
+	built-in.
+	* opts.c (common_handle_option): Handle -fsanitize=bool and
+	-fsanitize=enum.
+	* builtins.c (fold_builtin_memory_op): When sanitizing bool
+	and enum loads, don't use enum or bool types for memcpy folding.
+	* flag-types.h (SANITIZE_BOOL, SANITIZE_ENUM): New.
+	(SANITIZE_UNDEFINED): Or these in.
+
+2013-12-20  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/nds32.h (NDS32_MODE_TYPE_ALIGN): New macro.
+	(NDS32_AVAILABLE_REGNUM_FOR_ARG): Use more accurate alignment checking
+	to determine available register number.
+	* config/nds32/nds32.c (nds32_needs_double_word_align): Use new
+	macro NDS32_MODE_TYPE_ALIGN.
+	(nds32_function_arg): Refine code layout.
+
+2013-12-19  Jeff Law  <law@redhat.com>
+
+	* doc/invoke.texi: (dump-rtl-ree): Fix typo and clarify ree
+	handles both zero and sign extension.
+
+2013-12-19  Teresa Johnson  <tejohnson@google.com>
+
+	PR gcov-profile/59542
+	* bb-reorder.c (duplicate_computed_gotos): Invoke fixup_partitions
+	if we have made any changes.
+
+2013-12-19  Jakub Jelinek  <jakub@redhat.com>
+
+	PR other/59545
+	* genattrtab.c (struct attr_hash): Change hashcode type to unsigned.
+	(attr_hash_add_rtx, attr_hash_add_string): Change hashcode parameter
+	to unsigned.
+	(attr_rtx_1): Change hashcode variable to unsigned.
+	(attr_string): Likewise.  Perform first multiplication in unsigned
+	type.
+	* ifcvt.c (noce_try_store_flag_constants): Avoid signed integer
+	overflows.
+	* double-int.c (neg_double): Likewise.
+	* stor-layout.c (set_min_and_max_values_for_integral_type): Likewise.
+	* combine.c (force_to_mode): Likewise.
+	* postreload.c (move2add_use_add2_insn, move2add_use_add3_insn,
+	reload_cse_move2add, move2add_note_store): Likewise.
+	* simplify-rtx.c (simplify_const_unary_operation,
+	simplify_const_binary_operation): Likewise.
+	* ipa-split.c (find_split_points): Initialize first.can_split
+	and first.non_ssa_vars.
+	* gengtype-state.c (read_state_files_list): Fix up check.
+	* genautomata.c (reserv_sets_hash_value): Use portable rotation
+	idiom.
+
+2013-12-19  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/neon-docgen.ml: Add crypto intrinsics documentation.
+	* doc/arm-neon-intrinsics.texi: Regenerate.
+
+2013-12-19  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/neon-testgen.ml (effective_target): Handle "CRYPTO".
+
+2013-12-19  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	 * config/arm/arm.c (enum arm_builtins): Add crypto builtins.
+	 (arm_init_neon_builtins): Handle crypto builtins.
+	 (bdesc_2arg): Likewise.
+	 (bdesc_1arg): Likewise.
+	 (bdesc_3arg): New table.
+	 (arm_expand_ternop_builtin): New function.
+	 (arm_expand_unop_builtin): Handle sha1h explicitly.
+	 (arm_expand_builtin): Handle ternary builtins.
+	 * config/arm/arm.h (TARGET_CPU_CPP_BUILTINS):
+	 Define __ARM_FEATURE_CRYPTO.
+	 * config/arm/arm.md: Include crypto.md.
+	 (is_neon_type): Add crypto types.
+	 * config/arm/arm_neon_builtins.def: Add TImode reinterprets.
+	 * config/arm/crypto.def: New.
+	 * config/arm/crypto.md: Likewise.
+	 * config/arm/iterators.md (CRYPTO_UNARY): New int iterator.
+	 (CRYPTO_BINARY): Likewise.
+	 (CRYPTO_TERNARY): Likewise.
+	 (CRYPTO_SELECTING): Likewise.
+	 (crypto_pattern): New int attribute.
+	 (crypto_size_sfx): Likewise.
+	 (crypto_mode): Likewise.
+	 (crypto_type): Likewise.
+	 * config/arm/neon-gen.ml: Handle poly64_t and poly128_t types.
+	 Handle crypto intrinsics.
+	 * config/arm/neon.ml: Add support for poly64 and polt128 types
+	 and intrinsics. Define crypto intrinsics.
+	 * config/arm/neon.md (neon_vreinterpretti<mode>): New pattern.
+	 (neon_vreinterpretv16qi<mode>): Use VQXMOV mode iterator.
+	 (neon_vreinterpretv8hi<mode>): Likewise.
+	 (neon_vreinterpretv4si<mode>): Likewise.
+	 (neon_vreinterpretv4sf<mode>): Likewise.
+	 (neon_vreinterpretv2di<mode>): Likewise.
+	 * config/arm/unspecs.md (UNSPEC_AESD, UNSPEC_AESE, UNSPEC_AESIMC,
+	 UNSPEC_AESMC, UNSPEC_SHA1C, UNSPEC_SHA1M, UNSPEC_SHA1P, UNSPEC_SHA1H,
+	 UNSPEC_SHA1SU0, UNSPEC_SHA1SU1, UNSPEC_SHA256H, UNSPEC_SHA256H2,
+	 UNSPEC_SHA256SU0, UNSPEC_SHA256SU1, VMULLP64): Define.
+	 * config/arm/arm_neon.h: Regenerate.
+
+2013-12-19  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR driver/59321
+	* collect2.c (main): Check -fuse-ld=[bfd|gold] when
+	DEFAULT_LINKER is defined.
+	* common.opt (fuse-ld=bfd): Add Driver.
+	(fuse-ld=gold): Likewise.
+	* gcc.c (use_ld): New variable.
+	(driver_handle_option): Set use_ld for OPT_fuse_ld_bfd and
+	OPT_fuse_ld_gold.
+	(main): Check -fuse-ld=[bfd|gold] for -print-prog-name=ld.
+
+2013-12-19  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* Makefile.in (TEXI_GCC_FILES): Add arm-acle-intrinsics.texi.
+	* config.gcc (extra_headers): Add arm_acle.h.
+	* config/arm/arm.c (FL_CRC32): Define.
+	(arm_have_crc): Likewise.
+	(arm_option_override): Set arm_have_crc.
+	(arm_builtins): Add CRC32 builtins.
+	(bdesc_2arg): Likewise.
+	(arm_init_crc32_builtins): New function.
+	(arm_init_builtins): Initialise CRC32 builtins.
+	(arm_file_start): Handle architecture extensions.
+	* config/arm/arm.h (TARGET_CPU_CPP_BUILTINS): Define __ARM_FEATURE_CRC32.
+	Define __ARM_32BIT_STATE.
+	(TARGET_CRC32): Define.
+	* config/arm/arm-arches.def: Add armv8-a+crc.
+	* config/arm/arm-tables.opt: Regenerate.
+	* config/arm/arm.md (type): Add crc.
+	(<crc_variant>): New insn.
+	* config/arm/arm_acle.h: New file.
+	* config/arm/iterators.md (CRC): New int iterator.
+	(crc_variant, crc_mode): New int attributes.
+	* confg/arm/unspecs.md (UNSPEC_CRC32B, UNSPEC_CRC32H, UNSPEC_CRC32W,
+	UNSPEC_CRC32CB, UNSPEC_CRC32CH, UNSPEC_CRC32CW): New unspecs.
+	* doc/invoke.texi: Document -march=armv8-a+crc option.
+	* doc/extend.texi: Document ACLE intrinsics.
+
 2013-12-19  Charles Baylis  <charles.baylis@linaro.org>
 
 	PR target/59142

@@ -4270,9 +4270,19 @@
   DONE;
 })
 
+(define_expand "neon_vreinterpretti<mode>"
+  [(match_operand:TI 0 "s_register_operand" "")
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
+  "TARGET_NEON"
+{
+  neon_reinterpret (operands[0], operands[1]);
+  DONE;
+})
+
+
 (define_expand "neon_vreinterpretv16qi<mode>"
   [(match_operand:V16QI 0 "s_register_operand" "")
-   (match_operand:VQX 1 "s_register_operand" "")]
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
   "TARGET_NEON"
 {
   neon_reinterpret (operands[0], operands[1]);
@@ -4281,7 +4291,7 @@
 
 (define_expand "neon_vreinterpretv8hi<mode>"
   [(match_operand:V8HI 0 "s_register_operand" "")
-   (match_operand:VQX 1 "s_register_operand" "")]
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
   "TARGET_NEON"
 {
   neon_reinterpret (operands[0], operands[1]);
@@ -4290,7 +4300,7 @@
 
 (define_expand "neon_vreinterpretv4si<mode>"
   [(match_operand:V4SI 0 "s_register_operand" "")
-   (match_operand:VQX 1 "s_register_operand" "")]
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
   "TARGET_NEON"
 {
   neon_reinterpret (operands[0], operands[1]);
@@ -4299,7 +4309,7 @@
 
 (define_expand "neon_vreinterpretv4sf<mode>"
   [(match_operand:V4SF 0 "s_register_operand" "")
-   (match_operand:VQX 1 "s_register_operand" "")]
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
   "TARGET_NEON"
 {
   neon_reinterpret (operands[0], operands[1]);
@@ -4308,7 +4318,7 @@
 
 (define_expand "neon_vreinterpretv2di<mode>"
   [(match_operand:V2DI 0 "s_register_operand" "")
-   (match_operand:VQX 1 "s_register_operand" "")]
+   (match_operand:VQXMOV 1 "s_register_operand" "")]
   "TARGET_NEON"
 {
   neon_reinterpret (operands[0], operands[1]);
