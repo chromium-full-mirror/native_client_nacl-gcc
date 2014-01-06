@@ -1,5 +1,5 @@
 /* Interprocedural constant propagation
-   Copyright (C) 2005-2013 Free Software Foundation, Inc.
+   Copyright (C) 2005-2014 Free Software Foundation, Inc.
 
    Contributed by Razya Ladelsky <RAZYA@il.ibm.com> and Martin Jambor
    <mjambor@suse.cz>
@@ -437,6 +437,10 @@ determine_versionability (struct cgraph_node *node)
 	 coexist, but that may not be worth the effort.  */
       reason = "function has SIMD clones";
     }
+  /* Don't clone decls local to a comdat group; it breaks and for C++
+     decloned constructors, inlining is always better anyway.  */
+  else if (symtab_comdat_local_p (node))
+    reason = "comdat-local function";
 
   if (reason && dump_file && !node->alias && !node->thunk.thunk_p)
     fprintf (dump_file, "Function %s/%i is not versionable, reason: %s.\n",
@@ -2277,7 +2281,7 @@ ipcp_discover_new_direct_edges (struct cgraph_node *node,
 	{
 	  bool agg_contents = ie->indirect_info->agg_contents;
 	  bool polymorphic = ie->indirect_info->polymorphic;
-	  bool param_index = ie->indirect_info->param_index;
+	  int param_index = ie->indirect_info->param_index;
 	  struct cgraph_edge *cs = ipa_make_edge_direct_to_target (ie, target);
 	  found = true;
 

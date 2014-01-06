@@ -1,5 +1,5 @@
 /* Output routines for GCC for ARM.
-   Copyright (C) 1991-2013 Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
    Contributed by Pieter `Tiggr' Schoenmakers (rcpieter@win.tue.nl)
    and Martin Simmons (@harleqn.co.uk).
    More major hacks by Richard Earnshaw (rearnsha@arm.com).
@@ -20747,8 +20747,10 @@ arm_get_frame_offsets (void)
   offsets->saved_args = crtl->args.pretend_args_size;
 
   /* In Thumb mode this is incorrect, but never used.  */
-  offsets->frame = offsets->saved_args + (frame_pointer_needed ? 4 : 0) +
-                   arm_compute_static_chain_stack_bytes();
+  offsets->frame
+    = (offsets->saved_args
+       + arm_compute_static_chain_stack_bytes ()
+       + (frame_pointer_needed ? 4 : 0));
 
   if (TARGET_32BIT)
     {
@@ -20788,9 +20790,10 @@ arm_get_frame_offsets (void)
     }
 
   /* Saved registers include the stack frame.  */
-  offsets->saved_regs = offsets->saved_args + saved +
-                        arm_compute_static_chain_stack_bytes();
+  offsets->saved_regs
+    = offsets->saved_args + arm_compute_static_chain_stack_bytes () + saved;
   offsets->soft_frame = offsets->saved_regs + CALLER_INTERWORKING_SLOT_SIZE;
+
   /* A leaf function does not need any stack alignment if it has nothing
      on the stack.  */
   if (leaf && frame_size == 0
@@ -22083,7 +22086,11 @@ arm_print_operand (FILE *stream, rtx x, int code)
 
     case 'v':
 	gcc_assert (CONST_DOUBLE_P (x));
-	fprintf (stream, "#%d", vfp3_const_double_for_fract_bits (x));
+	int result;
+	result = vfp3_const_double_for_fract_bits (x);
+	if (result == 0)
+	  result = vfp3_const_double_for_bits (x);
+	fprintf (stream, "#%d", result);
 	return;
 
     /* Register specifier for vld1.16/vst1.16.  Translate the S register
@@ -27573,7 +27580,10 @@ arm_expand_epilogue_apcs_frame (bool really_return)
   saved_regs_mask = offsets->saved_regs_mask;
 
   /* Find the offset of the floating-point save area in the frame.  */
-  floats_from_frame = offsets->saved_args - offsets->frame;
+  floats_from_frame
+    = (offsets->saved_args
+       + arm_compute_static_chain_stack_bytes ()
+       - offsets->frame);
 
   /* Compute how many core registers saved and how far away the floats are.  */
   for (i = 0; i <= LAST_ARM_REGNUM; i++)
@@ -30247,6 +30257,26 @@ vfp3_const_double_for_fract_bits (rtx operand)
 	    return int_log2 (value);
 	}
     }
+  return 0;
+}
+
+int
+vfp3_const_double_for_bits (rtx operand)
+{
+  REAL_VALUE_TYPE r0;
+
+  if (!CONST_DOUBLE_P (operand))
+    return 0;
+
+  REAL_VALUE_FROM_CONST_DOUBLE (r0, operand);
+  if (exact_real_truncate (DFmode, &r0))
+    {
+      HOST_WIDE_INT value = real_to_integer (&r0);
+      value = value & 0xffffffff;
+      if ((value != 0) && ( (value & (value - 1)) == 0))
+	return int_log2 (value);
+    }
+
   return 0;
 }
 

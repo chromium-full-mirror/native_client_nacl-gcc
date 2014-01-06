@@ -1,5 +1,5 @@
 /* Variable tracking routines for the GNU compiler.
-   Copyright (C) 2002-2013 Free Software Foundation, Inc.
+   Copyright (C) 2002-2014 Free Software Foundation, Inc.
 
    This file is part of GCC.
 
@@ -5930,6 +5930,13 @@ add_stores (rtx loc, const_rtx expr, void *cuip)
   if (type != MO_VAL_SET)
     goto log_and_return;
 
+  v = find_use_val (oloc, mode, cui);
+
+  if (!v)
+    goto log_and_return;
+
+  resolve = preserve = !cselib_preserved_value_p (v);
+
   /* We cannot track values for multiple-part variables, so we track only
      locations for tracked parameters passed either by invisible reference
      or directly in multiple locations.  */
@@ -5943,14 +5950,15 @@ add_stores (rtx loc, const_rtx expr, void *cuip)
 	   && XEXP (DECL_INCOMING_RTL (REG_EXPR (loc)), 0) != arg_pointer_rtx)
           || (GET_CODE (DECL_INCOMING_RTL (REG_EXPR (loc))) == PARALLEL
 	      && XVECLEN (DECL_INCOMING_RTL (REG_EXPR (loc)), 0) > 1)))
-    goto log_and_return;
-
-  v = find_use_val (oloc, mode, cui);
-
-  if (!v)
-    goto log_and_return;
-
-  resolve = preserve = !cselib_preserved_value_p (v);
+    {
+      /* Although we don't use the value here, it could be used later by the
+	 mere virtue of its existence as the operand of the reverse operation
+	 that gave rise to it (typically extension/truncation).  Make sure it
+	 is preserved as required by vt_expand_var_loc_chain.  */
+      if (preserve)
+	preserve_value (v);
+      goto log_and_return;
+    }
 
   if (loc == stack_pointer_rtx
       && hard_frame_pointer_adjustment != -1
@@ -7931,7 +7939,7 @@ struct expand_loc_callback_data
 
   /* Stack of values and debug_exprs under expansion, and their
      children.  */
-  stack_vec<rtx, 4> expanding;
+  auto_vec<rtx, 4> expanding;
 
   /* Stack of values and debug_exprs whose expansion hit recursion
      cycles.  They will have VALUE_RECURSED_INTO marked when added to
@@ -7939,7 +7947,7 @@ struct expand_loc_callback_data
      resolves to a valid location.  So, if the flag remains set at the
      end of the search, we know no valid location for this one can
      possibly exist.  */
-  stack_vec<rtx, 4> pending;
+  auto_vec<rtx, 4> pending;
 
   /* The maximum depth among the sub-expressions under expansion.
      Zero indicates no expansion so far.  */
@@ -8886,7 +8894,7 @@ process_changed_values (variable_table_type htab)
 {
   int i, n;
   rtx val;
-  stack_vec<rtx, 20> changed_values_stack;
+  auto_vec<rtx, 20> changed_values_stack;
 
   /* Move values from changed_variables to changed_values_stack.  */
   changed_variables
