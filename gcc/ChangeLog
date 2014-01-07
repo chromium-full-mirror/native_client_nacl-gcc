@@ -2,6 +2,72 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-07  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/aarch64/aarch64-elf.h (ASM_SPEC): Remove identity spec for
+	-mcpu.
+
+2014-01-07  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* config/arm/arm.c (arm_expand_neon_args): Call expand_expr
+	with EXPAND_MEMORY for NEON_ARG_MEMORY; check if the returned
+	rtx is const0_rtx or not.
+
+2014-01-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR target/58115
+	* target-globals.c (save_target_globals): Remove this_fn_optab
+	handling.
+	* toplev.c: Include optabs.h.
+	(target_reinit): Temporarily restore the global options if another
+	set of options are in force.
+
+2014-01-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/58668
+	* cfgcleanup.c (flow_find_cross_jump): Don't count
+	any jumps if dir_p is NULL.  Remove p1 variable, use active_insn_p
+	to determine what is counted.
+	(flow_find_head_matching_sequence): Use active_insn_p to determine
+	what is counted.
+	(try_head_merge_bb): Adjust for the flow_find_head_matching_sequence
+	counting change.
+	* ifcvt.c (count_bb_insns): Use active_insn_p && !JUMP_P to
+	determine what is counted.
+
+	PR tree-optimization/59643
+	* tree-predcom.c (split_data_refs_to_components): If one dr is
+	read and one write, determine_offset fails and the write isn't
+	in the bad component, just put the read into the bad component.
+
+2014-01-07  Mike Stump  <mikestump@comcast.net>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR pch/59436
+	* tree-core.h (struct tree_optimization_option): Change optabs
+	type from unsigned char * to void *.
+	* optabs.c (init_tree_optimization_optabs): Adjust
+	TREE_OPTIMIZATION_OPTABS initialization.
+
+2014-01-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/59644
+	* config/i386/i386.h (struct machine_function): Add
+	no_drap_save_restore field.
+	* config/i386/i386.c (ix86_save_reg): Use
+	!cfun->machine->no_drap_save_restore instead of
+	crtl->stack_realign_needed.
+	(ix86_finalize_stack_realign_flags): Don't clear drap_reg unless
+	this function clears frame_pointer_needed.  Set
+	cfun->machine->no_drap_save_restore if clearing frame_pointer_needed
+	and DRAP reg is needed.
+
+2014-01-06  Marek Polacek  <polacek@redhat.com>
+
+	PR c/57773
+	* doc/implement-c.texi: Mention that other integer types are
+	permitted as bit-field types in strictly conforming mode.
+
 2014-01-02  Felix Yang  <fei.yang0953@gmail.com>
 
 	* modulo-sched.c (schedule_reg_moves): Clear distance1_uses if it
