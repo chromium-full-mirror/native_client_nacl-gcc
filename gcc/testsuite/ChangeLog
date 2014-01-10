@@ -1,3 +1,72 @@
+2014-01-10  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.target/arm/neon-nested-apcs.c: Tweak dg directives.
+
+2014-01-10  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/59744
+	* gcc.target/aarch64/cmn-neg.c: Use equality comparisons.
+	* gcc.target/aarch64/cmn-neg2.c: New test.
+
+2014-01-10  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59374
+	* gcc.dg/torture/pr59374-3.c: New testcase.
+
+2014-01-10  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* lib/target-supports.exp
+	(check_effective_target_arm_crypto_ok_nocache): New.
+	(check_effective_target_arm_crypto_ok): Use above procedure.
+	(add_options_for_arm_crypto): Use et_arm_crypto_flags.
+
+2014-01-10  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/58252
+	PR ipa/59226
+	* g++.dg/ipa/devirt-20.C: New testcase.	
+	* g++.dg/torture/pr58252.C: Likewise.
+	* g++.dg/torture/pr59226.C: Likewise.
+
+2014-01-10  Max Ostapenko  <m.ostapenko@partner.samsung.com>
+
+	* c-c++-common/asan/no-asan-stack.c: New test.
+
+2014-01-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/59670
+	* gcc.dg/pr59670.c: New test.
+
+2014-01-09  Steve Ellcey  <sellcey@mips.com>
+
+	* gcc.dg/delay-slot-1.c: Restrict -mabi=64 to 64 bit processors.
+
+2014-01-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/47735
+	* gcc.target/i386/pr47735.c: New test.
+
+	PR tree-optimization/59622
+	* g++.dg/opt/pr59622-2.C: New test.
+	* g++.dg/opt/pr59622-3.C: New test.
+	* g++.dg/opt/pr59622-4.C: New test.
+	* g++.dg/opt/pr59622-5.C: New test.
+
+	PR sanitizer/59136
+	* c-c++-common/asan/strip-path-prefix-1.c: Allow also the
+	filename:line instead of (modulename+offset) form with stripped
+	initial / from the filename.
+
+2014-01-09  Ian Lance Taylor  <iant@google.com>
+
+	* go.test/go-test.exp (go-gc-tests): Skip nilptr tests that test
+	the other Go compiler.
+
+2014-01-09  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59730
+	* g++.dg/cpp0x/variadic145.C: New.
+
 2014-01-09  Uros Bizjak  <ubizjak@gmail.com>
 
 	* go.test/go-test.exp (go-gc-tests): Don't run peano.go on systems

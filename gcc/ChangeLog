@@ -2,6 +2,121 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-10  Richard Earnshaw  <rearnsha@arm.com>
+
+	PR target/59744
+	* aarch64-modes.def (CC_Zmode): New flags mode.
+	* aarch64.c (aarch64_select_cc_mode): Only allow NEG when the condition
+	represents an equality.
+	(aarch64_get_condition_code): Handle CC_Zmode.
+	* aarch64.md (compare_neg<mode>): Restrict to equality operations.
+
+2014-01-10  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.c (s390_expand_tbegin): Remove jump over CC
+	extraction in good case.
+
+2014-01-10  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59374
+	* tree-vect-slp.c (vect_slp_analyze_bb_1): Move dependence
+	checking after SLP discovery.  Mark stmts not participating
+	in any SLP instance properly.
+
+2014-01-10  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.c (arm_new_rtx_costs): Use destination mode
+	when handling a SET rtx.
+
+2014-01-10  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm-cores.def (cortex-a53): Specify FL_CRC32.
+	(cortex-a57): Likewise.
+	(cortex-a57.cortex-a53): Likewise. Remove redundant flags.
+
+2014-01-10  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm.c (arm_init_iwmmxt_builtins): Skip
+	non-iwmmxt builtins.
+
+2014-01-10  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/58252
+	PR ipa/59226
+	* ipa-devirt.c record_target_from_binfo): Take as argument
+	stack of binfos and lookup matching one for virtual inheritance.
+	(possible_polymorphic_call_targets_1): Update.
+
+2014-01-10  Huacai Chen  <chenhc@lemote.com>
+
+	* config/mips/driver-native.c (host_detect_local_cpu): Handle new
+	kernel strings for Loongson-2E/2F/3A.
+
+2014-01-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/59670
+	* tree-vect-data-refs.c (vect_analyze_data_refs): Check
+	is_gimple_call before calling gimple_call_internal_p.
+
+2014-01-09  Steve Ellcey  <sellcey@mips.com>
+
+	* Makefile.in (TREE_FLOW_H): Remove.
+	(TREE_SSA_H): Add file names from tree-flow.h.
+	* doc/tree-ssa.texi (Annotations): Remove reference to tree-flow.h
+	* tree.h: Remove tree-flow.h reference.
+	* hash-table.h: Remove tree-flow.h reference.
+	* tree-ssa-loop-niter.c (dump_affine_iv): Replace tree-flow.h
+	reference with tree-ssa-loop.h.
+
+2014-01-09  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* doc/invoke.texi: Add -maltivec={be,le} options, and document
+	default element-order behavior for -maltivec.
+	* config/rs6000/rs6000.opt: Add -maltivec={be,le} options.
+	* config/rs6000/rs6000.c (rs6000_option_override_internal): Ensure
+	that -maltivec={le,be} implies -maltivec; disallow -maltivec=le
+	when targeting big endian, at least for now.
+	* config/rs6000/rs6000.h: Add #define of VECTOR_ELT_ORDER_BIG.
+
+2014-01-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/47735
+	* cfgexpand.c (expand_one_var): For SSA_NAMEs, if the underlying
+	var satisfies use_register_for_decl, just take into account type
+	alignment, rather than decl alignment.
+
+	PR tree-optimization/59622
+	* gimple-fold.c (gimple_fold_call): Fix a typo in message.  For
+	__builtin_unreachable replace the OBJ_TYPE_REF call with a call to
+	__builtin_unreachable and add if needed a setter of the lhs SSA_NAME.
+	Don't devirtualize for inplace at all.  For targets.length () == 1,
+	if the call is noreturn and cfun isn't in SSA form yet, clear lhs.
+
+2014-01-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/i386/i386.md (cpu): Remove the unused btver1.
+
+2014-01-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* gdbasan.in: Put a breakpoint on __sanitizer::Report.
+
+2014-01-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/58115
+	* tree-core.h (struct target_globals): New forward declaration.
+	(struct tree_target_option): Add globals field.
+	* tree.h (TREE_TARGET_GLOBALS): Define.
+	(prepare_target_option_nodes_for_pch): New prototype.
+	* target-globals.h (struct target_globals): Define even if
+	!SWITCHABLE_TARGET.
+	* tree.c (prepare_target_option_node_for_pch,
+	prepare_target_option_nodes_for_pch): New functions.
+	* config/i386/i386.h (SWITCHABLE_TARGET): Define.
+	* config/i386/i386.c: Include target-globals.h.
+	(ix86_set_current_function): Instead of doing target_reinit
+	unconditionally, use save_target_globals_default_opts and
+	restore_target_globals.
+
 2014-01-09  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/59715
