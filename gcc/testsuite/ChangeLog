@@ -1,3 +1,57 @@
+2014-01-13  Richard Biener  <rguenther@suse.de>
+
+	* g++.dg/lto/lto.exp: Do check_effective_target_lto check before
+	adjusting mathlib options.
+	* gfortran.dg/lto/lto.exp: Likewise.
+
+2014-01-13  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gnat.dg/loop_optimization17.adb: New test.
+	* gnat.dg/loop_optimization17_pkg.ad[sb]: New helper.
+
+2014-01-13  Christian Bruel  <christian.bruel@st.com>
+
+	* gcc.target/sh/cmpstrn.c: New case.
+
+2014-01-13  Jakub Jelinek  <jakub@redhat.com>
+
+	* gcc.dg/vect/vect-simd-clone-10.c: Add dg-do run.
+	* gcc.dg/vect/vect-simd-clone-12.c: Likewise.
+
+2014-01-12  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/58026
+	* gfortran.dg/alloc_comp_basics_6.f90: New.
+
+2014-01-11  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	PR fortran/59700
+	* gfortran.dg/pr59700.f90: New test.
+
+2014-01-11  Dominique d'Humieres  <dominiq@lps.ens.fr>
+
+	* gfortran.dg/binding_label_tests_10_main.f03: Cleanup mod file.
+	* gfortran.dg/use_only_3.f90: Likewise.
+	* gfortran.dg/inquire_10.f90: Delete opened file.
+	* gfortran.dg/inquire_15.f90: Likewise.
+	* gfortran.dg/pr16597.f90: Likewise.
+	* gfortran.dg/open_negative_unit_1.f90: Likewise + test
+	for PR59419.
+
+2014-01-10  Jeff Law  <law@redhat.com>
+
+	PR middle-end/59743
+	* gcc.c-torture/compile/pr59743.c: New test.
+
+2014-01-10  Jan Hubicka  <jh@suse.cz>
+
+	PR ipa/58585
+	* g++.dg/torture/pr58585.C: New testcase.
+
+2014-01-10  Hans-Peter Nilsson  <hp@axis.com>
+
+	* gcc.dg/pr46309.c: Disable for cris*-*-*.
+
 2014-01-10  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* gcc.target/arm/neon-nested-apcs.c: Tweak dg directives.

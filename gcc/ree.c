@@ -702,6 +702,18 @@ combine_reaching_defs (ext_cand *cand, const_rtx set_pat, ext_state *state)
       if (state->modified[INSN_UID (cand->insn)].kind != EXT_MODIFIED_NONE)
 	return false;
 
+      /* Transformation of
+	 (set (reg1) (expression))
+	 (set (reg2) (any_extend (reg1)))
+	 into
+	 (set (reg2) (any_extend (expression)))
+	 (set (reg1) (reg2))
+	 is only valid for scalar integral modes, as it relies on the low
+	 subreg of reg1 to have the value of (expression), which is not true
+	 e.g. for vector modes.  */
+      if (!SCALAR_INT_MODE_P (GET_MODE (SET_DEST (PATTERN (cand->insn)))))
+	return false;
+
       /* There's only one reaching def.  */
       rtx def_insn = state->defs_list[0];
 
@@ -711,8 +723,10 @@ combine_reaching_defs (ext_cand *cand, const_rtx set_pat, ext_state *state)
 
       /* The defining statement and candidate insn must be in the same block.
 	 This is merely to keep the test for safety and updating the insn
-	 stream simple.  */
-      if (BLOCK_FOR_INSN (cand->insn) != BLOCK_FOR_INSN (def_insn))
+	 stream simple.  Also ensure that within the block the candidate
+	 follows the defining insn.  */
+      if (BLOCK_FOR_INSN (cand->insn) != BLOCK_FOR_INSN (def_insn)
+	  || DF_INSN_LUID (def_insn) > DF_INSN_LUID (cand->insn))
 	return false;
 
       /* If there is an overlap between the destination of DEF_INSN and
