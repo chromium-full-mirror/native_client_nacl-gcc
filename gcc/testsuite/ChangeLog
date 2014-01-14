@@ -1,3 +1,76 @@
+2014-01-14  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/59794
+	* g++.dg/ext/vector23.C: Also prune ABI change for Linux/x86.
+	* gcc.target/i386/pr39162.c (y): New __m256i variable.
+	(bar): Change return type to void.  Set y to x.
+	* gcc.target/i386/pr59794-1.c: New testcase.
+	* gcc.target/i386/pr59794-2.c: Likewise.
+	* gcc.target/i386/pr59794-3.c: Likewise.
+	* gcc.target/i386/pr59794-4.c: Likewise.
+	* gcc.target/i386/pr59794-5.c: Likewise.
+	* gcc.target/i386/pr59794-6.c: Likewise.
+	* gcc.target/i386/pr59794-7.c: Likewise.
+
+2014-01-14  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/58921
+	PR tree-optimization/59006
+	* gcc.dg/torture/pr58921.c: New testcase.
+	* gcc.dg/torture/pr59006.c: Likewise.
+	* gcc.dg/vect/pr58508.c: XFAIL no longer handled cases.
+
+2014-01-14  Jakub Jelinek  <jakub@redhat.com>
+
+	PR testsuite/59494
+	* gfortran.dg/vect/fast-math-mgrid-resid.f: Change
+	-fdump-tree-optimized to -fdump-tree-pcom-details in dg-options and
+	cleanup-tree-dump from optimized to pcom.  Remove scan-tree-dump-times
+	for vect_\[^\\n\]*\\+, add scan-tree-dump-times for no suitable chains and
+	Executing predictive commoning without unrolling.
+
+2014-01-14  Kirill Yukhin  <kirill.yukhin@intel.com>
+
+	* gcc.target/i386/avx-1.c: Fix __builtin_ia32_exp2ps_mask,
+	__builtin_ia32_exp2pd_mask, __builtin_ia32_rcp28ps_mask,
+	__builtin_ia32_rcp28pd_mask, __builtin_ia32_rsqrt28ps_mask,
+	__builtin_ia32_rsqrt28pd_mask. Add __builtin_ia32_rcp28ss_round,
+	__builtin_ia32_rcp28sd_round, __builtin_ia32_rsqrt28ss_round,
+	__builtin_ia32_rsqrt28sd_round.
+	* gcc.target/i386/avx512er-vexp2pd-1.c: Fix rounding mode.
+	* gcc.target/i386/avx512er-vexp2ps-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrcp28pd-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrcp28ps-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28pd-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28ps-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrcp28sd-1.c: New.
+	* gcc.target/i386/avx512er-vrcp28sd-2.c: Ditto.
+	* gcc.target/i386/avx512er-vrcp28ss-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrcp28ss-2.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28sd-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28sd-2.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28ss-1.c: Ditto.
+	* gcc.target/i386/avx512er-vrsqrt28ss-2.c: Ditto.
+	* gcc.target/i386/avx512f-vmovntdqa-1.c: Ditto.
+	* gcc.target/i386/avx512f-vmovntdqa-2.c: Ditto.
+	* gcc.target/i386/avx512f-vrcp14sd-2.c: Fix.
+	* gcc.target/i386/avx512f-vrcp14ss-2.c: Ditto.
+	* gcc.target/i386/sse-22.c: Extend with new built-ins,
+	fix wrong rounding mode (see above).
+	* gcc.target/i386/sse-23.c: Ditto.
+
+2014-01-13  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gcc.dg/vmx/insert.c: New.
+	* gcc.dg/vmx/insert-be-order.c: New.
+	* gcc.dg/vmx/extract.c: New.
+	* gcc.dg/vmx/extract-be-order.c: New.
+
+2014-01-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59387
+	* gcc.c-torture/execute/pr59387.c: New test.
+
 2014-01-13  Richard Biener  <rguenther@suse.de>
 
 	* g++.dg/lto/lto.exp: Do check_effective_target_lto check before
