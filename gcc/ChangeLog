@@ -2,6 +2,136 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-15  Richard Henderson <rth@redhat.com>
+
+	PR debug/54694
+	* reginfo.c (global_regs_decl): Globalize.
+	* rtl.h (global_regs_decl): Declare.
+	* ira.c (do_reload): Diagnose frame_pointer_needed and it
+	reserved via global_regs.
+
+2014-01-15  Teresa Johnson  <tejohnson@google.com>
+
+	* tree-ssa-sccvn.c (visit_reference_op_call): Handle NULL vdef.
+
+2014-01-15  Bill Schmidt  <wschmidt@vnet.linux.ibm.com>
+
+	* config/rs6000/altivec.md (mulv8hi3): Explicitly generate vmulesh
+	and vmulosh rather than call gen_vec_widen_smult_*.
+	(vec_widen_umult_even_v16qi): Test VECTOR_ELT_ORDER_BIG rather
+	than BYTES_BIG_ENDIAN to determine use of even or odd instruction.
+	(vec_widen_smult_even_v16qi): Likewise.
+	(vec_widen_umult_even_v8hi): Likewise.
+	(vec_widen_smult_even_v8hi): Likewise.
+	(vec_widen_umult_odd_v16qi): Likewise.
+	(vec_widen_smult_odd_v16qi): Likewise.
+	(vec_widen_umult_odd_v8hi): Likewise.
+	(vec_widen_smult_odd_v8hi): Likewise.
+	(vec_widen_umult_hi_v16qi): Explicitly generate vmuleub and
+	vmuloub rather than call gen_vec_widen_umult_*.
+	(vec_widen_umult_lo_v16qi): Likewise.
+	(vec_widen_smult_hi_v16qi): Explicitly generate vmulesb and
+	vmulosb rather than call gen_vec_widen_smult_*.
+	(vec_widen_smult_lo_v16qi): Likewise.
+	(vec_widen_umult_hi_v8hi): Explicitly generate vmuleuh and vmulouh
+	rather than call gen_vec_widen_umult_*.
+	(vec_widen_umult_lo_v8hi): Likewise.
+	(vec_widen_smult_hi_v8hi): Explicitly gnerate vmulesh and vmulosh
+	rather than call gen_vec_widen_smult_*.
+	(vec_widen_smult_lo_v8hi): Likewise.
+
+2014-01-15  Jeff Law  <law@redhat.com>
+
+	PR tree-optimization/59747
+	* ree.c (find_and_remove_re): Properly handle case where a second
+	eliminated extension requires widening a copy created for elimination
+	of a prior extension.
+	(combine_set_extension): Ensure that the number of hard regs needed
+	for a destination register does not change when we widen it.
+
+2014-01-15  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* config.gcc (*-*-rtems*): Add t-rtems to tmake_file.
+	(arm*-*-uclinux*eabi*): Do not override an existing tmake_file.
+	(arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems*): Likwise.
+	(arm*-*-rtems*): Use t-rtems from existing tmake_file.
+	(avr-*-rtems*): Likewise.
+	(bfin*-rtems*): Likewise.
+	(moxie-*-rtems*): Likewise.
+	(h8300-*-rtems*): Likewise.
+	(i[34567]86-*-rtems*): Likewise.
+	(lm32-*-rtems*): Likewise.
+	(m32r-*-rtems*): Likewise.
+	(m68k-*-rtems*): Likewise.
+	(microblaze*-*-rtems*): Likewise.
+	(mips*-*-rtems*): Likewise.
+	(powerpc-*-rtems*): Likewise.
+	(sh-*-rtems*): Likewise.
+	(sparc-*-rtems*): Likewise.
+	(sparc64-*-rtems*): Likewise.
+	(v850-*-rtems*): Likewise.
+	(m32c-*-rtems*): Likewise.
+
+2014-01-15  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/59511
+	* ira.c (ira_init_register_move_cost): Use memory costs for some
+	cases of register move cost calculations.
+	* lra-constraints.c (lra_constraints): Use REG_FREQ_FROM_BB
+	instead of BB frequency.
+	* lra-coalesce.c (move_freq_compare_func, lra_coalesce): Ditto.
+	* lra-assigns.c (find_hard_regno_for): Ditto.
+
+2014-01-15  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59822
+	* tree-vect-stmts.c (hoist_defs_of_uses): New function.
+	(vectorizable_load): Use it to hoist defs of uses of invariant
+	loads out of the loop.
+
+2014-01-15  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+            Kugan Vivekanandarajah  <kuganv@linaro.org>
+
+	PR target/59695
+	* config/aarch64/aarch64.c (aarch64_build_constant): Fix incorrect
+	truncation.
+
+2014-01-15  Richard Biener  <rguenther@suse.de>
+
+	PR rtl-optimization/59802
+	* lcm.c (compute_available): Use inverted postorder to seed
+	the initial worklist.
+
+2014-01-15  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	PR target/59803
+	* config/s390/s390.c (s390_preferred_reload_class): Don't return
+	ADDR_REGS for invalid symrefs in non-PIC code.
+
+2014-01-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR other/58712
+	* builtins.c (determine_block_size): Initialize *probable_max_size
+	even if len_rtx is CONST_INT.
+
+2014-01-14  Andrew Pinski  <apinski@cavium.com>
+
+	* config/aarch64/aarch64-protos.h (tune_params): Add issue_rate.
+	* config/aarch64/aarch64.c (generic_tunings): Add issue rate of 2.
+	(cortexa53_tunings): Likewise.
+	(aarch64_sched_issue_rate): New function.
+	(TARGET_SCHED_ISSUE_RATE): Define.
+
+2014-01-14  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* ira-costs.c (find_costs_and_classes): Add missed
+	ira_init_register_move_cost_if_necessary.
+
+2014-01-14  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/59787
+	* config/arm/arm.c (arm_coproc_mem_operand): Add lra_in_progress.
+
 2014-01-14  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR target/59794
