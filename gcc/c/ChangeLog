@@ -1,3 +1,48 @@
+2014-01-23  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59846
+	* c-typeck.c (parser_build_binary_op): Use location instead of
+	input_location.
+	(build_binary_op): Pass location to shorten_compare.
+
+2014-01-23  Marek Polacek  <polacek@redhat.com>
+
+	PR c/58346
+	* c-typeck.c (pointer_diff): Give an error on arithmetic on pointer to
+	an empty aggregate.
+
+2014-01-23  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59871
+	* c-typeck.c (build_compound_expr): Warn even for right-hand operand
+	of a comma expression.
+	(emit_side_effect_warnings): Likewise.
+
+2014-01-23  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	PR c/59825
+	* c-array-notation.c (expand_array_notation_exprs): Rewrote this
+	function to use walk_tree and moved a lot of its functionality to
+	expand_array_notations.
+	(expand_array_notations): New function.
+
+2014-01-23  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	* c-parser.c (c_finish_omp_declare_simd): Made "cilk simd function"
+	attribute an attribute without value.
+
+2014-01-23  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/58809
+	* c-typeck.c (c_finish_omp_clause): Reject MIN_EXPR, MAX_EXPR,
+	BIT_AND_EXPR, BIT_IOR_EXPR and BIT_XOR_EXPR on COMPLEX_TYPEs.
+
+2014-01-22  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59891
+	* c-typeck.c (build_conditional_expr): Call c_fully_fold instead
+	of remove_c_maybe_const_expr on op1 and op2.
+
 2014-01-15  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c/58943

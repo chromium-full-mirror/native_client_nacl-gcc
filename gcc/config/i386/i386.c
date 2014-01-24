@@ -6183,7 +6183,7 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,  /* Argument info to initialize */
 
    The midde-end can't deal with the vector types > 16 bytes.  In this
    case, we return the original mode and warn ABI change if CUM isn't
-   NULL. 
+   NULL.
 
    If INT_RETURN is true, warn ABI change if the vector mode isn't
    available for function return value.  */
@@ -18271,8 +18271,18 @@ ix86_avoid_lea_for_addr (rtx insn, rtx operands[])
   if (!TARGET_AVOID_LEA_FOR_ADDR || optimize_function_for_size_p (cfun))
     return false;
 
-  /* Check it is correct to split here.  */
-  if (!ix86_ok_to_clobber_flags(insn))
+  /* The "at least two components" test below might not catch simple
+     move or zero extension insns if parts.base is non-NULL and parts.disp
+     is const0_rtx as the only components in the address, e.g. if the
+     register is %rbp or %r13.  As this test is much cheaper and moves or
+     zero extensions are the common case, do this check first.  */
+  if (REG_P (operands[1])
+      || (SImode_address_operand (operands[1], VOIDmode)
+	  && REG_P (XEXP (operands[1], 0))))
+    return false;
+
+  /* Check if it is OK to split here.  */
+  if (!ix86_ok_to_clobber_flags (insn))
     return false;
 
   ok = ix86_decompose_address (operands[1], &parts);
@@ -18421,7 +18431,7 @@ ix86_split_lea_for_addr (rtx insn, rtx operands[], enum machine_mode mode)
       /* Case r1 = r1 + ...  */
       if (regno1 == regno0)
 	{
-	  /* If we have a case r1 = r1 + C * r1 then we
+	  /* If we have a case r1 = r1 + C * r2 then we
 	     should use multiplication which is very
 	     expensive.  Assume cost model is wrong if we
 	     have such case here.  */
@@ -23499,16 +23509,24 @@ expand_small_movmem_or_setmem (rtx destmem, rtx srcmem,
     }
 
   destmem = offset_address (destmem, count, 1);
-  destmem = offset_address (destmem, GEN_INT (-size - GET_MODE_SIZE (mode)),
+  destmem = offset_address (destmem, GEN_INT (-2 * size),
 			    GET_MODE_SIZE (mode));
-  if (issetmem)
-    emit_move_insn (destmem, gen_lowpart (mode, value));
-  else
+  if (!issetmem)
     {
       srcmem = offset_address (srcmem, count, 1);
-      srcmem = offset_address (srcmem, GEN_INT (-size - GET_MODE_SIZE (mode)),
+      srcmem = offset_address (srcmem, GEN_INT (-2 * size),
 			       GET_MODE_SIZE (mode));
-      emit_move_insn (destmem, srcmem);
+    }
+  for (n = 0; n * GET_MODE_SIZE (mode) < size; n++)
+    {
+      if (issetmem)
+	emit_move_insn (destmem, gen_lowpart (mode, value));
+      else
+	{
+	  emit_move_insn (destmem, srcmem);
+	  srcmem = offset_address (srcmem, modesize, GET_MODE_SIZE (mode));
+	}
+      destmem = offset_address (destmem, modesize, GET_MODE_SIZE (mode));
     }
   emit_jump_insn (gen_jump (done_label));
   emit_barrier ();
@@ -25621,8 +25639,6 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
       break;
 
     case PROCESSOR_PENTIUMPRO:
-      memory = get_attr_memory (insn);
-
       /* INT->FP conversion is expensive.  */
       if (get_attr_fp_int_src (dep_insn))
 	cost += 5;
@@ -25634,6 +25650,8 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 	  && rtx_equal_p (SET_DEST (set), SET_SRC (set2))
 	  && MEM_P (SET_DEST (set2)))
 	cost += 1;
+
+      memory = get_attr_memory (insn);
 
       /* Show ability of reorder buffer to hide latency of load by executing
 	 in parallel with previous instruction in case
@@ -25652,10 +25670,8 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
       break;
 
     case PROCESSOR_K6:
-      memory = get_attr_memory (insn);
-
-      /* The esp dependency is resolved before the instruction is really
-	 finished.  */
+     /* The esp dependency is resolved before
+	the instruction is really finished.  */
       if ((insn_type == TYPE_PUSH || insn_type == TYPE_POP)
 	  && (dep_insn_type == TYPE_PUSH || dep_insn_type == TYPE_POP))
 	return 1;
@@ -25663,6 +25679,8 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
       /* INT->FP conversion is expensive.  */
       if (get_attr_fp_int_src (dep_insn))
 	cost += 5;
+
+      memory = get_attr_memory (insn);
 
       /* Show ability of reorder buffer to hide latency of load by executing
 	 in parallel with previous instruction in case
@@ -25682,8 +25700,6 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 	}
       break;
 
-    case PROCESSOR_ATHLON:
-    case PROCESSOR_K8:
     case PROCESSOR_AMDFAM10:
     case PROCESSOR_BDVER1:
     case PROCESSOR_BDVER2:
@@ -25692,13 +25708,15 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
     case PROCESSOR_BTVER1:
     case PROCESSOR_BTVER2:
     case PROCESSOR_GENERIC:
-      memory = get_attr_memory (insn);
-
       /* Stack engine allows to execute push&pop instructions in parall.  */
-      if (((insn_type == TYPE_PUSH || insn_type == TYPE_POP)
-	   && (dep_insn_type == TYPE_PUSH || dep_insn_type == TYPE_POP))
-	  && (!TARGET_ATHLON && !TARGET_K8))
+      if ((insn_type == TYPE_PUSH || insn_type == TYPE_POP)
+	  && (dep_insn_type == TYPE_PUSH || dep_insn_type == TYPE_POP))
 	return 0;
+      /* FALLTHRU */
+
+    case PROCESSOR_ATHLON:
+    case PROCESSOR_K8:
+      memory = get_attr_memory (insn);
 
       /* Show ability of reorder buffer to hide latency of load by executing
 	 in parallel with previous instruction in case
@@ -25730,12 +25748,12 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
     case PROCESSOR_NEHALEM:
     case PROCESSOR_SANDYBRIDGE:
     case PROCESSOR_HASWELL:
-      memory = get_attr_memory (insn);
-
       /* Stack engine allows to execute push&pop instructions in parall.  */
       if ((insn_type == TYPE_PUSH || insn_type == TYPE_POP)
 	  && (dep_insn_type == TYPE_PUSH || dep_insn_type == TYPE_POP))
 	return 0;
+
+      memory = get_attr_memory (insn);
 
       /* Show ability of reorder buffer to hide latency of load by executing
 	 in parallel with previous instruction in case
@@ -28488,6 +28506,7 @@ enum ix86_builtins
   IX86_BUILTIN_KUNPCKBW,
   IX86_BUILTIN_KXNOR16,
   IX86_BUILTIN_KXOR16,
+  IX86_BUILTIN_KMOV16,
 
   /* Alternate 4 and 8 element gather/scatter for the vectorizer
      where all operands are 32-byte or 64-byte wide respectively.  */
@@ -30195,6 +30214,7 @@ static const struct builtin_description bdesc_args[] =
   { OPTION_MASK_ISA_AVX512F, CODE_FOR_kunpckhi, "__builtin_ia32_kunpckhi", IX86_BUILTIN_KUNPCKBW, UNKNOWN, (int) HI_FTYPE_HI_HI },
   { OPTION_MASK_ISA_AVX512F, CODE_FOR_kxnorhi, "__builtin_ia32_kxnorhi", IX86_BUILTIN_KXNOR16, UNKNOWN, (int) HI_FTYPE_HI_HI },
   { OPTION_MASK_ISA_AVX512F, CODE_FOR_xorhi3, "__builtin_ia32_kxorhi", IX86_BUILTIN_KXOR16, UNKNOWN, (int) HI_FTYPE_HI_HI },
+  { OPTION_MASK_ISA_AVX512F, CODE_FOR_kmovw, "__builtin_ia32_kmov16", IX86_BUILTIN_KMOV16, UNKNOWN, (int) HI_FTYPE_HI },
 
   /* SHA */
   { OPTION_MASK_ISA_SSE2, CODE_FOR_sha1msg1, 0, IX86_BUILTIN_SHA1MSG1, UNKNOWN, (int) V4SI_FTYPE_V4SI_V4SI },

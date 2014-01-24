@@ -4838,7 +4838,8 @@ cp_build_binary_op (location_t location,
 	  tree xop0 = op0, xop1 = op1, xresult_type = result_type;
 	  enum tree_code xresultcode = resultcode;
 	  tree val
-	    = shorten_compare (&xop0, &xop1, &xresult_type, &xresultcode);
+	    = shorten_compare (location, &xop0, &xop1, &xresult_type,
+			       &xresultcode);
 	  if (val != 0)
 	    return cp_convert (boolean_type_node, val, complain);
 	  op0 = xop0, op1 = xop1;
@@ -5039,6 +5040,14 @@ pointer_diff (tree op0, tree op1, tree ptrtype, tsubst_flags_t complain)
       if (complain & tf_error)
 	error ("invalid use of a pointer to an incomplete type in "
 	       "pointer arithmetic");
+      else
+	return error_mark_node;
+    }
+
+  if (pointer_to_zero_sized_aggr_p (TREE_TYPE (op1)))
+    {
+      if (complain & tf_error)
+	error ("arithmetic on pointer to an empty aggregate");
       else
 	return error_mark_node;
     }
