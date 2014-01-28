@@ -1064,6 +1064,7 @@ package Opt is
    --  object directory, if project files are used.
 
    type Operating_Mode_Type is (Check_Syntax, Check_Semantics, Generate_Code);
+   pragma Ordered (Operating_Mode_Type);
    Operating_Mode : Operating_Mode_Type := Generate_Code;
    --  GNAT
    --  Indicates the operating mode of the compiler. The default is generate
@@ -1072,7 +1073,8 @@ package Opt is
    --  only mode. Operating_Mode can also be modified as a result of detecting
    --  errors during the compilation process. In particular if any serious
    --  error is detected then this flag is reset from Generate_Code to
-   --  Check_Semantics after generating an error message.
+   --  Check_Semantics after generating an error message. This is an ordered
+   --  type with the semantics that each value does more than the previous one.
 
    Optimize_Alignment : Character := 'O';
    --  Setting of Optimize_Alignment, set to T/S/O for time/space/off. Can
@@ -1264,9 +1266,9 @@ package Opt is
    --  GNAT
    --  Set True if a pragma Short_Descriptors applies to the current unit.
 
-   type SPARK_Mode_Type is (None, Off, Auto, On);
-   pragma Ordered (SPARK_Mode_Type);
-   --  Possible legal modes that can be set by aspect/pragma SPARK_Mode
+   type SPARK_Mode_Type is (None, Off, On);
+   --  Possible legal modes that can be set by aspect/pragma SPARK_Mode, as
+   --  well as the value None, which indicates no such pragma/aspect applies.
 
    SPARK_Mode : SPARK_Mode_Type := None;
    --  GNAT

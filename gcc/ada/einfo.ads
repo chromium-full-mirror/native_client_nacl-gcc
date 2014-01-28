@@ -2343,11 +2343,15 @@ package Einfo is
 
 --    Is_Ghost_Entity (synthesized)
 --       Applies to all entities. Yields True for a subprogram or a whole
---       object that has convention Ghost.
+--       object that has convention Ghost. For now only functions can have
+--       Ghost convention, so this will be false for other than functions,
+--       but we expect that to change in the future.
 
 --    Is_Ghost_Subprogram (synthesized)
 --       Applies to all entities. Yields True for a subprogram that has a Ghost
---       convention.
+--       convention. Note: for now, only ghost functions are allowed, so this
+--       will always be false for procedures, but that is expected to change in
+--       the future.
 
 --    Is_Hidden (Flag57)
 --       Defined in all entities. Set for all entities declared in the
@@ -2395,10 +2399,6 @@ package Einfo is
 --       be compiled. Is_Inlined is also set on generic subprograms and is
 --       inherited by their instances. It is also set on the body entities
 --       of inlined subprograms. See also Has_Pragma_Inline.
-
---    Is_Input_Only_State (synthesized)
---       Applies to all entities, true for abstract states that are subject to
---       option Input_Only.
 
 --    Is_Instantiated (Flag126)
 --       Defined in generic packages and generic subprograms. Set if the unit
@@ -2589,10 +2589,6 @@ package Einfo is
 --       set right, at which point, these comments can be removed, and the
 --       tests for static subtypes greatly simplified.
 
---    Is_Non_Volatile_State (synthesized)
---       Applies to all entities, true for abstract states that are subject to
---       option Non_Volatile.
-
 --    Is_Null_Init_Proc (Flag178)
 --       Defined in procedure entities. Set for generated init proc procedures
 --       (used to initialize composite types), if the code for the procedure
@@ -2632,10 +2628,6 @@ package Einfo is
 --    Is_Ordinary_Fixed_Point_Type (synthesized)
 --       Applies to all entities, true for ordinary fixed point types and
 --       subtypes.
-
---    Is_Output_Only_State (synthesized)
---       Applies to all entities, true for abstract states that are subject to
---       option Output_Only.
 
 --    Is_Package_Or_Generic_Package (synthesized)
 --       Applies to all entities. True for packages and generic packages.
@@ -5163,10 +5155,7 @@ package Einfo is
    --    Has_Non_Null_Refinement             (synth)
    --    Has_Null_Refinement                 (synth)
    --    Is_External_State                   (synth)
-   --    Is_Input_Only_State                 (synth)
    --    Is_Null_State                       (synth)
-   --    Is_Output_Only_State                (synth)
-   --    Is_Non_Volatile_State               (synth)
 
    --  E_Access_Protected_Subprogram_Type
    --    Equivalent_Type                     (Node18)
@@ -6783,10 +6772,7 @@ package Einfo is
    function Is_Finalizer                        (Id : E) return B;
    function Is_Ghost_Entity                     (Id : E) return B;
    function Is_Ghost_Subprogram                 (Id : E) return B;
-   function Is_Input_Only_State                 (Id : E) return B;
-   function Is_Non_Volatile_State               (Id : E) return B;
    function Is_Null_State                       (Id : E) return B;
-   function Is_Output_Only_State                (Id : E) return B;
    function Is_Package_Or_Generic_Package       (Id : E) return B;
    function Is_Prival                           (Id : E) return B;
    function Is_Protected_Component              (Id : E) return B;

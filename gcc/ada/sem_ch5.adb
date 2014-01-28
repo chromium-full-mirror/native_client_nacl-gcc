@@ -1814,7 +1814,7 @@ package body Sem_Ch5 is
             Set_Etype (Def_Id, Component_Type (Typ));
 
             if Present (Subt)
-              and then Bas /= Base_Type (Component_Type (Typ))
+              and then Base_Type (Bas) /= Base_Type (Component_Type (Typ))
             then
                Error_Msg_N
                  ("subtype indication does not match component type", Subt);
@@ -1920,6 +1920,14 @@ package body Sem_Ch5 is
                Next_Entity (Ent);
             end loop;
          end if;
+      end if;
+
+      --  A loop parameter cannot be volatile. This check is peformed only when
+      --  SPARK_Mode is on as it is not a standard Ada legality check.
+
+      if SPARK_Mode = On and then Is_SPARK_Volatile_Object (Ent) then
+         Error_Msg_N
+           ("loop parameter cannot be volatile (SPARK RM 7.1.3(6))", Ent);
       end if;
    end Analyze_Iterator_Specification;
 
@@ -2549,6 +2557,14 @@ package body Sem_Ch5 is
                end if;
             end if;
          end;
+      end if;
+
+      --  A loop parameter cannot be volatile. This check is peformed only when
+      --  SPARK_Mode is on as it is not a standard Ada legality check.
+
+      if SPARK_Mode = On and then Is_SPARK_Volatile_Object (Id) then
+         Error_Msg_N
+           ("loop parameter cannot be volatile (SPARK RM 7.1.3(6))", Id);
       end if;
    end Analyze_Loop_Parameter_Specification;
 

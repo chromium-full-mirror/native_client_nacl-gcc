@@ -1585,17 +1585,20 @@ package body Sem_Res is
 
       --  If in ASIS_Mode, propagate operand types to original actuals of
       --  function call, which would otherwise not be fully resolved. If
-      --  the call has already been constant-folded, nothing to do.
+      --  the call has already been constant-folded, nothing to do. We
+      --  relocate the operand nodes rather than copy them, to preserve
+      --  original_node pointers, given that the operands themselves may
+      --  have been rewritten.
 
       if ASIS_Mode and then Nkind (N) in N_Op then
          if Is_Binary then
             Rewrite (First (Parameter_Associations (Original_Node (N))),
-               New_Copy_Tree (Left_Opnd (N)));
+               Relocate_Node (Left_Opnd (N)));
             Rewrite (Next (First (Parameter_Associations (Original_Node (N)))),
-               New_Copy_Tree (Right_Opnd (N)));
+               Relocate_Node (Right_Opnd (N)));
          else
             Rewrite (First (Parameter_Associations (Original_Node (N))),
-               New_Copy_Tree (Right_Opnd (N)));
+               Relocate_Node (Right_Opnd (N)));
          end if;
 
          Set_Parent (Original_Node (N), Parent (N));
@@ -4041,6 +4044,16 @@ package body Sem_Res is
                then
                   Apply_Discriminant_Check (A, F_Typ);
 
+                  --  For view conversions of a discriminated object, apply
+                  --  check to object itself, the conversion alreay has the
+                  --  proper type.
+
+                  if Nkind (A) = N_Type_Conversion
+                    and then Is_Constrained (Etype (Expression (A)))
+                  then
+                     Apply_Discriminant_Check (Expression (A), F_Typ);
+                  end if;
+
                elsif Is_Access_Type (F_Typ)
                  and then Is_Array_Type (Designated_Type (F_Typ))
                  and then Is_Constrained (Designated_Type (F_Typ))
@@ -4254,7 +4267,7 @@ package body Sem_Res is
             --  they are not standard Ada legality rule.
 
             if SPARK_Mode = On
-              and then Is_Volatile_Object (A)
+              and then Is_SPARK_Volatile_Object (A)
             then
                --  A volatile object may act as an actual parameter when the
                --  corresponding formal is of a non-scalar volatile type.
@@ -4273,7 +4286,7 @@ package body Sem_Res is
                else
                   Error_Msg_N
                     ("volatile object cannot act as actual in a call (SPARK "
-                     & "RM 7.1.3(8))", A);
+                     & "RM 7.1.3(12))", A);
                end if;
             end if;
 
@@ -6274,7 +6287,10 @@ package body Sem_Res is
       --  Check comparison on unordered enumeration
 
       if Bad_Unordered_Enumeration_Reference (N, Etype (L)) then
-         Error_Msg_N ("comparison on unordered enumeration type?U?", N);
+         Error_Msg_Sloc := Sloc (Etype (L));
+         Error_Msg_NE
+           ("comparison on unordered enumeration type& declared#?U?",
+            N, Etype (L));
       end if;
 
       --  Evaluate the relation (note we do this after the above check since
@@ -6497,8 +6513,7 @@ package body Sem_Res is
       --  standard Ada legality rules.
 
       if SPARK_Mode = On
-        and then Ekind (E) = E_Variable
-        and then Is_Volatile_Object (E)
+        and then Is_SPARK_Volatile_Object (E)
         and then
           (Async_Writers_Enabled (E)
              or else Effective_Reads_Enabled (E))
@@ -6555,7 +6570,7 @@ package body Sem_Res is
          if not Usage_OK then
             Error_Msg_N
               ("volatile object cannot appear in this context (SPARK RM "
-               & "7.1.3(9))", N);
+               & "7.1.3(13))", N);
          end if;
       end if;
    end Resolve_Entity_Name;
@@ -8818,7 +8833,9 @@ package body Sem_Res is
 
         and then not First_Last_Ref
       then
-         Error_Msg ("subrange of unordered enumeration type?U?", Sloc (N));
+         Error_Msg_Sloc := Sloc (Typ);
+         Error_Msg_NE
+           ("subrange of unordered enumeration type& declared#?U?", N, Typ);
       end if;
 
       Check_Unset_Reference (L);

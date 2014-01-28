@@ -1,3 +1,71 @@
+2014-01-28  Jason Merrill  <jason@redhat.com>
+
+	* decl.c (duplicate_decls): Tweak.
+
+	PR c++/53756
+	* mangle.c (write_unqualified_name): Handle operator auto.
+
+2014-01-27  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59823
+	Core DR 1138
+	* call.c (reference_binding): Pass LOOKUP_NO_TEMP_BIND for
+	list-initialization.  A conversion to rvalue ref that involves
+	an lvalue-rvalue conversion is bad.
+	(convert_like_real): Give helpful error message.
+
+	PR c++/54652
+	* decl.c (duplicate_decls): Always use oldtype for TYPE_DECL.
+
+	PR c++/58504
+	* pt.c (tsubst_copy_and_build) [TRAIT_EXPR]: Use tsubst for
+	types.
+
+	PR c++/58606
+	* pt.c (template_parm_to_arg): Call convert_from_reference.
+	(tsubst_template_arg): Don't strip reference refs.
+
+	PR c++/58639
+	* call.c (build_aggr_conv): Reject value-initialization of reference.
+
+	PR c++/58812
+	PR c++/58651
+	* call.c (convert_like_real): Give helpful error about excess braces
+	for ck_rvalue of scalar type.
+
+	Core DR 1288
+	* call.c (reference_binding): Only elide braces if the single
+	element is reference-related.
+
+	PR c++/58814
+	* typeck.c (cp_build_modify_expr): Make the RHS an rvalue before
+	stabilizing.
+
+	PR c++/58837
+	* typeck.c (cp_truthvalue_conversion): Use explicit comparison for
+	FUNCTION_DECL.
+
+	PR c++/59097
+	* decl.c (compute_array_index_type): Don't call
+	maybe_constant_value for a non-integral expression.
+
+2014-01-24  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	* call.c (magic_varargs_p): Replaced flag_enable_cilkplus with
+	flag_cilkplus.
+	* cp-gimplify.c (cp_genericize): Likewise.
+	* decl.c (grokfndecl): Likewise.
+	* parser.c (cp_parser_postfix_expression): Likewise.
+	(cp_parser_postfix_open_square_expression): Likewise.
+	(cp_parser_direct_declarator): Likewise.
+	(is_cilkplus_vector_p): Likewise.
+	(cp_parser_omp_clause_name): Likewise.
+	(cp_parser_omp_all_clauses): Likewise.
+	* pt.c (apply_late_template_attributes): Likewise.
+	* typeck.c (cp_build_array_ref): Likewise.
+	(cp_build_compound_expr): Likewise.
+	(check_return_expr): Likewise.
+
 2014-01-24  Jason Merrill  <jason@redhat.com>
 
 	PR c++/58550

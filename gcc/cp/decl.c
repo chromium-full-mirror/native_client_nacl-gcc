@@ -1923,13 +1923,13 @@ duplicate_decls (tree newdecl, tree olddecl, bool newdecl_is_friend)
       if (TREE_CODE (newdecl) == FUNCTION_DECL)
 	maybe_instantiate_noexcept (olddecl);
 
-      /* Merge the data types specified in the two decls.  */
-      newtype = merge_types (TREE_TYPE (newdecl), TREE_TYPE (olddecl));
-
-      /* If merge_types produces a non-typedef type, just use the old type.  */
-      if (TREE_CODE (newdecl) == TYPE_DECL
-	  && newtype == DECL_ORIGINAL_TYPE (newdecl))
+      /* For typedefs use the old type, as the new type's DECL_NAME points
+	 at newdecl, which will be ggc_freed.  */
+      if (TREE_CODE (newdecl) == TYPE_DECL)
 	newtype = oldtype;
+      else
+	/* Merge the data types specified in the two decls.  */
+	newtype = merge_types (TREE_TYPE (newdecl), TREE_TYPE (olddecl));
 
       if (VAR_P (newdecl))
 	{
@@ -7674,7 +7674,7 @@ grokfndecl (tree ctype,
   if (TYPE_NOTHROW_P (type) || nothrow_libfn_p (decl))
     TREE_NOTHROW (decl) = 1;
 
-  if (flag_openmp || flag_enable_cilkplus)
+  if (flag_openmp || flag_cilkplus)
     {
       /* Adjust "omp declare simd" attributes.  */
       tree ods = lookup_attribute ("omp declare simd", *attrlist);
@@ -8262,7 +8262,9 @@ compute_array_index_type (tree name, tree size, tsubst_flags_t complain)
 	      abi_1_itype = error_mark_node;
 	    }
 
-	  size = maybe_constant_value (size);
+	  if (INTEGRAL_OR_UNSCOPED_ENUMERATION_TYPE_P (type))
+	    size = maybe_constant_value (size);
+
 	  if (!TREE_CONSTANT (size))
 	    size = osize;
 	}
