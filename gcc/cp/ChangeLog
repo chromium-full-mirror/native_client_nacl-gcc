@@ -1,4 +1,49 @@
+2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58846
+	* decl.c (get_dso_handle_node): Don't crash if dso_handle_node
+	== error_mark_node.
+
+2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58674
+	* pt.c (instantiate_template_1): Check for error_mark_node the second
+	argument too.
+
+2014-01-29  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59916
+	* optimize.c (maybe_thunk_body): Build a RETURN_EXPR for
+	cdtor_returns_this case.
+
+	PR c++/59315
+	* decl.c (cxx_maybe_build_cleanup): Call mark_used.
+
+2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58702
+	* semantics.c (finish_omp_reduction_clause): Check type for
+	error_mark_node.
+
 2014-01-28  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59791
+	* pt.c (tsubst_decl) [VAR_DECL]: Allow in unevaluated context.
+	(tsubst_copy): Use it if lookup fails.
+
+	PR c++/59818
+	* pt.c (tsubst_function_type): Make sure we keep the same function
+	quals.
+
+	PR c++/58701
+	* semantics.c (build_anon_member_initialization): Stop walking
+	when we run out of COMPONENT_REFs.
+
+	PR c++/58632
+	* decl.c (lookup_and_check_tag): Ignore template parameters if
+	scope == ts_current.
+	* pt.c (check_template_shadow): Don't complain about the injected
+	class name.
 
 	* decl.c (duplicate_decls): Tweak.
 

@@ -6709,8 +6709,11 @@ get_dso_handle_node (void)
 					ptr_type_node);
 
 #ifdef HAVE_GAS_HIDDEN
-  DECL_VISIBILITY (dso_handle_node) = VISIBILITY_HIDDEN;
-  DECL_VISIBILITY_SPECIFIED (dso_handle_node) = 1;
+  if (dso_handle_node != error_mark_node)
+    {
+      DECL_VISIBILITY (dso_handle_node) = VISIBILITY_HIDDEN;
+      DECL_VISIBILITY_SPECIFIED (dso_handle_node) = 1;
+    }
 #endif
 
   return dso_handle_node;
@@ -11982,7 +11985,10 @@ lookup_and_check_tag (enum tag_types tag_code, tree name,
 
   if (decl
       && (DECL_CLASS_TEMPLATE_P (decl)
-	  || DECL_TEMPLATE_TEMPLATE_PARM_P (decl)))
+	  /* If scope is ts_current we're defining a class, so ignore a
+	     template template parameter.  */
+	  || (scope != ts_current
+	      && DECL_TEMPLATE_TEMPLATE_PARM_P (decl))))
     decl = DECL_TEMPLATE_RESULT (decl);
 
   if (decl && TREE_CODE (decl) == TYPE_DECL)
@@ -14350,6 +14356,13 @@ cxx_maybe_build_cleanup (tree decl, tsubst_flags_t complain)
      destructor call instead.  */
   if (cleanup != NULL && EXPR_P (cleanup))
     SET_EXPR_LOCATION (cleanup, UNKNOWN_LOCATION);
+
+  if (cleanup
+      && !lookup_attribute ("warn_unused", TYPE_ATTRIBUTES (TREE_TYPE (decl))))
+    /* Treat objects with destructors as used; the destructor may do
+       something substantive.  */
+    mark_used (decl);
+
   return cleanup;
 }
 

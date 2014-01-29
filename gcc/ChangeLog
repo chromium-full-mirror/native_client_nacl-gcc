@@ -2,6 +2,157 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-29  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (altivec_expand_vec_perm_const):  Use
+	CODE_FOR_altivec_vmrg*_direct rather than CODE_FOR_altivec_vmrg*.
+	* config/rs6000/vsx.md (vsx_mergel_<mode>): Adjust for
+	-maltivec=be with LE targets.
+	(vsx_mergeh_<mode>): Likewise.
+	* config/rs6000/altivec.md (UNSPEC_VMRG[HL]_DIRECT): New
+	unspecs.
+	(mulv8hi3): Use gen_altivec_vmrg[hl]w_direct.
+	(altivec_vmrghb): Replace with define_expand and new
+	*altivec_vmrghb_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrghb_direct): New define_insn.
+	(altivec_vmrghh): Replace with define_expand and new
+	*altivec_vmrghh_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrghh_direct): New define_insn.
+	(altivec_vmrghw): Replace with define_expand and new
+	*altivec_vmrghw_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrghw_direct): New define_insn.
+	(*altivec_vmrghsf): Adjust for endianness.
+	(altivec_vmrglb): Replace with define_expand and new
+	*altivec_vmrglb_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrglb_direct): New define_insn.
+	(altivec_vmrglh): Replace with define_expand and new
+	*altivec_vmrglh_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrglh_direct): New define_insn.
+	(altivec_vmrglw): Replace with define_expand and new
+	*altivec_vmrglw_internal insn; adjust for -maltivec=be with LE
+	targets.
+	(altivec_vmrglw_direct): New define_insn.
+	(*altivec_vmrglsf): Adjust for endianness.
+	(vec_widen_umult_hi_v16qi): Use gen_altivec_vmrghh_direct.
+	(vec_widen_umult_lo_v16qi): Use gen_altivec_vmrglh_direct.
+	(vec_widen_smult_hi_v16qi): Use gen_altivec_vmrghh_direct.
+	(vec_widen_smult_lo_v16qi): Use gen_altivec_vmrglh_direct.
+	(vec_widen_umult_hi_v8hi): Use gen_altivec_vmrghw_direct.
+	(vec_widen_umult_lo_v8hi): Use gen_altivec_vmrglw_direct.
+	(vec_widen_smult_hi_v8hi): Use gen_altivec_vmrghw_direct.
+	(vec_widen_smult_lo_v8hi): Use gen_altivec_vmrglw_direct.
+
+2014-01-29  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_expand_mov_immediate)
+	(aarch64_legitimate_address_p, aarch64_class_max_nregs): Adjust
+	whitespace.
+
+2014-01-29  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/58742
+	* tree-ssa-forwprop.c (associate_pointerplus): Rename to
+	associate_pointerplus_align.
+	(associate_pointerplus_diff): New function.
+	(associate_pointerplus): Likewise.  Call associate_pointerplus_align
+	and associate_pointerplus_diff.
+
+2014-01-29  Richard Biener  <rguenther@suse.de>
+
+	* lto-streamer.h (LTO_major_version): Bump to 3.
+	(LTO_minor_version): Reset to 0.
+
+2014-01-29  Renlin Li  <Renlin.Li@arm.com>
+
+	* config/arm/arm-arches.def (ARM_ARCH): Add armv7ve arch.
+	* config/arm/arm.c (FL_FOR_ARCH7VE): New.
+	(arm_file_start): Generate correct asm header for armv7ve.
+	* config/arm/bpabi.h: Add multilib support for armv7ve.
+	* config/arm/driver-arm.c: Change the architectures of cortex-a7
+	and cortex-a15 to armv7ve.
+	* config/arm/t-aprofile: Add multilib support for armv7ve.
+	* doc/invoke.texi: Document -march=armv7ve.
+
+2014-01-29  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/58742
+	* tree-ssa-forwprop.c (associate_plusminus): Return true
+	if we changed sth, defer EH cleanup to ...
+	(ssa_forward_propagate_and_combine): ... here.  Call simplify_mult.
+	(simplify_mult): New function.
+
+2014-01-29  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/59917
+	PR tree-optimization/59920
+	* tree.c (build_common_builtin_nodes): Remove
+	__builtin_setjmp_dispatcher initialization.
+	* omp-low.h (make_gimple_omp_edges): Add a new int * argument.
+	* profile.c (branch_prob): Use gsi_start_nondebug_after_labels_bb
+	instead of gsi_after_labels + manually skipping debug stmts.
+	Don't ignore bbs with BUILT_IN_SETJMP_DISPATCHER, instead
+	ignore bbs with IFN_ABNORMAL_DISPATCHER.
+	* tree-inline.c (copy_edges_for_bb): Remove
+	can_make_abnormal_goto argument, instead add abnormal_goto_dest
+	argument.  Ignore computed_goto_p stmts.  Don't call
+	make_abnormal_goto_edges.  If a call might need abnormal edges
+	for non-local gotos, see if it already has an edge to
+	IFN_ABNORMAL_DISPATCHER or if it is IFN_ABNORMAL_DISPATCHER
+	with true argument, don't do anything then, otherwise add
+	EDGE_ABNORMAL from the call's bb to abnormal_goto_dest.
+	(copy_cfg_body): Compute abnormal_goto_dest, adjust copy_edges_for_bb
+	caller.
+	* gimple-low.c (struct lower_data): Remove calls_builtin_setjmp.
+	(lower_function_body): Don't emit __builtin_setjmp_dispatcher.
+	(lower_stmt): Don't set data->calls_builtin_setjmp.
+	(lower_builtin_setjmp): Adjust comment.
+	* builtins.def (BUILT_IN_SETJMP_DISPATCHER): Remove.
+	* tree-cfg.c (found_computed_goto): Remove.
+	(factor_computed_gotos): Remove.
+	(make_goto_expr_edges): Return bool, true for computed gotos.
+	Don't call make_abnormal_goto_edges.
+	(build_gimple_cfg): Don't set found_computed_goto, don't call
+	factor_computed_gotos.
+	(computed_goto_p): No longer static.
+	(make_blocks): Don't set found_computed_goto.
+	(get_abnormal_succ_dispatcher, handle_abnormal_edges): New functions.
+	(make_edges): If make_goto_expr_edges returns true, push bb
+	into ab_edge_goto vector, for stmt_can_make_abnormal_goto calls
+	instead of calling make_abnormal_goto_edges push bb into ab_edge_call
+	vector.  Record mapping between bbs and OpenMP regions if there
+	are any, adjust make_gimple_omp_edges caller.  Call
+	handle_abnormal_edges.
+	(make_abnormal_goto_edges): Remove.
+	* tree-cfg.h (make_abnormal_goto_edges): Remove.
+	(computed_goto_p, get_abnormal_succ_dispatcher): New prototypes.
+	* internal-fn.c (expand_ABNORMAL_DISPATCHER): New function.
+	* builtins.c (expand_builtin): Don't handle
+	BUILT_IN_SETJMP_DISPATCHER.
+	* internal-fn.def (ABNORMAL_DISPATCHER): New.
+	* omp-low.c (make_gimple_omp_edges): Add region_idx argument, when
+	filling *region also set *region_idx to (*region)->entry->index.
+
+	PR other/58712
+	* read-rtl.c (read_rtx_code): Clear all of RTX_CODE_SIZE (code).
+	For REGs set ORIGINAL_REGNO.
+
+2014-01-29  Bingfeng Mei  <bmei@broadcom.com>
+
+	* doc/md.texi: Mention that a target shouldn't implement 
+	vec_widen_(s|u)mul_even/odd pair if it is less efficient
+	than hi/lo pair.
+
+2014-01-29  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/59594
+	* tree-vect-data-refs.c (vect_analyze_data_ref_accesses): Sort
+	a copy of the datarefs vector rather than the vector itself.
+
 2014-01-28  Jason Merrill  <jason@redhat.com>
 
 	PR c++/53756

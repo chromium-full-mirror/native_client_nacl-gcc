@@ -3527,6 +3527,11 @@ check_template_shadow (tree decl)
 	  && TEMPLATE_PARMS_FOR_INLINE (current_template_parms)))
     return true;
 
+  /* Don't complain about the injected class name, as we've already
+     complained about the class itself.  */
+  if (DECL_SELF_REFERENCE_P (decl))
+    return false;
+
   error ("declaration of %q+#D", decl);
   error (" shadows template parm %q+#D", olddecl);
   return false;
@@ -10985,9 +10990,7 @@ tsubst_decl (tree t, tree args, tsubst_flags_t complain)
 	    DECL_TEMPLATE_INFO (r) = build_template_info (tmpl, argvec);
 	    SET_DECL_IMPLICIT_INSTANTIATION (r);
 	  }
-	else if (cp_unevaluated_operand)
-	  gcc_unreachable ();
-	else
+	else if (!cp_unevaluated_operand)
 	  register_local_specialization (r, t);
 
 	DECL_CHAIN (r) = NULL_TREE;
@@ -11184,6 +11187,8 @@ tsubst_function_type (tree t,
   else
     {
       tree r = TREE_TYPE (TREE_VALUE (arg_types));
+      /* Don't pick up extra function qualifiers from the basetype.  */
+      r = cp_build_qualified_type_real (r, type_memfn_quals (t), complain);
       if (! MAYBE_CLASS_TYPE_P (r))
 	{
 	  /* [temp.deduct]
@@ -12474,6 +12479,11 @@ tsubst_copy (tree t, tree args, tsubst_flags_t complain, tree in_decl)
 		}
 	      else
 		{
+		  /* This can happen for a variable used in a late-specified
+		     return type of a local lambda.  Just make a dummy decl
+		     since it's only used for its type.  */
+		  if (cp_unevaluated_operand)
+		    return tsubst_decl (t, args, complain);
 		  gcc_assert (errorcount || sorrycount);
 		  return error_mark_node;
 		}
@@ -15247,6 +15257,9 @@ instantiate_template_1 (tree tmpl, tree orig_args, tsubst_flags_t complain)
       gcc_unreachable ();
       return NULL_TREE;
     }
+
+  if (targ_ptr == error_mark_node)
+    return error_mark_node;
 
   /* Check to see if we already have this specialization.  */
   gen_tmpl = most_general_template (tmpl);
