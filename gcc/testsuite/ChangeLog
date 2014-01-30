@@ -1,3 +1,66 @@
+2014-01-30  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gcc.dg/vmx/splat.c: New.
+	* gcc.dg/vmx/splat-vsx.c: New.
+	* gcc.dg/vmx/splat-be-order.c: New.
+	* gcc.dg/vmx/splat-vsx-be-order.c: New.
+	* gcc.dg/vmx/eg-5.c: Remove special casing for little endian.
+	* gcc.dg/vmx/sn7153.c: Add special casing for little endian.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59993
+	* gcc.dg/torture/pr59993.c: New testcase.
+
+2014-01-30  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* g++.dg/vect/pr33426-ivdep.cc, g++.dg/vect/pr33426-ivdep-2.cc,
+	g++.dg/vect/pr33426-ivdep-3.cc, g++.dg/vect/pr33426-ivdep-4.cc,
+	gcc.dg/vect/vect-ivdep-1.c, gcc.dg/vect/vect-ivdep-2.c: Require
+	vect_int rather than vect_float.
+
+2014-01-30  Marek Polacek  <polacek@redhat.com>
+
+	* gcc.dg/Wconversion-real-integer.c: Properly end comment.
+
+2014-01-30  David Holsgrove <david.holsgrove@xilinx.com>
+
+	* gcc.target/microblaze/isa/fcmp4.c: New.
+
+2014-01-30  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59940
+	* gcc.dg/pr59940.c: New test.
+	* gcc.dg/pr35635.c (func3): Move dg-warning.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59903
+	* gcc.dg/torture/pr59903.c: New testcase.
+
+2014-01-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58843
+	* g++.dg/lookup/crash8.C: New.
+
+2014-01-30  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58649
+	* g++.dg/template/crash117.C: New.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR c/59905
+	* gcc.dg/cast-function-1.c: Adjust to survive DCE.
+	* gcc.dg/call-diag-2.c: Remove expected warnings about calling
+	abort.
+	* gcc.dg/invalid-call-1.c: Likewise.
+
+2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58561
+	* g++.dg/cpp1y/auto-fn23.C: New.
+
 2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/58846

@@ -2,6 +2,111 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-30  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gcc/config/rs6000/rs6000.c (rs6000_expand_vector_init): Use
+	gen_vsx_xxspltw_v4sf_direct instead of gen_vsx_xxspltw_v4sf;
+	remove element index adjustment for endian (now handled in vsx.md
+	and altivec.md).
+	(altivec_expand_vec_perm_const): Use
+	gen_altivec_vsplt[bhw]_direct instead of gen_altivec_vsplt[bhw].
+	* gcc/config/rs6000/vsx.md (UNSPEC_VSX_XXSPLTW): New unspec.
+	(vsx_xxspltw_<mode>): Adjust element index for little endian.
+	* gcc/config/rs6000/altivec.md (altivec_vspltb): Divide into a
+	define_expand and a new define_insn *altivec_vspltb_internal;
+	adjust for -maltivec=be on a little endian target.
+	(altivec_vspltb_direct): New.
+	(altivec_vsplth): Divide into a define_expand and a new
+	define_insn *altivec_vsplth_internal; adjust for -maltivec=be on a
+	little endian target.
+	(altivec_vsplth_direct): New.
+	(altivec_vspltw): Divide into a define_expand and a new
+	define_insn *altivec_vspltw_internal; adjust for -maltivec=be on a
+	little endian target.
+	(altivec_vspltw_direct): New.
+	(altivec_vspltsf): Divide into a define_expand and a new
+	define_insn *altivec_vspltsf_internal; adjust for -maltivec=be on
+	a little endian target.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59993
+	* tree-ssa-forwprop.c (associate_pointerplus): Check we
+	can propagate form the earlier stmt and avoid the transform
+	when the intermediate result is needed.
+
+2014-01-30  Alangi Derick  <alangiderick@gmail.com>
+
+	* README.Portability: Fix typo.
+
+2014-01-30  David Holsgrove <david.holsgrove@xilinx.com>
+
+	* config/microblaze/microblaze.md(cstoresf4, cbranchsf4): Replace
+	comparison_operator with ordered_comparison_operator.
+
+2014-01-30  Nick Clifton  <nickc@redhat.com>
+
+	* config/mn10300/mn10300-protos.h (mn10300_store_multiple_operation_p):
+	Rename to mn10300_store_multiple_regs.
+	* config/mn10300/mn10300.c: Likewise.
+	* config/mn10300/mn10300.md (store_movm): Fix typo: call
+	store_multiple_regs.
+	* config/mn10300/predicates.md (mn10300_store_multiple_operation):
+	Call mn10300_store_multiple_regs.
+
+2014-01-30  Nick Clifton  <nickc@redhat.com>
+	    DJ Delorie  <dj@redhat.com>
+
+	* config/rl78/rl78.c (register_sizes): Make the "upper half" of
+	%fp 2 to keep registers after it properly word-aligned.
+	(rl78_alloc_physical_registers_umul): Handle the case where both
+	input operands are the same.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59903
+	* tree-vect-loop.c (vect_transform_loop): Guard multiple-types
+	check properly.
+
+2014-01-30  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59633
+	* tree.c (walk_type_fields): Handle VECTOR_TYPE.
+
+	PR c++/59645
+	* cgraphunit.c (expand_thunk): Copy volatile arg to a temporary.
+
+2014-01-30  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/59951
+	* tree-vect-slp.c (vect_bb_slp_scalar_cost): Skip uses in debug
+	insns.
+
+2014-01-30  Savin Zlobec  <savin.zlobec@gmail.com>
+
+	PR target/59784
+	* config/nios2/nios2.c (nios2_fpu_insn_asm): Fix asm output of
+	SFmode to DFmode case.
+
+2014-01-29  DJ Delorie  <dj@redhat.com>
+
+	* config/msp430/msp430.opt (-minrt): New.
+	* config/msp430/msp430.h (STARTFILE_SPEC): Link alternate runtime
+	if -minrt given.
+	(ENDFILE_SPEC): Likewise.
+
+2014-01-29  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-inline-analysis.c (clobber_only_eh_bb_p): New function.
+	(estimate_function_body_sizes): Use it.
+
+2014-01-29  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58561
+	* dwarf2out.c (is_cxx_auto): New.
+	(is_base_type): Use it.
+	(gen_type_die_with_usage): Likewise.
+
 2014-01-29  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
 
 	* config/rs6000/rs6000.c (altivec_expand_vec_perm_const):  Use
