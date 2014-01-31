@@ -1,3 +1,120 @@
+2014-01-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59082
+	* g++.dg/inherit/crash4.C: New.
+
+2014-01-31  Maxim Ostapenko  <m.ostapenko@partner.samsung.com>
+
+	* c-c++-common/tsan/simple_race.c: Made test less flaky.
+
+2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
+
+	* gcc.target/i386/m512-check.h: Use correct rounding values.
+
+2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
+
+	* gcc.target/i386/avx-1.c: Use correct rounding values.
+        * gcc.target/i386/avx512f-vaddpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vaddps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vaddsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vaddss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtdq2ps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtpd2dq-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtpd2ps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtpd2udq-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtps2dq-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtps2udq-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsd2si-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsd2si64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsd2ss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsd2usi-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsd2usi64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsi2sd64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsi2ss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtsi2ss64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtss2si-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtss2si64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtss2usi-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtss2usi64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtudq2ps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtusi2sd64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtusi2ss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vcvtusi2ss64-1.c: Ditto.
+        * gcc.target/i386/avx512f-vdivpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vdivps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vdivsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vdivss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddXXXsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddXXXss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddsubXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmaddsubXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubXXXsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubXXXss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubaddXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfmsubaddXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmaddXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmaddXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmaddXXXsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmaddXXXss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmsubXXXpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmsubXXXps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmsubXXXsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vfnmsubXXXss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vmulpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vmulps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vmulsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vmulss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vscalefpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vscalefps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vscalefsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vscalefss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsqrtpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsqrtps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsqrtsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsqrtss-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsubpd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsubps-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsubsd-1.c: Ditto.
+        * gcc.target/i386/avx512f-vsubss-1.c: Ditto.
+        * gcc.target/i386/sse-13.c: Ditto.
+        * gcc.target/i386/sse-14.c: Ditto.
+        * gcc.target/i386/sse-22.c: Ditto.
+        * gcc.target/i386/sse-23.c: Ditto.
+
+2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
+
+	* gcc.target/i386/avx512f-inline-asm.c: Swap Yk and k.
+	* gcc.target/i386/avx512f-kmovw-1.c: Also allow k0.
+
+2014-01-31  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/59990
+	* gcc.dg/torture/pr59990.c: New testcase.
+
+2014-01-31  Jakub Jelinek  <jakub@redhat.com>
+
+	* lib/tsan-dg.exp (tsan_init): Try to run a trivial program,
+	if it fails don't run any tsan tests.
+
+2014-01-31  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59963
+	* gcc.dg/pr59940.c (g): Adjust dg-warning.
+	(y): Adjust dg-error.
+	* gcc.dg/cast-function-1.c (bar): Adjust dg-warnings.
+	* gcc.dg/pr59963-1.c: New test.
+	* gcc.dg/pr59963-2.c: New test.
+	* gcc.dg/pr59963-3.c: New test.
+
+2014-01-30  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/59923
+	* gcc.target/arm/pr59923.c: New test.
+
 2014-01-30  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
 
 	* gcc.dg/vmx/splat.c: New.

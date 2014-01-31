@@ -2,6 +2,151 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
+
+	* config/i386/avx512fintrin.h (_MM_FROUND_TO_NEAREST_INT),
+	(_MM_FROUND_TO_NEG_INF), (_MM_FROUND_TO_POS_INF),
+	(_MM_FROUND_TO_ZERO), (_MM_FROUND_CUR_DIRECTION): Are already defined
+	in smmintrin.h, remove them.
+	(_MM_FROUND_NO_EXC): Same as above, bit also wrong value.
+	* config/i386/i386.c (ix86_print_operand): Split sae and rounding.
+	* config/i386/i386.md (ROUND_SAE): Fix value.
+	* config/i386/predicates.md (const_4_or_8_to_11_operand): New.
+	(const48_operand): New.
+	* config/i386/subst.md (round), (round_expand): Use
+	const_4_or_8_to_11_operand.
+	(round_saeonly), (round_saeonly_expand): Use const48_operand.
+
+2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
+
+	* config/i386/constraints.md (Yk): Swap meaning with k.
+	* config/i386/i386.md (movhi_internal): Change Yk to k.
+	(movqi_internal): Ditto.
+	(*k<logic><mode>): Ditto.
+	(*andhi_1): Ditto.
+	(*andqi_1): Ditto.
+	(kandn<mode>): Ditto.
+	(*<code>hi_1): Ditto.
+	(*<code>qi_1): Ditto.
+	(kxnor<mode>): Ditto.
+	(kortestzhi): Ditto.
+	(kortestchi): Ditto.
+	(kunpckhi): Ditto.
+	(*one_cmplhi2_1): Ditto.
+	(*one_cmplqi2_1): Ditto.
+	* config/i386/sse.md (): Change k to Yk.
+	(avx512f_load<mode>_mask): Ditto.
+	(avx512f_blendm<mode>): Ditto.
+	(avx512f_store<mode>_mask): Ditto.
+	(avx512f_storeu<ssemodesuffix>512_mask): Ditto.
+	(avx512f_storedqu<mode>_mask): Ditto.
+	(avx512f_cmp<mode>3<mask_scalar_merge_name><round_saeonly_name>): Ditto.
+	(avx512f_ucmp<mode>3<mask_scalar_merge_name>): Ditto.
+	(avx512f_vmcmp<mode>3<round_saeonly_name>): Ditto.
+	(avx512f_vmcmp<mode>3_mask<round_saeonly_name>): Ditto.
+	(avx512f_maskcmp<mode>3): Ditto.
+	(avx512f_fmadd_<mode>_mask<round_name>): Ditto.
+	(avx512f_fmadd_<mode>_mask3<round_name>): Ditto.
+	(avx512f_fmsub_<mode>_mask<round_name>): Ditto.
+	(avx512f_fmsub_<mode>_mask3<round_name>): Ditto.
+	(avx512f_fnmadd_<mode>_mask<round_name>): Ditto.
+	(avx512f_fnmadd_<mode>_mask3<round_name>): Ditto.
+	(avx512f_fnmsub_<mode>_mask<round_name>): Ditto.
+	(avx512f_fnmsub_<mode>_mask3<round_name>): Ditto.
+	(avx512f_fmaddsub_<mode>_mask<round_name>): Ditto.
+	(avx512f_fmaddsub_<mode>_mask3<round_name>): Ditto.
+	(avx512f_fmsubadd_<mode>_mask<round_name>): Ditto.
+	(avx512f_fmsubadd_<mode>_mask3<round_name>): Ditto.
+	(avx512f_vextract<shuffletype>32x4_1_maskm): Ditto.
+	(vec_extract_lo_<mode>_maskm): Ditto.
+	(vec_extract_hi_<mode>_maskm): Ditto.
+	(avx512f_vternlog<mode>_mask): Ditto.
+	(avx512f_fixupimm<mode>_mask<round_saeonly_name>): Ditto.
+	(avx512f_sfixupimm<mode>_mask<round_saeonly_name>): Ditto.
+	(avx512f_<code><pmov_src_lower><mode>2_mask): Ditto.
+	(avx512f_<code>v8div16qi2_mask): Ditto.
+	(avx512f_<code>v8div16qi2_mask_store): Ditto.
+	(avx512f_eq<mode>3<mask_scalar_merge_name>_1): Ditto.
+	(avx512f_gt<mode>3<mask_scalar_merge_name>): Ditto.
+	(avx512f_testm<mode>3<mask_scalar_merge_name>): Ditto.
+	(avx512f_testnm<mode>3<mask_scalar_merge_name>): Ditto.
+	(*avx512pf_gatherpf<mode>sf_mask): Ditto.
+	(*avx512pf_gatherpf<mode>df_mask): Ditto.
+	(*avx512pf_scatterpf<mode>sf_mask): Ditto.
+	(*avx512pf_scatterpf<mode>df_mask): Ditto.
+	(avx512cd_maskb_vec_dupv8di): Ditto.
+	(avx512cd_maskw_vec_dupv16si): Ditto.
+	(avx512f_vpermi2var<mode>3_maskz): Ditto.
+	(avx512f_vpermi2var<mode>3_mask): Ditto.
+	(avx512f_vpermi2var<mode>3_mask): Ditto.
+	(avx512f_vpermt2var<mode>3_maskz): Ditto.
+	(*avx512f_gathersi<mode>): Ditto.
+	(*avx512f_gathersi<mode>_2): Ditto.
+	(*avx512f_gatherdi<mode>): Ditto.
+	(*avx512f_gatherdi<mode>_2): Ditto.
+	(*avx512f_scattersi<mode>): Ditto.
+	(*avx512f_scatterdi<mode>): Ditto.
+	(avx512f_compress<mode>_mask): Ditto.
+	(avx512f_compressstore<mode>_mask): Ditto.
+	(avx512f_expand<mode>_mask): Ditto.
+	* config/i386/subst.md (mask): Change k to Yk.
+	(mask_scalar_merge): Ditto.
+	(sd): Ditto.
+
+2014-01-31  Marc Glisse  <marc.glisse@inria.fr>
+
+	* doc/extend.texi (Vector Extensions): Document ?: in C++.
+
+2014-01-31  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/59990
+	* builtins.c (fold_builtin_memory_op): Make sure to not
+	use a floating-point mode or a boolean or enumeral type for
+	the copy operation.
+
+2014-01-30  DJ Delorie  <dj@redhat.com>
+
+	* config/msp430/msp430.h (LIB_SPEC): Add -lcrt
+	* config/msp430/msp430.md (msp430_refsym_need_exit): New.
+	* config/msp430/msp430.c (msp430_expand_epilogue): Call it
+	whenever main() has an epilogue.
+
+2014-01-30  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (rs6000_expand_vector_init): Remove
+	unused variable "field".
+	* config/rs6000/vsx.md (vsx_mergel_<mode>): Add missing DONE.
+	(vsx_mergeh_<mode>): Likewise.
+	* config/rs6000/altivec.md (altivec_vmrghb): Likewise.
+	(altivec_vmrghh): Likewise.
+	(altivec_vmrghw): Likewise.
+	(altivec_vmrglb): Likewise.
+	(altivec_vmrglh): Likewise.
+	(altivec_vmrglw): Likewise.
+	(altivec_vspltb): Add missing uses.
+	(altivec_vsplth): Likewise.
+	(altivec_vspltw): Likewise.
+	(altivec_vspltsf): Likewise.
+
+2014-01-30  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/59923
+	* ifcvt.c (cond_exec_process_insns): Don't conditionalize
+	frame related instructions.
+
+2014-01-30  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/59959
+	* lra-constrains.c (simplify_operand_subreg): Assign NO_REGS to
+	any reload of register whose subreg is invalid.
+
+2014-01-30  Jakub Jelinek  <jakub@redhat.com>
+
+	* config/i386/f16cintrin.h (_cvtsh_ss): Avoid -Wnarrowing
+	warning.
+	* config/i386/avx512fintrin.h (_mm512_mask_cvtusepi64_storeu_epi32):
+	Add missing return type - void.
+
 2014-01-30  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
 
 	* gcc/config/rs6000/rs6000.c (rs6000_expand_vector_init): Use

@@ -1,3 +1,43 @@
+2014-01-31  Jason Merrill  <jason@redhat.com>
+
+	PR c++/55800
+	* decl2.c (get_tls_init_fn): Copy DECL_EXTERNAL from the variable.
+
+2014-01-31  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59082
+	* class.c (build_vfield_ref): Early return error_mark_node if
+	TYPE_VFIELD (type) is null.
+	(build_base_path): Check return value of build_vfield_ref.
+
+2014-01-31  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59646
+	* call.c (convert_like_real) [ck_aggr]: Set TARGET_EXPR_LIST_INIT_P.
+	[ck_list]: Check for error_mark_node.
+	(build_aggr_conv): Set LOOKUP_NO_NARROWING and check_narrowing.
+
+	PR c++/57043
+	* pt.c (fn_type_unification): Don't do DEDUCE_EXACT check
+	during partial ordering.
+
+2014-01-31  Marek Polacek  <polacek@redhat.com>
+
+	PR c/59963
+	* typeck.c (build_function_call_vec): Add dummy arg_loc parameter.
+
+2014-01-30  Jason Merrill  <jason@redhat.com>
+
+	PR c++/57899
+	* cp-tree.h (struct saved_scope): Add x_local_specializations.
+	(local_specializations): New macro.
+	* pt.c (local_specializations): Remove variable.
+
+2014-01-30  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR c++/58708
+	* parser.c (make_string_pack): Use double_int::from_buffer.
+
 2014-01-30  Marek Polacek  <polacek@redhat.com>
 
 	PR c/59940
