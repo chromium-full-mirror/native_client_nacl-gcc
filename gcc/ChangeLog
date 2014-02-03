@@ -2,6 +2,168 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-03  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/i386/i386.c (flag_opts): Add -mlong-double-128.
+	(ix86_option_override_internal): Default long double to 64-bit for
+	32-bit Bionic and to 128-bit for 64-bit Bionic.
+
+	* config/i386/i386.h (LONG_DOUBLE_TYPE_SIZE): Use 128 if
+	TARGET_LONG_DOUBLE_128 is true.
+	(LIBGCC2_LONG_DOUBLE_TYPE_SIZE): Likewise.
+
+	* config/i386/i386.opt (mlong-double-80): Negate -mlong-double-64.
+	(mlong-double-64): Negate -mlong-double-128.
+	(mlong-double-128): New option.
+
+	* config/i386/i386-c.c (ix86_target_macros): Define
+	__LONG_DOUBLE_128__ for TARGET_LONG_DOUBLE_128.
+
+	* doc/invoke.texi: Document -mlong-double-128.
+
+2014-02-03  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR rtl-optimization/60024
+	* sel-sched.c (init_regs_for_mode): Check if mode is OK first.
+
+2014-02-03  Markus Trippelsdorf  <markus@trippelsdorf.de>
+
+	* doc/invoke.texi: (fprofile-reorder-functions): Fix typo.
+
+2014-02-03  Andrey Belevantsev  <abel@ispras.ru>
+
+	PR rtl-optimization/57662
+	* sel-sched.c (code_motion_path_driver): Do not mark already not
+	existing blocks in the visiting bitmap.
+
+2014-02-03  Andrey Belevantsev  <abel@ispras.ru>
+
+	* sel-sched-ir.c (sel_gen_insn_from_expr_after): Reset INSN_DELETED_P
+	on the insn being emitted.
+
+2014-02-03  James Greenhalgh  <james.greenhalgh@arm.com>
+	    Will Deacon  <will.deacon@arm.com>
+
+	* doc/gimple.texi (gimple_asm_clear_volatile): Remove.
+
+2014-02-03  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/arm/arm-tables.opt: Regenerate.
+
+2014-02-02  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (altivec_expand_vec_perm_le): Generalize
+	for vector types other than V16QImode.
+	* config/rs6000/altivec.md (altivec_vperm_<mode>): Change to a
+	define_expand, and call altivec_expand_vec_perm_le when producing
+	code with little endian element order.
+	(*altivec_vperm_<mode>_internal): New insn having previous
+	behavior of altivec_vperm_<mode>.
+	(altivec_vperm_<mode>_uns): Change to a define_expand, and call
+	altivec_expand_vec_perm_le when producing code with little endian
+	element order.
+	(*altivec_vperm_<mode>_uns_internal): New insn having previous
+	behavior of altivec_vperm_<mode>_uns.
+
+2014-02-02  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/altivec.md (UNSPEC_VSUMSWS_DIRECT): New unspec.
+	(altivec_vsumsws): Add handling for -maltivec=be with a little
+	endian target.
+	(altivec_vsumsws_direct): New.
+	(reduc_splus_<mode>): Call gen_altivec_vsumsws_direct instead of
+	gen_altivec_vsumsws.
+
+2014-02-02  Jan Hubicka  <jh@suse.cz>
+
+	* ipa-devirt.c (subbinfo_with_vtable_at_offset,
+	vtable_pointer_value_to_binfo): New functions.
+	* ipa-utils.h (vtable_pointer_value_to_binfo): Declare.
+	* ipa-prop.c (extr_type_from_vtbl_ptr_store): Use it.
+
+2014-02-02  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* config/nios2/nios2.md (load_got_register): Initialize GOT
+	pointer from _gp_got instead of _GLOBAL_OFFSET_TABLE_.
+	* config/nios2/nios2.c (nios2_function_profiler): Likewise.
+
+2014-02-02  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ipa-prop.c (update_jump_functions_after_inlining): When type is not
+	preserverd by passthrough, do not propagate the type.
+
+2014-02-02  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/mips/mips.c (MIPS_GET_FCSR, MIPS_SET_FCSR): New macros.
+	(mips_atomic_assign_expand_fenv): New function.
+	(TARGET_ATOMIC_ASSIGN_EXPAND_FENV): Define.
+
+2014-02-02  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* doc/extend.texi (__builtin_mips_get_fcsr): Document.
+	(__builtin_mips_set_fcsr): Likewise.
+	* config/mips/mips-ftypes.def: Add MIPS_VOID_FTYPE_USI and
+	MIPS_USI_FTYPE_VOID.
+	* config/mips/mips-protos.h (mips16_expand_get_fcsr): Declare
+	(mips16_expand_set_fcsr): Likewise.
+	* config/mips/mips.c (mips16_get_fcsr_stub): New variable.
+	(mips16_set_fcsr_stub): Likewise.
+	(mips16_get_fcsr_one_only_stub): New class.
+	(mips16_set_fcsr_one_only_stub): Likewise.
+	(mips16_expand_get_fcsr, mips16_expand_set_fcsr): New functions.
+	(mips_code_end): Output the get_fcsr and set_fcsr stubs, if needed.
+	(BUILTIN_AVAIL_MIPS16, AVAIL_ALL): New macros.
+	(hard_float): New availability predicate.
+	(mips_builtins): Add get_fcsr and set_fcsr.
+	(mips_expand_builtin): Check BUILTIN_AVAIL_MIPS16.
+	* config/mips/mips.md (UNSPEC_GET_FCSR, UNSPEC_SET_FCSR): New unspecs.
+	(GET_FCSR_REGNUM, SET_FCSR_REGNUM): New constants.
+	(mips_get_fcsr, *mips_get_fcsr, mips_get_fcsr_mips16_<mode>)
+	(mips_set_fcsr, *mips_set_fcsr, mips_set_fcsr_mips16_<mode>): New
+	patterns.
+
+2014-02-02  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* config/mips/mips.c (mips_one_only_stub): New class.
+	(mips_need_mips16_rdhwr_p): Replace with...
+	(mips16_rdhwr_stub): ...this new variable.
+	(mips16_stub_call_address): New function.
+	(mips16_rdhwr_one_only_stub): New class.
+	(mips_expand_thread_pointer): Use mips16_stub_call_address.
+	(mips_output_mips16_rdhwr): Delete.
+	(mips_finish_stub): New function.
+	(mips_code_end): Use it to handle rdhwr stubs.
+
+2014-02-02  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/60017
+	* config/i386/i386.c (classify_argument): Fix handling of bit_offset
+	when calculating size of integer atomic types.
+
+2014-02-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* ipa-inline-analysis.c (true_predicate_p): Fix a typo in comments.
+
+2014-02-01  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/60003
+	* gimple-low.c (lower_builtin_setjmp): Set cfun->has_nonlocal_label.
+	* profile.c (branch_prob): Use gimple_call_builtin_p
+	to check for BUILT_IN_SETJMP_RECEIVER.
+	* tree-inline.c (copy_bb): Call notice_special_calls.
+
+2014-01-31  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR bootstrap/59985
+	* lra-constraints.c (process_alt_operands): Update reload_sum only
+	on the first pass.
+
+2014-01-31  Richard Henderson  <rth@redhat.com>
+
+	PR middle-end/60004
+	* tree-eh.c (lower_try_finally_switch): Delay lowering finally block
+	until after else_eh is processed.
+
 2014-01-31  Ilya Tocar  <ilya.tocar@intel.com>
 
 	* config/i386/avx512fintrin.h (_MM_FROUND_TO_NEAREST_INT),
@@ -40,7 +202,8 @@
 	(avx512f_store<mode>_mask): Ditto.
 	(avx512f_storeu<ssemodesuffix>512_mask): Ditto.
 	(avx512f_storedqu<mode>_mask): Ditto.
-	(avx512f_cmp<mode>3<mask_scalar_merge_name><round_saeonly_name>): Ditto.
+	(avx512f_cmp<mode>3<mask_scalar_merge_name><round_saeonly_name>):
+	Ditto.
 	(avx512f_ucmp<mode>3<mask_scalar_merge_name>): Ditto.
 	(avx512f_vmcmp<mode>3<round_saeonly_name>): Ditto.
 	(avx512f_vmcmp<mode>3_mask<round_saeonly_name>): Ditto.
@@ -142,8 +305,7 @@
 
 2014-01-30  Jakub Jelinek  <jakub@redhat.com>
 
-	* config/i386/f16cintrin.h (_cvtsh_ss): Avoid -Wnarrowing
-	warning.
+	* config/i386/f16cintrin.h (_cvtsh_ss): Avoid -Wnarrowing warning.
 	* config/i386/avx512fintrin.h (_mm512_mask_cvtusepi64_storeu_epi32):
 	Add missing return type - void.
 
@@ -224,8 +386,7 @@
 2014-01-30  Richard Biener  <rguenther@suse.de>
 
 	PR tree-optimization/59951
-	* tree-vect-slp.c (vect_bb_slp_scalar_cost): Skip uses in debug
-	insns.
+	* tree-vect-slp.c (vect_bb_slp_scalar_cost): Skip uses in debug insns.
 
 2014-01-30  Savin Zlobec  <savin.zlobec@gmail.com>
 
@@ -259,33 +420,26 @@
 	* config/rs6000/vsx.md (vsx_mergel_<mode>): Adjust for
 	-maltivec=be with LE targets.
 	(vsx_mergeh_<mode>): Likewise.
-	* config/rs6000/altivec.md (UNSPEC_VMRG[HL]_DIRECT): New
-	unspecs.
+	* config/rs6000/altivec.md (UNSPEC_VMRG[HL]_DIRECT): New unspecs.
 	(mulv8hi3): Use gen_altivec_vmrg[hl]w_direct.
 	(altivec_vmrghb): Replace with define_expand and new
-	*altivec_vmrghb_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrghb_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrghb_direct): New define_insn.
 	(altivec_vmrghh): Replace with define_expand and new
-	*altivec_vmrghh_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrghh_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrghh_direct): New define_insn.
 	(altivec_vmrghw): Replace with define_expand and new
-	*altivec_vmrghw_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrghw_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrghw_direct): New define_insn.
 	(*altivec_vmrghsf): Adjust for endianness.
 	(altivec_vmrglb): Replace with define_expand and new
-	*altivec_vmrglb_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrglb_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrglb_direct): New define_insn.
 	(altivec_vmrglh): Replace with define_expand and new
-	*altivec_vmrglh_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrglh_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrglh_direct): New define_insn.
 	(altivec_vmrglw): Replace with define_expand and new
-	*altivec_vmrglw_internal insn; adjust for -maltivec=be with LE
-	targets.
+	*altivec_vmrglw_internal insn; adjust for -maltivec=be with LE targets.
 	(altivec_vmrglw_direct): New define_insn.
 	(*altivec_vmrglsf): Adjust for endianness.
 	(vec_widen_umult_hi_v16qi): Use gen_altivec_vmrghh_direct.
@@ -381,8 +535,7 @@
 	* tree-cfg.h (make_abnormal_goto_edges): Remove.
 	(computed_goto_p, get_abnormal_succ_dispatcher): New prototypes.
 	* internal-fn.c (expand_ABNORMAL_DISPATCHER): New function.
-	* builtins.c (expand_builtin): Don't handle
-	BUILT_IN_SETJMP_DISPATCHER.
+	* builtins.c (expand_builtin): Don't handle BUILT_IN_SETJMP_DISPATCHER.
 	* internal-fn.def (ABNORMAL_DISPATCHER): New.
 	* omp-low.c (make_gimple_omp_edges): Add region_idx argument, when
 	filling *region also set *region_idx to (*region)->entry->index.
@@ -393,7 +546,7 @@
 
 2014-01-29  Bingfeng Mei  <bmei@broadcom.com>
 
-	* doc/md.texi: Mention that a target shouldn't implement 
+	* doc/md.texi: Mention that a target shouldn't implement
 	vec_widen_(s|u)mul_even/odd pair if it is less efficient
 	than hi/lo pair.
 
@@ -430,8 +583,7 @@
 
 	PR preprocessor/59935
 	* input.c (location_get_source_line): Bail out on when line number
-	is zero, and test the return value of
-	lookup_or_add_file_to_cache_tab.
+	is zero, and test the return value of lookup_or_add_file_to_cache_tab.
 
 2014-01-28  Richard Biener  <rguenther@suse.de>
 
@@ -458,8 +610,7 @@
 
 2014-01-28  Richard Biener  <rguenther@suse.de>
 
-	* tree-data-ref.h (ddr_is_anti_dependent, ddrs_have_anti_deps):
-	Remove.
+	* tree-data-ref.h (ddr_is_anti_dependent, ddrs_have_anti_deps): Remove.
 
 2014-01-28  Richard Biener  <rguenther@suse.de>
 
