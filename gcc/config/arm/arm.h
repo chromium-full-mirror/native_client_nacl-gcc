@@ -255,10 +255,8 @@ extern void (*arm_lang_output_object_attributes_hook)(void);
 
 #define TARGET_HARD_TP			(target_thread_pointer == TP_CP15)
 #define TARGET_SOFT_TP			(target_thread_pointer == TP_SOFT)
-#define TARGET_R9_INDIRECT0_TP		\
-  (target_thread_pointer == TP_R9_INDIRECT0)
-#define TARGET_R9_INDIRECT4_TP		\
-  (target_thread_pointer == TP_R9_INDIRECT4)
+#define TARGET_R9_INDIRECT_TP		\
+  (target_thread_pointer == TP_R9_INDIRECT)
 #define TARGET_GNU2_TLS			(target_tls_dialect == TLS_GNU2)
 
 /* Only 16-bit thumb code.  */

@@ -207,10 +207,7 @@ EnumValue
 Enum(arm_tp_type) String(cp15) Value(TP_CP15)
 
 EnumValue
-Enum(arm_tp_type) String(r9-indirect0) Value(TP_R9_INDIRECT0)
-
-EnumValue
-Enum(arm_tp_type) String(r9-indirect4) Value(TP_R9_INDIRECT4)
+Enum(arm_tp_type) String(r9-indirect) Value(TP_R9_INDIRECT)
 
 mtpcs-frame
 Target Report Mask(TPCS_FRAME)
