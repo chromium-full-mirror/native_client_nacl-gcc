@@ -65,8 +65,7 @@ enum arm_tp_type {
   TP_AUTO,
   TP_SOFT,
   TP_CP15,
-  TP_R9_INDIRECT0,
-  TP_R9_INDIRECT4
+  TP_R9_INDIRECT
 };
 
 /* Which TLS scheme to use.  */
