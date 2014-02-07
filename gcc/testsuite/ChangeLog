@@ -1,3 +1,42 @@
+2014-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR preprocessor/56824
+	* gcc.dg/pr56824.c: New test.
+
+2014-02-07  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* gcc.dg/gcc-have-sync-compare-and-swap.c: Align the 16 byte
+	variable used for atomic operations.
+
+2014-02-07  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* gcc.dg/vect/pr60092-2.c: New testcase.
+
+2014-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/60082
+	Revert
+	2014-02-05  Balaji V. Iyer  <balaji.v.iyer@intel.com>
+
+	* g++.dg/cilk-plus/CK/catch_exc.cc: Disable test for -O1.
+	* c-c++-common/cilk-plus/CK/spawner_inline.c: Likewise.
+
+2014-02-07  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* gcc.target/s390/fp2int1.c: New testcase.
+
+2014-02-07  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* gcc.dg/tree-ssa/alias-30.c: New testcase.
+	* gcc.dg/tree-ssa/alias-31.c: Likewise.
+
+2014-02-06  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/59918
+	* g++.dg/torture/pr59918.C: New testcase.
+
 2014-02-06  Jakub Jelinek  <jakub@redhat.com>
 
 	PR target/59575

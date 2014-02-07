@@ -2,6 +2,130 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-07  Jeff Law  <law@redhat.com>
+
+	* ipa-inline.c (inline_small_functions): Fix typos.
+
+2014-02-07  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
+
+	* config/s390/s390-protos.h (s390_can_use_simple_return_insn)
+	(s390_can_use_return_insn): Declare.
+	* config/s390/s390.h (EPILOGUE_USES): Define.
+	* config/s390/s390.c (s390_mainpool_start): Allow two main_pool
+	instructions.
+	(s390_chunkify_start): Handle return JUMP_LABELs.
+	(s390_early_mach): Emit a main_pool instruction on the entry edge.
+	(s300_set_up_by_prologue, s390_can_use_simple_return_insn)
+	(s390_can_use_return_insn): New functions.
+	(s390_fix_long_loop_prediction): Handle conditional returns.
+	(TARGET_SET_UP_BY_PROLOGUE): Define.
+	* config/s390/s390.md (ANY_RETURN): New code iterator.
+	(*creturn, *csimple_return, return, simple_return): New patterns.
+
+2014-02-07  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
+
+	* config/s390/s390.c (s390_restore_gprs_from_fprs): Add REG_CFA_RESTORE
+	notes to each restore.  Also add REG_CFA_DEF_CFA when restoring %r15.
+	(s390_optimize_prologue): Don't clear RTX_FRAME_RELATED_P.  Update the
+	REG_CFA_RESTORE list when deciding not to restore a register.
+
+2014-02-07  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
+
+	* config/s390/s390.c: Include tree-pass.h and context.h.
+	(s390_early_mach): New function, split out from...
+	(s390_emit_prologue): ...here.
+	(pass_data_s390_early_mach): New pass structure.
+	(pass_s390_early_mach): New class.
+	(s390_option_override): Create and register early_mach pass.
+	Move to end of file.
+
+2014-02-07  Richard Sandiford  <rsandifo@linux.vnet.ibm.com>
+
+	* var-tracking.c (vt_stack_adjustments): Don't require stack_adjusts
+	to match for the exit block.
+
+2014-02-07  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* config/s390/s390.md ("atomic_load<mode>", "atomic_store<mode>")
+	("atomic_compare_and_swap<mode>", "atomic_fetch_<atomic><mode>"):
+	Reject misaligned operands.
+
+2014-02-07  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* optabs.c (expand_atomic_compare_and_swap): Allow expander to
+	fail.
+
+2014-02-07  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* gimple-low.c (lower_builtin_posix_memalign): New function.
+	(lower_stmt): Call it to lower posix_memalign in a way
+	to make alignment info accessible.
+
+2014-02-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/60082
+	* tree.c (build_common_builtin_nodes): Set ECF_LEAF for
+	__builtin_setjmp_receiver.
+
+2014-02-07  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* builtin-types.def (BT_FN_INT_PTRPTR_SIZE_SIZE): Add.
+	* builtins.def (BUILT_IN_POSIX_MEMALIGN): Likewise.
+	* tree-ssa-structalias.c (find_func_aliases_for_builtin_call):
+	Handle BUILT_IN_POSIX_MEMALIGN.
+	(find_func_clobbers): Likewise.
+	* tree-ssa-alias.c (ref_maybe_used_by_call_p_1): Likewise.
+	(call_may_clobber_ref_p_1): Likewise.
+
+2014-02-06  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/59918
+	* ipa-devirt.c (record_target_from_binfo): Remove overactive sanity check.
+
+2014-02-06  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/59469
+	* lto-cgraph.c (lto_output_node): Use
+	symtab_get_symbol_partitioning_class.
+	(lto_output_varpool_node): likewise.
+	(symtab_get_symbol_partitioning_class): Move here from
+	lto/lto-partition.c
+	* cgraph.h (symbol_partitioning_class): Likewise.
+	(symtab_get_symbol_partitioning_class): Declare.
+
+2014-02-06  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ggc.h (ggc_internal_cleared_alloc): New macro.
+	* vec.h (vec_safe_copy): Handle memory stats.
+	* omp-low.c (simd_clone_struct_alloc): Use ggc_internal_cleared_alloc.
+	* target-globals.c (save_target_globals): Likewise.
+
+2014-02-06  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR target/60077
+	* expr.c (emit_move_resolve_push): Export; be bit more selective
+	on when to clear alias set.
+	* expr.h (emit_move_resolve_push): Declare.
+	* function.h (struct function): Add tail_call_marked.
+	* tree-tailcall.c (optimize_tail_call): Set tail_call_marked.
+	* config/i386/i386-protos.h (ix86_expand_push): Remove.
+	* config/i386/i386.md (TImode move expander): De not call
+	ix86_expand_push.
+	(FP push expanders): Preserve memory attributes.
+	* config/i386/sse.md (push<mode>1): Remove.
+	* config/i386/i386.c (ix86_expand_vector_move): Handle push
+	operation.
+	(ix86_expand_push): Remove.
+	* config/i386/mmx.md (push<mode>1): Remove.
+
+2014-02-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR rtl-optimization/60030
+	* internal-fn.c (ubsan_expand_si_overflow_mul_check): Surround
+	lopart with paradoxical subreg before shifting it up by hprec.
+
 2014-02-06  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* config/arm/aarch-cost-tables.h (cortexa57_extra_costs): New table.
