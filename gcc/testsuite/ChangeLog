@@ -1,3 +1,107 @@
+2014-02-10  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* gcc.dg/binop-xor1.c: Don't xfail scan-tree-dump-times.
+
+2014-02-10  Jeff Law  <law@redhat.com>
+
+	PR middle-end-52306
+	* gcc.c-torture/compile/pr52306.c: New test.
+
+2014-02-10  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* g++.dg/ext/vector26.C: Use -mmmx for 32-bit x86.
+
+2014-02-10  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60115
+	* gcc.dg/torture/pr60115.c: New testcase.
+
+2014-02-10  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* g++.dg/vect/pr33426-ivdep-3.cc: Require vect_int_mult as well.
+	* g++.dg/vect/pr33426-ivdep-4.cc: Likewise.
+
+2014-02-10  Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Ilya Tocar  <ilya.tocar@intel.com>
+
+	* gcc.target/i386/avx512f-vexpandpd-1.c: Update intrinsics.
+	* gcc.target/i386/avx512f-vexpandps-1.c: Ditto.
+	* gcc.target/i386/avx512f-vexpandpd-2.c: Ditto.
+	* gcc.target/i386/avx512f-vexpandps-2.c: Ditto.
+	* gcc.target/i386/avx512f-vmovdqu32-1: Ditto.
+	* gcc.target/i386/avx512f-vmovdqu32-2: Ditto.
+	* gcc.target/i386/avx512f-vmovdqu64-1: Ditto.
+	* gcc.target/i386/avx512f-vmovdqu64-2: Ditto.
+	* gcc.target/i386/avx512f-vpcmpd-2.c: Ditto.
+	* gcc.target/i386/avx512f-vpcmpq-2.c: Ditto.
+	* gcc.target/i386/avx512f-vpcmupd-2.c: Ditto.
+	* gcc.target/i386/avx512f-vpcmupq-2.c: Ditto.
+	* gcc.target/i386/avx512f-vrndscalepd-1.c: Ditto.
+	* gcc.target/i386/avx512f-vrndscaleps-1.c: Ditto.
+	* gcc.target/i386/avx512f-vrndscalepd-2.c: Ditto.
+	* gcc.target/i386/avx512f-vrndscaleps-2.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf0dpd-1.c: Update parameters.
+	* gcc.target/i386/avx512pf-vgatherpf0dps-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf0qpd-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf0qps-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf1dpd-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf1dps-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf1qpd-1.c: Ditto.
+	* gcc.target/i386/avx512pf-vgatherpf1qps-1.c: Ditto.
+	* gcc.target/i386/avx512f-vpsrad-2.c: Initialize 64 bits.
+	* gcc.target/i386/avx512f-vpslld-2.c: Ditto.
+	* gcc.target/i386/avx512f-vpsrld-2.c: Ditto.
+
+2014-02-10  Jakub Jelinek  <jakub@redhat.com>
+
+	* gcc.dg/vect/pr59984.c: Require effective target
+	vect_simd_clones.
+
+2014-02-09  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/57522
+	* gfortran.dg/associated_target_5.f03: New test.
+
+2014-02-09  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/59026
+	* gfortran.dg/elemental_by_value_1.f90: New test.
+
+2014-02-08  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/58470
+	* gfortran.dg/finalize_22.f90: New.
+
+2014-02-08  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/60066
+	* gfortran.dg/elemental_subroutine_10.f90: New test.  This PR
+	was fixed by the patch for PR59906.
+
+2014-02-08  Andreas Schwab  <schwab@linux-m68k.org>
+
+	PR translation/52289
+	* gfortran.dg/coarray_8.f90: Update dg-error match.
+
+2014-02-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c/59984
+	* gcc.dg/vect/pr59984.c: New test.
+
+	PR middle-end/60092
+	* gcc.dg/attr-alloc_align-1.c: New test.
+	* gcc.dg/attr-alloc_align-2.c: New test.
+	* gcc.dg/attr-alloc_align-3.c: New test.
+	* gcc.dg/attr-assume_aligned-1.c: New test.
+	* gcc.dg/attr-assume_aligned-2.c: New test.
+	* gcc.dg/attr-assume_aligned-3.c: New test.
+
+2014-02-08  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/60077
+	* gcc.target/i386/pr60077-1.c: New test.
+	* gcc.target/i386/pr60077-2.c: New test.
+
 2014-02-07  Jakub Jelinek  <jakub@redhat.com>
 
 	PR preprocessor/56824
@@ -304,7 +408,7 @@
 2014-02-01  Paul Thomas  <pault@gcc.gnu.org>
 
 	PR fortran/59906
-	* gfortran.dg/elemental_subroutine_9.f90 : New test
+	* gfortran.dg/elemental_subroutine_9.f90: New test.
 
 2014-02-01  Richard Sandiford  <rdsandiford@googlemail.com>
 

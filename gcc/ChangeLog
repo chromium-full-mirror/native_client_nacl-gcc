@@ -2,7 +2,154 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-10  Jeff Law  <law@redhat.com>
+
+	PR middle-end/52306
+	* reload1.c (emit_input_reload_insns): Do not create invalid RTL
+	when changing the SET_DEST of a prior insn to avoid an input
+	reload.
+
+2014-02-10  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+
+	* config/rs6000/sysv4.h (ENDIAN_SELECT): Do not attempt to enforce
+	big-endian mode for -mcall-aixdesc, -mcall-freebsd, -mcall-netbsd,
+	-mcall-openbsd, or -mcall-linux.
+	(CC1_ENDIAN_BIG_SPEC): Remove.
+	(CC1_ENDIAN_LITTLE_SPEC): Remove.
+	(CC1_ENDIAN_DEFAULT_SPEC): Remove.
+	(CC1_SPEC): Remove (always empty) %cc1_endian_... spec.
+	(SUBTARGET_EXTRA_SPECS): Remove %cc1_endian_big, %cc1_endian_little,
+	and %cc1_endian_default.
+	* config/rs6000/sysv4le.h (CC1_ENDIAN_DEFAULT_SPEC): Remove.
+
+2014-02-10  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60115
+	* tree-eh.c (tree_could_trap_p): Unify TARGET_MEM_REF and
+	MEM_REF handling.  Properly verify that the accesses are not
+	out of the objects bound.
+
+2014-02-10  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_override_options): Fix typo from
+	coretex to cortex.
+
+2014-02-10  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* ipa-devirt.c (get_polymorphic_call_info_from_invariant): Return
+	proper constants and fix formatting.
+	(possible_polymorphic_call_targets): Fix formatting.
+
+2014-02-10  Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Ilya Tocar  <ilya.tocar@intel.com>
+
+	* config/i386/avx512fintrin.h (_mm512_storeu_epi64): Removed.
+	(_mm512_loadu_epi32): Renamed into...
+	(_mm512_loadu_si512): This.
+	(_mm512_storeu_epi32): Renamed into...
+	(_mm512_storeu_si512): This.
+	(_mm512_maskz_ceil_ps): Removed.
+	(_mm512_maskz_ceil_pd): Ditto.
+	(_mm512_maskz_floor_ps): Ditto.
+	(_mm512_maskz_floor_pd): Ditto.
+	(_mm512_floor_round_ps): Ditto.
+	(_mm512_floor_round_pd): Ditto.
+	(_mm512_ceil_round_ps): Ditto.
+	(_mm512_ceil_round_pd): Ditto.
+	(_mm512_mask_floor_round_ps): Ditto.
+	(_mm512_mask_floor_round_pd): Ditto.
+	(_mm512_mask_ceil_round_ps): Ditto.
+	(_mm512_mask_ceil_round_pd): Ditto.
+	(_mm512_maskz_floor_round_ps): Ditto.
+	(_mm512_maskz_floor_round_pd): Ditto.
+	(_mm512_maskz_ceil_round_ps): Ditto.
+	(_mm512_maskz_ceil_round_pd): Ditto.
+	(_mm512_expand_pd): Ditto.
+	(_mm512_expand_ps): Ditto.
+	* config/i386/i386.c (ix86_builtins): Remove
+	IX86_BUILTIN_EXPANDPD512_NOMASK, IX86_BUILTIN_EXPANDPS512_NOMASK.
+	(bdesc_args): Ditto.
+	* config/i386/predicates.md (const1256_operand): New.
+	(const_1_to_2_operand): Ditto.
+	* config/i386/sse.md (avx512pf_gatherpf<mode>sf): Change hint value.
+	(*avx512pf_gatherpf<mode>sf_mask): Ditto.
+	(*avx512pf_gatherpf<mode>sf): Ditto.
+	(avx512pf_gatherpf<mode>df): Ditto.
+	(*avx512pf_gatherpf<mode>df_mask): Ditto.
+	(*avx512pf_gatherpf<mode>df): Ditto.
+	(avx512pf_scatterpf<mode>sf): Ditto.
+	(*avx512pf_scatterpf<mode>sf_mask): Ditto.
+	(*avx512pf_scatterpf<mode>sf): Ditto.
+	(avx512pf_scatterpf<mode>df): Ditto.
+	(*avx512pf_scatterpf<mode>df_mask): Ditto.
+	(*avx512pf_scatterpf<mode>df): Ditto.
+	(avx512f_expand<mode>): Removed.
+	(<shift_insn><mode>3<mask_name>): Change predicate type.
+
+2014-02-08  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-vect-data-refs.c (vect_analyze_data_refs): For clobbers
+	not at the end of datarefs vector use ordered_remove to avoid
+	reordering datarefs vector.
+
+	PR c/59984
+	* gimplify.c (gimplify_bind_expr): In ORT_SIMD region
+	mark local addressable non-static vars as GOVD_PRIVATE
+	instead of GOVD_LOCAL.
+	* omp-low.c (lower_omp_for): Move gimple_bind_vars
+	and BLOCK_VARS of gimple_bind_block to new_stmt rather
+	than copying them.
+
+	PR middle-end/60092
+	* tree-ssa-ccp.c (surely_varying_stmt_p): Don't return true
+	if TYPE_ATTRIBUTES (gimple_call_fntype ()) contain
+	assume_aligned or alloc_align attributes.
+	(bit_value_assume_aligned): Add ATTR, PTRVAL and ALLOC_ALIGN
+	arguments.  Handle also assume_aligned and alloc_align attributes.
+	(evaluate_stmt): Adjust bit_value_assume_aligned caller.
+	Handle calls to functions with assume_aligned or alloc_align
+	attributes.
+	* doc/extend.texi: Document assume_aligned and alloc_align
+	attributes.
+
+2014-02-08  Terry Guo  <terry.guo@arm.com>
+
+	* doc/invoke.texi: Document ARM -march=armv7e-m.
+
+2014-02-08  Jakub Jelinek  <jakub@redhat.com>
+
+	* cilk-common.c (cilk_init_builtins): Clear TREE_NOTHROW
+	flag on __cilkrts_rethrow builtin.
+
+	PR ipa/60026
+	* ipa-cp.c (determine_versionability): Fail at -O0
+	or __attribute__((optimize (0))) or -fno-ipa-cp functions.
+	* tree-sra.c (ipa_sra_preliminary_function_checks): Similarly.
+
+	Revert:
+	2014-02-04  Jakub Jelinek  <jakub@redhat.com>
+
+	PR ipa/60026
+	* tree-inline.c (copy_forbidden): Fail for
+	__attribute__((optimize (0))) functions.
+
+2014-02-07  Jan Hubicka  <hubicka@ucw.cz>
+
+	* varpool.c: Include pointer-set.h.
+	(varpool_remove_unreferenced_decls): Variables in other partitions
+	will not be output; be however careful to not lose information
+	about partitioning.
+
+2014-02-07  Jan Hubicka  <hubicka@ucw.cz>
+
+	* gimple-fold.c (gimple_get_virt_method_for_vtable): Do O(1)
+	lookup in the vtable constructor.
+
 2014-02-07  Jeff Law  <law@redhat.com>
+
+	PR target/40977
+	* config/m68k/m68k.md (ashldi_extsi): Turn into a
+	define_insn_and_split.
 
 	* ipa-inline.c (inline_small_functions): Fix typos.
 
