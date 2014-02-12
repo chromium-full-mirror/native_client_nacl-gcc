@@ -2,6 +2,123 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-12  H.J. Lu  <hongjiu.lu@intel.com>
+	    Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/60151
+	* configure.ac (HAVE_AS_GOTOFF_IN_DATA): Pass --32 to GNU
+	assembler.
+	* configure: Regenerated.
+
+2014-02-12  Richard Biener  <rguenther@suse.de>
+
+	* vec.c (vec_prefix::calculate_allocation): Move as
+	inline variant to vec.h.
+	(vec_prefix::calculate_allocation_1): New out-of-line version.
+	* vec.h (vec_prefix::calculate_allocation_1): Declare.
+	(vec_prefix::m_has_auto_buf): Rename to ...
+	(vec_prefix::m_using_auto_storage): ... this.
+	(vec_prefix::calculate_allocation): Inline the easy cases
+	and dispatch to calculate_allocation_1 which doesn't need the
+	prefix address.
+	(va_heap::reserve): Use gcc_checking_assert.
+	(vec<T, A, vl_embed>::embedded_init): Add argument to initialize
+	m_using_auto_storage.
+	(auto_vec): Change m_vecpfx member to a vec<T, va_heap, vl_embed>
+	member and adjust.
+	(vec<T, va_heap, vl_ptr>::reserve): Remove redundant check.
+	(vec<T, va_heap, vl_ptr>::release): Avoid casting.
+	(vec<T, va_heap, vl_ptr>::using_auto_storage): Simplify.
+
+2014-02-12  Richard Biener  <rguenther@suse.de>
+
+	* gcse.c (compute_transp): break from loop over canon_modify_mem_list
+	when we found a dependence.
+
+2014-02-12  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* gimplify.c (gimplify_call_expr, gimplify_modify_expr): Move
+	common code...
+	(maybe_fold_stmt): ... into this new function.
+	* omp-low.c (lower_omp): Update comment.
+
+	* omp-low.c (lower_omp_target): Add clobber for sizes array, after
+	last use.
+
+	* omp-low.c (diagnose_sb_0): Make sure label_ctx is valid to
+	dereference.
+
+2014-02-12  James Greenhalgh  <james.greenhalgh@arm.com>
+
+	* config/arm/aarch-cost-tables.h (generic_extra_costs): Fix
+	identifiers in comments.
+	(cortexa53_extra_costs): Likewise.
+	* config/arm/arm.c (cortexa9_extra_costs): Fix identifiers in
+	comments.
+	(cortexa7_extra_costs): Likewise.
+	(cortexa12_extra_costs): Likewise.
+	(cortexa15_extra_costs): Likewise.
+	(v7m_extra_costs): Likewise.
+
+2014-02-12  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* gimple-low.c (lower_builtin_posix_memalign): Lower conditional
+	of posix_memalign being successful.
+	(lower_stmt): Restrict lowering of posix_memalign to when
+	-ftree-bit-ccp is enabled.
+
+2014-02-12  Senthil Kumar Selvaraj  <senthil_kumar.selvaraj@atmel.com>
+
+	* config/avr/avr-c.c (avr_resolve_overloaded_builtin): Pass vNULL for
+	arg_loc.
+	* config/spu/spu-c.c (spu_resolve_overloaded_builtin): Likewise.
+
+2014-02-12  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR rtl-optimization/60116
+	* combine.c (try_combine): Also remove dangling REG_DEAD notes on the
+	other_insn once the combination has been validated.
+
+2014-02-11  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR lto/59468
+	* ipa-utils.h (possible_polymorphic_call_targets): Update prototype
+	and wrapper.
+	* ipa-devirt.c: Include demangle.h
+	(odr_violation_reported): New static variable.
+	(add_type_duplicate): Update odr_violations.
+	(maybe_record_node): Add completep parameter; update it.
+	(record_target_from_binfo): Add COMPLETEP parameter;
+	update it as needed.
+	(possible_polymorphic_call_targets_1): Likewise.
+	(struct polymorphic_call_target_d): Add nonconstruction_targets;
+	rename FINAL to COMPLETE.
+	(record_targets_from_bases): Sanity check we found the binfo;
+	fix COMPLETEP updating.
+	(possible_polymorphic_call_targets): Add NONCONSTRUTION_TARGETSP
+	parameter, fix computing of COMPLETEP.
+	(dump_possible_polymorphic_call_targets): Imrove readability of dump; at
+	LTO time do demangling.
+	(ipa_devirt): Use nonconstruction_targets; Improve dumps.
+	* gimple-fold.c (gimple_get_virt_method_for_vtable): Add can_refer
+	parameter.
+	(gimple_get_virt_method_for_binfo): Likewise.
+	* gimple-fold.h (gimple_get_virt_method_for_binfo,
+	gimple_get_virt_method_for_vtable): Update prototypes.
+
+2014-02-11  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/49008
+	* genautomata.c (add_presence_absence): Fix typo with
+	{final_}presence_list.
+
+2014-02-11  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	PR target/60137
+	* config/rs6000/rs6000.md (128-bit GPR splitter): Add a splitter
+	for VSX/Altivec vectors that land in GPR registers.
+
 2014-02-11  Richard Henderson  <rth@redhat.com>
 	    Jakub Jelinek  <jakub@redhat.com>
 
