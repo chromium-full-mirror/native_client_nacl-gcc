@@ -1,3 +1,28 @@
+2014-02-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/43546
+	* gcc.target/i386/pr43546.c: New test.
+
+2014-02-13  Dominik Vogt  <vogt@linux.vnet.ibm.com>
+
+	* gcc.target/s390/hotpatch-compile-8.c: New test.
+
+2014-02-13  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.dg/pr59605.c: Convert to a compile test.  Protect MAX_COPY
+	definition with an ifndef.
+	* gcc.dg/pr59605-2.c: New test.
+
+2014-02-13  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.dg/gomp/simd-clones-5.c: Update comment for new warning message.
+
+2014-02-12  Joseph Myers  <joseph@codesourcery.com>
+
+	* gcc.dg/torture/float128-mul-underflow.c,
+	gcc.dg/torture/float128-truncdf-underflow.c,
+	gcc.dg/torture/float128-truncsf-underflow.c: New tests.
+
 2014-02-12  Jakub Jelinek  <jakub@redhat.com>
 
 	PR middle-end/59737
