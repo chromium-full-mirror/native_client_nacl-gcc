@@ -2,6 +2,85 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-14  Roland McGrath  <mcgrathr@google.com>
+
+	* configure.ac (HAVE_AS_IX86_UD2): New test for 'ud2' mnemonic.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+	* config/i386/i386.md (trap) [HAVE_AS_IX86_UD2]: Use the mnemonic
+	instead of ASM_SHORT.
+
+2014-02-14  Vladimir Makarov  <vmakarov@redhat.com>
+	    Richard Earnshaw  <rearnsha@arm.com>
+
+	PR rtl-optimization/59535
+	* lra-constraints.c (process_alt_operands): Encourage alternative
+	when unassigned pseudo class is superset of the alternative class.
+	(inherit_reload_reg): Don't inherit when optimizing for code size.
+	* config/arm/arm.h (MODE_BASE_REG_CLASS): Add version for LRA
+	returning CORE_REGS for anything but Thumb1 and BASE_REGS for
+	modes not less than 4 for Thumb1.
+
+2014-02-14  Kyle McMartin  <kyle@redhat.com>
+
+	PR pch/60010
+	* config/host-linux.c (TRY_EMPTY_VM_SPACE): Define for AArch64.
+
+2014-02-14  Richard Biener  <rguenther@suse.de>
+
+	* cilk-common.c (cilk_arrow): Build a MEM_REF, not an INDIRECT_REF.
+	(get_frame_arg): Drop the assert with langhook types_compatible_p.
+	Do not strip INDIRECT_REFs.
+
+2014-02-14  Richard Biener  <rguenther@suse.de>
+
+	PR lto/60179
+	* lto-streamer-out.c (DFS_write_tree_body): Do not follow
+	DECL_FUNCTION_SPECIFIC_TARGET.
+	(hash_tree): Do not hash DECL_FUNCTION_SPECIFIC_TARGET.
+	* tree-streamer-out.c (pack_ts_target_option): Remove.
+	(streamer_pack_tree_bitfields): Do not stream
+	TS_TARGET_OPTION.
+	(write_ts_function_decl_tree_pointers): Do not stream
+	DECL_FUNCTION_SPECIFIC_TARGET.
+	* tree-streamer-in.c (unpack_ts_target_option): Remove.
+	(unpack_value_fields): Do not stream TS_TARGET_OPTION.
+	(lto_input_ts_function_decl_tree_pointers): Do not stream
+	DECL_FUNCTION_SPECIFIC_TARGET.
+
+2014-02-14  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-vect-loop.c (vect_is_slp_reduction): Don't set
+	use_stmt twice.
+	(get_initial_def_for_induction, vectorizable_induction): Ignore
+	debug stmts when looking for exit_phi.
+	(vectorizable_live_operation): Fix up condition.
+
+2014-02-14  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/nds32.c (nds32_asm_function_prologue): Do not use
+	nreverse() because it changes the content of original tree list.
+
+2014-02-14  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/t-mlibs (MULTILIB_OPTIONS): Fix typo in comment.
+	* config/nds32/nds32.c (nds32_merge_decl_attributes): Likewise.
+
+2014-02-14  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/nds32.c (nds32_naked_function_p): Follow the
+	GNU coding standards.
+
+2014-02-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR debug/60152
+	* dwarf2out.c (gen_subprogram_die): Don't call
+	add_calling_convention_attribute if subr_die is old_die.
+
+2014-02-13  Sharad Singhai  <singhai@google.com>
+
+	* doc/optinfo.texi: Fix order of nodes.
+
 2014-02-13  Uros Bizjak  <ubizjak@gmail.com>
 
 	* config/i386/sse.md (xop_vmfrcz<mode>2): Generate const0 in
