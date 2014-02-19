@@ -2,6 +2,210 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-19  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (vspltis_constant): Fix most significant
+	bit of zero.
+
+2014-02-19  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/60207
+	* config/i386/i386.c (construct_container): Remove TFmode check
+	for X86_64_INTEGER_CLASS.
+
+2014-02-19  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/59794
+	* config/i386/i386.c (type_natural_mode): Warn for ABI changes
+	only when -Wpsabi is enabled.
+
+2014-02-19  Michael Hudson-Doyle  <michael.hudson@linaro.org>
+
+	 PR target/59799
+	* config/aarch64/aarch64.c (aarch64_pass_by_reference): The rules for
+	passing arrays in registers are the same as for structs, so remove the
+	special case for them.
+
+2014-02-19  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* expr.c (expand_expr_real_1) <case VIEW_CONVERT_EXPR>: For a bit-field
+	destination type, extract only the valid bits if the source type is not
+	integral and has a different mode.
+
+2014-02-19  Richard Biener  <rguenther@suse.de>
+
+	PR ipa/60243
+	* tree-inline.c (estimate_num_insns): Avoid calling cgraph_get_node
+	for all calls.
+
+2014-02-19  Richard Biener  <rguenther@suse.de>
+
+	PR ipa/60243
+	* ipa-prop.c: Include stringpool.h and tree-ssanames.h.
+	(ipa_modify_call_arguments): Emit an argument load explicitely and
+	preserve virtual SSA form there and for the replacement call.
+	Do not update SSA form nor free dominance info.
+
+2014-02-18  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ipa.c (function_and_variable_visibility): Also clear WEAK
+	flag when disolving COMDAT_GROUP.
+
+2014-02-18  Jan Hubicka  <hubicka@ucw.cz>
+
+	* ipa-prop.h (ipa_ancestor_jf_data): Update ocmment.
+	* ipa-prop.c (ipa_set_jf_known_type): Return early when
+	not devirtualizing.
+	(ipa_set_ancestor_jf): Set type to NULL hwen it is not preserved;
+	do more sanity checks.
+	(detect_type_change): Return true when giving up early.
+	(compute_complex_assign_jump_func): Fix type parameter of
+	ipa_set_ancestor_jf.
+	(compute_complex_ancestor_jump_func): Likewise.
+	(update_jump_functions_after_inlining): Fix updating of
+	ancestor function.
+	* ipa-cp.c (ipa_get_jf_ancestor_result): Be ready for type to be NULL.
+
+2014-02-18  Jan Hubicka  <hubicka@ucw.cz>
+
+	* cgraph.c (cgraph_update_edges_for_call_stmt_node): Also remove
+	inline clones when edge disappears.
+
+2014-02-18  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	PR target/60203
+	* config/rs6000/rs6000.md (mov<mode>_64bit, TF/TDmode moves):
+	Split 64-bit moves into 2 patterns.  Do not allow the use of
+	direct move for TDmode in little endian, since the decimal value
+	has little endian bytes within a word, but the 64-bit pieces are
+	ordered in a big endian fashion, and normal subreg's of TDmode are
+	not allowed.
+	(mov<mode>_64bit_dm): Likewise.
+	(movtd_64bit_nodm): Likewise.
+
+2014-02-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR tree-optimization/60174
+	* tree-ssa-reassoc.c (init_range_entry): Do not look into the defining
+	statement of an SSA_NAME that occurs in an abnormal PHI node.
+
+2014-02-18  Jakub Jelinek  <jakub@redhat.com>
+
+	PR sanitizer/60142
+	* final.c (SEEN_BB): Remove.
+	(SEEN_NOTE, SEEN_EMITTED): Renumber.
+	(final_scan_insn): Don't force_source_line on second
+	NOTE_INSN_BASIC_BLOCK.
+
+2014-02-18  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/60205
+	* config/i386/i386.h (struct ix86_args): Add warn_avx512f.
+	* config/i386/i386.c (init_cumulative_args): Initialize warn_avx512f.
+	(type_natural_mode): Warn ABI change when %zmm register is not
+	available for AVX512F vector value passing.
+
+2014-02-18  Kai Tietz  <ktietz@redhat.com>
+
+	PR target/60193
+	* config/i386/i386.c (ix86_expand_prologue): Use value in
+	rax register as displacement when restoring %r10 or %rax.
+	Fix wrong offset when restoring both registers.
+
+2014-02-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* ipa-prop.c (compute_complex_ancestor_jump_func): Replace overzealous
+	assertion with conditional return.
+
+2014-02-18  Jakub Jelinek  <jakub@redhat.com>
+	    Uros Bizjak  <ubizjak@gmail.com>
+
+	PR driver/60233
+	* config/i386/driver-i386.c (host_detect_local_cpu): If
+	YMM state is not saved by the OS, also clear has_f16c.  Move
+	CPUID 0x80000001 handling before YMM state saving checking.
+
+2014-02-18  Andrey Belevantsev  <abel@ispras.ru>
+
+	PR rtl-optimization/58960
+	* haifa-sched.c (alloc_global_sched_pressure_data): New,
+	factored out from ...
+	(sched_init): ... here.
+	(free_global_sched_pressure_data): New, factored out from ...
+	(sched_finish): ... here.
+	* sched-int.h (free_global_sched_pressure_data): Declare.
+	* sched-rgn.c (nr_regions_initial): New static global.
+	(haifa_find_rgns): Initialize it.
+	(schedule_region): Disable sched-pressure for the newly
+	generated regions.
+
+2014-02-17  Richard Biener  <rguenther@suse.de>
+
+	* tree-vect-stmts.c (free_stmt_vec_info): Clear BB and
+	release SSA defs of pattern stmts.
+
+2014-02-17  Richard Biener  <rguenther@suse.de>
+
+	* tree-inline.c (expand_call_inline): Release the virtual
+	operand defined by the call we are about to inline.
+
+2014-02-17  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa.c (verify_ssa): If verify_def found an error, ICE.
+
+2014-02-17  Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Ilya Tocar  <ilya.tocar@intel.com>
+
+	* config/i386/avx512fintrin.h (_mm512_maskz_permutexvar_epi64): Swap
+	arguments order in builtin.
+	(_mm512_permutexvar_epi64): Ditto.
+	(_mm512_mask_permutexvar_epi64): Ditto
+	(_mm512_maskz_permutexvar_epi32): Ditto
+	(_mm512_permutexvar_epi32): Ditto
+	(_mm512_mask_permutexvar_epi32): Ditto
+
+2014-02-16  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/altivec.md (p8_vmrgew): Handle little endian targets.
+	(p8_vmrgow): Likewise.
+
+2014-02-16  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/vsx.md (vsx_xxpermdi_<mode>): Handle little
+	endian targets.
+
+2014-02-15  Michael Meissner  <meissner@linux.vnet.ibm.com>
+
+	PR target/60203
+	* config/rs6000/rs6000.md (rreg): Add TFmode, TDmode constraints.
+	(mov<mode>_internal, TFmode/TDmode): Split TFmode/TDmode moves
+	into 64-bit and 32-bit moves.  On 64-bit moves, add support for
+	using direct move instructions on ISA 2.07.  Also adjust
+	instruction length for 64-bit.
+	(mov<mode>_64bit, TFmode/TDmode): Likewise.
+	(mov<mode>_32bit, TFmode/TDmode): Likewise.
+
+2014-02-15  Alan Modra  <amodra@gmail.com>
+
+	PR target/58675
+	PR target/57935
+	* config/rs6000/rs6000.c (rs6000_secondary_reload_inner): Use
+	find_replacement on parts of insn rtl that might be reloaded.
+
+2014-02-15  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60183
+	* tree-ssa-phiprop.c (propagate_with_phi): Avoid speculating loads.
+	(tree_ssa_phiprop): Calculate and free post-dominators.
+
+2014-02-14  Jeff Law  <law@redhat.com>
+
+	PR rtl-optimization/60131
+	* ree.c (get_extended_src_reg): New function.
+	(combine_reaching_defs): Use it rather than assuming location of REG.
+	(find_and_remove_re): Verify first operand of extension is
+	a REG before adding the insns to the copy list.
+
 2014-02-14  Roland McGrath  <mcgrathr@google.com>
 
 	* configure.ac (HAVE_AS_IX86_UD2): New test for 'ud2' mnemonic.
@@ -39,8 +243,7 @@
 	DECL_FUNCTION_SPECIFIC_TARGET.
 	(hash_tree): Do not hash DECL_FUNCTION_SPECIFIC_TARGET.
 	* tree-streamer-out.c (pack_ts_target_option): Remove.
-	(streamer_pack_tree_bitfields): Do not stream
-	TS_TARGET_OPTION.
+	(streamer_pack_tree_bitfields): Do not stream TS_TARGET_OPTION.
 	(write_ts_function_decl_tree_pointers): Do not stream
 	DECL_FUNCTION_SPECIFIC_TARGET.
 	* tree-streamer-in.c (unpack_ts_target_option): Remove.
@@ -50,8 +253,7 @@
 
 2014-02-14  Jakub Jelinek  <jakub@redhat.com>
 
-	* tree-vect-loop.c (vect_is_slp_reduction): Don't set
-	use_stmt twice.
+	* tree-vect-loop.c (vect_is_slp_reduction): Don't set use_stmt twice.
 	(get_initial_def_for_induction, vectorizable_induction): Ignore
 	debug stmts when looking for exit_phi.
 	(vectorizable_live_operation): Fix up condition.

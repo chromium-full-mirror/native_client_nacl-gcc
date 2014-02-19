@@ -2333,187 +2333,17 @@ package body Sem_Prag is
    --------------------------------------------
 
    procedure Analyze_Initial_Condition_In_Decl_Part (N : Node_Id) is
-      Pack_Id   : constant Entity_Id := Defining_Entity (Parent (Parent (N)));
-      Prag_Init : constant Node_Id   :=
-                    Get_Pragma (Pack_Id, Pragma_Initializes);
-      --  The related pragma Initializes
-
-      Vars : Elist_Id := No_Elist;
-      --  A list of all variables declared in pragma Initializes
-
-      procedure Collect_Variables;
-      --  Inspect the initialization list of pragma Initializes and collect the
-      --  entities of all variables declared within the related package.
-
-      function Match_Variable (N : Node_Id) return Traverse_Result;
-      --  Determine whether arbitrary node N denotes a variable declared in the
-      --  visible declarations of the related package.
-
-      procedure Report_Unused_Variables;
-      --  Emit errors for all variables found in list Vars
-
-      -----------------------
-      -- Collect_Variables --
-      -----------------------
-
-      procedure Collect_Variables is
-         procedure Collect_Variable (Item : Node_Id);
-         --  Determine whether Item denotes a variable that appears in the
-         --  related package and if it does, add it to list Vars.
-
-         ----------------------
-         -- Collect_Variable --
-         ----------------------
-
-         procedure Collect_Variable (Item : Node_Id) is
-            Item_Id : Entity_Id;
-
-         begin
-            if Is_Entity_Name (Item) and then Present (Entity (Item)) then
-               Item_Id := Entity (Item);
-
-               --  The item is a variable declared in the related package
-
-               if Ekind (Item_Id) = E_Variable
-                 and then Scope (Item_Id) = Pack_Id
-               then
-                  Add_Item (Item_Id, Vars);
-               end if;
-            end if;
-         end Collect_Variable;
-
-         --  Local variables
-
-         Inits : constant Node_Id :=
-                   Get_Pragma_Arg
-                     (First (Pragma_Argument_Associations (Prag_Init)));
-         Init  : Node_Id;
-
-      --  Start of processing for Collect_Variables
-
-      begin
-         --  Multiple initialization items appear as an aggregate
-
-         if Nkind (Inits) = N_Aggregate
-           and then Present (Expressions (Inits))
-         then
-            Init := First (Expressions (Inits));
-            while Present (Init) loop
-               Collect_Variable (Init);
-
-               Next (Init);
-            end loop;
-
-         --  Single initialization item
-
-         else
-            Collect_Variable (Inits);
-         end if;
-      end Collect_Variables;
-
-      --------------------
-      -- Match_Variable --
-      --------------------
-
-      function Match_Variable (N : Node_Id) return Traverse_Result is
-         Var_Id : Entity_Id;
-
-      begin
-         --  Find a variable declared within the related package and try to
-         --  remove it from the list of collected variables found in pragma
-         --  Initializes.
-
-         if Is_Entity_Name (N)
-           and then Present (Entity (N))
-         then
-            Var_Id := Entity (N);
-
-            if Ekind (Var_Id) = E_Variable
-              and then Scope (Var_Id) = Pack_Id
-            then
-               Remove (Vars, Var_Id);
-            end if;
-         end if;
-
-         return OK;
-      end Match_Variable;
-
-      procedure Match_Variables is new Traverse_Proc (Match_Variable);
-
-      -----------------------------
-      -- Report_Unused_Variables --
-      -----------------------------
-
-      procedure Report_Unused_Variables is
-         Posted   : Boolean := False;
-         Var_Elmt : Elmt_Id;
-         Var_Id   : Entity_Id;
-
-      begin
-         if Present (Vars) then
-            Var_Elmt := First_Elmt (Vars);
-            while Present (Var_Elmt) loop
-               Var_Id := Node (Var_Elmt);
-
-               if not Posted then
-                  Posted := True;
-                  Error_Msg_Name_1 := Name_Initial_Condition;
-                  Error_Msg_N
-                    ("expression of % must mention the following variables",
-                     N);
-               end if;
-
-               Error_Msg_Sloc := Sloc (Var_Id);
-               Error_Msg_NE ("\  & declared #", N, Var_Id);
-
-               Next_Elmt (Var_Elmt);
-            end loop;
-         end if;
-      end Report_Unused_Variables;
-
-      Expr   : constant Node_Id :=
-                 Get_Pragma_Arg (First (Pragma_Argument_Associations (N)));
-      Errors : constant Nat     := Serious_Errors_Detected;
-
-   --  Start of processing for Analyze_Initial_Condition_In_Decl_Part
+      Expr : constant Node_Id :=
+               Get_Pragma_Arg (First (Pragma_Argument_Associations (N)));
 
    begin
       Set_Analyzed (N);
-
-      --  Pragma Initial_Condition depends on the names enumerated in pragma
-      --  Initializes. Without those, the analysis cannot take place.
-
-      if No (Prag_Init) then
-         Error_Msg_Name_1 := Name_Initial_Condition;
-         Error_Msg_Name_2 := Name_Initializes;
-
-         Error_Msg_N ("% requires the presence of aspect or pragma %", N);
-         return;
-      end if;
 
       --  The expression is preanalyzed because it has not been moved to its
       --  final place yet. A direct analysis may generate side effects and this
       --  is not desired at this point.
 
       Preanalyze_And_Resolve (Expr, Standard_Boolean);
-
-      --  Perform variable matching only when the expression is legal
-
-      if Serious_Errors_Detected = Errors then
-         Collect_Variables;
-
-         --  Verify that all variables mentioned in pragma Initializes are used
-         --  in the expression of pragma Initial_Condition.
-
-         Match_Variables (Expr);
-      end if;
-
-      --  Emit errors for all variables that should participate in the
-      --  expression of pragma Initial_Condition.
-
-      if Serious_Errors_Detected = Errors then
-         Report_Unused_Variables;
-      end if;
    end Analyze_Initial_Condition_In_Decl_Part;
 
    --------------------------------------
@@ -3103,8 +2933,9 @@ package body Sem_Prag is
       --  pragma Attach_Handler.
 
       procedure Check_Loop_Pragma_Placement;
-      --  Verify whether pragma Loop_Invariant or Loop_Optimize or Loop_Variant
-      --  appear immediately within a construct restricted to loops.
+      --  Verify whether pragmas Loop_Invariant, Loop_Optimize and Loop_Variant
+      --  appear immediately within a construct restricted to loops, and that
+      --  pragmas Loop_Invariant and Loop_Variant are grouped together.
 
       procedure Check_Is_In_Decl_Part_Or_Package_Spec;
       --  Check that pragma appears in a declarative part, or in a package
@@ -3887,6 +3718,28 @@ package body Sem_Prag is
                           Generic_Formal_Declarations
                             (Unit_Declaration_Node (Scop));
 
+               --  If this is an aspect applied to a subprogram body, the
+               --  pragma is inserted in its declarative part.
+
+               elsif From_Aspect_Specification (N)
+                 and then
+                   Nkind (Unit_Declaration_Node (Ent)) = N_Subprogram_Body
+                 and then  Ent = Current_Scope
+               then
+                  OK := True;
+
+               --  If the aspect is a predicate (possibly others ???)  and the
+               --  context is a record type, this is a discriminant expression
+               --  within a type declaration, that freezes the predicated
+               --  subtype.
+
+               elsif From_Aspect_Specification (N)
+                 and then Prag_Id = Pragma_Predicate
+                 and then Ekind (Current_Scope) = E_Record_Type
+                 and then Scop = Scope (Current_Scope)
+               then
+                  OK := True;
+
                --  Default case, just check that the pragma occurs in the scope
                --  of the entity denoted by the name.
 
@@ -4574,11 +4427,178 @@ package body Sem_Prag is
       ---------------------------------
 
       procedure Check_Loop_Pragma_Placement is
+         procedure Check_Loop_Pragma_Grouping (Loop_Stmt : Node_Id);
+         --  Verify whether the current pragma is properly grouped with other
+         --  pragma Loop_Invariant and/or Loop_Variant. Node Loop_Stmt is the
+         --  related loop where the pragma appears.
+
+         function Is_Loop_Pragma (Stmt : Node_Id) return Boolean;
+         --  Determine whether an arbitrary statement Stmt denotes pragma
+         --  Loop_Invariant or Loop_Variant.
+
          procedure Placement_Error (Constr : Node_Id);
          pragma No_Return (Placement_Error);
          --  Node Constr denotes the last loop restricted construct before we
          --  encountered an illegal relation between enclosing constructs. Emit
          --  an error depending on what Constr was.
+
+         --------------------------------
+         -- Check_Loop_Pragma_Grouping --
+         --------------------------------
+
+         procedure Check_Loop_Pragma_Grouping (Loop_Stmt : Node_Id) is
+            Stop_Search : exception;
+            --  This exception is used to terminate the recursive descent of
+            --  routine Check_Grouping.
+
+            procedure Check_Grouping (L : List_Id);
+            --  Find the first group of pragmas in list L and if successful,
+            --  ensure that the current pragma is part of that group. The
+            --  routine raises Stop_Search once such a check is performed to
+            --  halt the recursive descent.
+
+            procedure Grouping_Error (Prag : Node_Id);
+            pragma No_Return (Grouping_Error);
+            --  Emit an error concerning the current pragma indicating that it
+            --  should be placed after pragma Prag.
+
+            --------------------
+            -- Check_Grouping --
+            --------------------
+
+            procedure Check_Grouping (L : List_Id) is
+               HSS  : Node_Id;
+               Prag : Node_Id;
+               Stmt : Node_Id;
+
+            begin
+               --  Inspect the list of declarations or statements looking for
+               --  the first grouping of pragmas:
+
+               --    loop
+               --       pragma Loop_Invariant ...;
+               --       pragma Loop_Variant ...;
+               --       . . .                     -- (1)
+               --       pragma Loop_Variant ...;  --  current pragma
+
+               --  If the current pragma is not in the grouping, then it must
+               --  either appear in a different declarative or statement list
+               --  or the construct at (1) is separating the pragma from the
+               --  grouping.
+
+               Stmt := First (L);
+               while Present (Stmt) loop
+
+                  --  Pragmas Loop_Invariant and Loop_Variant may only appear
+                  --  inside a loop or a block housed inside a loop. Inspect
+                  --  the declarations and statements of the block as they may
+                  --  contain the first grouping.
+
+                  if Nkind (Stmt) = N_Block_Statement then
+                     HSS := Handled_Statement_Sequence (Stmt);
+
+                     Check_Grouping (Declarations (Stmt));
+
+                     if Present (HSS) then
+                        Check_Grouping (Statements (HSS));
+                     end if;
+
+                  --  First pragma of the first topmost grouping has been found
+
+                  elsif Is_Loop_Pragma (Stmt) then
+
+                     --  The group and the current pragma are not in the same
+                     --  declarative or statement list.
+
+                     if List_Containing (Stmt) /= List_Containing (N) then
+                        Grouping_Error (Stmt);
+
+                     --  Try to reach the current pragma from the first pragma
+                     --  of the grouping while skipping other members:
+
+                     --    pragma Loop_Invariant ...;  --  first pragma
+                     --    pragma Loop_Variant ...;    --  member
+                     --    . . .
+                     --    pragma Loop_Variant ...;    --  current pragma
+
+                     else
+                        while Present (Stmt) loop
+
+                           --  The current pragma is either the first pragma
+                           --  of the group or is a member of the group. Stop
+                           --  the search as the placement is legal.
+
+                           if Stmt = N then
+                              raise Stop_Search;
+
+                           --  Skip group members, but keep track of the last
+                           --  pragma in the group.
+
+                           elsif Is_Loop_Pragma (Stmt) then
+                              Prag := Stmt;
+
+                           --  A non-pragma is separating the group from the
+                           --  current pragma, the placement is erroneous.
+
+                           else
+                              Grouping_Error (Prag);
+                           end if;
+
+                           Next (Stmt);
+                        end loop;
+
+                        --  If the traversal did not reach the current pragma,
+                        --  then the list must be malformed.
+
+                        raise Program_Error;
+                     end if;
+                  end if;
+
+                  Next (Stmt);
+               end loop;
+            end Check_Grouping;
+
+            --------------------
+            -- Grouping_Error --
+            --------------------
+
+            procedure Grouping_Error (Prag : Node_Id) is
+            begin
+               Error_Msg_Sloc := Sloc (Prag);
+               Error_Pragma ("pragma% must appear immediately after pragma#");
+            end Grouping_Error;
+
+         --  Start of processing for Check_Loop_Pragma_Grouping
+
+         begin
+            --  Inspect the statements of the loop or nested blocks housed
+            --  within to determine whether the current pragma is part of the
+            --  first topmost grouping of Loop_Invariant and Loop_Variant.
+
+            Check_Grouping (Statements (Loop_Stmt));
+
+         exception
+            when Stop_Search => null;
+         end Check_Loop_Pragma_Grouping;
+
+         --------------------
+         -- Is_Loop_Pragma --
+         --------------------
+
+         function Is_Loop_Pragma (Stmt : Node_Id) return Boolean is
+         begin
+            --  Inspect the original node as Loop_Invariant and Loop_Variant
+            --  pragmas are rewritten to null when assertions are disabled.
+
+            if Nkind (Original_Node (Stmt)) = N_Pragma then
+               return
+                 Nam_In (Pragma_Name (Original_Node (Stmt)),
+                         Name_Loop_Invariant,
+                         Name_Loop_Variant);
+            else
+               return False;
+            end if;
+         end Is_Loop_Pragma;
 
          ---------------------
          -- Placement_Error --
@@ -4586,6 +4606,7 @@ package body Sem_Prag is
 
          procedure Placement_Error (Constr : Node_Id) is
             LA : constant String := " with Loop_Entry";
+
          begin
             if Prag_Id = Pragma_Assert then
                Error_Msg_String (1 .. LA'Length) := LA;
@@ -4613,6 +4634,9 @@ package body Sem_Prag is
       --  Start of processing for Check_Loop_Pragma_Placement
 
       begin
+         --  Check that pragma appears immediately within a loop statement,
+         --  ignoring intervening block statements.
+
          Prev := N;
          Stmt := Parent (N);
          while Present (Stmt) loop
@@ -4649,7 +4673,7 @@ package body Sem_Prag is
                --  Stop the traversal because we reached the innermost loop
                --  regardless of whether we encountered an error or not.
 
-               return;
+               exit;
 
             --  Ignore a handled statement sequence. Note that this node may
             --  be related to a subprogram body in which case we will emit an
@@ -4666,6 +4690,17 @@ package body Sem_Prag is
                return;
             end if;
          end loop;
+
+         --  Check that the current pragma Loop_Invariant or Loop_Variant is
+         --  grouped together with other such pragmas.
+
+         if Is_Loop_Pragma (N) then
+
+            --  The previous check should have located the related loop
+
+            pragma Assert (Nkind (Stmt) = N_Loop_Statement);
+            Check_Loop_Pragma_Grouping (Stmt);
+         end if;
       end Check_Loop_Pragma_Placement;
 
       -------------------------------------------
@@ -9986,14 +10021,16 @@ package body Sem_Prag is
                --  Opt is not a duplicate property and sets the flag Status.
 
                procedure Create_Abstract_State
-                 (State_Nam  : Name_Id;
-                  State_Decl : Node_Id;
-                  Is_Null    : Boolean := False);
-               --  Generate an abstract state entity with name State_Nam and
-               --  enter it into visibility. State_Decl is the "declaration"
-               --  of the state as it appears in pragma Abstract_State. Flag
-               --  Is_Null should be set when the associated Abstract_State
-               --  pragma defines a null state.
+                 (Nam     : Name_Id;
+                  Decl    : Node_Id;
+                  Loc     : Source_Ptr;
+                  Is_Null : Boolean);
+               --  Generate an abstract state entity with name Nam and enter it
+               --  into visibility. Decl is the "declaration" of the state as
+               --  it appears in pragma Abstract_State. Loc is the location of
+               --  the related state "declaration". Flag Is_Null should be set
+               --  when the associated Abstract_State pragma defines a null
+               --  state.
 
                -----------------------------
                -- Analyze_External_Option --
@@ -10243,17 +10280,16 @@ package body Sem_Prag is
                ---------------------------
 
                procedure Create_Abstract_State
-                 (State_Nam  : Name_Id;
-                  State_Decl : Node_Id;
-                  Is_Null    : Boolean := False)
+                 (Nam     : Name_Id;
+                  Decl    : Node_Id;
+                  Loc     : Source_Ptr;
+                  Is_Null : Boolean)
                is
                begin
                   --  The generated state abstraction reuses the same chars
                   --  from the original state declaration. Decorate the entity.
 
-                  State_Id :=
-                    Make_Defining_Identifier (Sloc (State),
-                      Chars => New_External_Name (State_Nam));
+                  State_Id := Make_Defining_Identifier (Loc, Nam);
 
                   --  Null states never come from source
 
@@ -10270,15 +10306,16 @@ package body Sem_Prag is
                   --  N_Null and does not carry any linkages.
 
                   if not Is_Null then
-                     if Present (State_Decl) then
-                        Set_Entity (State_Decl, State_Id);
-                        Set_Etype  (State_Decl, Standard_Void_Type);
+                     if Present (Decl) then
+                        Set_Entity (Decl, State_Id);
+                        Set_Etype  (Decl, Standard_Void_Type);
                      end if;
 
-                     --  Every non-null state must be nameable and resolvable
-                     --  the same way a constant is.
+                     --  Every non-null state must be defined, nameable and
+                     --  resolvable.
 
                      Push_Scope (Pack_Id);
+                     Generate_Definition (State_Id);
                      Enter_Name (State_Id);
                      Pop_Scope;
                   end if;
@@ -10303,9 +10340,10 @@ package body Sem_Prag is
 
                elsif Nkind (State) = N_Null then
                   Create_Abstract_State
-                    (State_Nam  => New_Internal_Name ('S'),
-                     State_Decl => Empty,
-                     Is_Null    => True);
+                    (Nam     => New_Internal_Name ('S'),
+                     Decl    => Empty,
+                     Loc     => Sloc (State),
+                     Is_Null => True);
                   Null_Seen := True;
 
                   --  Catch a case where a null state appears in a list of
@@ -10321,8 +10359,10 @@ package body Sem_Prag is
 
                elsif Nkind (State) = N_Identifier then
                   Create_Abstract_State
-                    (State_Nam  => Chars (State),
-                     State_Decl => State);
+                    (Nam     => Chars (State),
+                     Decl    => State,
+                     Loc     => Sloc (State),
+                     Is_Null => False);
                   Non_Null_Seen := True;
 
                --  State declaration with various options. This construct
@@ -10331,8 +10371,10 @@ package body Sem_Prag is
                elsif Nkind (State) = N_Extension_Aggregate then
                   if Nkind (Ancestor_Part (State)) = N_Identifier then
                      Create_Abstract_State
-                       (State_Nam  => Chars (Ancestor_Part (State)),
-                        State_Decl => Ancestor_Part (State));
+                       (Nam     => Chars (Ancestor_Part (State)),
+                        Decl    => Ancestor_Part (State),
+                        Loc     => Sloc (Ancestor_Part (State)),
+                        Is_Null => False);
                      Non_Null_Seen := True;
                   else
                      Error_Msg_N
@@ -16481,8 +16523,17 @@ package body Sem_Prag is
                   E := Homonym (E);
                end loop;
 
+               --  If entity in not in current scope it may be the enclosing
+               --  suprogram body to which the aspect applies.
+
                if not Found then
-                  Error_Pragma_Arg ("no procedure & found for pragma%", Arg);
+                  if Entity (Id) = Current_Scope
+                    and then From_Aspect_Specification (N)
+                  then
+                     Set_No_Return (Entity (Id));
+                  else
+                     Error_Pragma_Arg ("no procedure& found for pragma%", Arg);
+                  end if;
                end if;
 
                Next (Arg);
@@ -17820,25 +17871,27 @@ package body Sem_Prag is
                elsif Raises_Constraint_Error (Arg) then
                   null;
 
-               --  Otherwise check in range
+               --  Otherwise check in range except if Relaxed_RM_Semantics
+               --  where we ignore the value if out of range.
 
                else
                   declare
                      Val : constant Uint := Expr_Value (Arg);
-
                   begin
-                     if Val < 0
-                       or else Val > Expr_Value (Expression
-                                       (Parent (RTE (RE_Max_Priority))))
+                     if not Relaxed_RM_Semantics
+                       and then
+                         (Val < 0
+                           or else Val > Expr_Value (Expression
+                                           (Parent (RTE (RE_Max_Priority)))))
                      then
                         Error_Pragma_Arg
                           ("main subprogram priority is out of range", Arg1);
+                     else
+                        Set_Main_Priority
+                          (Current_Sem_Unit, UI_To_Int (Expr_Value (Arg)));
                      end if;
                   end;
                end if;
-
-               Set_Main_Priority
-                    (Current_Sem_Unit, UI_To_Int (Expr_Value (Arg)));
 
                --  Load an arbitrary entity from System.Tasking.Stages or
                --  System.Tasking.Restricted.Stages (depending on the
@@ -21434,15 +21487,37 @@ package body Sem_Prag is
                   elsif Has_Non_Null_Refinement (Dep_Id) then
                      Has_Refined_State := True;
 
-                     if Is_Entity_Name (Ref_Output) then
-                        Ref_Id := Entity_Of (Ref_Output);
+                     --  Account for the case where a state with a non-null
+                     --  refinement matches a null output list:
 
-                        --  The output of the refinement clause is a valid
-                        --  constituent of the state. Remove the clause from
-                        --  the pool of candidates if both input lists match.
-                        --  Note that the search continues because one clause
-                        --  may have been normalized into multiple clauses as
-                        --  per the example above.
+                     --    Refined_State   => (State_1 => (C1, C2),
+                     --                        State_2 => (C3, C4))
+                     --    Depends         => (State_1 => State_2)
+                     --    Refined_Depends => (null    => C3)
+
+                     if Nkind (Ref_Output) = N_Null
+                       and then Inputs_Match
+                                  (Dep_Clause  => Dep_Clause,
+                                   Ref_Clause  => Ref_Clause,
+                                   Post_Errors => False)
+                     then
+                        Has_Constituent := True;
+
+                        --  Note that the search continues after the clause is
+                        --  removed from the pool of candidates because it may
+                        --  have been normalized into multiple simple clauses.
+
+                        Remove (Ref_Clause);
+
+                     --  Otherwise the output of the refinement clause must be
+                     --  a valid constituent of the state:
+
+                     --    Refined_State   => (State => (C1, C2))
+                     --    Depends         => (State => <input>)
+                     --    Refined_Depends => (C1    => <input>)
+
+                     elsif Is_Entity_Name (Ref_Output) then
+                        Ref_Id := Entity_Of (Ref_Output);
 
                         if Ekind_In (Ref_Id, E_Abstract_State, E_Variable)
                           and then Present (Encapsulating_State (Ref_Id))
@@ -21453,6 +21528,12 @@ package body Sem_Prag is
                                       Post_Errors => False)
                         then
                            Has_Constituent := True;
+
+                           --  Note that the search continues after the clause
+                           --  is removed from the pool of candidates because
+                           --  it may have been normalized into multiple simple
+                           --  clauses.
+
                            Remove (Ref_Clause);
                         end if;
                      end if;
@@ -21819,12 +21900,13 @@ package body Sem_Prag is
       begin
          --  Construct a list of all refinement inputs. Note that the input
          --  list is copied because the algorithm modifies its contents and
-         --  this should not be visible in Refined_Depends.
+         --  this should not be visible in Refined_Depends. The same applies
+         --  for a solitary input.
 
          if Nkind (Inputs) = N_Aggregate then
             Ref_Inputs := New_Copy_List (Expressions (Inputs));
          else
-            Ref_Inputs := New_List (Inputs);
+            Ref_Inputs := New_List (New_Copy (Inputs));
          end if;
 
          --  Depending on whether the original dependency clause mentions
@@ -22574,10 +22656,13 @@ package body Sem_Prag is
          --  Start of processing for Check_Refined_Global_Item
 
          begin
-            --  The state or variable acts as a constituent of a state, collect
-            --  it for the state completeness checks performed later on.
+            --  When the state or variable acts as a constituent of another
+            --  state with a visible refinement, collect it for the state
+            --  completeness checks performed later on.
 
-            if Present (Encapsulating_State (Item_Id)) then
+            if Present (Encapsulating_State (Item_Id))
+             and then Has_Visible_Refinement (Encapsulating_State (Item_Id))
+            then
                if Global_Mode = Name_Input then
                   Add_Item (Item_Id, In_Constits);
 

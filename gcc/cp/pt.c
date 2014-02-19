@@ -13806,6 +13806,11 @@ tsubst_expr (tree t, tree args, tsubst_flags_t complain, tree in_decl,
 				    RECUR (TREE_OPERAND (t, 1)),
 				    complain));
 
+    case ANNOTATE_EXPR:
+      tmp = RECUR (TREE_OPERAND (t, 0));
+      RETURN (build2_loc (EXPR_LOCATION (t), ANNOTATE_EXPR,
+			  TREE_TYPE (tmp), tmp, RECUR (TREE_OPERAND (t, 1))));
+
     default:
       gcc_assert (!STATEMENT_CODE_P (TREE_CODE (t)));
 
@@ -19279,6 +19284,10 @@ void
 maybe_instantiate_noexcept (tree fn)
 {
   tree fntype, spec, noex, clone;
+
+  /* Don't instantiate a noexcept-specification from template context.  */
+  if (processing_template_decl)
+    return;
 
   if (DECL_CLONED_FUNCTION_P (fn))
     fn = DECL_CLONED_FUNCTION (fn);

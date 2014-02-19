@@ -2342,10 +2342,24 @@ package body Sem_Ch3 is
       if Present (L) then
          Context := Parent (L);
 
-         if Nkind (Context) = N_Package_Specification
-           and then L = Visible_Declarations (Context)
-         then
-            Analyze_Package_Contract (Defining_Entity (Context));
+         if Nkind (Context) = N_Package_Specification then
+
+            --  When a package has private declarations, its contract must be
+            --  analyzed at the end of the said declarations. This way both the
+            --  analysis and freeze actions are properly synchronized in case
+            --  of private type use within the contract.
+
+            if L = Private_Declarations (Context) then
+               Analyze_Package_Contract (Defining_Entity (Context));
+
+            --  Otherwise the contract is analyzed at the end of the visible
+            --  declarations.
+
+            elsif L = Visible_Declarations (Context)
+              and then No (Private_Declarations (Context))
+            then
+               Analyze_Package_Contract (Defining_Entity (Context));
+            end if;
 
          elsif Nkind (Context) = N_Package_Body then
             In_Package_Body := True;
@@ -9377,7 +9391,26 @@ package body Sem_Ch3 is
                Error_Msg_NE
                  ("type & must implement abstract subprogram & with a " &
                   "procedure", Subp_Alias, Contr_Typ);
+
+            elsif Present (Get_Rep_Pragma (Impl_Subp, Name_Implemented))
+              and then Implementation_Kind (Impl_Subp) /= Impl_Kind
+            then
+               Error_Msg_Name_1 := Impl_Kind;
+               Error_Msg_N
+                ("overriding operation& must have synchronization%",
+                 Subp_Alias);
             end if;
+
+         --  If primitive has Optional synchronization, overriding operation
+         --  must match if it has an explicit synchronization..
+
+         elsif Present (Get_Rep_Pragma (Impl_Subp, Name_Implemented))
+           and then Implementation_Kind (Impl_Subp) /= Impl_Kind
+         then
+               Error_Msg_Name_1 := Impl_Kind;
+               Error_Msg_N
+                ("overriding operation& must have syncrhonization%",
+                 Subp_Alias);
          end if;
       end Check_Pragma_Implemented;
 

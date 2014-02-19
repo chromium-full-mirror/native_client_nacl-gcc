@@ -103,6 +103,10 @@ package body Exp_Ch5 is
    --  clause (this last case is required because holes in the tagged type
    --  might be filled with components from child types).
 
+   procedure Expand_Formal_Container_Loop (Typ : Entity_Id; N : Node_Id);
+   --  Use the primitives specified in an Iterable aspect to expand a loop
+   --  over a so-called formal container, primarily for SPARK usage.
+
    procedure Expand_Iterator_Loop (N : Node_Id);
    --  Expand loop over arrays and containers that uses the form "for X of C"
    --  with an optional subtype mark, or "for Y in C".
@@ -1929,7 +1933,8 @@ package body Exp_Ch5 is
 
       if Is_Access_Type (Typ)
         and then Is_Entity_Name (Lhs)
-        and then Present (Effective_Extra_Accessibility (Entity (Lhs))) then
+        and then Present (Effective_Extra_Accessibility (Entity (Lhs)))
+      then
          declare
             function Lhs_Entity return Entity_Id;
             --  Look through renames to find the underlying entity.
@@ -2651,6 +2656,85 @@ package body Exp_Ch5 is
       Adjust_Condition (Condition (N));
    end Expand_N_Exit_Statement;
 
+   ----------------------------------
+   -- Expand_Formal_Container_Loop --
+   ----------------------------------
+
+   procedure Expand_Formal_Container_Loop (Typ : Entity_Id; N : Node_Id) is
+      Isc       : constant Node_Id    := Iteration_Scheme (N);
+      I_Spec    : constant Node_Id    := Iterator_Specification (Isc);
+      Cursor    : constant Entity_Id  := Defining_Identifier (I_Spec);
+      Container : constant Node_Id    := Entity (Name (I_Spec));
+      Stats     : constant List_Id    := Statements (N);
+      Loc       : constant Source_Ptr := Sloc (N);
+
+      First_Op : constant Entity_Id :=
+                   Get_Iterable_Type_Primitive (Typ, Name_First);
+      Next_Op  : constant Entity_Id :=
+                   Get_Iterable_Type_Primitive (Typ, Name_Next);
+      Has_Element_Op : constant Entity_Id :=
+                   Get_Iterable_Type_Primitive (Typ, Name_Has_Element);
+
+      Advance  : Node_Id;
+      Init     : Node_Id;
+      New_Loop : Node_Id;
+
+   begin
+      --  The expansion resembles the one for Ada containers, but the
+      --  primitives mention the the domain of iteration explicitly, and
+      --  First applied to the container yields a cursor directly.
+
+      --    Cursor : Cursor_type := First (Container);
+      --    while Has_Element (Cursor, Container) loop
+      --          <original loop statements>
+      --       Cursor := Next (Container, Cursor);
+      --    end loop;
+
+      Init :=
+         Make_Object_Declaration (Loc,
+           Defining_Identifier => Cursor,
+           Object_Definition => New_Occurrence_Of (Etype (First_Op),  Loc),
+             Expression =>
+               Make_Function_Call (Loc,
+                 Name => New_Occurrence_Of (First_Op, Loc),
+                   Parameter_Associations =>
+                     New_List (New_Occurrence_Of (Container, Loc))));
+
+      Set_Ekind (Cursor, E_Variable);
+
+      Insert_Action (N, Init);
+
+      Advance :=
+        Make_Assignment_Statement (Loc,
+          Name => New_Occurrence_Of (Cursor, Loc),
+          Expression =>
+            Make_Function_Call (Loc,
+              Name => New_Occurrence_Of (Next_Op, Loc),
+                Parameter_Associations =>
+                  New_List
+                    (New_Occurrence_Of (Container, Loc),
+                     New_Occurrence_Of (Cursor, Loc))));
+
+      Append_To (Stats, Advance);
+
+      New_Loop :=
+        Make_Loop_Statement (Loc,
+          Iteration_Scheme =>
+            Make_Iteration_Scheme (Loc,
+              Condition =>
+                Make_Function_Call (Loc,
+                  Name                   =>
+                    New_Occurrence_Of (Has_Element_Op, Loc),
+                  Parameter_Associations =>
+                    New_List
+                     (New_Reference_To (Container, Loc),
+                      New_Reference_To (Cursor, Loc)))),
+          Statements => Stats,
+          End_Label  => Empty);
+      Rewrite (N, New_Loop);
+      Analyze (New_Loop);
+   end Expand_Formal_Container_Loop;
+
    -----------------------------
    -- Expand_N_Goto_Statement --
    -----------------------------
@@ -2965,6 +3049,10 @@ package body Exp_Ch5 is
 
       if Is_Array_Type (Container_Typ) then
          Expand_Iterator_Loop_Over_Array (N);
+         return;
+
+      elsif Has_Aspect (Container_Typ, Aspect_Iterable) then
+         Expand_Formal_Container_Loop (Container_Typ, N);
          return;
       end if;
 

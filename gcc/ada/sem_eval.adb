@@ -37,6 +37,7 @@ with Namet;    use Namet;
 with Nmake;    use Nmake;
 with Nlists;   use Nlists;
 with Opt;      use Opt;
+with Par_SCO;  use Par_SCO;
 with Rtsfind;  use Rtsfind;
 with Sem;      use Sem;
 with Sem_Aux;  use Sem_Aux;
@@ -1955,8 +1956,8 @@ package body Sem_Eval is
 
       elsif Ekind (Def_Id) = E_Constant then
 
-         --  Deferred constants must always be treated as nonstatic
-         --  outside the scope of their full view.
+         --  Deferred constants must always be treated as nonstatic outside the
+         --  scope of their full view.
 
          if Present (Full_View (Def_Id))
            and then not In_Open_Scopes (Scope (Def_Id))
@@ -1976,6 +1977,16 @@ package body Sem_Eval is
               and then not Is_Generic_Type (Etype (N))
             then
                Validate_Static_Object_Name (N);
+            end if;
+
+            --  Mark constant condition in SCOs
+
+            if Generate_SCO
+              and then Comes_From_Source (N)
+              and then Is_Boolean_Type (Etype (Def_Id))
+              and then Compile_Time_Known_Value (N)
+            then
+               Set_SCO_Condition (N, Expr_Value_E (N) = Standard_True);
             end if;
 
             return;
@@ -4823,6 +4834,10 @@ package body Sem_Eval is
    --  they are the same identical constraint, or if they are static and the
    --  values match (RM 4.9.1(1)).
 
+   --  In addition, in GNAT, the object size (Esize) values of the types must
+   --  match if they are set. The use of 'Object_Size can cause this to be
+   --  false even if the types would otherwise match in the RM sense.
+
    function Subtypes_Statically_Match (T1, T2 : Entity_Id) return Boolean is
 
       function Predicates_Match return Boolean;
@@ -4841,8 +4856,12 @@ package body Sem_Eval is
          if Ada_Version < Ada_2012 then
             return True;
 
+         --  Both types must have predicates or lack them
+
          elsif Has_Predicates (T1) /= Has_Predicates (T2) then
             return False;
+
+         --  Check matching predicates
 
          else
             Pred1 :=
@@ -4874,6 +4893,13 @@ package body Sem_Eval is
 
       if T1 = T2 then
          return True;
+
+      --  No match if sizes different (from use of 'Object_Size)
+
+      elsif Known_Static_Esize (T1) and then Known_Static_Esize (T2)
+        and then Esize (T1) /= Esize (T2)
+      then
+         return False;
 
       --  Scalar types
 
