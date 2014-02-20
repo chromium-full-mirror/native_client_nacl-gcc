@@ -2507,7 +2507,7 @@ package body Sem_Attr is
 
       when Attribute_Abort_Signal =>
          Check_Standard_Prefix;
-         Rewrite (N, New_Reference_To (Stand.Abort_Signal, Loc));
+         Rewrite (N, New_Occurrence_Of (Stand.Abort_Signal, Loc));
          Analyze (N);
 
       ------------
@@ -2776,7 +2776,7 @@ package body Sem_Attr is
 
          Set_Etype (N, Base_Type (Entity (P)));
          Set_Entity (N, Base_Type (Entity (P)));
-         Rewrite (N, New_Reference_To (Entity (N), Loc));
+         Rewrite (N, New_Occurrence_Of (Entity (N), Loc));
          Analyze (N);
       end Base;
 
@@ -6204,8 +6204,9 @@ package body Sem_Attr is
 
          --  Local variables
 
-         Assoc : Node_Id;
-         Comp  : Node_Id;
+         Assoc     : Node_Id;
+         Comp      : Node_Id;
+         Comp_Type : Entity_Id;
 
       --  Start of processing for Update
 
@@ -6240,6 +6241,7 @@ package body Sem_Attr is
          while Present (Assoc) loop
             Comp := First (Choices (Assoc));
             Analyze (Expression (Assoc));
+            Comp_Type := Empty;
             while Present (Comp) loop
                if Nkind (Comp) = N_Others_Choice then
                   Error_Attr
@@ -6304,6 +6306,21 @@ package body Sem_Attr is
                      Error_Msg_N ("name should be identifier or OTHERS", Comp);
                   else
                      Check_Component_Reference (Comp, P_Type);
+
+                     --  Verify that all choices in an association denote
+                     --  components of the same type.
+
+                     if No (Etype (Comp)) then
+                        null;
+
+                     elsif No (Comp_Type) then
+                        Comp_Type := Base_Type (Etype (Comp));
+
+                     elsif Comp_Type /= Base_Type (Etype (Comp)) then
+                        Error_Msg_N
+                          ("components in choice list must have same type",
+                             Assoc);
+                     end if;
                   end if;
                end if;
 
@@ -7783,7 +7800,7 @@ package body Sem_Attr is
          elsif Is_VAX_Float (P_Type)
            and then Nkind (Lo_Bound) = N_Identifier
          then
-            Rewrite (N, New_Reference_To (Entity (Lo_Bound), Sloc (N)));
+            Rewrite (N, New_Occurrence_Of (Entity (Lo_Bound), Sloc (N)));
             Analyze (N);
 
          else
@@ -8027,7 +8044,7 @@ package body Sem_Attr is
          elsif Is_VAX_Float (P_Type)
            and then Nkind (Hi_Bound) = N_Identifier
          then
-            Rewrite (N, New_Reference_To (Entity (Hi_Bound), Sloc (N)));
+            Rewrite (N, New_Occurrence_Of (Entity (Hi_Bound), Sloc (N)));
             Analyze (N);
 
          else

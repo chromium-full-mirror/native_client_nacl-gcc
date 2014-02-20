@@ -86,7 +86,7 @@ package body Sem_Ch13 is
    --  size value. In this case, we reset the Alignment to unknown.
 
    procedure Build_Predicate_Functions (Typ : Entity_Id; N : Node_Id);
-   --  If Typ has predicates (indicated by Has_Predicates being set for Typ,
+   --  If Typ has predicates (indicated by Has_Predicates being set for Typ),
    --  then either there are pragma Predicate entries on the rep chain for the
    --  type (note that Predicate aspects are converted to pragma Predicate), or
    --  there are inherited aspects from a parent type, or ancestor subtypes.
@@ -2008,13 +2008,22 @@ package body Sem_Ch13 is
                --  immediately.
 
                when Aspect_Abstract_State => Abstract_State : declare
-                  Decls : List_Id;
+                  Context : Node_Id := N;
+                  Decls   : List_Id;
 
                begin
-                  if Nkind_In (N, N_Generic_Package_Declaration,
-                                  N_Package_Declaration)
+                  --  When aspect Abstract_State appears on a generic package,
+                  --  it is propageted to the package instance. The context in
+                  --  this case is the instance spec.
+
+                  if Nkind (Context) = N_Package_Instantiation then
+                     Context := Instance_Spec (Context);
+                  end if;
+
+                  if Nkind_In (Context, N_Generic_Package_Declaration,
+                                        N_Package_Declaration)
                   then
-                     Decls := Visible_Declarations (Specification (N));
+                     Decls := Visible_Declarations (Specification (Context));
 
                      Make_Aitem_Pragma
                        (Pragma_Argument_Associations => New_List (
@@ -2025,7 +2034,7 @@ package body Sem_Ch13 is
 
                      if No (Decls) then
                         Decls := New_List;
-                        Set_Visible_Declarations (N, Decls);
+                        Set_Visible_Declarations (Context, Decls);
                      end if;
 
                      Prepend_To (Decls, Aitem);
@@ -2084,13 +2093,22 @@ package body Sem_Ch13 is
                --  it must be evaluated at the end of the said declarations.
 
                when Aspect_Initial_Condition => Initial_Condition : declare
-                  Decls : List_Id;
+                  Context : Node_Id := N;
+                  Decls   : List_Id;
 
                begin
-                  if Nkind_In (N, N_Generic_Package_Declaration,
-                                  N_Package_Declaration)
+                  --  When aspect Abstract_State appears on a generic package,
+                  --  it is propageted to the package instance. The context in
+                  --  this case is the instance spec.
+
+                  if Nkind (Context) = N_Package_Instantiation then
+                     Context := Instance_Spec (Context);
+                  end if;
+
+                  if Nkind_In (Context, N_Generic_Package_Declaration,
+                                        N_Package_Declaration)
                   then
-                     Decls := Visible_Declarations (Specification (N));
+                     Decls := Visible_Declarations (Specification (Context));
 
                      Make_Aitem_Pragma
                        (Pragma_Argument_Associations => New_List (
@@ -2104,7 +2122,7 @@ package body Sem_Ch13 is
 
                      if No (Decls) then
                         Decls := New_List;
-                        Set_Visible_Declarations (N, Decls);
+                        Set_Visible_Declarations (Context, Decls);
                      end if;
 
                      Prepend_To (Decls, Aitem);
@@ -2125,13 +2143,22 @@ package body Sem_Ch13 is
                --  said declarations.
 
                when Aspect_Initializes => Initializes : declare
-                  Decls : List_Id;
+                  Context : Node_Id := N;
+                  Decls   : List_Id;
 
                begin
-                  if Nkind_In (N, N_Generic_Package_Declaration,
-                                  N_Package_Declaration)
+                  --  When aspect Abstract_State appears on a generic package,
+                  --  it is propageted to the package instance. The context in
+                  --  this case is the instance spec.
+
+                  if Nkind (Context) = N_Package_Instantiation then
+                     Context := Instance_Spec (Context);
+                  end if;
+
+                  if Nkind_In (Context, N_Generic_Package_Declaration,
+                                        N_Package_Declaration)
                   then
-                     Decls := Visible_Declarations (Specification (N));
+                     Decls := Visible_Declarations (Specification (Context));
 
                      Make_Aitem_Pragma
                        (Pragma_Argument_Associations => New_List (
@@ -2144,7 +2171,7 @@ package body Sem_Ch13 is
 
                      if No (Decls) then
                         Decls := New_List;
-                        Set_Visible_Declarations (N, Decls);
+                        Set_Visible_Declarations (Context, Decls);
                      end if;
 
                      Prepend_To (Decls, Aitem);
@@ -4386,17 +4413,17 @@ package body Sem_Ch13 is
             else
                Check_Size (Expr, U_Ent, Size, Biased);
 
-               if Size /= 8
-                    and then
-                  Size /= 16
-                    and then
-                  Size /= 32
-                    and then
-                  UI_Mod (Size, 64) /= 0
-               then
-                  Error_Msg_N
-                    ("Object_Size must be 8, 16, 32, or multiple of 64",
-                     Expr);
+               if Is_Scalar_Type (U_Ent) then
+                  if Size /= 8 and then Size /= 16 and then Size /= 32
+                    and then UI_Mod (Size, 64) /= 0
+                  then
+                     Error_Msg_N
+                       ("Object_Size must be 8, 16, 32, or multiple of 64",
+                        Expr);
+                  end if;
+
+               elsif Size mod 8 /= 0 then
+                  Error_Msg_N ("Object_Size must be a multiple of 8", Expr);
                end if;
 
                Set_Esize (U_Ent, Size);
@@ -5610,7 +5637,7 @@ package body Sem_Ch13 is
             if Operating_Mode = Check_Semantics and then ASIS_Mode then
                AtM_Nod :=
                  Make_Attribute_Definition_Clause (Loc,
-                   Name       => New_Reference_To (Base_Type (Rectype), Loc),
+                   Name       => New_Occurrence_Of (Base_Type (Rectype), Loc),
                    Chars      => Name_Alignment,
                    Expression => Relocate_Node (Expression (M)));
 
@@ -6861,14 +6888,14 @@ package body Sem_Ch13 is
                        Defining_Identifier => BTemp,
                        Constant_Present    => True,
                          Object_Definition =>
-                           New_Reference_To (Standard_Boolean, Loc),
+                           New_Occurrence_Of (Standard_Boolean, Loc),
                          Expression        => Expr_M)),
 
                    Handled_Statement_Sequence =>
                      Make_Handled_Sequence_Of_Statements (Loc,
                        Statements => New_List (
                          Make_Simple_Return_Statement (Loc,
-                           Expression => New_Reference_To (BTemp, Loc)))));
+                           Expression => New_Occurrence_Of (BTemp, Loc)))));
 
                --  Insert declaration before freeze node and body after
 
@@ -10266,7 +10293,7 @@ package body Sem_Ch13 is
          Out_P   : constant Boolean := (Nam = TSS_Stream_Read);
          Formals : List_Id;
          Spec    : Node_Id;
-         T_Ref   : constant Node_Id := New_Reference_To (Etyp, Loc);
+         T_Ref   : constant Node_Id := New_Occurrence_Of (Etyp, Loc);
 
       begin
          Subp_Id := Make_Defining_Identifier (Loc, Sname);
@@ -10280,7 +10307,7 @@ package body Sem_Ch13 is
                         Parameter_Type =>
                           Make_Access_Definition (Loc,
                             Subtype_Mark =>
-                              New_Reference_To (
+                              New_Occurrence_Of (
                                 Designated_Type (Etype (F)), Loc))));
 
          if Nam = TSS_Stream_Input then
@@ -10350,7 +10377,7 @@ package body Sem_Ch13 is
       Subp_Decl :=
         Make_Subprogram_Renaming_Declaration (Loc,
           Specification => Build_Spec,
-          Name => New_Reference_To (Subp, Loc));
+          Name => New_Occurrence_Of (Subp, Loc));
 
       if Defer_Declaration then
          Set_TSS (Base_Type (Ent), Subp_Id);
@@ -11466,6 +11493,7 @@ package body Sem_Ch13 is
       First_Id       := Empty;
       Next_Id        := Empty;
       Has_Element_Id := Empty;
+      Element_Id     := Empty;
 
       --  Each expression must resolve to a function with the proper signature
 

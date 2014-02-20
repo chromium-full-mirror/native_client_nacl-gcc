@@ -1857,39 +1857,45 @@ package body Sem_Ch5 is
          Set_Ekind (Def_Id, E_Loop_Parameter);
 
          if Of_Present (N) then
-
-            --  The type of the loop variable is the Iterator_Element aspect of
-            --  the container type.
-
-            declare
-               Element : constant Entity_Id :=
-                           Find_Value_Of_Aspect (Typ, Aspect_Iterator_Element);
-            begin
-               if No (Element) then
-                  Error_Msg_NE ("cannot iterate over&", N, Typ);
-                  return;
-               else
-                  Set_Etype (Def_Id, Entity (Element));
-
-                  --  If subtype indication was given, verify that it matches
-                  --  element type of container.
-
-                  if Present (Subt)
-                     and then Bas /= Base_Type (Etype (Def_Id))
-                  then
-                     Error_Msg_N
-                       ("subtype indication does not match element type",
-                          Subt);
-                  end if;
-
-                  --  If the container has a variable indexing aspect, the
-                  --  element is a variable and is modifiable in the loop.
-
-                  if Has_Aspect (Typ, Aspect_Variable_Indexing) then
-                     Set_Ekind (Def_Id, E_Variable);
-                  end if;
+            if Has_Aspect (Typ, Aspect_Iterable) then
+               if No (Get_Iterable_Type_Primitive (Typ, Name_Element)) then
+                  Error_Msg_N ("Missing Element primitive for iteration", N);
                end if;
-            end;
+
+            --  For a predefined container, The type of the loop variable is
+            --  the Iterator_Element aspect of the container type.
+
+            else
+               declare
+                  Element : constant Entity_Id :=
+                           Find_Value_Of_Aspect (Typ, Aspect_Iterator_Element);
+               begin
+                  if No (Element) then
+                     Error_Msg_NE ("cannot iterate over&", N, Typ);
+                     return;
+                  else
+                     Set_Etype (Def_Id, Entity (Element));
+
+                     --  If subtype indication was given, verify that it
+                     --  matches element type of container.
+
+                     if Present (Subt)
+                        and then Bas /= Base_Type (Etype (Def_Id))
+                     then
+                        Error_Msg_N
+                          ("subtype indication does not match element type",
+                             Subt);
+                     end if;
+
+                     --  If the container has a variable indexing aspect, the
+                     --  element is a variable and is modifiable in the loop.
+
+                     if Has_Aspect (Typ, Aspect_Variable_Indexing) then
+                        Set_Ekind (Def_Id, E_Variable);
+                     end if;
+                  end if;
+               end;
+            end if;
 
          else
             --  For an iteration of the form IN, the name must denote an
@@ -1931,6 +1937,7 @@ package body Sem_Ch5 is
                Set_Etype (Def_Id,
                  Get_Cursor_Type
                   (Parent (Find_Value_Of_Aspect (Typ, Aspect_Iterable)), Typ));
+               Ent := Etype (Def_Id);
 
             else
                Ent := First_Entity (Scope (Typ));
@@ -1948,8 +1955,13 @@ package body Sem_Ch5 is
 
       --  A loop parameter cannot be volatile. This check is peformed only when
       --  SPARK_Mode is on as it is not a standard Ada legality check.
+      --  Not clear whether this applies to element iterators, where the
+      --  cursor is not an explicit entity ???
 
-      if SPARK_Mode = On and then Is_SPARK_Volatile_Object (Ent) then
+      if SPARK_Mode = On
+        and then not Of_Present (N)
+        and then Is_SPARK_Volatile_Object (Ent)
+      then
          Error_Msg_N
            ("loop parameter cannot be volatile (SPARK RM 7.1.3(6))", Ent);
       end if;
@@ -2039,7 +2051,7 @@ package body Sem_Ch5 is
                    Defining_Identifier => Subt,
                    Subtype_Indication  =>
                       Make_Subtype_Indication (Loc,
-                        Subtype_Mark => New_Reference_To (Indx, Loc),
+                        Subtype_Mark => New_Occurrence_Of (Indx, Loc),
                         Constraint   =>
                           Make_Range_Constraint (Loc, Relocate_Node (DS))));
                Insert_Before (Loop_Nod, Decl);
@@ -2047,7 +2059,7 @@ package body Sem_Ch5 is
 
                Rewrite (DS,
                  Make_Attribute_Reference (Loc,
-                   Prefix         => New_Reference_To (Subt, Loc),
+                   Prefix         => New_Occurrence_Of (Subt, Loc),
                    Attribute_Name => Attribute_Name (DS)));
 
                Analyze (DS);

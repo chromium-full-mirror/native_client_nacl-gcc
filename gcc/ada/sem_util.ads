@@ -419,39 +419,6 @@ package Sem_Util is
    --  Current_Scope is returned. The returned value is Empty if this is called
    --  from a library package which is not within any subprogram.
 
-   --  The following type lists all possible forms of default initialization
-   --  that may apply to a type.
-
-   type Default_Initialization_Kind is
-     (No_Possible_Initialization,
-      --  This value signifies that a type cannot possibly be initialized
-      --  because it has no content, for example - a null record.
-
-      Full_Default_Initialization,
-      --  This value covers the following combinations of types and content:
-      --    * Access type
-      --    * Array-of-scalars with specified Default_Component_Value
-      --    * Array type with fully default initialized component type
-      --    * Record or protected type with components that either have a
-      --      default expression or their related types are fully default
-      --      initialized.
-      --    * Scalar type with specified Default_Value
-      --    * Task type
-      --    * Type extension of a type with full default initialization where
-      --      the extension components are also fully default initialized.
-
-      Mixed_Initialization,
-      --  This value applies to a type where some of its internals are fully
-      --  default initialized and some are not.
-
-      No_Default_Initialization);
-      --  This value reflects a type where none of its content is fully
-      --  default initialized.
-
-   function Default_Initialization
-     (Typ : Entity_Id) return Default_Initialization_Kind;
-   --  Determine default initialization kind that applies to a particular type
-
    function Deepest_Type_Access_Level (Typ : Entity_Id) return Uint;
    --  Same as Type_Access_Level, except that if the type is the type of an Ada
    --  2012 stand-alone object of an anonymous access type, then return the
@@ -851,6 +818,13 @@ package Sem_Util is
    pragma Inline (Get_Pragma_Id);
    --  Obtains the Pragma_Id from the Chars field of Pragma_Identifier (N)
 
+   procedure Get_Reason_String (N : Node_Id);
+   --  Recursive routine to analyze reason argument for pragma Warnings. The
+   --  value of the reason argument is appended to the current string using
+   --  Store_String_Chars. The reason argument is expected to be a string
+   --  literal or concatenation of string literals. An error is given for
+   --  any other form.
+
    function Get_Referenced_Object (N : Node_Id) return Node_Id;
    --  Given a node, return the renamed object if the node represents a renamed
    --  object, otherwise return the node unchanged. The node may represent an
@@ -1206,6 +1180,16 @@ package Sem_Util is
    function Is_Iterator (Typ : Entity_Id) return Boolean;
    --  AI05-0139-2: Check whether Typ is one of the predefined interfaces in
    --  Ada.Iterator_Interfaces, or it is derived from one.
+
+   function Is_Junk_Name (N : Name_Id) return Boolean;
+   --  Returns True if the given name contains any of the following substrings
+   --    discard
+   --    dummy
+   --    ignore
+   --    junk
+   --    unused
+   --  Used to suppress warnings on names matching these patterns. The contents
+   --  of Name_Buffer and Name_Len are desteoyed by this call.
 
    type Is_LHS_Result is (Yes, No, Unknown);
    function Is_LHS (N : Node_Id) return Is_LHS_Result;

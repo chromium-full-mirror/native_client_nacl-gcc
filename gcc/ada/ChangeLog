@@ -1,3 +1,328 @@
+2014-02-20  Sergey Rybin  <rybin@adacore.com frybin>
+
+	* gnat_ugn.texi, vms_data.ads (gnatelim): Add description of
+	project-specific options.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* a-cbdlli.adb (Insert): When capacity exceeded, raise Capacity_Error,
+	not Constraint_Error.
+	* a-cbmutr.adb (Append_Child, Insert_Child, Prepend_Child): Ditto.
+	* sem_ch5.adb: Code clean up.
+
+2014-02-20  Hristian Kirtchev  <kirtchev@adacore.com>
+
+	* sem_prag.adb (Usage_Error): Remove local
+	constant Typ. Remove the specialized diagnostics for unconstrained
+	or tagged items as those are not part of the explicit input set
+	of the related subprogram and should not be flagged.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_attr.adb: Add guard to preserve all errors.
+
+2014-02-20  Vincent Celier  <celier@adacore.com>
+
+	* switch-m.adb (Normalize_Compiler_Switches): Take into account
+	switches that are recorded in ALI files: -gnateA, -gnateE,
+	-gnateF, -gnateinn, -gnateu, -gnateV and -gnateY.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_ch5.adb (Analyze_Iterator_Specification): Check legality
+	of an element iterator form over a formal container with an
+	Iterable aspect.
+	* exp_ch5.adb (Build_Formal_Container_Iteration): Utility
+	to create declaration and loop statements for both forms of
+	container iterators.
+	(Expand_Formal_Container_Element_Iterator): New procedure
+	to handle loops of the form  "for E of C" when C is a formal
+	container.
+	(Expand_Formal_Container_Iterator): Code cleanup.
+
+2014-02-20  Hristian Kirtchev  <kirtchev@adacore.com>
+
+	* sem_prag.adb (Add_Item_To_Name_Buffer): New routine.
+	(Analyze_Contract_Case): Remove the use of
+	"may". Replace "aspect Contract_Cases" to avoid categorization
+	of aspect vs pragma.
+	(Analyze_External_Property_In_Decl_Part): Remove the use of "formal".
+	(Analyze_Global_Item): Remove
+	the use of "formal", specify the subprogram.  Split the
+	error message about a state with visible refinement into
+	two. Remove the use of "global" from "volatile global item".
+	(Analyze_Initialization_Item): Ensure that the SPARK RM reference
+	is on one line.
+	(Analyze_Input_Output): Update the call to
+	Check_Mode. Specify the duplicated item. Reword the error
+	message concerning an input of a null output list. Use "\"
+	for error message continuation.
+	(Analyze_Part_Of): Remove
+	the use of "may". Use "\" for error message continuation.
+	(Analyze_Refined_Depends_In_Decl_Part): Update the error
+	message concerning a useless refinement to match the format
+	of Refined_Global.
+	(Analyze_Refined_Global_In_Decl_Part): Reword the error message
+	concerning a useless refinement.
+	(Analyze_Refinement_Clause): Use "\" for error message continuation.
+	(Check_Constituent_Usage): Use "\" for error message continuation.
+	(Check_Dependency_Clause): Use "\" for error message continuation.
+	(Check_Matching_Constituent): Use "\" for error message continuation.
+	(Check_Missing_Part_Of): Use "\" for error message continuation.
+	(Check_Mode): Renamed to
+	Check_Role. Update the comment on usage. Redo the error reporting
+	to use Role_Error.
+	(Check_Mode_Restriction_In_Enclosing_Context): Use "\" for error
+	message continuation.
+	(Find_Mode): Renamed to Find_Role. Update the parameter profile along
+	with comment on usage. Update all occurrences of Is_Input and Is_Output.
+	(Inconsistent_Mode_Error): Use "\" for error message continuation.
+	(Input_Match): Use "\" for error message continuation.
+	(Role_Error): New routine.
+	(Set_Convention_From_Pragma): Use "\" for error message continuation.
+	(Usage_Error): Add local variable Error_Msg. Build specialized error
+	message showcasing the offending item kind. Redo the diagnostics for
+	unconstrained types.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* exp_util.adb (Is_Iterated_Container): Use high-level primitives
+	to determine whether a type is a container type, rather than
+	examining only its type declaration, so that subtypes and derived
+	types are handled properly.
+
+2014-02-20  Sergey Rybin  <rybin@adacore.com frybin>
+
+	* gnat_ugn.texi: gnatmetric: add description of project-specific
+	options.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_attr.adb (Analyze_Attribute, case 'Update): Verify that
+	all choices in an association for a record type have the same
+	type, as is done for record aggregates.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* a-cborma.adb, a-cbhama.adb, a-cbdlli.adb, a-cbmutr.adb: Use pragma
+	Unmodified rather than Warnings (Off). Make comments
+	uniform in the four affected units.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* sem_ch13.adb (Analyze_Attribute_Definition_Clause, case
+	Object_Size): For non-scalar types allow any value that is a
+	multiple of 8.
+	* gnat_rm.texi: Document Object_Size for composites more clearly.
+
+2014-02-20  Yannick Moy  <moy@adacore.com>
+
+	* sem_util.ads, sem_util.adb (Default_Initialization): Remove function.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* stand.ads: Raise_Type: new predefined entity, used as the type
+	of a Raise_Expression prior to resolution.
+	* cstand.adb: Build entity for Raise_Type.
+	* sem_ch11.adb (Analyze_Raise_Expression): use Raise_Type as the
+	initial type of the node.
+	* sem_type.adb (Covers): Raise_Type is compatible with all
+	other types.
+	* sem_res.adb (Resolve): Remove special handling of Any_Type on
+	Raise_Expression nodes.
+	(Resolve_Raise_Expression): Signal ambiguity if the type of the
+	context is still Raise_Type.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* sem_ch12.adb (Validate_Access_Type_Instance): Add message if
+	mismatching predicates.
+	* sem_ch6.adb (Check_Conformance): Give better messages on
+	predicate mismatch.
+	* sem_eval.adb (Predicates_Match): Move to spec.
+	* sem_eval.ads (Predicates_Match): Moved here from body.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* a-cbmutr.adb: Use default value in Insert_Child.
+
+2014-02-20  Vincent Celier  <celier@adacore.com>
+
+	* gnatcmd.adb, make.adb, prj-makr.adb, clean.adb: Call
+	Stringt.Initialize in all project aware tools.
+
+2014-02-20  Doug Rupp  <rupp@adacore.com>
+
+	* gnat_ugn.texi: Document gnatbind -X option.
+	* vms_data.ads: Minor warnings documentation reformatting.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* exp_ch3.adb (Expand_Freeze_Array_Type): Only create invariant
+	procedure for a base type.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* sem_ch4.adb (Analyze_Case_Expression): Get type from first
+	expression with type info.
+	* sem_ch13.adb: Minor reformatting.
+	* sem_eval.adb (Subtypes_Statically_Match): Make sure we return
+	False if predicates do not match on the two types.
+
+2014-02-20  Arnaud Charlet  <charlet@adacore.com>
+
+	* sem_prag.adb (Analyze_Pragma [pragma Attach_Handler]):
+	In Relaxed_RM_Semantics mode, allow any static integer value,
+	for compatibility with other compilers.
+
+2014-02-20  Vincent Celier  <celier@adacore.com>
+
+	* errutil.adb (Initialize): Properly initialize entry in table
+	Warnings when warnings are suppressed.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* s-os_lib.ads: Add warning about non-portability of Rename_File.
+	* sem_util.ads, sem_util.adb (Is_Junk_Name): New function.
+	* sem_warn.adb: Use Is_Junk_Name to suppress some warnings.
+	* gnat_ugn.texi: Document no warnings on junk variable names.
+	* layout.adb: Minor code reorganization (use Ekind_In).
+	* stringt.adb: Move initialization of Null_String_Id to Initialize
+	routine.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_ch13.adb: Initialize optional Element_Id.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* s-os_lib.ads (Rename_File): Minor commment addition.
+
+2014-02-20  Thomas Quinot  <quinot@adacore.com>
+
+	* einfo.ads: Minor reformatting.
+
+2014-02-20  Hristian Kirtchev  <kirtchev@adacore.com>
+
+	* aspects.adb (Exchange_Aspects): New routine.
+	* aspects.ads (Exchange_Aspects): New routine.
+	* atree.adb (Rewrite): Do not check whether the save node has
+	aspects as it never will, instead check the node about to be clobbered.
+	* einfo.adb (Write_Field25_Name): Abstract_States can appear in
+	entities of generic packages.
+	* sem_ch6.adb (Analyze_Expression_Function): Fix the parent
+	pointer of an aspect specification list after rewriting takes place.
+	* sem_ch7.adb (Analyze_Package_Body_Helper): Swap the aspect
+	specifications of the generic template and the copy used for analysis.
+	* sem_ch12.adb (Analyze_Generic_Package_Declaration): Swap
+	the aspect specifications of the generic template and the
+	copy used for analysis.
+	(Analyze_Package_Instantiation): Propagate the aspect specifications
+	from the generic template to the instantiation.
+	(Build_Instance_Compilation_Unit_Nodes): Propagate the aspect
+	specifications from the generic template to the instantiation.
+	* sem_ch13.adb (Analyze_Aspect_Specifications): Handle aspects
+	Abstract_State, Initializes and Initial_Condition when they
+	apply to a package instantiation.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* stringt.adb: Add call to Initialize in package initialization.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* a-crbtgk.adb, a-cihama.adb, a-coinve.adb, a-ciorse.adb, a-crbtgo.adb,
+	a-cidlli.adb, a-cimutr.adb, a-cihase.adb, a-cohama.adb, a-coorse.adb,
+	a-chtgke.adb, a-chtgop.adb, a-comutr.adb, a-ciorma.adb, a-cobove.adb,
+	a-convec.adb, a-cohase.adb, a-chtgbk.adb, a-chtgbo.adb: Minor
+	reformatting.
+
+2014-02-20  Bob Duff  <duff@adacore.com>
+
+	* s-os_lib.ads: Minor: Remove incorrect comment.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* sem_elab.adb (Check_Elab_Assign): Clearer warning message.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* a-cborma.adb (Assign): When creating a node without a specified
+	element, insert an uninitialized element in the map, because
+	the instance may provide an element type with a default
+	initialization, e.g a scalar with a Default_Value aspect.
+	* a-cbhama.adb (Assign_Key): Remove useless Allocate procedure.
+	(Insert): In the version without explicit element, provide an
+	uninitialized element, as above.
+	* a-cbdlli.adb (Append): In the version without explicit element,
+	provide an uninitalized element, as above.
+	(Allocate): Remove unused version.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* sem_elab.adb: Minor code reorganization (use Nkind_In).
+	* stringt.adb: Remove temporary pragma Warnings (Off).
+	* stringt.ads: Add pragma Elaborate_Body to ensure initialization
+	of Null_String_Id.
+
+2014-02-20  Matthew Heaney  <heaney@adacore.com>
+
+	* a-chtgbk.adb (Replace): Use correct offset when calculating bucket
+	index.
+
+2014-02-20  Ed Schonberg  <schonberg@adacore.com>
+
+	* sem_ch5.adb (Analyze_Iterator_Specification): Initialize
+	properly the cursor type for subsequent volatile testing in SPARK
+	mode, when domain is a formal container with an Iterabe aspect.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* errout.adb (Set_Warnings_Mode_Off): Add Reason argument.
+	(Set_Specific_Warning_Off): Add Reason argument.
+	* errout.ads (Set_Warnings_Mode_Off): Add Reason argument.
+	(Set_Specific_Warning_Off): Add Reason argument.
+	* erroutc.adb (Warnings_Entry): Add Reason field
+	(Specific_Warning_Entry): Add Reason field.
+	(Warnings_Suppressed): return String_Id for Reason.
+	(Warning_Specifically_Suppressed): return String_Id for Reason.
+	* erroutc.ads (Warnings_Entry): Add Reason field.
+	(Specific_Warning_Entry): Add Reason field.
+	(Set_Specific_Warning_Off): Add Reason argument.
+	(Set_Warnings_Mode_Off): Add Reason argument.
+	(Warnings_Suppressed): return String_Id for Reason.
+	(Warning_Specifically_Suppressed): return String_Id for Reason.
+	* errutil.adb (Warnings_Suppressed): returns String_Id for Reason
+	(Warning_Specifically_Suppressed): returns String_Id for Reason
+	* gnat_rm.texi: Document that Warning parameter is string literal
+	or a concatenation of string literals.
+	* par-prag.adb: New handling for Reason argument.
+	* sem_prag.adb (Analyze_Pragma, case Warning): New handling
+	for Reason argument.
+	* sem_util.ads, sem_util.adb (Get_Reason_String): New procedure.
+	* sem_warn.ads (Warnings_Off_Entry): Add reason field.
+	* stringt.adb: Set Null_String_Id.
+	* stringt.ads (Null_String_Id): New constant.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* einfo.ads: Minor comment addition: Etype of package is
+	Standard_Void_Type.
+	* checks.adb, exp_aggr.adb, exp_atag.adb, exp_attr.adb, exp_ch13.adb,
+	exp_ch2.adb, exp_ch3.adb, exp_ch4.adb, exp_ch5.adb, exp_ch6.adb,
+	exp_ch7.adb, exp_ch9.adb, exp_dbug.adb, exp_disp.adb, exp_imgv.adb,
+	exp_intr.adb, exp_prag.adb, exp_sel.adb, exp_strm.adb, exp_util.adb,
+	freeze.adb, rtsfind.adb, sem_aggr.adb, sem_attr.adb, sem_ch10.adb,
+	sem_ch12.adb, sem_ch13.adb, sem_ch3.adb, sem_ch4.adb, sem_ch5.adb,
+	sem_ch6.adb, sem_ch8.adb, sem_dim.adb, sem_prag.adb, sem_res.adb,
+	sem_util.adb, tbuild.adb, tbuild.ads: Remove New_Reference_To.
+	Replace all calls with calls to New_Occurrence_Of.
+
+2014-02-20  Robert Dewar  <dewar@adacore.com>
+
+	* par-util.adb (Ignore, case of right paren): Make this a
+	serious error.
+
 2014-02-19  Robert Dewar  <dewar@adacore.com>
 
 	* sem_ch5.adb, sem_prag.adb, sem_attr.adb: Minor reformatting.

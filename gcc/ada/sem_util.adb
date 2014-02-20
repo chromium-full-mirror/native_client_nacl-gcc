@@ -710,7 +710,7 @@ package body Sem_Util is
       Loc := Sloc (N);
 
       if Nkind (N) = N_Defining_Identifier then
-         Obj := New_Reference_To (N, Loc);
+         Obj := New_Occurrence_Of (N, Loc);
 
          --  If this is a formal parameter of a subprogram declaration, and
          --  we are compiling the body, we want the declaration for the
@@ -808,7 +808,7 @@ package body Sem_Util is
           Defining_Identifier => Subt,
           Subtype_Indication =>
             Make_Subtype_Indication (Loc,
-              Subtype_Mark => New_Reference_To (T,  Loc),
+              Subtype_Mark => New_Occurrence_Of (T,  Loc),
               Constraint  =>
                 Make_Index_Or_Discriminant_Constraint (Loc,
                   Constraints => Constraints)));
@@ -1038,7 +1038,7 @@ package body Sem_Util is
           Defining_Identifier => Subt,
           Subtype_Indication =>
             Make_Subtype_Indication (Loc,
-              Subtype_Mark => New_Reference_To (Base_Type (T),  Loc),
+              Subtype_Mark => New_Occurrence_Of (Base_Type (T),  Loc),
               Constraint  =>
                 Make_Index_Or_Discriminant_Constraint (Loc,
                   Constraints => C)));
@@ -3874,7 +3874,7 @@ package body Sem_Util is
                 In_Present  => In_Present (Parent (Formal)),
                 Out_Present => Out_Present (Parent (Formal)),
              Parameter_Type =>
-                  New_Reference_To (Etype (Formal), Loc),
+                  New_Occurrence_Of (Etype (Formal), Loc),
                 Expression =>
                   New_Copy_Tree (Expression (Parent (Formal)))),
               Plist);
@@ -4035,138 +4035,6 @@ package body Sem_Util is
          return Type_Access_Level (Typ);
       end if;
    end Deepest_Type_Access_Level;
-
-   ----------------------------
-   -- Default_Initialization --
-   ----------------------------
-
-   function Default_Initialization
-     (Typ : Entity_Id) return Default_Initialization_Kind
-   is
-      Comp : Entity_Id;
-      Init : Default_Initialization_Kind;
-
-      FDI : Boolean := False;
-      NDI : Boolean := False;
-      --  Two flags used to designate whether a record type has at least one
-      --  fully default initialized component and/or one not fully default
-      --  initialized component.
-
-   begin
-      --  Access types are always fully default initialized
-
-      if Is_Access_Type (Typ) then
-         return Full_Default_Initialization;
-
-      --  An array type subject to aspect/pragma Default_Component_Value is
-      --  fully default initialized. Otherwise its initialization status is
-      --  that of its component type.
-
-      elsif Is_Array_Type (Typ) then
-         if Present (Default_Aspect_Component_Value (Base_Type (Typ))) then
-            return Full_Default_Initialization;
-         else
-            return Default_Initialization (Component_Type (Typ));
-         end if;
-
-      --  The initialization status of a private type depends on its full view
-
-      elsif Is_Private_Type (Typ) and then Present (Full_View (Typ)) then
-         return Default_Initialization (Full_View (Typ));
-
-      --  Record and protected types offer several initialization options
-      --  depending on their components (if any).
-
-      elsif Is_Record_Type (Typ) or else Is_Protected_Type (Typ) then
-         Comp := First_Component (Typ);
-
-         --  Inspect all components
-
-         if Present (Comp) then
-            while Present (Comp) loop
-
-               --  Do not process internally generated components except for
-               --  _parent which represents the ancestor portion of a derived
-               --  type.
-
-               if Comes_From_Source (Comp)
-                 or else Chars (Comp) = Name_uParent
-               then
-                  Init := Default_Initialization (Base_Type (Etype (Comp)));
-
-                  --  A component with mixed initialization renders the whole
-                  --  record/protected type mixed.
-
-                  if Init = Mixed_Initialization then
-                     return Mixed_Initialization;
-
-                  --  The component is fully default initialized when its type
-                  --  is fully default initialized or when the component has an
-                  --  initialization expression. Note that this has precedence
-                  --  given that the component type may lack initialization.
-
-                  elsif Init = Full_Default_Initialization
-                    or else Present (Expression (Parent (Comp)))
-                  then
-                     FDI := True;
-
-                  --  Components with no possible initialization are ignored
-
-                  elsif Init = No_Possible_Initialization then
-                     null;
-
-                  --  The component has no full default initialization
-
-                  else
-                     NDI := True;
-                  end if;
-               end if;
-
-               Next_Component (Comp);
-            end loop;
-
-            --  Detect a mixed case of initialization
-
-            if FDI and NDI then
-               return Mixed_Initialization;
-
-            elsif FDI then
-               return Full_Default_Initialization;
-
-            elsif NDI then
-               return No_Default_Initialization;
-
-            --  The type either has no components or they are all internally
-            --  generated.
-
-            else
-               return No_Possible_Initialization;
-            end if;
-
-         --  The record type is null, there is nothing to initialize
-
-         else
-            return No_Possible_Initialization;
-         end if;
-
-      --  A scalar type subject to aspect/pragma Default_Value is fully default
-      --  initialized.
-
-      elsif Is_Scalar_Type (Typ)
-        and then Present (Default_Aspect_Value (Base_Type (Typ)))
-      then
-         return Full_Default_Initialization;
-
-      --  Task types are always fully default initialized
-
-      elsif Is_Task_Type (Typ) then
-         return Full_Default_Initialization;
-      end if;
-
-      --  The type has no full default initialization
-
-      return No_Default_Initialization;
-   end Default_Initialization;
 
    ---------------------
    -- Defining_Entity --
@@ -6766,6 +6634,30 @@ package body Sem_Util is
    begin
       return Get_Pragma_Id (Pragma_Name (N));
    end Get_Pragma_Id;
+
+   -----------------------
+   -- Get_Reason_String --
+   -----------------------
+
+   procedure Get_Reason_String (N : Node_Id) is
+   begin
+      if Nkind (N) = N_String_Literal then
+         Store_String_Chars (Strval (N));
+
+      elsif Nkind (N) = N_Op_Concat then
+         Get_Reason_String (Left_Opnd (N));
+         Get_Reason_String (Right_Opnd (N));
+
+      --  If not of required form, error
+
+      else
+         Error_Msg_N
+           ("Reason for pragma Warnings has wrong form", N);
+         Error_Msg_N
+           ("\must be string literal or concatenation of string literals", N);
+         return;
+      end if;
+   end Get_Reason_String;
 
    ---------------------------
    -- Get_Referenced_Object --
@@ -10344,6 +10236,45 @@ package body Sem_Util is
          return False;
       end if;
    end Is_Iterator;
+
+   ------------------
+   -- Is_Junk_Name --
+   ------------------
+
+   function Is_Junk_Name (N : Name_Id) return Boolean is
+      function Match (S : String) return Boolean;
+      --  Return true if substring S is found in Name_Buffer (1 .. Name_Len)
+
+      -----------
+      -- Match --
+      -----------
+
+      function Match (S : String) return Boolean is
+         Slen1 : constant Integer := S'Length - 1;
+
+      begin
+         for J in 1 .. Name_Len - S'Length + 1 loop
+            if Name_Buffer (J .. J + Slen1) = S then
+               return True;
+            end if;
+         end loop;
+
+         return False;
+      end Match;
+
+   --  Start of processing for Is_Junk_Name
+
+   begin
+      Get_Unqualified_Decoded_Name_String (N);
+      Set_All_Upper_Case;
+
+      return
+        Match ("DISCARD") or else
+        Match ("DUMMY")   or else
+        Match ("IGNORE")  or else
+        Match ("JUNK")    or else
+        Match ("UNUSED");
+   end Is_Junk_Name;
 
    ------------
    -- Is_LHS --

@@ -7133,6 +7133,13 @@ This is particularly useful for clearly signaling that a particular
 parameter is not modified, even though the spec suggests that it might
 be.
 
+For the variable case, warnings are never given for unreferenced variables
+whose name contains one of the substrings
+@code{DISCARD, DUMMY, IGNORE, JUNK, UNUSED} in any casing. Such names
+are typically to be used in cases where such warnings are expected.
+Thus it is never necessary to use @code{pragma Unmodified} for such
+variables, though it is harmless to do so.
+
 @node Pragma Unreferenced
 @unnumberedsec Pragma Unreferenced
 @findex Unreferenced
@@ -7182,6 +7189,13 @@ clause. In this case the arguments must be unit names of units previously
 mentioned in @code{with} clauses (similar to the usage of pragma
 @code{Elaborate_All}. The effect is to suppress warnings about unreferenced
 units and unreferenced entities within these units.
+
+For the variable case, warnings are never given for unreferenced variables
+whose name contains one of the substrings
+@code{DISCARD, DUMMY, IGNORE, JUNK, UNUSED} in any casing. Such names
+are typically to be used in cases where such warnings are expected.
+Thus it is never necessary to use @code{pragma Unreferenced} for such
+variables, though it is harmless to do so.
 
 @node Pragma Unreferenced_Objects
 @unnumberedsec Pragma Unreferenced_Objects
@@ -7381,7 +7395,7 @@ pragma Warnings (On | Off, LOCAL_NAME [,REASON]);
 pragma Warnings (static_string_EXPRESSION [,REASON]);
 pragma Warnings (On | Off, static_string_EXPRESSION [,REASON]);
 
-REASON ::= Reason => static_string_EXPRESSION
+REASON ::= Reason => STRING_LITERAL @{& STRING_LITERAL@}
 @end smallexample
 
 @noindent
@@ -8725,6 +8739,10 @@ will have a size of 40 (that is @code{Rec'Size} will be 40).  The
 alignment will be 4, because of the
 integer field, and so the default size of record objects for this type
 will be 64 (8 bytes).
+
+If the alignment of the above record is specified to be 1, then the
+object size will be 40 (5 bytes). This is true by default, and also
+an object size of 40 can be explicitly specified in this case.
 
 A consequence of this capability is that different object sizes can be
 given to subtypes that would otherwise be considered in Ada to be
