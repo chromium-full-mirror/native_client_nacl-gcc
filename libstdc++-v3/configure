@@ -6283,7 +6283,7 @@ freebsd* | dragonfly*)
   fi
   ;;
 
-gnu*)
+gnu* | nacl*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
@@ -9266,7 +9266,7 @@ _LT_EOF
       archive_expsym_cmds='sed "s,^,_," $export_symbols >$output_objdir/$soname.expsym~$CC -shared $pic_flag $libobjs $deplibs $compiler_flags ${wl}-h,$soname ${wl}--retain-symbols-file,$output_objdir/$soname.expsym ${wl}--image-base,`expr ${RANDOM-$$} % 4096 / 2 \* 262144 + 1342177280` -o $lib'
       ;;
 
-    gnu* | linux* | tpf* | k*bsd*-gnu | kopensolaris*-gnu)
+    gnu* | linux* | tpf* | k*bsd*-gnu | kopensolaris*-gnu | nacl*)
       tmp_diet=no
       if test "$host_os" = linux-dietlibc; then
 	case $cc_basename in
@@ -10680,7 +10680,7 @@ freebsd* | dragonfly*)
   esac
   ;;
 
-gnu*)
+gnu* | nacl*)
   version_type=linux
   need_lib_prefix=no
   need_version=no
@@ -10688,6 +10688,7 @@ gnu*)
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
   hardcode_into_libs=yes
+  dynamic_linker='GNU ld.so'
   ;;
 
 haiku*)
@@ -11289,6 +11290,15 @@ fi
 
     ;;
 
+  # This case is really only needed because of bootstrapping issues.
+  # The empirical tests below will barf on GCC_NO_EXECUTABLES when
+  # linking has failed because of missing crt[1in].o files.
+  nacl*)
+    lt_cv_dlopen=dlopen
+    lt_cv_dlopen_libs=-ldl
+    lt_cv_dlopen_self=yes
+    ;;
+
   *)
     ac_fn_c_check_func "$LINENO" "shl_load" "ac_cv_func_shl_load"
 if test "x$ac_cv_func_shl_load" = x""yes; then :
@@ -11513,7 +11523,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11516 "configure"
+#line 11526 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11619,7 +11629,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11622 "configure"
+#line 11632 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12567,7 +12577,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
         ld_shlibs_CXX=yes
         ;;
 
-      gnu*)
+      gnu* | nacl*)
         ;;
 
       haiku*)
@@ -14364,7 +14374,7 @@ freebsd* | dragonfly*)
   esac
   ;;
 
-gnu*)
+gnu* | nacl*)
   version_type=linux
   need_lib_prefix=no
   need_version=no
@@ -14372,6 +14382,7 @@ gnu*)
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
   hardcode_into_libs=yes
+  dynamic_linker='GNU ld.so'
   ;;
 
 haiku*)
@@ -15033,7 +15044,7 @@ fi
     #
     # Fake what AC_TRY_COMPILE does.  XXX Look at redoing this new-style.
     cat > conftest.$ac_ext << EOF
-#line 15036 "configure"
+#line 15047 "configure"
 struct S { ~S(); };
 void bar();
 void foo()
@@ -15383,7 +15394,7 @@ $as_echo "$glibcxx_cv_atomic_long_long" >&6; }
   # Fake what AC_TRY_COMPILE does.
 
     cat > conftest.$ac_ext << EOF
-#line 15386 "configure"
+#line 15397 "configure"
 int main()
 {
   typedef bool atomic_type;
@@ -15418,7 +15429,7 @@ $as_echo "$glibcxx_cv_atomic_bool" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 15421 "configure"
+#line 15432 "configure"
 int main()
 {
   typedef short atomic_type;
@@ -15453,7 +15464,7 @@ $as_echo "$glibcxx_cv_atomic_short" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 15456 "configure"
+#line 15467 "configure"
 int main()
 {
   // NB: _Atomic_word not necessarily int.
@@ -15489,7 +15500,7 @@ $as_echo "$glibcxx_cv_atomic_int" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 15492 "configure"
+#line 15503 "configure"
 int main()
 {
   typedef long long atomic_type;
@@ -15568,7 +15579,7 @@ $as_echo "$as_me: WARNING: Performance of certain classes will degrade as a resu
   # unnecessary for this test.
 
     cat > conftest.$ac_ext << EOF
-#line 15571 "configure"
+#line 15582 "configure"
 int main()
 {
   _Decimal32 d1;
@@ -15610,7 +15621,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   # unnecessary for this test.
 
     cat > conftest.$ac_ext << EOF
-#line 15613 "configure"
+#line 15624 "configure"
 template<typename T1, typename T2>
   struct same
   { typedef T2 type; };
@@ -15644,7 +15655,7 @@ $as_echo "$enable_int128" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 15647 "configure"
+#line 15658 "configure"
 template<typename T1, typename T2>
   struct same
   { typedef T2 type; };
@@ -46113,7 +46124,11 @@ $as_echo "#define HAVE_TLS 1" >>confdefs.h
 	;;
     esac
     ;;
+<<<<<<< HEAD
   *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu)
+=======
+  *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu | *-cygwin* | *-nacl*)
+>>>>>>> 4c023f7... Teach libtool and libstdc++ configury about *-nacl shared libraries
 
   # All these tests are for C++; save the language and the compiler flags.
   # The CXXFLAGS thing is suspicious, but based on similar bits previously

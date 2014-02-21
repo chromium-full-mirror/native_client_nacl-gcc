@@ -1742,6 +1742,15 @@ else
     ])
     ;;
 
+  # This case is really only needed because of bootstrapping issues.
+  # The empirical tests below will barf on GCC_NO_EXECUTABLES when
+  # linking has failed because of missing crt[1in].o files.
+  nacl*)
+    lt_cv_dlopen=dlopen
+    lt_cv_dlopen_libs=-ldl
+    lt_cv_dlopen_self=yes
+    ;;
+
   *)
     AC_CHECK_FUNC([shl_load],
 	  [lt_cv_dlopen="shl_load"],
@@ -2317,7 +2326,7 @@ freebsd* | dragonfly*)
   esac
   ;;
 
-gnu*)
+gnu* | nacl*)
   version_type=linux
   need_lib_prefix=no
   need_version=no
@@ -2325,6 +2334,7 @@ gnu*)
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
   hardcode_into_libs=yes
+  dynamic_linker='GNU ld.so'
   ;;
 
 haiku*)
@@ -3041,7 +3051,7 @@ freebsd* | dragonfly*)
   fi
   ;;
 
-gnu*)
+gnu* | nacl*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
@@ -4443,7 +4453,7 @@ _LT_EOF
       _LT_TAGVAR(archive_expsym_cmds, $1)='sed "s,^,_," $export_symbols >$output_objdir/$soname.expsym~$CC -shared $pic_flag $libobjs $deplibs $compiler_flags ${wl}-h,$soname ${wl}--retain-symbols-file,$output_objdir/$soname.expsym ${wl}--image-base,`expr ${RANDOM-$$} % 4096 / 2 \* 262144 + 1342177280` -o $lib'
       ;;
 
-    gnu* | linux* | tpf* | k*bsd*-gnu | kopensolaris*-gnu)
+    gnu* | linux* | tpf* | k*bsd*-gnu | kopensolaris*-gnu | nacl*)
       tmp_diet=no
       if test "$host_os" = linux-dietlibc; then
 	case $cc_basename in
@@ -5776,7 +5786,7 @@ if test "$_lt_caught_CXX_error" != yes; then
         _LT_TAGVAR(ld_shlibs, $1)=yes
         ;;
 
-      gnu*)
+      gnu* | nacl*)
         ;;
 
       haiku*)
