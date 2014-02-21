@@ -2,6 +2,85 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-02-21  Catherine Moore  <clm@codesourcery.com>
+
+	* doc/invoke.texi (mvirt, mno-virt): Document.
+	* config/mips/mips.opt (mvirt): New option.
+	* config/mips/mips.h (ASM_SPEC): Pass mvirt to the assembler.
+
+2014-02-21  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60276
+	* tree-vectorizer.h (struct _stmt_vec_info): Add min_neg_dist field.
+	(STMT_VINFO_MIN_NEG_DIST): New macro.
+	* tree-vect-data-refs.c (vect_analyze_data_ref_dependence): Record
+	STMT_VINFO_MIN_NEG_DIST.
+	* tree-vect-stmts.c (vectorizable_load): Verify if assumptions
+	made for negative dependence distances still hold.
+
+2014-02-21  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60291
+	* tree-ssa-live.c (mark_all_vars_used_1): Do not walk
+	DECL_INITIAL for globals not in the current function context.
+
+2014-02-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/56490
+	* params.def (PARAM_UNINIT_CONTROL_DEP_ATTEMPTS): New param.
+	* tree-ssa-uninit.c: Include params.h.
+	(compute_control_dep_chain): Add num_calls argument, return false
+	if it exceed PARAM_UNINIT_CONTROL_DEP_ATTEMPTS param, pass
+	num_calls to recursive call.
+	(find_predicates): Change dep_chain into normal array,
+	cur_chain into auto_vec<edge, MAX_CHAIN_LEN + 1>, add num_calls
+	variable and adjust compute_control_dep_chain caller.
+	(find_def_preds): Likewise.
+
+2014-02-21  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* gimple-pretty-print.c (dump_gimple_omp_for) [flags & TDF_RAW]
+	<case GF_OMP_FOR_KIND_CILKSIMD>: Add missing break statement.
+
+2014-02-21  Nick Clifton  <nickc@redhat.com>
+
+	* config/stormy16/stormy16.md (pushdqi1): Add mode to post_inc.
+	(pushhi1): Likewise.
+	(popqi1): Add mode to pre_dec.
+	(pophi1): Likewise.
+
+2014-02-21  Jakub Jelinek  <jakub@redhat.com>
+
+	* config/i386/i386.c (ix86_expand_vec_perm): Use V8SImode
+	mode for mask of V8SFmode permutation.
+
+2014-02-20  Richard Henderson  <rth@redhat.com>
+
+	PR c++/60272
+	* builtins.c (expand_builtin_atomic_compare_exchange): Always make
+	a new pseudo for OLDVAL.
+
+2014-02-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/57896
+	* config/i386/i386.c (expand_vec_perm_interleave2): Don't call
+	gen_reg_rtx if d->testing_p.
+	(expand_vec_perm_pshufb2, expand_vec_perm_broadcast_1): Return early
+	if d->testing_p and we will certainly return true.
+	(expand_vec_perm_even_odd_1): Likewise.  Don't call gen_reg_rtx
+	if d->testing_p.
+
+2014-02-20  Uros Bizjak  <ubizjak@gmail.com>
+
+	* emit-rtl.c (gen_reg_rtx): Assert that
+	crtl->emit.regno_pointer_align_length is non-zero.
+
+2014-02-20  Richard Henderson  <rth@redhat.com>
+
+	PR c++/60272
+	* builtins.c (expand_builtin_atomic_compare_exchange): Conditionalize
+	on failure the store back into EXPECT.
+
 2014-02-20  Chung-Lin Tang  <cltang@codesourcery.com>
 	    Sandra Loosemore  <sandra@codesourcery.com>
 
@@ -30,8 +109,7 @@
 
 	* tree-cfg.c (replace_uses_by): Mark altered BBs before
 	doing the substitution.
-	(verify_gimple_assign_single): Also verify bare MEM_REFs
-	on the lhs.
+	(verify_gimple_assign_single): Also verify bare MEM_REFs on the lhs.
 
 2014-02-20  Martin Jambor  <mjambor@suse.cz>
 
@@ -48,8 +126,8 @@
 2014-02-20  Jan Hubicka  <hubicka@ucw.cz>
 
 	PR ipa/58555
-	* ipa-inline-transform.c (clone_inlined_nodes): Add freq_scale parameter
-	specifying the scaling.
+	* ipa-inline-transform.c (clone_inlined_nodes): Add freq_scale
+	parameter specifying the scaling.
 	(inline_call): Update.
 	(want_inline_recursively): Guard division by zero.
 	(recursive_inlining): Update.
@@ -62,7 +140,7 @@
 	64 bytes or less in register.
 
 2014-02-20  Ilya Tocar  <ilya.tocar@intel.com>
-            Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Kirill Yukhin  <kirill.yukhin@intel.com>
 
 	* config/i386/avx512erintrin.h (_mm_rcp28_round_sd): Swap operands.
 	(_mm_rcp28_round_ss): Ditto.
@@ -565,7 +643,7 @@
 
 	* config/microblaze/microblaze.h: Define SIZE_TYPE and PTRDIFF_TYPE.
 
-2014-02-10  Richard Henderson <rth@redhat.com>
+2014-02-10  Richard Henderson  <rth@redhat.com>
 
 	PR target/59927
 	* calls.c (expand_call): Don't double-push for reg_parm_stack_space.
@@ -984,7 +1062,7 @@
 	(altivec_vupklpx): Emit vupkhpx instead of vupklpx when target is
 	little endian and -maltivec=be is not specified.
 
-2014-02-05  Richard Henderson <rth@redhat.com>
+2014-02-05  Richard Henderson  <rth@redhat.com>
 
 	PR debug/52727
 	* combine-stack-adj.c: Revert r206943.
@@ -2924,7 +3002,7 @@
 	* config/aarch64/aarch64.c (aarch64_register_move_cost): Correct cost
 	of moving from/to the STACK_REG register class.
 
-2014-01-15  Richard Henderson <rth@redhat.com>
+2014-01-15  Richard Henderson  <rth@redhat.com>
 
 	PR debug/54694
 	* reginfo.c (global_regs_decl): Globalize.

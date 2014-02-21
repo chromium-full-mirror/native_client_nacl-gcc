@@ -1,3 +1,53 @@
+2014-02-21  Jason Merrill  <jason@redhat.com>
+
+	PR c++/60216
+	* pt.c (register_specialization): Copy DECL_DELETED_FN to clones.
+	(check_explicit_specialization): Don't clone.
+
+	PR c++/60219
+	* pt.c (coerce_template_parms): Bail if argument packing fails.
+
+	PR c++/60224
+	* decl.c (cp_complete_array_type, maybe_deduce_size_from_array_init):
+	Don't get confused by a CONSTRUCTOR that already has a type.
+
+	PR c++/60227
+	* call.c (build_array_conv): Don't crash on VLA.
+
+	PR c++/60248
+	* mangle.c (mangle_decl): Don't make an alias for a TYPE_DECL.
+
+	PR c++/60252
+	* lambda.c (maybe_resolve_dummy): Don't try to capture this
+	in declaration context.
+
+	DR 1591
+	PR c++/60051
+	* pt.c (unify): Only unify if deducible.  Handle 0-length list.
+
+	PR c++/60250
+	* parser.c (cp_parser_direct_declarator): Don't wrap a
+	type-dependent expression in a NOP_EXPR.
+
+	PR c++/60251
+	* lambda.c (is_normal_capture_proxy): Handle VLA capture.
+
+	PR c++/60167
+	PR c++/60222
+	PR c++/58606
+	* parser.c (cp_parser_template_argument): Restore dereference.
+	* pt.c (template_parm_to_arg): Dereference non-pack expansions too.
+	(process_partial_specialization): Handle deref.
+	(unify): Likewise.
+
+2014-02-21  Adam Butcher  <adam@jessamine.co.uk>
+
+	PR c++/60052
+	PR c++/60053
+	* parser.c (cp_parser_parameter_declaration_list): Correctly reset
+	implicit_template_scope upon leaving an out-of-line generic member
+	function definition.
+
 2014-02-20  Kai Tietz  <ktietz@redhat.com>
 
 	PR c++/58873

@@ -1440,6 +1440,8 @@ register_specialization (tree spec, tree tmpl, tree args, bool is_friend,
 		    = DECL_DECLARED_INLINE_P (fn);
 		  DECL_SOURCE_LOCATION (clone)
 		    = DECL_SOURCE_LOCATION (fn);
+		  DECL_DELETED_FN (clone)
+		    = DECL_DELETED_FN (fn);
 		}
 	      check_specialization_namespace (tmpl);
 
@@ -2770,15 +2772,16 @@ check_explicit_specialization (tree declarator,
 	       It's just the name of an instantiation.  But, it's not
 	       a request for an instantiation, either.  */
 	    SET_DECL_IMPLICIT_INSTANTIATION (decl);
-	  else if (DECL_CONSTRUCTOR_P (decl) || DECL_DESTRUCTOR_P (decl))
-	    /* This is indeed a specialization.  In case of constructors
-	       and destructors, we need in-charge and not-in-charge
-	       versions in V3 ABI.  */
-	    clone_function_decl (decl, /*update_method_vec_p=*/0);
 
 	  /* Register this specialization so that we can find it
 	     again.  */
 	  decl = register_specialization (decl, gen_tmpl, targs, is_friend, 0);
+
+	  /* A 'structor should already have clones.  */
+	  gcc_assert (decl == error_mark_node
+		      || !(DECL_CONSTRUCTOR_P (decl)
+			   || DECL_DESTRUCTOR_P (decl))
+		      || DECL_CLONED_FUNCTION_P (DECL_CHAIN (decl)));
 	}
     }
 
@@ -3861,6 +3864,8 @@ template_parm_to_arg (tree t)
 	  SET_ARGUMENT_PACK_ARGS (t, vec);
 	  TREE_TYPE (t) = type;
 	}
+      else
+	t = convert_from_reference (t);
     }
   return t;
 }
@@ -4218,10 +4223,12 @@ process_partial_specialization (tree decl)
           if (/* These first two lines are the `non-type' bit.  */
               !TYPE_P (arg)
               && TREE_CODE (arg) != TEMPLATE_DECL
-              /* This next line is the `argument expression is not just a
+              /* This next two lines are the `argument expression is not just a
                  simple identifier' condition and also the `specialized
                  non-type argument' bit.  */
-              && TREE_CODE (arg) != TEMPLATE_PARM_INDEX)
+              && TREE_CODE (arg) != TEMPLATE_PARM_INDEX
+	      && !(REFERENCE_REF_P (arg)
+		   && TREE_CODE (TREE_OPERAND (arg, 0)) == TEMPLATE_PARM_INDEX))
             {
               if ((!packed_args && tpd.arg_uses_template_parms[i])
                   || (packed_args && uses_template_parms (arg)))
@@ -6804,6 +6811,8 @@ coerce_template_parms (tree parms,
           /* Store this argument.  */
           if (arg == error_mark_node)
             lost++;
+	  if (lost)
+	    break;
           TREE_VEC_ELT (new_inner_args, parm_idx) = arg;
 
 	  /* We are done with all of the arguments.  */
@@ -17258,14 +17267,16 @@ unify (tree tparms, tree targs, tree parm, tree arg, int strict,
 				   explain_p);
 	}
 
-      if (TREE_CODE (parm) == ARRAY_TYPE)
+      if (TREE_CODE (parm) == ARRAY_TYPE
+	  && deducible_array_bound (TYPE_DOMAIN (parm)))
 	{
 	  /* Also deduce from the length of the initializer list.  */
 	  tree max = size_int (CONSTRUCTOR_NELTS (arg));
 	  tree idx = compute_array_index_type (NULL_TREE, max, tf_none);
-	  if (TYPE_DOMAIN (parm) != NULL_TREE)
-	    return unify_array_domain (tparms, targs, TYPE_DOMAIN (parm),
-				       idx, explain_p);
+	  if (idx == error_mark_node)
+	    return unify_invalid (explain_p);
+	  return unify_array_domain (tparms, targs, TYPE_DOMAIN (parm),
+				     idx, explain_p);
 	}
 
       /* If the std::initializer_list<T> deduction worked, replace the
@@ -17892,6 +17903,12 @@ unify (tree tparms, tree targs, tree parm, tree arg, int strict,
     case ERROR_MARK:
       /* Unification fails if we hit an error node.  */
       return unify_invalid (explain_p);
+
+    case INDIRECT_REF:
+      if (REFERENCE_REF_P (parm))
+	return unify (tparms, targs, TREE_OPERAND (parm, 0), arg,
+		      strict, explain_p);
+      /* FALLTHRU */
 
     default:
       /* An unresolved overload is a nondeduced context.  */

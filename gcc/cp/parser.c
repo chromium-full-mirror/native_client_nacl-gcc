@@ -13937,6 +13937,7 @@ cp_parser_template_argument (cp_parser* parser)
 
 	  if (INDIRECT_REF_P (argument))
 	    {
+	      /* Strip the dereference temporarily.  */
 	      gcc_assert (REFERENCE_REF_P (argument));
 	      argument = TREE_OPERAND (argument, 0);
 	    }
@@ -13975,6 +13976,8 @@ cp_parser_template_argument (cp_parser* parser)
 	      if (address_p)
 		argument = build_x_unary_op (loc, ADDR_EXPR, argument,
 					     tf_warning_or_error);
+	      else
+		argument = convert_from_reference (argument);
 	      return argument;
 	    }
 	}
@@ -17230,7 +17233,8 @@ cp_parser_direct_declarator (cp_parser* parser,
 				   "array bound is not an integer constant");
 		  bounds = error_mark_node;
 		}
-	      else if (processing_template_decl)
+	      else if (processing_template_decl
+		       && !type_dependent_expression_p (bounds))
 		{
 		  /* Remember this wasn't a constant-expression.  */
 		  bounds = build_nop (TREE_TYPE (bounds), bounds);
@@ -18372,11 +18376,21 @@ cp_parser_parameter_declaration_list (cp_parser* parser, bool *is_error)
   parser->in_unbraced_linkage_specification_p
     = saved_in_unbraced_linkage_specification_p;
 
+  /* Reset implicit_template_scope if we are about to leave the function
+     parameter list that introduced it.  Note that for out-of-line member
+     definitions, there will be one or more class scopes before we get to
+     the template parameter scope.  */
+
   if (cp_binding_level *its = parser->implicit_template_scope)
-    if (current_binding_level->level_chain == its)
+    if (cp_binding_level *maybe_its = current_binding_level->level_chain)
       {
-	parser->implicit_template_parms = 0;
-	parser->implicit_template_scope = 0;
+	while (maybe_its->kind == sk_class)
+	  maybe_its = maybe_its->level_chain;
+	if (maybe_its == its)
+	  {
+	    parser->implicit_template_parms = 0;
+	    parser->implicit_template_scope = 0;
+	  }
       }
 
   return parameters;
