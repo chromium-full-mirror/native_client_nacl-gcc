@@ -89,7 +89,7 @@
   "TARGET_HAVE_LDREXD && ARM_DOUBLEWORD_ALIGN"
   "%b1ldrexd%?\t%0, %H0, %C1"
   [(set_attr "predicable" "yes")
-   (set_attr "sfi_breg_operand" "1")])
+   (set (attr "length") (attr "length_breg_op1"))])
 
 (define_expand "atomic_compare_and_swap<mode>"
   [(match_operand:SI 0 "s_register_operand" "")		;; bool out
