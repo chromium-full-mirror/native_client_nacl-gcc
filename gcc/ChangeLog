@@ -2,6 +2,88 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-03-03  Nick Clifton  <nickc@redhat.com>
+
+	* config/rl78/rl78-real.md (cbranchsi4_real_signed): Add
+	anti-cacnonical alternatives.
+	(negandhi3_real): New pattern.
+	* config/rl78/rl78-virt.md (negandhi3_virt): New pattern.
+
+2014-03-03  Senthil Kumar Selvaraj  <senthil_kumar.selvaraj@atmel.com>
+
+	* config/avr/avr-mcus.def: Remove atxmega16x1.
+	* config/avr/avr-tables.opt: Regenerate.
+	* config/avr/t-multilib: Regenerate.
+	* doc/avr-mmcu.texi: Regenerate.
+
+2014-03-03  Tobias Grosser  <tobias@grosser.es>
+	Mircea Namolaru  <mircea.namolaru@inria.fr>
+
+	PR tree-optimization/58028
+	* graphite-clast-to-gimple.c (set_cloog_options): Don't remove
+	scalar dimensions.
+
+2014-03-03  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* config/arm/neon.md (*movmisalign<mode>): Legitimize addresses
+	not handled by recognizers.
+
+2014-03-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/60175
+	* function.c (expand_function_end): Don't emit
+	clobber_return_register sequence if clobber_after is a BARRIER.
+	* cfgexpand.c (construct_exit_block): Append instructions before
+	return_label to prev_bb.
+
+2014-03-02  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/constraints.md: Document reserved use of "wc".
+
+2014-03-02  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/60150
+	* ipa.c (function_and_variable_visibility): When dissolving comdat
+	group, also set all symbols to local.
+
+2014-03-02  Jan Hubicka  <hubicka@ucw.cz>
+
+	PR ipa/60306
+
+	Revert:
+	2013-12-14   Jan Hubicka  <jh@suse.cz>
+        PR middle-end/58477
+        * ipa-prop.c (stmt_may_be_vtbl_ptr_store): Skip clobbers.
+
+2014-03-02  Jon Beniston  <jon@beniston.com>
+
+	PR bootstrap/48230
+	PR bootstrap/50927
+	PR bootstrap/52466
+	PR target/46898
+	* config/lm32/lm32.c (lm32_legitimate_constant_p): Remove, as incorrect.
+	  (TARGET_LEGITIMATE_CONSTANT_P): Undefine, as not needed.
+	* config/lm32/lm32.md (movsi_insn): Add 32-bit immediate support.
+	(simple_return, *simple_return): New patterns
+	* config/lm32/predicates.md (movsi_rhs_operand): Remove as obsolete.
+	* configure.ac (force_sjlj_exceptions): Force sjlj exceptions for lm32.
+
+2014-03-01  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	* dwarf2out.c (gen_subprogram_die): Tidy.
+
+2014-03-01  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/60071
+	* config/sh/sh.md (*mov_t_msb_neg): Split into ...
+	(*mov_t_msb_neg_negc): ... this new insn.
+
+2014-02-28  Jason Merrill  <jason@redhat.com>
+
+	PR c++/58678
+	* ipa-devirt.c (ipa_devirt): Don't choose an implicitly-declared
+	function.
+
 2014-02-28  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/60314
