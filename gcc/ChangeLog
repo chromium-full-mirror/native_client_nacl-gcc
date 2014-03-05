@@ -2,6 +2,108 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-03-05  Jakub Jelinek  <jakub@redhat.com>
+
+	PR plugins/59335
+	* Makefile.in (PLUGIN_HEADERS): Add tree-phinodes.h, stor-layout.h,
+	ssa-iterators.h, $(RESOURCE_H) and tree-cfgcleanup.h.
+
+	PR plugins/59335
+	* config/i386/t-i386 (OPTIONS_H_EXTRA): Add stringop.def.
+	(TM_H): Add x86-tune.def.
+
+2014-03-05  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/aarch64/aarch64.c (generic_tunings):
+	Use cortexa57_extra_costs.
+
+2014-03-05  Jakub Jelinek  <jakub@redhat.com>
+
+	PR lto/60404
+	* cfgexpand.c (expand_used_vars): Do not assume all SSA_NAMEs
+	of PARM/RESULT_DECLs must be coalesced with optimize && in_lto_p.
+	* tree-ssa-coalesce.c (coalesce_ssa_name): Use MUST_COALESCE_COST - 1
+	cost for in_lto_p.
+
+2014-03-04  Heiher  <r@hev.cc>
+
+	* config/mips/mips-cpus.def (loongson3a): Mark as a MIPS64r2 processor.
+	* config/mips/mips.h (MIPS_ISA_LEVEL_SPEC): Adjust accordingly.
+
+2014-03-04  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/predicates.md (const2356_operand): Change to ...
+	(const2367_operand): ... this.
+	* config/i386/sse.md (avx512pf_scatterpf<mode>sf): Use
+	const2367_operand.
+	(*avx512pf_scatterpf<mode>sf_mask): Ditto.
+	(*avx512pf_scatterpf<mode>sf): Ditto.
+	(avx512pf_scatterpf<mode>df): Ditto.
+	(*avx512pf_scatterpf<mode>df_mask): Ditto.
+	(*avx512pf_scatterpf<mode>df): Ditto.
+	* config/i386/i386.c (ix86_expand_builtin): Update
+	incorrect hint operand error message.
+
+2014-03-04  Richard Biener  <rguenther@suse.de>
+
+	* lto-section-in.c (lto_get_section_data): Fix const cast.
+
+2014-03-04  Paulo Matos  <paulo@matos-sorge.com>
+
+        * tree-streamer.c (record_common_node): Assert we don't record
+        nodes with type double.
+        (preload_common_node): Skip type double, complex double and
+        double pointer since it is now frontend dependent due to
+        fshort-double option.
+
+2014-03-04  Richard Biener  <rguenther@suse.de>
+
+	PR lto/60405
+	* lto-streamer-in.c (lto_read_body): Remove LTO bytecode version check.
+	(lto_input_toplevel_asms): Likewise.
+	* lto-section-in.c (lto_get_section_data): Instead do it here
+	for every section.
+
+2014-03-04  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60382
+	* tree-vect-loop.c (vect_is_simple_reduction_1): Do not consider
+	dead PHIs a reduction.
+
+2014-03-03  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/xmmintrin.h (enum _mm_hint) <_MM_HINT_ET0>: Correct
+	hint value.
+	(_mm_prefetch): Move out of GCC target("sse") pragma.
+	* config/i386/prfchwintrin.h (_m_prefetchw): Move out of
+	GCC target("prfchw") pragma.
+	* config/i386/i386.md (prefetch): Emit prefetchwt1 only
+	for locality <= 2.
+	* config/i386/i386.c (ix86_option_override_internal): Enable
+	-mprfchw with -mprefetchwt1.
+
+2014-03-03  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.md (casesi_load) <length attribute alternative 0>:
+	Mark as varying.
+
+2014-03-03  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* opts.h (CL_PCH_IGNORE): Define.
+	* targhooks.c (option_affects_pch_p):
+	Return false for options that have CL_PCH_IGNORE set.
+	* opt-functions.awk: Process PchIgnore.
+	* doc/options.texi: Document PchIgnore.
+
+	* config/arc/arc.opt (misize): Add PchIgnore property.
+
+2014-03-03  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* config/rs6000/rs6000.c (rs6000_preferred_reload_class): Disallow
+	reload of PLUS rtx's outside of GENERAL_REGS or BASE_REGS; relax
+	constraint on constants to permit them being loaded into
+	GENERAL_REGS or BASE_REGS.
+
 2014-03-03  Nick Clifton  <nickc@redhat.com>
 
 	* config/rl78/rl78-real.md (cbranchsi4_real_signed): Add
@@ -17,7 +119,7 @@
 	* doc/avr-mmcu.texi: Regenerate.
 
 2014-03-03  Tobias Grosser  <tobias@grosser.es>
-	Mircea Namolaru  <mircea.namolaru@inria.fr>
+	    Mircea Namolaru  <mircea.namolaru@inria.fr>
 
 	PR tree-optimization/58028
 	* graphite-clast-to-gimple.c (set_cloog_options): Don't remove

@@ -1,3 +1,51 @@
+2014-03-05  Jakub Jelinek  <jakub@redhat.com>
+
+	PR lto/60404
+	* gcc.dg/lto/pr60404_0.c: New test.
+	* gcc.dg/lto/pr60404_1.c: New file.
+	* gcc.dg/lto/pr60404_2.c: New file.
+
+2014-03-04  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
+
+	* gcc.dg/vmx/extract-vsx.c: Replace "vector long" with "vector
+	long long" throughout.
+	* gcc.dg/vmx/extract-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/insert-vsx.c: Likewise.
+	* gcc.dg/vmx/insert-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/ld-vsx.c: Likewise.
+	* gcc.dg/vmx/ld-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/ldl-vsx.c: Likewise.
+	* gcc.dg/vmx/ldl-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/merge-vsx.c: Likewise.
+	* gcc.dg/vmx/merge-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/st-vsx.c: Likewise.
+	* gcc.dg/vmx/st-vsx-be-order.c: Likewise.
+	* gcc.dg/vmx/stl-vsx.c: Likewise.
+	* gcc.dg/vmx/stl-vsx-be-order.c: Likewise.
+
+2014-03-04  Paulo Matos  <paulo@matos-sorge.com>
+
+        * gcc.dg/lto/pr55113_0.c: New testcase.
+
+2014-03-04  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/60376
+	* g++.dg/cpp1y/pr60376.C: New.
+
+2014-03-04  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* g++.dg/abi/anon2.C: Don't scan assembler for c++98.
+
+2014-03-04  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60382
+	* gcc.dg/vect/pr60382.c: New testcase.
+
+2014-03-03  Jerry DeLisle  <jvdelisle@gcc.gnu>
+
+	PR libfortran/60148
+	* gfortran.dg/namelist_84.f90: New test.
+
 2014-03-03  Kirill Yukhin  <kirill.yukhin@intel.com>
 
 	* gcc.target/i386/avx512er-vexp2ps-2.c: Decrease exponent
