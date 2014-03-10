@@ -2,6 +2,69 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-03-10  Jakub Jelinek  <jakub@redhat.com>
+
+	PR ipa/60457
+	* ipa.c (symtab_remove_unreachable_nodes): Don't call
+	cgraph_get_create_node on VAR_DECLs.
+
+2014-03-10  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60474
+	* tree.c (signed_or_unsigned_type_for): Handle OFFSET_TYPEs.
+
+2014-03-08  Douglas B Rupp  <rupp@gnat.com>
+
+	* config/vms/vms.opt (vms_float_format): New variable.
+
+2014-03-08  Tobias Burnus  <burnus@net-b.de>
+
+	* doc/invoke.texi (-fcilkplus): Update implementation
+	status.
+
+2014-03-08  Paulo Matos  <paulo@matos-sorge.com>
+	    Richard Biener  <rguenther@suse.de>
+
+	* lto-wrapper.c (merge_and_complain): Ensure -fshort-double is used
+	consistently accross all TUs.
+	(run_gcc): Enable -fshort-double automatically at link at link-time
+	and disallow override.
+
+2014-03-08  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR target/58271
+	* config/mips/mips.c (mips_option_override): Promote -mpaired-single
+	warning to an error.  Disable TARGET_PAIRED_SINGLE and TARGET_MIPS3D
+	if they can't be used.
+
+2014-03-07  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (HAVE_AS_IX86_TLSLDMPLT): Improve test for Solaris
+	11/x86 ld.
+	* configure: Regenerate.
+
+2014-03-07  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (TLS_SECTION_ASM_FLAG): Save as tls_section_flag.
+	(LIB_TLS_SPEC): Save as ld_tls_libs.
+	(HAVE_AS_IX86_TLSLDMPLT): Define as 1/0.
+	(HAVE_AS_IX86_TLSLDM): New test.
+	* configure, config.in: Regenerate.
+	* config/i386/i386.c (legitimize_tls_address): Fall back to
+	TLS_MODEL_GLOBAL_DYNAMIC on 32-bit Solaris/x86 if tool chain
+	cannot support TLS_MODEL_LOCAL_DYNAMIC.
+	* config/i386/i386.md (*tls_local_dynamic_base_32_gnu): Use if
+	instead of #ifdef in HAVE_AS_IX86_TLSLDMPLT test.
+
+2014-03-07  Paulo Matos  <paulo@matos-sorge.com>
+
+	* common.opt (fira-loop-pressure): Mark as optimization.
+
+2014-03-07  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* langhooks.c (lhd_omp_mappable_type): The error_mark_node is not
+	an OpenMP mappable type.
+
 2014-03-06  Matthias Klose  <doko@ubuntu.com>
 
 	* Makefile.in (s-mlib): Only pass MULTIARCH_DIRNAME if
