@@ -1,4 +1,15 @@
+2014-03-11  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/60389
+	* method.c (get_inherited_ctor): New.
+	* cp-tree.h (get_inherited_ctor): Declare it.
+	* semantics.c (is_valid_constexpr_fn): Use it.
+
 2014-03-10  Jason Merrill  <jason@redhat.com>
+
+	PR c++/60367
+	* call.c (convert_default_arg): Remove special handling for
+	CONSTRUCTOR.
 
 	PR c++/53492
 	* parser.c (cp_parser_class_head): Also check PRIMARY_TEMPLATE_P

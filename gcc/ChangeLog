@@ -2,6 +2,111 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-03-12  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* config/aarch64/aarch64-builtins.c
+	(aarch64_builtin_vectorized_function): Add BUILT_IN_LFLOORF,
+	BUILT_IN_LLFLOOR, BUILT_IN_LCEILF and BUILT_IN_LLCEIL.
+	* config/aarch64/arm_neon.h (vcvtaq_u64_f64): Call __builtin_llfloor
+	instead of __builtin_lfloor.
+	(vcvtnq_u64_f64): Call __builtin_llceil instead of __builtin_lceil.
+
+2014-03-12  Jakub Jelinek  <jakub@redhat.com>
+
+	* tree-ssa-ifcombine.c (forwarder_block_to): New function.
+	(tree_ssa_ifcombine_bb_1): New function.
+	(tree_ssa_ifcombine_bb): Use it.  Handle also cases where else_bb
+	is an empty forwarder block to then_bb or vice versa and then_bb
+	and else_bb are effectively swapped.
+
+2014-03-12  Christian Bruel  <christian.bruel@st.com>
+
+	PR target/60264
+	* config/arm/arm.c (arm_emit_vfp_multi_reg_pop): Emit a	REG_CFA_DEF_CFA
+	note.
+	(arm_expand_epilogue_apcs_frame): call arm_add_cfa_adjust_cfa_note.
+	(arm_unwind_emit): Allow REG_CFA_DEF_CFA.
+
+2014-03-12  Thomas Preud'homme  <thomas.preudhomme@arm.com>
+
+	PR tree-optimization/60454
+	* tree-ssa-math-opts.c (find_bswap_1): Fix bswap detection.
+
+2014-03-12  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config.gcc (aarch64*-*-*): Use ISA flags from aarch64-arches.def.
+	Do not define target_cpu_default2 to generic.
+	* config/aarch64/aarch64.h (TARGET_CPU_DEFAULT): Use generic cpu.
+	* config/aarch64/aarch64.c (aarch64_override_options): Update comment.
+	* config/aarch64/aarch64-arches.def (armv8-a): Use generic cpu.
+
+2014-03-12  Jakub Jelinek  <jakub@redhat.com>
+	    Marc Glisse  <marc.glisse@inria.fr>
+
+	PR tree-optimization/60502
+	* tree-ssa-reassoc.c (eliminate_not_pairs): Use build_all_ones_cst
+	instead of build_low_bits_mask.
+
+2014-03-12  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/60482
+	* tree-vrp.c (register_edge_assert_for_1): Don't add assert
+	if there are multiple uses, but op doesn't live on E edge.
+	* tree-cfg.c (assert_unreachable_fallthru_edge_p): Also ignore
+	clobber stmts before __builtin_unreachable.
+
+2014-03-11  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* builtins.c (expand_builtin_setjmp_receiver): Use and clobber
+	hard_frame_pointer_rtx.
+	* cse.c (cse_insn): Remove volatile check.
+	* cselib.c (cselib_process_insn): Likewise.
+	* dse.c (scan_insn): Likewise.
+
+2014-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/arc.c (conditionalize_nonjump): New function, broken
+	out of:
+	(arc_ifcvt) .
+	(arc_predicate_delay_insns): Use it.
+
+2014-03-11  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/arc/predicates.md (extend_operand): During/after reload,
+	allow const_int_operand.
+	* config/arc/arc.md (mulsidi3_700): Use extend_operand predicate.
+	(umulsidi3_700): Likewise.  Change operand 2 constraint back to "cL".
+	(mulsi3_highpart): Change operand 2 constraint alternatives 2 and 3
+	to "i".
+	(umulsi3_highpart_i): Likewise.
+
+2014-03-11  Richard Biener  <rguenther@suse.de>
+
+	* tree-ssa-structalias.c (get_constraint_for_ptr_offset):
+	Add asserts to guard possible wrong-code bugs.
+
+2014-03-11  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60429
+	PR tree-optimization/60485
+	* tree-ssa-structalias.c (set_union_with_increment): Properly
+	take into account all fields that overlap the shifted vars.
+	(do_sd_constraint): Likewise.
+	(do_ds_constraint): Likewise.
+	(get_constraint_for_ptr_offset): Likewise.
+
+2014-03-11  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* config/nios2/nios2.c (machine_function): Add fp_save_offset field.
+	(nios2_compute_frame_layout):
+	Add calculation of cfun->machine->fp_save_offset.
+	(nios2_expand_prologue): Correct setting of frame pointer register
+	in prologue.
+	(nios2_expand_epilogue): Update recovery of stack pointer from
+	frame pointer accordingly.
+	(nios2_initial_elimination_offset): Update calculation of offset
+	for eliminating to HARD_FRAME_POINTER_REGNUM.
+
 2014-03-10  Jakub Jelinek  <jakub@redhat.com>
 
 	PR ipa/60457
