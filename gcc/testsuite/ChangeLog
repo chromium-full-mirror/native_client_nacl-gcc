@@ -1,3 +1,37 @@
+2014-03-14  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR rtl-optimization/60508
+	* gcc.target/i386/pr60508.c: New.
+
+2014-03-14  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60518
+	* g++.dg/pr60518.C: New testcase.
+
+2014-03-14  Martin Jambor  <mjambor@suse.cz>
+
+	PR lto/60461
+	* gcc.dg/lto/pr60461_0.c: New test.
+
+2014-03-14  Cesar Philippidis  <cesar@codesourcery.com>
+
+	* lib/gcc-dg.exp (cleanup-saved-temps): Handle LTO temporaries.
+	* lib/lto.exp (lto-execute): Cleanup LTO temporaries.
+	* gcc.dg/lto/save-temps_0.c: New testcase.
+
+2014-03-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR middle-end/36282
+	* c-c++-common/pr36282-1.c: New test.
+	* c-c++-common/pr36282-2.c: New test.
+	* c-c++-common/pr36282-3.c: New test.
+	* c-c++-common/pr36282-4.c: New test.
+
+2014-03-13  Richard Henderson  <rth@redhat.com>
+
+	PR debug/60438
+	* g++.dg/torture/pr60438-1.C, g++.dg/torture/pr60438-2.C: New.
+
 2014-03-13  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/60383
