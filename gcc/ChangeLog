@@ -2,6 +2,71 @@
 
 	* config/arm/arm.c (get_label_padding): Use align_labels as minimum.
 
+2014-03-17  Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/60534
+	* omp-low.c (omp_max_vf): Treat -fno-tree-loop-optimize the same
+	as -fno-tree-loop-vectorize.
+	(expand_omp_simd): Likewise.
+
+2014-03-15  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* config/sparc/sparc-protos.h (tls_call_delay): Delete.
+	(eligible_for_call_delay): New prototype.
+	* config/sparc/sparc.c (tls_call_delay): Rename into...
+	(eligible_for_call_delay): ...this.  Return false if the instruction
+	cannot be put in the delay slot of a branch.
+	(eligible_for_restore_insn): Simplify.
+	(eligible_for_return_delay): Return false if the instruction cannot be
+	put in the delay slot of a branch and simplify.
+	(eligible_for_sibcall_delay): Return false if the instruction cannot be
+	put in the delay slot of a branch.
+	* config/sparc/sparc.md (fix_ut699): New attribute.
+	(tls_call_delay): Delete.
+	(in_call_delay): Reimplement.
+	(eligible_for_sibcall_delay): Rename into...
+	(in_sibcall_delay): ...this.
+	(eligible_for_return_delay): Rename into...
+	(in_return_delay): ...this.
+	(in_branch_delay): Reimplement.
+	(in_uncond_branch_delay): Delete.
+	(in_annul_branch_delay): Delete.
+
+2014-03-14  Richard Henderson  <rth@redhat.com>
+
+	PR target/60525
+	* config/i386/i386.md (floathi<X87MODEF>2): Delete expander; rename
+	define_insn from *floathi<X87MODEF>2_i387; allow nonimmediate_operand.
+	(*floathi<X87MODEF>2_i387_with_temp): Remove.
+	(floathi splitters): Remove.
+	(float<SWI48x>xf2): New pattern.
+	(float<SWI48><MODEF>2): Rename from float<SWI48x><X87MODEF>2.  Drop
+	code that tried to handle DImode for 32-bit, but which was excluded
+	by the pattern's condition.  Drop allocation of stack temporary.
+	(*floatsi<MODEF>2_vector_mixed_with_temp): Remove.
+	(*float<SWI48><MODEF>2_mixed_with_temp): Remove.
+	(*float<SWI48><MODEF>2_mixed_interunit): Remove.
+	(*float<SWI48><MODEF>2_mixed_nointerunit): Remove.
+	(*floatsi<MODEF>2_vector_sse_with_temp): Remove.
+	(*float<SWI48><MODEF>2_sse_with_temp): Remove.
+	(*float<SWI48><MODEF>2_sse_interunit): Remove.
+	(*float<SWI48><MODEF>2_sse_nointerunit): Remove.
+	(*float<SWI48x><X87MODEF>2_i387_with_temp): Remove.
+	(*float<SWI48x><X87MODEF>2_i387): Remove.
+	(all float _with_temp splitters): Remove.
+	(*float<SWI48x><MODEF>2_i387): New pattern.
+	(*float<SWI48><MODEF>2_sse): New pattern.
+	(float TARGET_USE_VECTOR_CONVERTS splitters): Merge them.
+	(float TARGET_SSE_PARTIAL_REG_DEPENDENCY splitters): Merge them.
+
+2014-03-14  Jakub Jelinek  <jakub@redhat.com>
+	    Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/60484
+	* common.opt (dump_base_name_prefixed): New Variable.
+	* opts.c (finish_options): Don't prepend directory to x_dump_base_name
+	if x_dump_base_name_prefixed is already set, set it at the end.
+
 2014-03-14  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR rtl-optimization/60508

@@ -1,3 +1,45 @@
+2014-03-17  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59571
+	* g++.dg/cpp0x/constexpr-ice13.C: New.
+
+2014-03-17  Marek Polacek  <polacek@redhat.com>
+
+	PR middle-end/60534
+	* gcc.dg/gomp/pr60534.c: New test.
+
+2014-03-17  Kai Tietz  <ktietz@redhat.com>
+
+	* gcc.c-torture/compile/20010327-1.c: Disable test for LLP64 targets.
+
+2014-03-17  Andreas Schwab  <schwab@linux-m68k.org>
+
+	PR testsuite/58851
+	* gfortran.dg/unlimited_polymorphic_13.f90: Properly compute
+	storage size.
+
+2014-03-15  Jerry DeLisle  <jvdelisle@gcc.gnu>
+
+	PR libfortran/58324
+	* gfortran.dg/list_read_12.f90: New test.
+
+2014-03-15  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/55207
+	* gfortran.dg/assumed_rank_7.f90: Explicitly deallocate variables.
+	* gfortran.dg/c_ptr_tests_16.f90: Put into subroutine.
+	* gfortran.dg/inline_sum_bounds_check_1.f90: Add
+	-Wno-aggressive-loop-optimizations and remove an unused variable.
+	* gfortran.dg/intent_optimize_1.f90: Put into subroutine.
+	* gfortran.dg/pointer_init_9.f90: New.
+	* gfortran.dg/volatile4.f90: Put into subroutine.
+	* gfortran.dg/volatile6.f90: Ditto.
+
+2014-03-14  Mikael Morin  <mikael@gcc.gnu.org>
+
+	PR fortran/60392
+	* gfortran.dg/transpose_4.f90: New test.
+
 2014-03-14  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR rtl-optimization/60508
