@@ -2801,8 +2801,8 @@
 
 (define_insn "insv_zero"
   [(set (zero_extract:SI (match_operand:SI 0 "s_register_operand" "+r")
-                         (match_operand:SI 1 "const_int_operand" "M")
-                         (match_operand:SI 2 "const_int_operand" "M"))
+                         (match_operand:SI 1 "const_int_M_operand" "M")
+                         (match_operand:SI 2 "const_int_M_operand" "M"))
         (const_int 0))]
   "arm_arch_thumb2"
   "bfc%?\t%0, %2, %1"
@@ -2814,8 +2814,8 @@
 
 (define_insn "insv_t2"
   [(set (zero_extract:SI (match_operand:SI 0 "s_register_operand" "+r")
-                         (match_operand:SI 1 "const_int_operand" "M")
-                         (match_operand:SI 2 "const_int_operand" "M"))
+                         (match_operand:SI 1 "const_int_M_operand" "M")
+                         (match_operand:SI 2 "const_int_M_operand" "M"))
         (match_operand:SI 3 "s_register_operand" "r"))]
   "arm_arch_thumb2"
   "bfi%?\t%0, %3, %2, %1"
@@ -4505,8 +4505,8 @@
 (define_insn "*extv_reg"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
 	(sign_extract:SI (match_operand:SI 1 "s_register_operand" "r")
-                         (match_operand:SI 2 "const_int_operand" "M")
-                         (match_operand:SI 3 "const_int_operand" "M")))]
+                         (match_operand:SI 2 "const_int_M_operand" "M")
+                         (match_operand:SI 3 "const_int_M_operand" "M")))]
   "arm_arch_thumb2"
   "sbfx%?\t%0, %1, %3, %2"
   [(set_attr "length" "4")
@@ -4518,8 +4518,8 @@
 (define_insn "extzv_t2"
   [(set (match_operand:SI 0 "s_register_operand" "=r")
 	(zero_extract:SI (match_operand:SI 1 "s_register_operand" "r")
-                         (match_operand:SI 2 "const_int_operand" "M")
-                         (match_operand:SI 3 "const_int_operand" "M")))]
+                         (match_operand:SI 2 "const_int_M_operand" "M")
+                         (match_operand:SI 3 "const_int_M_operand" "M")))]
   "arm_arch_thumb2"
   "ubfx%?\t%0, %1, %3, %2"
   [(set_attr "length" "4")
@@ -12179,7 +12179,7 @@
   [(match_parallel 0 "load_multiple_operation"
     [(set (match_operand:SI 1 "s_register_operand" "+rk")
           (plus:SI (match_dup 1)
-                   (match_operand:SI 2 "const_int_operand" "I")))
+                   (match_operand:SI 2 "const_int_I_operand" "I")))
      (set (match_operand:SI 3 "s_register_operand" "=rk")
           (mem:SI (match_dup 1)))
         ])]
@@ -12210,7 +12210,7 @@
     [(return)
      (set (match_operand:SI 1 "s_register_operand" "+rk")
           (plus:SI (match_dup 1)
-                   (match_operand:SI 2 "const_int_operand" "I")))
+                   (match_operand:SI 2 "const_int_I_operand" "I")))
      (set (match_operand:SI 3 "s_register_operand" "=rk")
           (mem:SI (match_dup 1)))
         ])]
@@ -12263,7 +12263,7 @@
   [(match_parallel 0 "pop_multiple_fp"
     [(set (match_operand:SI 1 "s_register_operand" "+rk")
           (plus:SI (match_dup 1)
-                   (match_operand:SI 2 "const_int_operand" "I")))
+                   (match_operand:SI 2 "const_int_I_operand" "I")))
      (set (match_operand:DF 3 "vfp_hard_register_operand" "")
           (mem:DF (match_dup 1)))])]
   "TARGET_32BIT && TARGET_HARD_FLOAT && TARGET_VFP"
