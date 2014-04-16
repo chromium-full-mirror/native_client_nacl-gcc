@@ -1,3 +1,55 @@
+2014-04-10  Richard Biener  <rguenther@suse.de>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	PR ipa/60761
+	* error.c (dump_decl) <case FUNCTION_DECL>: If
+	DECL_LANG_SPECIFIC is NULL, but DECL_ABSTRACT_ORIGIN is not,
+	recurse on DECL_ABSTRACT_ORIGIN instead of printing
+	<built-in>.
+
+2014-04-09  Fabien Chêne  <fabien@gcc.gnu.org>
+
+	* pt.c (check_template_variable): Check for the return of pedwarn
+	before emitting a note.
+	* parser.c (cp_parser_lambda_introducer): Likewise.
+
+2014-04-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59115
+	* pt.c (process_template_parm): For an invalid non-type parameter
+	only set TREE_TYPE to error_mark_node.
+	(push_inline_template_parms_recursive, comp_template_parms,
+	redeclare_class_template, coerce_template_template_parm,
+	coerce_template_template_parms, unify): Use error_operand_p.
+
+2014-04-08  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* class.c (check_bases_and_members): Warn about non-virtual dtors
+	in public bases only.  Check warn_ecpp before complaining about
+	non-polymorphic bases.
+
+2014-04-04  Fabien Chêne  <fabien@gcc.gnu.org>
+
+	* decl.c (duplicate_decls): Check for the return of warning_at
+	before emitting a note.
+	(warn_misplaced_attr_for_class_type): Likewise.
+	(check_tag_decl): Likewise.
+
+2014-04-04  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/58207
+	* semantics.c (sort_constexpr_mem_initializers): Robustify loop.
+
+2014-04-04  Patrick Palka  <patrick@parcs.ath.cx>
+
+	PR c++/44613
+	* semantics.c (add_stmt): Set STATEMENT_LIST_HAS_LABEL.
+	* decl.c (cp_finish_decl): Create a new BIND_EXPR before
+	instantiating a variable-sized type.
+
+	PR c++/21113
+	* decl.c (decl_jump_unsafe): Consider variably-modified decls.
+
 2014-04-04  Fabien Chêne  <fabien@gcc.gnu.org>
 
 	* class.c (find_abi_tags_r): Check for the return of warning
