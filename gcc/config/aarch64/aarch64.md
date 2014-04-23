@@ -1106,7 +1106,26 @@
    (set_attr "simd" "*,*,*,yes")]
 )
 
-(define_insn "*add<mode>3_compare0"
+(define_expand "addti3"
+  [(set (match_operand:TI 0 "register_operand" "")
+	(plus:TI (match_operand:TI 1 "register_operand" "")
+		 (match_operand:TI 2 "register_operand" "")))]
+  ""
+{
+  rtx low = gen_reg_rtx (DImode);
+  emit_insn (gen_adddi3_compare0 (low, gen_lowpart (DImode, operands[1]),
+				  gen_lowpart (DImode, operands[2])));
+
+  rtx high = gen_reg_rtx (DImode);
+  emit_insn (gen_adddi3_carryin (high, gen_highpart (DImode, operands[1]),
+				 gen_highpart (DImode, operands[2])));
+
+  emit_move_insn (gen_lowpart (DImode, operands[0]), low);
+  emit_move_insn (gen_highpart (DImode, operands[0]), high);
+  DONE;
+})
+
+(define_insn "add<mode>3_compare0"
   [(set (reg:CC_NZ CC_REGNUM)
 	(compare:CC_NZ
 	 (plus:GPI (match_operand:GPI 1 "register_operand" "%r,r,r")
@@ -1390,7 +1409,7 @@
   [(set_attr "type" "alu_ext")]
 )
 
-(define_insn "*add<mode>3_carryin"
+(define_insn "add<mode>3_carryin"
   [(set
     (match_operand:GPI 0 "register_operand" "=r")
     (plus:GPI (geu:GPI (reg:CC CC_REGNUM) (const_int 0))
@@ -1558,8 +1577,26 @@
    (set_attr "simd" "*,yes")]
 )
 
+(define_expand "subti3"
+  [(set (match_operand:TI 0 "register_operand" "")
+	(minus:TI (match_operand:TI 1 "register_operand" "")
+		  (match_operand:TI 2 "register_operand" "")))]
+  ""
+{
+  rtx low = gen_reg_rtx (DImode);
+  emit_insn (gen_subdi3_compare0 (low, gen_lowpart (DImode, operands[1]),
+				  gen_lowpart (DImode, operands[2])));
 
-(define_insn "*sub<mode>3_compare0"
+  rtx high = gen_reg_rtx (DImode);
+  emit_insn (gen_subdi3_carryin (high, gen_highpart (DImode, operands[1]),
+				 gen_highpart (DImode, operands[2])));
+
+  emit_move_insn (gen_lowpart (DImode, operands[0]), low);
+  emit_move_insn (gen_highpart (DImode, operands[0]), high);
+  DONE;
+})
+
+(define_insn "sub<mode>3_compare0"
   [(set (reg:CC_NZ CC_REGNUM)
 	(compare:CC_NZ (minus:GPI (match_operand:GPI 1 "register_operand" "r")
 				  (match_operand:GPI 2 "register_operand" "r"))
@@ -1706,7 +1743,7 @@
   [(set_attr "type" "alu_ext")]
 )
 
-(define_insn "*sub<mode>3_carryin"
+(define_insn "sub<mode>3_carryin"
   [(set
     (match_operand:GPI 0 "register_operand" "=r")
     (minus:GPI (minus:GPI
@@ -1935,7 +1972,7 @@
   [(set_attr "type" "mul")]
 )
 
-(define_insn "*madd<mode>"
+(define_insn "madd<mode>"
   [(set (match_operand:GPI 0 "register_operand" "=r")
 	(plus:GPI (mult:GPI (match_operand:GPI 1 "register_operand" "r")
 			    (match_operand:GPI 2 "register_operand" "r"))
@@ -2044,6 +2081,48 @@
   "<su>mnegl\\t%0, %w1, %w2"
   [(set_attr "type" "<su>mull")]
 )
+
+(define_expand "<su_optab>mulditi3"
+  [(set (match_operand:TI 0 "register_operand")
+	(mult:TI (ANY_EXTEND:TI (match_operand:DI 1 "register_operand"))
+		 (ANY_EXTEND:TI (match_operand:DI 2 "register_operand"))))]
+  ""
+{
+  rtx low = gen_reg_rtx (DImode);
+  emit_insn (gen_muldi3 (low, operands[1], operands[2]));
+
+  rtx high = gen_reg_rtx (DImode);
+  emit_insn (gen_<su>muldi3_highpart (high, operands[1], operands[2]));
+
+  emit_move_insn (gen_lowpart (DImode, operands[0]), low);
+  emit_move_insn (gen_highpart (DImode, operands[0]), high);
+  DONE;
+})
+
+;; The default expansion of multi3 using umuldi3_highpart will perform
+;; the additions in an order that fails to combine into two madd insns.
+(define_expand "multi3"
+  [(set (match_operand:TI 0 "register_operand")
+	(mult:TI (match_operand:TI 1 "register_operand")
+		 (match_operand:TI 2 "register_operand")))]
+  ""
+{
+  rtx l0 = gen_reg_rtx (DImode);
+  rtx l1 = gen_lowpart (DImode, operands[1]);
+  rtx l2 = gen_lowpart (DImode, operands[2]);
+  rtx h0 = gen_reg_rtx (DImode);
+  rtx h1 = gen_highpart (DImode, operands[1]);
+  rtx h2 = gen_highpart (DImode, operands[2]);
+
+  emit_insn (gen_muldi3 (l0, l1, l2));
+  emit_insn (gen_umuldi3_highpart (h0, l1, l2));
+  emit_insn (gen_madddi (h0, h1, l2, h0));
+  emit_insn (gen_madddi (h0, l1, h2, h0));
+
+  emit_move_insn (gen_lowpart (DImode, operands[0]), l0);
+  emit_move_insn (gen_highpart (DImode, operands[0]), h0);
+  DONE;
+})
 
 (define_insn "<su>muldi3_highpart"
   [(set (match_operand:DI 0 "register_operand" "=r")
@@ -3171,6 +3250,38 @@
         (bswap:HI (match_operand:HI 1 "register_operand" "r")))]
   ""
   "rev16\\t%w0, %w1"
+  [(set_attr "type" "rev")]
+)
+
+;; There are no canonicalisation rules for the position of the lshiftrt, ashift
+;; operations within an IOR/AND RTX, therefore we have two patterns matching
+;; each valid permutation.
+
+(define_insn "rev16<mode>2"
+  [(set (match_operand:GPI 0 "register_operand" "=r")
+        (ior:GPI (and:GPI (ashift:GPI (match_operand:GPI 1 "register_operand" "r")
+                                      (const_int 8))
+                          (match_operand:GPI 3 "const_int_operand" "n"))
+                 (and:GPI (lshiftrt:GPI (match_dup 1)
+                                        (const_int 8))
+                          (match_operand:GPI 2 "const_int_operand" "n"))))]
+  "aarch_rev16_shleft_mask_imm_p (operands[3], <MODE>mode)
+   && aarch_rev16_shright_mask_imm_p (operands[2], <MODE>mode)"
+  "rev16\\t%<w>0, %<w>1"
+  [(set_attr "type" "rev")]
+)
+
+(define_insn "rev16<mode>2_alt"
+  [(set (match_operand:GPI 0 "register_operand" "=r")
+        (ior:GPI (and:GPI (lshiftrt:GPI (match_operand:GPI 1 "register_operand" "r")
+                                        (const_int 8))
+                          (match_operand:GPI 2 "const_int_operand" "n"))
+                 (and:GPI (ashift:GPI (match_dup 1)
+                                      (const_int 8))
+                          (match_operand:GPI 3 "const_int_operand" "n"))))]
+  "aarch_rev16_shleft_mask_imm_p (operands[3], <MODE>mode)
+   && aarch_rev16_shright_mask_imm_p (operands[2], <MODE>mode)"
+  "rev16\\t%<w>0, %<w>1"
   [(set_attr "type" "rev")]
 )
 
