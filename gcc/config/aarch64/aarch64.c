@@ -4471,9 +4471,13 @@ aarch64_strip_shift (rtx x)
 {
   rtx op = x;
 
+  /* We accept both ROTATERT and ROTATE: since the RHS must be a constant
+     we can convert both to ROR during final output.  */
   if ((GET_CODE (op) == ASHIFT
        || GET_CODE (op) == ASHIFTRT
-       || GET_CODE (op) == LSHIFTRT)
+       || GET_CODE (op) == LSHIFTRT
+       || GET_CODE (op) == ROTATERT
+       || GET_CODE (op) == ROTATE)
       && CONST_INT_P (XEXP (op, 1)))
     return XEXP (op, 0);
 
@@ -8139,11 +8143,6 @@ aarch64_evpc_tbl (struct expand_vec_perm_d *d)
   enum machine_mode vmode = d->vmode;
   unsigned int i, nelt = d->nelt;
 
-  /* TODO: ARM's TBL indexing is little-endian.  In order to handle GCC's
-     numbering of elements for big-endian, we must reverse the order.  */
-  if (BYTES_BIG_ENDIAN)
-    return false;
-
   if (d->testing_p)
     return true;
 
@@ -8154,7 +8153,15 @@ aarch64_evpc_tbl (struct expand_vec_perm_d *d)
     return false;
 
   for (i = 0; i < nelt; ++i)
-    rperm[i] = GEN_INT (d->perm[i]);
+    {
+      int nunits = GET_MODE_NUNITS (vmode);
+
+      /* If big-endian and two vectors we end up with a weird mixed-endian
+	 mode on NEON.  Reverse the index within each word but not the word
+	 itself.  */
+      rperm[i] = GEN_INT (BYTES_BIG_ENDIAN ? d->perm[i] ^ (nunits - 1)
+					   : d->perm[i]);
+    }
   sel = gen_rtx_CONST_VECTOR (vmode, gen_rtvec_v (nelt, rperm));
   sel = force_reg (vmode, sel);
 

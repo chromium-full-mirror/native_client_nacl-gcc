@@ -884,10 +884,6 @@ enum machine_mode output_memory_reference_mode;
 /* The register number to be used for the PIC offset register.  */
 unsigned arm_pic_register = INVALID_REGNUM;
 
-/* Set to 1 after arm_reorg has started.  Reset to start at the start of
-   the next function.  */
-static int after_arm_reorg = 0;
-
 enum arm_pcs arm_pcs_default;
 
 /* For an explanation of these variables, see final_prescan_insn below.  */
@@ -1714,7 +1710,8 @@ const struct tune_params arm_cortex_a8_tune =
   false,					/* Prefer LDRD/STRD.  */
   {true, true},					/* Prefer non short circuit.  */
   &arm_default_vec_cost,                        /* Vectorizer costs.  */
-  false                                         /* Prefer Neon for 64-bits bitops.  */
+  false,                                        /* Prefer Neon for 64-bits bitops.  */
+  false, false                                  /* Prefer 32-bit encodings.  */
 };
 
 const struct tune_params arm_cortex_a7_tune =
@@ -1781,7 +1778,8 @@ const struct tune_params arm_cortex_a57_tune =
   true,                                       /* Prefer LDRD/STRD.  */
   {true, true},                                /* Prefer non short circuit.  */
   &arm_default_vec_cost,                       /* Vectorizer costs.  */
-  false                                        /* Prefer Neon for 64-bits bitops.  */
+  false,                                       /* Prefer Neon for 64-bits bitops.  */
+  true, true                                   /* Prefer 32-bit encodings.  */
 };
 
 /* Branches can be dual-issued on Cortex-A5, so conditional execution is
@@ -1834,7 +1832,8 @@ const struct tune_params arm_cortex_a12_tune =
   true,						/* Prefer LDRD/STRD.  */
   {true, true},					/* Prefer non short circuit.  */
   &arm_default_vec_cost,                        /* Vectorizer costs.  */
-  false                                         /* Prefer Neon for 64-bits bitops.  */
+  false,                                        /* Prefer Neon for 64-bits bitops.  */
+  false, false                                  /* Prefer 32-bit encodings.  */
 };
 
 /* armv7m tuning.  On Cortex-M4 cores for example, MOVW/MOVT take a single
@@ -3548,7 +3547,7 @@ arm_split_constant (enum rtx_code code, enum machine_mode mode, rtx insn,
 
 	 Ref: gcc -O1 -mcpu=strongarm gcc.c-torture/compile/980506-2.c
       */
-      if (!after_arm_reorg
+      if (!cfun->machine->after_arm_reorg
 	  && !cond
 	  && (arm_gen_constant (code, mode, NULL_RTX, val, target, source,
 				1, 0)
@@ -17680,7 +17679,7 @@ arm_reorg (void)
   /* From now on we must synthesize any constants that we can't handle
      directly.  This can happen if the RTL gets split during final
      instruction generation.  */
-  after_arm_reorg = 1;
+  cfun->machine->after_arm_reorg = 1;
 
   /* Free the minipool memory.  */
   obstack_free (&minipool_obstack, minipool_startobj);
@@ -19952,9 +19951,6 @@ arm_output_function_epilogue (FILE *file ATTRIBUTE_UNUSED,
 		  || (cfun->machine->return_used_this_function != 0)
 		  || offsets->saved_regs == offsets->outgoing_args
 		  || frame_pointer_needed);
-
-      /* Reset the ARM-specific per-function variables.  */
-      after_arm_reorg = 0;
     }
 }
 
