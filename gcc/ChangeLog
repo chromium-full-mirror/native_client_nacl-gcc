@@ -1,3 +1,144 @@
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	* tree-pass.h (TODO_verify_il): Define.
+	(TODO_verify_all): Complete properly.
+	* passes.c (execute_function_todo): Move existing loop-closed
+	SSA verification under TODO_verify_il.
+	(execute_one_pass): Trigger TODO_verify_il at todo-after time.
+	* graphite-sese-to-poly.c (rewrite_cross_bb_scalar_deps):
+	Fix tree sharing issue.
+
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/60092
+	* builtins.def (DEF_C11_BUILTIN): Add.
+	(BUILT_IN_ALIGNED_ALLOC): Likewise.
+	* coretypes.h (enum function_class): Add function_c11_misc.
+	* tree-ssa-alias.c (ref_maybe_used_by_call_p_1): Handle
+	BUILT_IN_ALIGNED_ALLOC like BUILT_IN_MALLOC.
+	(call_may_clobber_ref_p_1): Likewise.
+	* tree-ssa-dce.c (mark_stmt_if_obviously_necessary): Likewise.
+	(mark_all_reaching_defs_necessary_1): Likewise.
+	(propagate_necessity): Likewise.
+	(eliminate_unnecessary_stmts): Likewise.
+	* tree-ssa-ccp.c (evaluate_stmt): Handle BUILT_IN_ALIGNED_ALLOC.
+
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	* tree-vrp.c (vrp_var_may_overflow): Remove.
+	(vrp_visit_phi_node): Rather than bumping to +-INF possibly
+	with overflow immediately bump to one before that value and
+	let iteration figure out overflow status.
+
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	* configure.ac: Do valgrind header checks unconditionally.
+	Add --enable-valgrind-annotations.
+	* system.h: Guard valgrind header inclusion with
+	ENABLE_VALGRIND_ANNOTATIONS instead of ENABLE_VALGRIND_CHECKING.
+	* alloc-pool.c (pool_alloc, pool_free): Use
+	ENABLE_VALGRIND_ANNOTATIONS instead of ENABLE_VALGRIND_CHECKING
+	to guard possibly dead code.
+	* config.in: Regenerated.
+	* configure: Likewise.
+
+2014-04-28  Jeff Law  <law@redhat.com>
+
+	PR tree-optimization/60902
+	* tree-ssa-threadedge.c
+	(record_temporary_equivalences_from_stmts_at_dest): Only iterate
+	over real defs when invalidating outputs from statements that do not
+	produce useful outputs for threading.
+
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60979
+	* graphite-scop-detection.c (scopdet_basic_block_info): Reject
+	SCOPs that end in a block with a successor with abnormal
+	predecessors.
+
+2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	* tree-pass.h (execute_pass_list): Adjust prototype.
+	* passes.c (pass_manager::execute_early_local_passes):
+	Adjust.
+	(do_per_function): Change callback signature, push all actual
+	work to the callbals.
+	(do_per_function_toporder): Likewise.
+	(execute_function_dump): Adjust.
+	(execute_function_todo): Likewise.
+	(clear_last_verified): Likewise.
+	(verify_curr_properties): Likewise.
+	(update_properties_after_pass): Likewise.
+	(execute_pass_list_1): Split out from ...
+	(execute_pass_list): ... here.  Adjust.
+	(execute_ipa_pass_list): Likewise.
+	* cgraphunit.c (cgraph_add_new_function): Adjust.
+	(analyze_function): Likewise.
+	(expand_function): Likewise.
+	* cgraph.c (release_function_body): Free dominance info
+	here instead of asserting it was magically freed elsewhere.
+
+2014-04-28  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure.ac: Tweak GAS check for LEON instructions on SPARC.
+	* configure: Regenerate.
+	* config/sparc/sparc.opt (muser-mode): New option.
+	* config/sparc/sync.md (atomic_compare_and_swap<mode>_1): Do not enable
+	for LEON3.
+	(atomic_compare_and_swap_leon3_1): New instruction for LEON3.
+	* doc/invoke.texi (SPARC options): Document -muser-mode.
+
+2014-04-27  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* cselib.c (find_slot_memmode): Delete.
+	(cselib_hasher): Change compare_type to a struct.
+	(cselib_hasher::equal): Update accordingly.  Don't expect wrapped
+	constants.
+	(preserve_constants_and_equivs): Adjust for new compare_type.
+	(cselib_find_slot): Likewise.  Take the mode of the rtx as argument.
+	(wrap_constant): Delete.
+	(cselib_lookup_mem, cselib_lookup_1): Update calls to cselib_find_slot.
+
+2014-04-26  Markus Trippelsdorf  <markus@trippelsdorf.de>
+
+	* doc/install.texi (Building with profile feedback): Remove
+	outdated sentence.
+
+2014-04-26  Tom de Vries  <tom@codesourcery.com>
+
+	* config/i386/i386.md (define_expand "ldexpxf3"): Fix out-of-bounds
+	array accesses.
+
+2014-04-25  Cary Coutant  <ccoutant@google.com>
+
+        PR debug/60929
+	* dwarf2out.c (should_move_die_to_comdat): A type definition
+        can contain a subprogram definition, but don't move it to a
+        comdat unit.
+	(clone_as_declaration): Copy DW_AT_abstract_origin attribute.
+        (generate_skeleton_bottom_up): Remove DW_AT_object_pointer attribute
+        from original DIE.
+	(clone_tree_hash): Rename to...
+	(clone_tree_partial): ...this; change callers.  Copy
+        DW_TAG_subprogram DIEs as declarations.
+	(copy_decls_walk): Don't copy children of a declaration into a
+        type unit.
+
+2014-04-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/60969
+	* config/i386/i386.md (*movsf_internal): Set MODE to SI for
+	alternative 12.
+
+2014-04-25  Jiong Wang  <jiong.wang@arm.com>
+
+	* config/arm/predicates.md (call_insn_operand): Add long_call check.
+	* config/arm/arm.md (sibcall, sibcall_value): Force the address to
+	reg for long_call.
+	* config/arm/arm.c (arm_function_ok_for_sibcall): Remove long_call
+	restriction.
+
 2014-04-25  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* config/arm/arm.c (arm_cortex_a8_tune): Initialise
