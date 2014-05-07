@@ -1,3 +1,93 @@
+2014-05-07  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/61034
+	* tree-ssa-alias.c (call_may_clobber_ref_p_1): Export.
+	(maybe_skip_until): Use translate to take into account
+	lattices when trying to do disambiguations.
+	(get_continuation_for_phi_1): Likewise.
+	(get_continuation_for_phi): Adjust for added translate
+	arguments.
+	(walk_non_aliased_vuses): Likewise.
+	* tree-ssa-alias.h (get_continuation_for_phi): Adjust
+	prototype.
+	(walk_non_aliased_vuses): Likewise.
+	(call_may_clobber_ref_p_1): Declare.
+	* tree-ssa-sccvn.c (vn_reference_lookup_3): Also
+	disambiguate against calls.  Stop early if we are
+	only supposed to disambiguate.
+	* tree-ssa-pre.c (translate_vuse_through_block): Adjust.
+
+2014-05-07  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* config/epiphany/epiphany.c (epiphany_handle_interrupt_attribute):
+	Emit an error when the function has arguments.
+
+2014-05-07  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* cfgloop.h (unswitch_loops): Remove.
+	* doc/passes.texi: Remove references to loop-unswitch.c
+	* timevar.def (TV_LOOP_UNSWITCH): Remove.
+
+2014-05-07  Evgeny Stupachenko  <evstupac@gmail.com>
+
+	* tree-vect-data-refs.c (vect_grouped_load_supported): New
+	check for loads group of length 3.
+	(vect_permute_load_chain): New permutations for loads group of
+	length 3.
+	* tree-vect-stmts.c (vect_model_load_cost): Change cost
+	of vec_perm_shuffle for the new permutations.
+
+2014-05-07  Alan Lawrence  <alan.lawrence@arm.com>
+
+	* config/aarch64/arm_neon.h (vtrn1_f32, vtrn1_p8, vtrn1_p16, vtrn1_s8,
+	vtrn1_s16, vtrn1_s32, vtrn1_u8, vtrn1_u16, vtrn1_u32, vtrn1q_f32,
+	vtrn1q_f64, vtrn1q_p8, vtrn1q_p16, vtrn1q_s8, vtrn1q_s16, vtrn1q_s32,
+	vtrn1q_s64, vtrn1q_u8, vtrn1q_u16, vtrn1q_u32, vtrn1q_u64, vtrn2_f32,
+	vtrn2_p8, vtrn2_p16, vtrn2_s8, vtrn2_s16, vtrn2_s32, vtrn2_u8,
+	vtrn2_u16, vtrn2_u32, vtrn2q_f32, vtrn2q_f64, vtrn2q_p8, vtrn2q_p16,
+	vtrn2q_s8, vtrn2q_s16, vtrn2q_s32, vtrn2q_s64, vtrn2q_u8, vtrn2q_u16,
+	vtrn2q_u32, vtrn2q_u64): Replace temporary asm with __builtin_shuffle.
+
+2014-05-07  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* loop-unswitch.c: Delete.
+
+2014-05-07  Richard Biener  <rguenther@suse.de>
+
+	* config.gcc: Always set need_64bit_hwint to yes.
+
+2014-05-07  Chung-Ju Wu  <jasonwucj@gmail.com>
+
+	* config/nds32/nds32.h (HONOR_REG_ALLOC_ORDER): Have it in favor
+	of using optimize_size.
+
+2014-05-06  Mike Stump  <mikestump@comcast.net>
+
+	* wide-int.h (wi::int_traits <HOST_WIDE_INT>): Always define.
+
+2014-05-06  Joseph Myers  <joseph@codesourcery.com>
+
+	* config/i386/sse.md (*mov<mode>_internal)
+	(*<sse>_loadu<ssemodesuffix><avxsizesuffix><mask_name>)
+	(*<sse2_avx_avx512f>_loaddqu<mode><mask_name>)
+	(<sse>_andnot<mode>3, <code><mode>3, *andnot<mode>3)
+	(*<code><mode>3, *andnot<mode>3<mask_name>)
+	(<mask_codefor><code><mode>3<mask_name>): Only consider
+	TARGET_SSE_PACKED_SINGLE_INSN_OPTIMAL for modes of size 16.
+
+2014-05-06  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	Revert:
+	2014-05-03  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* lra-constraints.c (valid_address_p): Move earlier in file.
+	Add a constraint argument to the address_info version.
+	(satisfies_memory_constraint_p): New function.
+	(satisfies_address_constraint_p): Likewise.
+	(process_alt_operands, curr_insn_transform): Use them.
+	(process_address): Pass the constraint to valid_address_p when
+	checking address operands.
+
 2014-05-06  Richard Sandiford  <r.sandiford@uk.ibm.com>
 
 	* lto-cgraph.c (compute_ltrans_boundary): Make node variables local
@@ -1060,7 +1150,7 @@
 
 	* doc/invoke.texi: Describe -fsanitize=float-divide-by-zero.
 
-2014-02-26  Kito Cheng  <kito@0xlab.org>
+2014-05-02  Kito Cheng  <kito@0xlab.org>
 
 	* defaults.h (HONOR_REG_ALLOC_ORDER): Change HONOR_REG_ALLOC_ORDER
 	to a C expression marco.
@@ -2258,7 +2348,6 @@
 2014-04-23  Richard Biener  <rguenther@suse.de>
 
 	* Makefile.in (OBJS): Remove loop-unswitch.o.
-	* loop-unswitch.c: Delete.
 	* tree-pass.h (make_pass_rtl_unswitch): Remove.
 	* passes.def (pass_rtl_unswitch): Likewise.
 	* loop-init.c (gate_rtl_unswitch): Likewise.
