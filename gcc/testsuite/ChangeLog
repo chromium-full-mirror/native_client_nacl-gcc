@@ -1,3 +1,68 @@
+2014-05-08  Tobias Burnus  <burnus@net-b.de>
+
+	* gfortran.dg/coarray_collectives_1.f90: New.
+	* gfortran.dg/coarray_collectives_2.f90: New.
+	* gfortran.dg/coarray_collectives_3.f90: New.
+	* gfortran.dg/coarray_collectives_4.f90: New.
+	* gfortran.dg/coarray_collectives_5.f90: New.
+	* gfortran.dg/coarray_collectives_6.f90: New.
+	* gfortran.dg/coarray/collectives_1.f90: New.
+	* gfortran.dg/assumed_rank_5.f90: Update dg-error.
+	* gfortran.dg/assumed_type_4.f90: Update dg-error.
+	* gfortran.dg/bind_c_array_params.f03: Update dg-error.
+	* gfortran.dg/bind_c_usage_28.f90: Update dg-error.
+	* gfortran.dg/c_funloc_tests_5.f03: Update dg-error.
+	* gfortran.dg/c_funloc_tests_6.f90: Update dg-error.
+	* gfortran.dg/c_loc_tests_11.f03: Update dg-error.
+
+2014-05-08  Wei Mi  <wmi@google.com>
+
+	PR target/58066
+	* gcc.target/i386/pr58066.c: New test.
+
+2014-05-08  Joseph Myers  <joseph@codesourcery.com>
+
+	* gcc.target/i386/avx256-unaligned-load-2.c,
+	gcc.target/i386/pr49002-1.c, gcc.target/i386/pr53712.c,
+	gcc.target/i386/pr53907.c, gcc.target/i386/pr59539-1.c: Allow
+	packed-single instructions.
+
+2014-05-08  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/13981
+	* g++.dg/diagnostic/pr13981.C: New.
+
+2014-05-08  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR tree-optimization/59100
+	* gcc.dg/tree-ssa/phi-opt-12.c: New file.
+	* gcc.dg/tree-ssa/phi-opt-13.c: Likewise.
+
+2014-05-08  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR tree-optimization/61095
+	* gcc.dg/torture/pr61095.c: New test.
+
+2014-05-04  Thomas Preud'homme  <thomas.preudhomme@arm.com>
+
+	PR middle-end/39246
+	* gcc.dg/uninit-13.c: Move warning on the actual source line where
+	the uninitialized complex is used.
+	* gcc.dg/uninit-17.c: New test to check partial initialization of
+	complex with branches.
+	* gcc.dg/uninit-17-O0.c: Likewise.
+
+2014-05-07  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/60884
+	* gcc.target/sh/pr53976-1.c (test_02): Remove inappropriate test case.
+	(test_03): Rename to test_02.
+
+2014-05-07  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/61083
+	* g++.dg/cpp0x/sfinae50.C: New.
+
 2014-05-07  Paolo Carlini  <paolo.carlini@oracle.com>
 
 	PR c++/61080
@@ -516,7 +581,7 @@
 
 2014-04-28  Martin Jambor  <mjambor@suse.cz>
 
-        * gcc.dg/tree-ssa/sra-14.c: New test.
+	* gcc.dg/tree-ssa/sra-14.c: New test.
 
 2014-04-28  Richard Biener  <rguenther@suse.de>
 
@@ -565,10 +630,10 @@
 
 2014-04-25  Cary Coutant  <ccoutant@google.com>
 
-        PR debug/60929
-        * g++.dg/debug/dwarf2/dwarf4-nested.C: New test case.
-        * g++.dg/debug/dwarf2/dwarf4-typedef.C: Add
-        -fdebug-types-section flag.
+	PR debug/60929
+	* g++.dg/debug/dwarf2/dwarf4-nested.C: New test case.
+	* g++.dg/debug/dwarf2/dwarf4-typedef.C: Add
+	-fdebug-types-section flag.
 
 2014-04-25  Jiong Wang  <jiong.wang@arm.com>
 
