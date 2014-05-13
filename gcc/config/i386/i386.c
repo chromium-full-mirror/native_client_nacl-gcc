@@ -83,6 +83,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "pass_manager.h"
 #include "target-globals.h"
 #include "tree-vectorizer.h"
+#include "shrink-wrap.h"
 
 static rtx legitimize_dllimport_symbol (rtx, bool);
 static rtx legitimize_pe_coff_extern_decl (rtx, bool);
@@ -3130,7 +3131,7 @@ ix86_option_override_internal (bool main_args_p,
   (PTA_SANDYBRIDGE | PTA_FSGSBASE | PTA_RDRND | PTA_F16C)
 #define PTA_HASWELL \
   (PTA_IVYBRIDGE | PTA_AVX2 | PTA_BMI | PTA_BMI2 | PTA_LZCNT \
-   | PTA_FMA | PTA_MOVBE | PTA_RTM | PTA_HLE)
+   | PTA_FMA | PTA_MOVBE | PTA_HLE)
 #define PTA_BROADWELL \
   (PTA_HASWELL | PTA_ADX | PTA_PRFCHW | PTA_RDSEED)
 #define PTA_BONNELL \
@@ -16259,7 +16260,7 @@ ix86_i387_mode_needed (int entity, rtx insn)
 /* Return mode that entity must be switched into
    prior to the execution of insn.  */
 
-int
+static int
 ix86_mode_needed (int entity, rtx insn)
 {
   switch (entity)
@@ -16357,7 +16358,7 @@ ix86_avx_u128_mode_entry (void)
 /* Return a mode that ENTITY is assumed to be
    switched to at function entry.  */
 
-int
+static int
 ix86_mode_entry (int entity)
 {
   switch (entity)
@@ -16390,7 +16391,7 @@ ix86_avx_u128_mode_exit (void)
 /* Return a mode that ENTITY is assumed to be
    switched to at function exit.  */
 
-int
+static int
 ix86_mode_exit (int entity)
 {
   switch (entity)
@@ -16405,6 +16406,12 @@ ix86_mode_exit (int entity)
     default:
       gcc_unreachable ();
     }
+}
+
+static int
+ix86_mode_priority (int entity ATTRIBUTE_UNUSED, int n)
+{
+  return n;
 }
 
 /* Output code to initialize control word copies used by trunc?f?i and
@@ -16522,7 +16529,11 @@ ix86_avx_emit_vzeroupper (HARD_REG_SET regs_live)
 
 /* Generate one or more insns to set ENTITY to MODE.  */
 
-void
+/* Generate one or more insns to set ENTITY to MODE.  HARD_REG_LIVE
+   is the set of hard registers live at the point where the insn(s)
+   are to be inserted.  */
+
+static void
 ix86_emit_mode_set (int entity, int mode, HARD_REG_SET regs_live)
 {
   switch (entity)
@@ -24268,8 +24279,13 @@ ix86_expand_set_or_movmem (rtx dst, rtx src, rtx count_exp, rtx val_exp,
     align = MEM_ALIGN (dst) / BITS_PER_UNIT;
 
   if (CONST_INT_P (count_exp))
-    min_size = max_size = probable_max_size = count = expected_size
-      = INTVAL (count_exp);
+    {
+      min_size = max_size = probable_max_size = count = expected_size
+	= INTVAL (count_exp);
+      /* When COUNT is 0, there is nothing to do.  */
+      if (!count)
+	return true;
+    }
   else
     {
       if (min_size_exp)
@@ -24278,7 +24294,7 @@ ix86_expand_set_or_movmem (rtx dst, rtx src, rtx count_exp, rtx val_exp,
 	max_size = INTVAL (max_size_exp);
       if (probable_max_size_exp)
 	probable_max_size = INTVAL (probable_max_size_exp);
-      if (CONST_INT_P (expected_size_exp) && count == 0)
+      if (CONST_INT_P (expected_size_exp))
 	expected_size = INTVAL (expected_size_exp);
      }
 
@@ -47280,6 +47296,24 @@ ix86_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
 #undef TARGET_FLOAT_EXCEPTIONS_ROUNDING_SUPPORTED_P
 #define TARGET_FLOAT_EXCEPTIONS_ROUNDING_SUPPORTED_P \
   ix86_float_exceptions_rounding_supported_p
+
+#undef TARGET_MODE_EMIT
+#define TARGET_MODE_EMIT ix86_emit_mode_set
+
+#undef TARGET_MODE_NEEDED
+#define TARGET_MODE_NEEDED ix86_mode_needed
+
+#undef TARGET_MODE_AFTER
+#define TARGET_MODE_AFTER ix86_mode_after
+
+#undef TARGET_MODE_ENTRY
+#define TARGET_MODE_ENTRY ix86_mode_entry
+
+#undef TARGET_MODE_EXIT
+#define TARGET_MODE_EXIT ix86_mode_exit
+
+#undef TARGET_MODE_PRIORITY
+#define TARGET_MODE_PRIORITY ix86_mode_priority
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 

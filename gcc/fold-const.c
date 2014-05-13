@@ -3444,7 +3444,7 @@ optimize_bit_field_compare (location_t loc, enum tree_code code,
 {
   HOST_WIDE_INT lbitpos, lbitsize, rbitpos, rbitsize, nbitpos, nbitsize;
   tree type = TREE_TYPE (lhs);
-  tree signed_type, unsigned_type;
+  tree unsigned_type;
   int const_p = TREE_CODE (rhs) == INTEGER_CST;
   enum machine_mode lmode, rmode, nmode;
   int lunsignedp, runsignedp;
@@ -3489,7 +3489,6 @@ optimize_bit_field_compare (location_t loc, enum tree_code code,
 
   /* Set signed and unsigned types of the precision of this mode for the
      shifts below.  */
-  signed_type = lang_hooks.types.type_for_mode (nmode, 0);
   unsigned_type = lang_hooks.types.type_for_mode (nmode, 1);
 
   /* Compute the bit position and size for the new reference and our offset
@@ -3538,10 +3537,7 @@ optimize_bit_field_compare (location_t loc, enum tree_code code,
 
   if (lunsignedp)
     {
-      if (! integer_zerop (const_binop (RSHIFT_EXPR,
-					fold_convert_loc (loc,
-							  unsigned_type, rhs),
-					size_int (lbitsize))))
+      if (wi::lrshift (rhs, lbitsize) != 0)
 	{
 	  warning (0, "comparison is always %d due to width of bit-field",
 		   code == NE_EXPR);
@@ -3550,10 +3546,8 @@ optimize_bit_field_compare (location_t loc, enum tree_code code,
     }
   else
     {
-      tree tem = const_binop (RSHIFT_EXPR,
-			      fold_convert_loc (loc, signed_type, rhs),
-			      size_int (lbitsize - 1));
-      if (! integer_zerop (tem) && ! integer_all_onesp (tem))
+      wide_int tem = wi::arshift (rhs, lbitsize - 1);
+      if (tem != 0 && tem != -1)
 	{
 	  warning (0, "comparison is always %d due to width of bit-field",
 		   code == NE_EXPR);
@@ -5708,7 +5702,7 @@ extract_muldiv_1 (tree t, tree c, enum tree_code code, tree wide_type,
       /* For a constant, we can always simplify if we are a multiply
 	 or (for divide and modulus) if it is a multiple of our constant.  */
       if (code == MULT_EXPR
-	  || integer_zerop (const_binop (TRUNC_MOD_EXPR, t, c)))
+	  || wi::multiple_of_p (t, c, TYPE_SIGN (type)))
 	return const_binop (code, fold_convert (ctype, t),
 			    fold_convert (ctype, c));
       break;
@@ -5888,7 +5882,7 @@ extract_muldiv_1 (tree t, tree c, enum tree_code code, tree wide_type,
       /* If it's a multiply or a division/modulus operation of a multiple
          of our constant, do the operation and verify it doesn't overflow.  */
       if (code == MULT_EXPR
-	  || integer_zerop (const_binop (TRUNC_MOD_EXPR, op1, c)))
+	  || wi::multiple_of_p (op1, c, TYPE_SIGN (type)))
 	{
 	  op1 = const_binop (code, fold_convert (ctype, op1),
 			     fold_convert (ctype, c));
@@ -5932,7 +5926,7 @@ extract_muldiv_1 (tree t, tree c, enum tree_code code, tree wide_type,
 	  /* If the multiplication can overflow we cannot optimize this.  */
 	  && TYPE_OVERFLOW_UNDEFINED (TREE_TYPE (t))
 	  && TREE_CODE (TREE_OPERAND (t, 1)) == INTEGER_CST
-	  && integer_zerop (const_binop (TRUNC_MOD_EXPR, op1, c)))
+	  && wi::multiple_of_p (op1, c, TYPE_SIGN (type)))
 	{
 	  *strict_overflow_p = true;
 	  return omit_one_operand (type, integer_zero_node, op0);
@@ -5989,7 +5983,7 @@ extract_muldiv_1 (tree t, tree c, enum tree_code code, tree wide_type,
 		  && code != FLOOR_MOD_EXPR && code != ROUND_MOD_EXPR
 		  && code != MULT_EXPR)))
 	{
-	  if (integer_zerop (const_binop (TRUNC_MOD_EXPR, op1, c)))
+	  if (wi::multiple_of_p (op1, c, TYPE_SIGN (type)))
 	    {
 	      if (TYPE_OVERFLOW_UNDEFINED (ctype))
 		*strict_overflow_p = true;
@@ -5998,7 +5992,7 @@ extract_muldiv_1 (tree t, tree c, enum tree_code code, tree wide_type,
 						const_binop (TRUNC_DIV_EXPR,
 							     op1, c)));
 	    }
-	  else if (integer_zerop (const_binop (TRUNC_MOD_EXPR, c, op1)))
+	  else if (wi::multiple_of_p (c, op1, TYPE_SIGN (type)))
 	    {
 	      if (TYPE_OVERFLOW_UNDEFINED (ctype))
 		*strict_overflow_p = true;
@@ -10356,9 +10350,8 @@ fold_binary_loc (location_t loc,
 	      && TREE_CODE (arg1) == BIT_AND_EXPR
 	      && TREE_CODE (TREE_OPERAND (arg0, 1)) == INTEGER_CST
 	      && TREE_CODE (TREE_OPERAND (arg1, 1)) == INTEGER_CST
-	      && integer_zerop (const_binop (BIT_AND_EXPR,
-					     TREE_OPERAND (arg0, 1),
-					     TREE_OPERAND (arg1, 1))))
+	      && wi::bit_and (TREE_OPERAND (arg0, 1),
+			      TREE_OPERAND (arg1, 1)) == 0)
 	    {
 	      code = BIT_IOR_EXPR;
 	      goto bit_ior;
@@ -11358,7 +11351,7 @@ fold_binary_loc (location_t loc,
 	  wide_int c3 = c1.and_not (c2);
 	  for (w = BITS_PER_UNIT; w <= width; w <<= 1)
 	    {
-	      wide_int mask = wi::mask (width - w, false,
+	      wide_int mask = wi::mask (w, false,
 					TYPE_PRECISION (type));
 	      if (((c1 | c2) & mask) == mask && c1.and_not (mask) == 0)
 		{
@@ -11478,9 +11471,8 @@ fold_binary_loc (location_t loc,
 	  && TREE_CODE (arg1) == BIT_AND_EXPR
 	  && TREE_CODE (TREE_OPERAND (arg0, 1)) == INTEGER_CST
 	  && TREE_CODE (TREE_OPERAND (arg1, 1)) == INTEGER_CST
-	  && integer_zerop (const_binop (BIT_AND_EXPR,
-					 TREE_OPERAND (arg0, 1),
-					 TREE_OPERAND (arg1, 1))))
+	  && wi::bit_and (TREE_OPERAND (arg0, 1),
+			  TREE_OPERAND (arg1, 1)) == 0)
 	{
 	  code = BIT_IOR_EXPR;
 	  goto bit_ior;
@@ -15314,8 +15306,8 @@ multiple_of_p (tree type, const_tree top, const_tree bottom)
 	      && (tree_int_cst_sgn (top) < 0
 		  || tree_int_cst_sgn (bottom) < 0)))
 	return 0;
-      return integer_zerop (int_const_binop (TRUNC_MOD_EXPR,
-					     top, bottom));
+      return wi::multiple_of_p (wi::to_widest (top), wi::to_widest (bottom),
+				SIGNED);
 
     default:
       return 0;

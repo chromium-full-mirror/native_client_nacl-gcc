@@ -1,3 +1,157 @@
+2014-05-13  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/54310
+	* g++.dg/template/pr54310.C: New.
+
+2014-05-13  Nathan Sidwell  <nathan@codesourcery.com>
+	    Sandra Loosemore  <sandra@codesourcery.com>
+
+	* gcc.target/mips/loongson-simd.c: Disable micromips too.
+
+2014-05-13  Catherine Moore  <clm@cm00re.com>
+
+	* gcc.target/mips/near-far-1.c: Adjust expected output
+	to allow the JALS instruction.
+	* gcc.target/mips/near-far-2.c: Likewise.
+	* gcc.target/mips/near-far-4.c: Likewise.
+
+2014-05-13  Bin Cheng  <bin.cheng@arm.com>
+
+	* gcc.dg/tree-ssa/ivopts-lower_base.c: New test.
+
+2014-05-13  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/61060
+	* gcc.dg/pr61060.c: New test.
+
+2014-05-12  DJ Delorie  <dj@redhat.com>
+
+	* gcc.dg/sibcall-3.c: MSP430 doesn't have sibcall.
+	* gcc.dg/sibcall-4.c: Likewise.
+
+2014-05-12  Dimitris Papavasiliou  <dpapavas@gmail.com>
+
+	* objc.dg/shadow-1.m: New test.
+	* objc.dg/shadow-2.m: New test.
+	* objc.dg/ivar-scope-1.m: New test.
+	* objc.dg/ivar-scope-2.m: New test.
+	* objc.dg/ivar-scope-3.m: New test.
+	* objc.dg/ivar-scope-4.m: New test.
+	* objc.dg/ivar-visibility-1.m: New test.
+	* objc.dg/ivar-visibility-2.m: New test.
+	* objc.dg/ivar-visibility-3.m: New test.
+	* objc.dg/ivar-visibility-4.m: New test.
+
+2014-05-12  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/60127
+	* gfortran.dg/gomp/omp_do_concurrent.f90: New.
+
+2014-05-12  Thomas Koenig  <tkoenig@gcc.gnu.org>
+
+	PR fortran/60834
+	* gfortran.dg/associate_16.f90:  New test.
+
+2014-05-12  Senthil Kumar Selvaraj  <senthil_kumar.selvaraj@atmel.com>
+
+	PR target/60991
+	* gcc.target/avr/pr60991.c: New testcase.
+
+2014-05-12  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/60054
+	* g++.dg/cpp1y/pr60054.C: New.
+
+2014-05-12  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/51199
+	* g++.dg/template/pr51199.C: New.
+
+2014-05-11  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* gcc.c-torture/execute/20101011-1.c [__MMIX__] (DO_TEST): Define as 0.
+
+2014-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* gfortran.dg/gomp/affinity-1.f90: New test.
+
+2014-05-11  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gcc.dg/torture/pr61136.c: New test.
+
+2014-05-11  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR c++/59705
+	* g++.dg/cpp0x/sfinae51.C: New.
+
+	PR c++/58353
+	* g++.dg/cpp0x/variadic157.C: New.
+
+2014-05-10  Oleg Endo  <olegendo@gcc.gnu.org>
+
+	PR target/51244
+	* gcc.target/sh/pr51244-14.c: Relax criteria for passing the test.
+
+2014-05-10  Marek Polacek  <polacek@redhat.com>
+
+	* gcc.dg/pedwarn-init.c: New test.
+	* gcc.dg/init-string-1.c: Adjust dg-error.
+
+2014-05-10  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* lib/target-supports.exp
+	(check_effective_target_logical_op_short_circuit): Add mmix-*-*
+	to the list.
+
+2014-05-09  Marek Polacek  <polacek@redhat.com>
+
+	PR c/61096
+	* gcc.dg/pr61096-1.c: New test.
+	* gcc.dg/pr61096-2.c: New test.
+
+2014-05-09  Florian Weimer  <fweimer@redhat.com>
+
+	* gcc.dg/fstack-protector-strong.c: Add coverage for return slots.
+	* g++.dg/fstack-protector-strong.C: Likewise.
+	* gcc.target/i386/ssp-strong-reg.c: New file.
+
+2014-05-09  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/61055
+	* gcc.target/avr/torture/pr61055.c: New test.
+
+2014-05-09  Marek Polacek  <polacek@redhat.com>
+
+	PR c/50459
+	* c-c++-common/attributes-1.c: Move test line to a new test.
+	* c-c++-common/attributes-2.c: New test.
+	* c-c++-common/pr50459.c: New test.
+	* c-c++-common/pr59280.c: Add "undeclared" to dg-error.
+	* gcc.dg/nonnull-2.c: Likewise.
+	* gcc.dg/pr55570.c: Modify dg-error.
+	* gcc.dg/tm/wrap-2.c: Likewise.
+
+2014-05-08  Jeff Law  <law@redhat.com>
+
+	PR tree-optimization/61009
+	* g++.dg/tree-ssa/pr61009.C: New test.
+
+2014-05-08  Matthias Klose  <doko@ubuntu.com>
+
+	PR driver/61106
+	* gcc-dg/unused-8a.c: New.
+	* gcc-dg/unused-8b.c: Likewise.
+
+2014-05-08  Marek Polacek  <polacek@redhat.com>
+
+	PR c/61053
+	* gcc.dg/pr61053.c: New test.
+
+2014-05-08  Marek Polacek  <polacek@redhat.com>
+
+	PR c/61077
+	* gcc.dg/pr61077.c: New test.
+
 2014-05-08  Tobias Burnus  <burnus@net-b.de>
 
 	* gfortran.dg/coarray_collectives_1.f90: New.
