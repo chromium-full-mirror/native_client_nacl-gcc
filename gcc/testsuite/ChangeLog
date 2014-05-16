@@ -1,3 +1,44 @@
+2014-05-16  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/61194
+	* gcc.dg/vect/pr61194.c: New testcase.
+
+2014-05-16  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/ssa-fre-39.c: New testcase.
+	* gcc.dg/tree-ssa/ssa-fre-40.c: Likewise.
+	* gcc.dg/tree-ssa/ssa-pre-8.c: One more elimination.
+	* gcc.dg/tree-ssa/struct-aliasing-2.c: Scan cddce1 dump.
+
+2014-05-16  Richard Biener  <rguenther@suse.de>
+
+	* gcc.dg/tree-ssa/ssa-fre-41.c: New testcase.
+
+2014-05-15  Martin Jambor  <mjambor@suse.cz>
+
+	PR ipa/61085
+	* g++.dg/ipa/pr61085.C: New test.
+
+2014-05-15  Martin Jambor  <mjambor@suse.cz>
+
+	PR tree-optimization/61090
+	* gcc.dg/tree-ssa/pr61090.c: New test.
+
+2014-05-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/61158
+	* gcc.dg/pr61158.c: New test.
+
+2014-05-15  Andreas Schwab  <schwab@suse.de>
+
+	* obj-c++.dg/exceptions-3.mm: Remove check for message no longer
+	emitted.
+	* obj-c++.dg/exceptions-5.mm: Likewise.
+
+2014-05-15  Zhenqiang Chen  <zhenqiang.chen@linaro.org>
+
+	* shrink-wrap-loop.c: New test case.
+
 2014-05-14  Alan Lawrence  <alan.lawrence@arm.com>
 
 	* gcc.target/arm/simd/vtrnqf32_1.c: New file.
@@ -37,12 +78,12 @@
 2014-05-14  Andrey Belevantsev  <abel@ispras.ru>
 
 	PR rtl-optimization/60866
-	* gcc.dg/pr60866.c: New test. 
+	* gcc.dg/pr60866.c: New test.
 
 2014-05-14  Andrey Belevantsev  <abel@ispras.ru>
 
 	PR rtl-optimization/60901
-	* gcc.target/i386/pr60901.c: New test. 
+	* gcc.target/i386/pr60901.c: New test.
 
 2014-05-14  Yury Gribov  <y.gribov@samsung.com>
 
