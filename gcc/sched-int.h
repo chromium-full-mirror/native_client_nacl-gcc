@@ -170,7 +170,7 @@ struct ready_list
   int n_debug;
 };
 
-extern char *ready_try;
+extern signed char *ready_try;
 extern struct ready_list ready;
 
 extern int max_issue (struct ready_list *, int, state_t, bool, int *);
@@ -1141,9 +1141,7 @@ enum SCHED_FLAGS {
 
 enum SPEC_SCHED_FLAGS {
   COUNT_SPEC_IN_CRITICAL_PATH = 1,
-  PREFER_NON_DATA_SPEC = COUNT_SPEC_IN_CRITICAL_PATH << 1,
-  PREFER_NON_CONTROL_SPEC = PREFER_NON_DATA_SPEC << 1,
-  SEL_SCHED_SPEC_DONT_CHECK_CONTROL = PREFER_NON_CONTROL_SPEC << 1
+  SEL_SCHED_SPEC_DONT_CHECK_CONTROL = COUNT_SPEC_IN_CRITICAL_PATH << 1
 };
 
 #define NOTE_NOT_BB_P(NOTE) (NOTE_P (NOTE) && (NOTE_KIND (NOTE)	\

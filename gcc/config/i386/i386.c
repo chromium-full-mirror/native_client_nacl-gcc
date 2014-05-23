@@ -5147,7 +5147,7 @@ x86_64_elf_unique_section (tree decl, int reloc)
     {
       const char *prefix = NULL;
       /* We only need to use .gnu.linkonce if we don't have COMDAT groups.  */
-      bool one_only = DECL_ONE_ONLY (decl) && !HAVE_COMDAT_GROUP;
+      bool one_only = DECL_COMDAT_GROUP (decl) && !HAVE_COMDAT_GROUP;
 
       switch (categorize_decl_for_section (decl, reloc))
 	{
@@ -11949,7 +11949,7 @@ split_stack_prologue_scratch_regno (void)
 	      if (regparm >= 2)
 		{
 		  sorry ("-fsplit-stack does not support 2 register "
-			 " parameters for a nested function");
+			 "parameters for a nested function");
 		  return INVALID_REGNUM;
 		}
 	      return DX_REG;
@@ -13778,7 +13778,7 @@ get_dllimport_decl (tree decl, bool beimport)
   if (h)
     return h->to;
 
-  *loc = h = ggc_alloc_tree_map ();
+  *loc = h = ggc_alloc<tree_map> ();
   h->hash = in.hash;
   h->base.from = decl;
   h->to = to = build_decl (DECL_SOURCE_LOCATION (decl),
@@ -25165,7 +25165,7 @@ ix86_init_machine_status (void)
 {
   struct machine_function *f;
 
-  f = ggc_alloc_cleared_machine_function ();
+  f = ggc_cleared_alloc<machine_function> ();
   f->use_fast_prologue_epilogue_nregs = -1;
   f->call_abi = ix86_abi;
 
@@ -25189,7 +25189,7 @@ assign_386_stack_local (enum machine_mode mode, enum ix86_stack_slot n)
     if (s->mode == mode && s->n == n)
       return validize_mem (copy_rtx (s->rtl));
 
-  s = ggc_alloc_stack_local_entry ();
+  s = ggc_alloc<stack_local_entry> ();
   s->n = n;
   s->mode = mode;
   s->rtl = assign_stack_local (mode, GET_MODE_SIZE (mode), 0);
@@ -26513,7 +26513,7 @@ static int min_insn_size (rtx);
 static void
 core2i7_first_cycle_multipass_filter_ready_try
 (const_ix86_first_cycle_multipass_data_t data,
- char *ready_try, int n_ready, bool first_cycle_insn_p)
+ signed char *ready_try, int n_ready, bool first_cycle_insn_p)
 {
   while (n_ready--)
     {
@@ -26545,7 +26545,8 @@ core2i7_first_cycle_multipass_filter_ready_try
 
 /* Prepare for a new round of multipass lookahead scheduling.  */
 static void
-core2i7_first_cycle_multipass_begin (void *_data, char *ready_try, int n_ready,
+core2i7_first_cycle_multipass_begin (void *_data,
+				     signed char *ready_try, int n_ready,
 				     bool first_cycle_insn_p)
 {
   ix86_first_cycle_multipass_data_t data
@@ -26566,7 +26567,8 @@ core2i7_first_cycle_multipass_begin (void *_data, char *ready_try, int n_ready,
 /* INSN is being issued in current solution.  Account for its impact on
    the decoder model.  */
 static void
-core2i7_first_cycle_multipass_issue (void *_data, char *ready_try, int n_ready,
+core2i7_first_cycle_multipass_issue (void *_data,
+				     signed char *ready_try, int n_ready,
 				     rtx insn, const void *_prev_data)
 {
   ix86_first_cycle_multipass_data_t data
@@ -26604,7 +26606,7 @@ core2i7_first_cycle_multipass_issue (void *_data, char *ready_try, int n_ready,
 /* Revert the effect on ready_try.  */
 static void
 core2i7_first_cycle_multipass_backtrack (const void *_data,
-					 char *ready_try,
+					 signed char *ready_try,
 					 int n_ready ATTRIBUTE_UNUSED)
 {
   const_ix86_first_cycle_multipass_data_t data
