@@ -371,7 +371,7 @@ init_insn_lengths (void)
 /* Obtain the current length of an insn.  If branch shortening has been done,
    get its actual length.  Otherwise, use FALLBACK_FN to calculate the
    length.  */
-static inline int
+static int
 get_attr_length_1 (rtx insn, int (*fallback_fn) (rtx))
 {
   rtx body;
@@ -1925,7 +1925,7 @@ dump_basic_block_info (FILE *file, rtx insn, basic_block *start_to_bb,
       if (bb->frequency)
         fprintf (file, " freq:%d", bb->frequency);
       if (bb->count)
-        fprintf (file, " count:" HOST_WIDEST_INT_PRINT_DEC,
+        fprintf (file, " count:%"PRId64,
                  bb->count);
       fprintf (file, " seq:%d", (*bb_seqn)++);
       fprintf (file, "\n%s PRED:", ASM_COMMENT_START);

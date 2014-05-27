@@ -9269,7 +9269,7 @@ ix86_code_end (void)
 #endif
       if (USE_HIDDEN_LINKONCE)
 	{
-	  DECL_COMDAT_GROUP (decl) = DECL_ASSEMBLER_NAME (decl);
+	  cgraph_create_node (decl)->set_comdat_group (DECL_ASSEMBLER_NAME (decl));
 
 	  targetm.asm_out.unique_section (decl, 0);
 	  switch_to_section (get_named_section (decl, NULL, 0));
@@ -38033,10 +38033,10 @@ ix86_rtx_costs (rtx x, int code_i, int outer_code_i, int opno, int *total,
       else if (TARGET_64BIT && !x86_64_zext_immediate_operand (x, VOIDmode))
 	*total = 2;
       else if (flag_pic && SYMBOLIC_CONST (x)
-	       && (!TARGET_64BIT
-		   || (!GET_CODE (x) != LABEL_REF
-		       && (GET_CODE (x) != SYMBOL_REF
-			   || !SYMBOL_REF_LOCAL_P (x)))))
+	       && !(TARGET_64BIT
+		    && (GET_CODE (x) == LABEL_REF
+			|| (GET_CODE (x) == SYMBOL_REF
+			    && SYMBOL_REF_LOCAL_P (x)))))
 	*total = 1;
       else
 	*total = 0;

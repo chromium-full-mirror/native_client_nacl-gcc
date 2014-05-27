@@ -603,6 +603,16 @@ decl_assembler_name (tree decl)
   return DECL_WITH_VIS_CHECK (decl)->decl_with_vis.assembler_name;
 }
 
+/* Return comdat group of DECL.  */
+tree
+decl_comdat_group (tree node)
+{
+  struct symtab_node *snode = symtab_get_node (node);
+  if (!snode)
+    return NULL;
+  return snode->get_comdat_group ();
+}
+
 /* Compute the number of bytes occupied by a tree with code CODE.
    This function cannot be used for nodes that have variable sizes,
    including TREE_VEC, INTEGER_CST, STRING_CST, and CALL_EXPR.  */
@@ -972,14 +982,20 @@ copy_node_stat (tree node MEM_STAT_DECL)
 	}
       /* DECL_DEBUG_EXPR is copied explicitely by callers.  */
       if (TREE_CODE (node) == VAR_DECL)
-	DECL_HAS_DEBUG_EXPR_P (t) = 0;
+	{
+	  DECL_HAS_DEBUG_EXPR_P (t) = 0;
+	  t->decl_with_vis.symtab_node = NULL;
+	}
       if (TREE_CODE (node) == VAR_DECL && DECL_HAS_INIT_PRIORITY_P (node))
 	{
 	  SET_DECL_INIT_PRIORITY (t, DECL_INIT_PRIORITY (node));
 	  DECL_HAS_INIT_PRIORITY_P (t) = 1;
 	}
       if (TREE_CODE (node) == FUNCTION_DECL)
-	DECL_STRUCT_FUNCTION (t) = NULL;
+	{
+	  DECL_STRUCT_FUNCTION (t) = NULL;
+	  t->decl_with_vis.symtab_node = NULL;
+	}
     }
   else if (TREE_CODE_CLASS (code) == tcc_type)
     {
@@ -5238,7 +5254,6 @@ find_decls_types_r (tree *tp, int *ws, void *data)
       else if (TREE_CODE (t) == VAR_DECL)
 	{
 	  fld_worklist_push (DECL_SECTION_NAME (t), fld);
-	  fld_worklist_push (DECL_COMDAT_GROUP (t), fld);
 	}
 
       if ((TREE_CODE (t) == VAR_DECL || TREE_CODE (t) == PARM_DECL)
@@ -10471,40 +10486,6 @@ int_cst_value (const_tree x)
 	val |= (~(unsigned HOST_WIDE_INT) 0) << (bits - 1) << 1;
       else
 	val &= ~((~(unsigned HOST_WIDE_INT) 0) << (bits - 1) << 1);
-    }
-
-  return val;
-}
-
-/* Return value of a constant X and sign-extend it.  */
-
-HOST_WIDEST_INT
-widest_int_cst_value (const_tree x)
-{
-  unsigned bits = TYPE_PRECISION (TREE_TYPE (x));
-  unsigned HOST_WIDEST_INT val = TREE_INT_CST_LOW (x);
-
-#if HOST_BITS_PER_WIDEST_INT > HOST_BITS_PER_WIDE_INT
-  gcc_assert (HOST_BITS_PER_WIDEST_INT >= HOST_BITS_PER_DOUBLE_INT);
-  gcc_assert (TREE_INT_CST_NUNITS (x) == 2);
-
-  if (TREE_INT_CST_NUNITS (x) == 1)
-    val = HOST_WIDE_INT (val);
-  else
-    val |= (((unsigned HOST_WIDEST_INT) TREE_INT_CST_ELT (x, 1))
-	    << HOST_BITS_PER_WIDE_INT);
-#else
-  /* Make sure the sign-extended value will fit in a HOST_WIDE_INT.  */
-  gcc_assert (TREE_INT_CST_NUNITS (x) == 1);
-#endif
-
-  if (bits < HOST_BITS_PER_WIDEST_INT)
-    {
-      bool negative = ((val >> (bits - 1)) & 1) != 0;
-      if (negative)
-	val |= (~(unsigned HOST_WIDEST_INT) 0) << (bits - 1) << 1;
-      else
-	val &= ~((~(unsigned HOST_WIDEST_INT) 0) << (bits - 1) << 1);
     }
 
   return val;

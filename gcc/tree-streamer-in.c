@@ -568,7 +568,7 @@ streamer_alloc_tree (struct lto_input_block *ib, struct data_in *data_in,
   enum tree_code code;
   tree result;
 #ifdef LTO_STREAMER_DEBUG
-  HOST_WIDEST_INT orig_address_in_writer;
+  HOST_WIDE_INT orig_address_in_writer;
 #endif
 
   result = NULL_TREE;
@@ -760,7 +760,6 @@ lto_input_ts_decl_with_vis_tree_pointers (struct lto_input_block *ib,
     }
 
   DECL_SECTION_NAME (expr) = stream_read_tree (ib, data_in);
-  DECL_COMDAT_GROUP (expr) = stream_read_tree (ib, data_in);
 }
 
 
