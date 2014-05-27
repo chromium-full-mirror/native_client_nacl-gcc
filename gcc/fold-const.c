@@ -484,8 +484,6 @@ negate_expr_p (tree t)
 
     case TRUNC_DIV_EXPR:
     case ROUND_DIV_EXPR:
-    case FLOOR_DIV_EXPR:
-    case CEIL_DIV_EXPR:
     case EXACT_DIV_EXPR:
       /* In general we can't negate A / B, because if A is INT_MIN and
 	 B is 1, we may turn this into INT_MIN / -1 which is undefined
@@ -682,8 +680,6 @@ fold_negate_expr (location_t loc, tree t)
 
     case TRUNC_DIV_EXPR:
     case ROUND_DIV_EXPR:
-    case FLOOR_DIV_EXPR:
-    case CEIL_DIV_EXPR:
     case EXACT_DIV_EXPR:
       /* In general we can't negate A / B, because if A is INT_MIN and
 	 B is 1, we may turn this into INT_MIN / -1 which is undefined
@@ -12092,11 +12088,17 @@ fold_binary_loc (location_t loc,
 		      /* See if we can shorten the right shift.  */
 		      if (shiftc < prec)
 			shift_type = inner_type;
+		      /* Otherwise X >> C1 is all zeros, so we'll optimize
+			 it into (X, 0) later on by making sure zerobits
+			 is all ones.  */
 		    }
 		}
 	      zerobits = ~(unsigned HOST_WIDE_INT) 0;
-	      zerobits >>= HOST_BITS_PER_WIDE_INT - shiftc;
-	      zerobits <<= prec - shiftc;
+	      if (shiftc < prec)
+		{
+		  zerobits >>= HOST_BITS_PER_WIDE_INT - shiftc;
+		  zerobits <<= prec - shiftc;
+		}
 	      /* For arithmetic shift if sign bit could be set, zerobits
 		 can contain actually sign bits, so no transformation is
 		 possible, unless MASK masks them all away.  In that
@@ -12114,7 +12116,7 @@ fold_binary_loc (location_t loc,
 	  /* ((X << 16) & 0xff00) is (X, 0).  */
 	  if ((mask & zerobits) == mask)
 	    return omit_one_operand_loc (loc, type,
-				     build_int_cst (type, 0), arg0);
+					 build_int_cst (type, 0), arg0);
 
 	  newmask = mask | zerobits;
 	  if (newmask != mask && (newmask & (newmask + 1)) == 0)
