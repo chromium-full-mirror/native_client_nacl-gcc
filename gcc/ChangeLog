@@ -1,3 +1,68 @@
+2014-05-28  Eric Botcazou  <ebotcazou@adacore.com>
+
+	Backport from mainline
+	2014-05-27  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* double-int.c (div_and_round_double) <ROUND_DIV_EXPR>: Use the proper
+	predicate to detect a negative quotient.
+
+2014-05-28  Richard Biener  <rguenther@suse.de>
+
+	Backport from mainline
+	2014-05-28  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/61045
+	* fold-const.c (fold_comparison): When folding
+	X +- C1 CMP Y +- C2 to X CMP Y +- C2 +- C1 also ensure
+	the sign of the remaining constant operand stays the same.
+
+	2014-05-05  Richard Biener  <rguenther@suse.de>
+
+	PR middle-end/61010
+	* fold-const.c (fold_binary_loc): Consistently avoid
+	canonicalizing X & CST away from a CST that is the mask
+	of a mode.
+
+	2014-04-28  Richard Biener  <rguenther@suse.de>
+
+	PR tree-optimization/60979
+	* graphite-scop-detection.c (scopdet_basic_block_info): Reject
+	SCOPs that end in a block with a successor with abnormal
+	predecessors.
+
+2014-05-28  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac ($gcc_cv_ld_clearcap): New test.
+	* configure: Regenerate.
+	* config.in: Regenerate.
+	* config/sol2.opt (mclear-hwcap): New option.
+	* config/sol2.h (LINK_CLEARCAP_SPEC): Define.
+	* config/sol2-clearcap.map: Moved here from
+	testsuite/gcc.target/i386/clearcap.map.
+	* config/sol2-clearcapv2.map: Move here from
+	gcc.target/i386/clearcapv2.map.
+	* config/t-sol2 (install): Depend on install-clearcap-map.
+	(install-clearcap-map): New target.
+	* doc/invoke.texi (Option Summary, Solaris 2 Options): Document
+	-mclear-hwcap.
+
+2014-05-28  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR libgcc/61152
+	* config/dbx.h (License): Add Runtime Library Exception.
+	* config/newlib-stdint.h (License): Same.
+	* config/rtems.h (License): Same
+	* config/initfini-array.h (License): Same
+	* config/v850/v850.h (License): Same.
+	* config/v850/v850-opts.h (License): Same
+	* config/v850/rtems.h (License): Same.
+
+2014-05-28  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/61044
+	* doc/extend.texi (Local Labels): Note that label differences are
+	not supported for AVR.
+
 2014-05-27  Georg-Johann Lay  <avr@gjlay.de>
 
 	Backport from 2014-05-12 mainline r210322.
