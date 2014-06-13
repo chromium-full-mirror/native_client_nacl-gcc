@@ -17,7 +17,9 @@
 	\macro eq, \args
 	\macro ne, \args
 	\macro cs, \args
+	\macro hs, \args
 	\macro cc, \args
+	\macro lo, \args
 	\macro mi, \args
 	\macro pl, \args
 	\macro vs, \args
