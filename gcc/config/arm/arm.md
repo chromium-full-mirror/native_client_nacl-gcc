@@ -12532,9 +12532,17 @@
 	     (match_operand:SI 1 "" "")
 	     (match_operand:SI 2 "" ""))]
   "TARGET_32BIT && arm_arch5e"
-  "%b0pld\\t%a0"
+{
+  if (TARGET_SFI_NACL1)
+    {
+      /* The sfi_breg_operand machinery expects a MEM rtx, so give it one.  */
+      operands[0] = gen_rtx_MEM (Pmode, operands[0]);
+      return "%b0pld\t%0";
+    }
+  return "pld\\t%a0";
+}
   [(set_attr "type" "load1")
-   (set_attr "sfi_breg_operand" "0")]
+   (set (attr "length") (if_then_else (match_test "TARGET_SFI_NACL1") (const_int 12) (const_int 4)))]
 )
 
 ;; General predication pattern
