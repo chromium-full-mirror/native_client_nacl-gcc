@@ -50,11 +50,6 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #undef  JUMP_TABLES_IN_TEXT_SECTION
 #define JUMP_TABLES_IN_TEXT_SECTION     0
 
-/* Every Native Client platform has a va_list type of the same
-   size and minimum alignment, even if it just contains unused
-   padding space to reach that size.  */
-#define VA_LIST_TYPE_SIZE               (16 * BITS_PER_UNIT)
-
 #define NACL_MIN_ALIGN(condition, bundle_size)                          \
   do {                                                                  \
     if (condition)                                                      \
