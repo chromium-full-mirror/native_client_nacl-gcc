@@ -1563,32 +1563,6 @@ arm_build_builtin_va_list (void)
   DECL_ARTIFICIAL (ap_field) = 1;
   DECL_FIELD_CONTEXT (ap_field) = va_list_type;
   TYPE_FIELDS (va_list_type) = ap_field;
-
-#ifdef VA_LIST_TYPE_SIZE
-  /* Certain variant ABIs require that the struct be padded out to
-     a larger exact size.  */
-  gcc_assert (VA_LIST_TYPE_SIZE % (4 * BITS_PER_UNIT) == 0);
-  {
-    unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE / BITS_PER_UNIT - 4) / 4;
-    unsigned int i;
-    tree *next_field = &DECL_CHAIN (ap_field);
-    for (i = 0; i < num_pad_fields; ++i)
-      {
-        char pad_field_name[10];
-        tree pad_field;
-        sprintf (pad_field_name, "__pad%u", i);
-        pad_field = build_decl (BUILTINS_LOCATION,
-                                FIELD_DECL,
-                                get_identifier (pad_field_name),
-                                ptr_type_node);
-        DECL_ARTIFICIAL (pad_field) = 1;
-        DECL_FIELD_CONTEXT (pad_field) = va_list_type;
-        *next_field = pad_field;
-        next_field = &DECL_CHAIN (pad_field);
-      }
-  }
-#endif
-
   /* Compute its layout.  */
   layout_type (va_list_type);
 

@@ -7573,97 +7573,42 @@ ix86_build_builtin_va_list_abi (enum calling_abi abi)
   tree f_gpr, f_fpr, f_ovf, f_sav, record, type_decl;
 
   /* For i386 we use plain pointer to argument area.  */
-  if ((!TARGET_64BIT || abi == MS_ABI)
-#ifdef VA_LIST_TYPE_SIZE
-      && VA_LIST_TYPE_SIZE == POINTER_SIZE
-#endif
-      )
+  if (!TARGET_64BIT || abi == MS_ABI)
     return build_pointer_type (char_type_node);
 
   record = lang_hooks.types.make_type (RECORD_TYPE);
   type_decl = build_decl (BUILTINS_LOCATION,
 			  TYPE_DECL, get_identifier ("__va_list_tag"), record);
 
-  if (TARGET_64BIT)
-    {
-      f_gpr = build_decl (BUILTINS_LOCATION,
-                          FIELD_DECL, get_identifier ("gp_offset"),
-                          unsigned_type_node);
-      f_fpr = build_decl (BUILTINS_LOCATION,
-                          FIELD_DECL, get_identifier ("fp_offset"),
-                          unsigned_type_node);
-      f_ovf = build_decl (BUILTINS_LOCATION,
-                          FIELD_DECL, get_identifier ("overflow_arg_area"),
-                          ptr_type_node);
-      f_sav = build_decl (BUILTINS_LOCATION,
-                          FIELD_DECL, get_identifier ("reg_save_area"),
-                          ptr_type_node);
+  f_gpr = build_decl (BUILTINS_LOCATION,
+		      FIELD_DECL, get_identifier ("gp_offset"),
+		      unsigned_type_node);
+  f_fpr = build_decl (BUILTINS_LOCATION,
+		      FIELD_DECL, get_identifier ("fp_offset"),
+		      unsigned_type_node);
+  f_ovf = build_decl (BUILTINS_LOCATION,
+		      FIELD_DECL, get_identifier ("overflow_arg_area"),
+		      ptr_type_node);
+  f_sav = build_decl (BUILTINS_LOCATION,
+		      FIELD_DECL, get_identifier ("reg_save_area"),
+		      ptr_type_node);
 
-      va_list_gpr_counter_field = f_gpr;
-      va_list_fpr_counter_field = f_fpr;
+  va_list_gpr_counter_field = f_gpr;
+  va_list_fpr_counter_field = f_fpr;
 
-      DECL_FIELD_CONTEXT (f_gpr) = record;
-      DECL_FIELD_CONTEXT (f_fpr) = record;
-      DECL_FIELD_CONTEXT (f_ovf) = record;
-      DECL_FIELD_CONTEXT (f_sav) = record;
+  DECL_FIELD_CONTEXT (f_gpr) = record;
+  DECL_FIELD_CONTEXT (f_fpr) = record;
+  DECL_FIELD_CONTEXT (f_ovf) = record;
+  DECL_FIELD_CONTEXT (f_sav) = record;
 
-      TYPE_STUB_DECL (record) = type_decl;
-      TYPE_NAME (record) = type_decl;
-      TYPE_FIELDS (record) = f_gpr;
-      DECL_CHAIN (f_gpr) = f_fpr;
-      DECL_CHAIN (f_fpr) = f_ovf;
-      DECL_CHAIN (f_ovf) = f_sav;
-    }
-#ifdef VA_LIST_TYPE_SIZE
-  else
-    {
-      /* Certain variant ABIs require that va_list be padded out to
-         a larger exact size.  Hence we have to make it a struct.  */
-
-      tree ap_field, *next_field;
-      unsigned int num_pad_fields = (VA_LIST_TYPE_SIZE / BITS_PER_UNIT - 4) / 4;
-      unsigned int i;
-
-      gcc_assert (VA_LIST_TYPE_SIZE % (4 * BITS_PER_UNIT) == 0);
-
-      ap_field = build_decl (BUILTINS_LOCATION,
-                             FIELD_DECL,
-                             get_identifier ("__ap"),
-                             ptr_type_node);
-      DECL_ARTIFICIAL (ap_field) = 1;
-      DECL_FIELD_CONTEXT (ap_field) = record;
-
-      next_field = &DECL_CHAIN (ap_field);
-      for (i = 0; i < num_pad_fields; ++i)
-        {
-          char pad_field_name[10];
-          tree pad_field;
-          sprintf (pad_field_name, "__pad%u", i);
-          pad_field = build_decl (BUILTINS_LOCATION,
-                                  FIELD_DECL,
-                                  get_identifier (pad_field_name),
-                                  ptr_type_node);
-          DECL_ARTIFICIAL (pad_field) = 1;
-          DECL_FIELD_CONTEXT (pad_field) = record;
-          *next_field = pad_field;
-          next_field = &DECL_CHAIN (pad_field);
-        }
-
-      TYPE_STUB_DECL (record) = type_decl;
-      TYPE_NAME (record) = type_decl;
-      TYPE_FIELDS (record) = ap_field;
-    }
-#endif
+  TYPE_STUB_DECL (record) = type_decl;
+  TYPE_NAME (record) = type_decl;
+  TYPE_FIELDS (record) = f_gpr;
+  DECL_CHAIN (f_gpr) = f_fpr;
+  DECL_CHAIN (f_fpr) = f_ovf;
+  DECL_CHAIN (f_ovf) = f_sav;
 
   layout_type (record);
-
-#ifdef VA_LIST_TYPE_SIZE
-  /* This assertion is just here as a sanity check on the code above.
-     But under -lang-asm we get called even though the basics like
-     setting up ptr_type_node haven't been done.  */
-  if (TREE_INT_CST_LOW (TYPE_SIZE (ptr_type_node)) == POINTER_SIZE)
-    gcc_assert (TREE_INT_CST_LOW (TYPE_SIZE (record)) == VA_LIST_TYPE_SIZE);
-#endif
 
   /* The correct type is an array type of one element.  */
   return build_array_type (record, build_index_type (size_zero_node));
@@ -7863,11 +7808,6 @@ is_va_list_char_pointer (tree type)
 {
   tree canonic;
 
-#ifdef VA_LIST_TYPE_SIZE
-  if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
-    return false;
-#endif
-
   /* For 32-bit it is always true.  */
   if (!TARGET_64BIT)
     return true;
@@ -7922,20 +7862,6 @@ ix86_va_start (tree valist, rtx nextarg)
   /* Only 64bit target needs something special.  */
   if (!TARGET_64BIT || is_va_list_char_pointer (TREE_TYPE (valist)))
     {
-#ifdef VA_LIST_TYPE_SIZE
-      if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
-        {
-          /* We're using a structure type to give it some padding.
-             But all we need is the first field, a simple pointer.  */
-          tree va_list_type = TREE_TYPE (va_list_type_node);
-          tree f_ap = TYPE_FIELDS (va_list_type);
-          valist = build_simple_mem_ref_loc (EXPR_LOCATION (valist), valist);
-          TREE_TYPE (valist) = va_list_type;
-          valist = build3 (COMPONENT_REF, TREE_TYPE (f_ap),
-                           valist, f_ap, NULL_TREE);
-        }
-#endif
-
       if (cfun->machine->split_stack_varargs_pointer == NULL_RTX)
 	std_expand_builtin_va_start (valist, nextarg);
       else
@@ -8039,19 +7965,7 @@ ix86_gimplify_va_arg (tree valist, tree type, gimple_seq *pre_p,
 
   /* Only 64bit target needs something special.  */
   if (!TARGET_64BIT || is_va_list_char_pointer (TREE_TYPE (valist)))
-    {
-#ifdef VA_LIST_TYPE_SIZE
-      if (VA_LIST_TYPE_SIZE != POINTER_SIZE)
-        {
-          /* We're using a structure type to give it some padding.
-             But all we need is the first field, a simple pointer.  */
-          tree fld = TYPE_FIELDS (TREE_TYPE (va_list_type_node));
-          valist = build3 (COMPONENT_REF, TREE_TYPE (fld),
-                           build_va_arg_indirect_ref (valist), fld, NULL_TREE);
-        }
-#endif
-      return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
-    }
+    return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
 
   f_gpr = TYPE_FIELDS (TREE_TYPE (sysv_va_list_type_node));
   f_fpr = DECL_CHAIN (f_gpr);
