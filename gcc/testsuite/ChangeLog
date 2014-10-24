@@ -1,3 +1,131 @@
+2014-10-24  Markus Trippelsdorf  <markus@trippelsdorf.de>
+
+	PR bootstrap/63632
+	* g++.dg/torture/pr63632.C: New test.
+
+2014-10-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/63563
+	* gcc.target/i386/pr63563.c: New test.
+
+2014-10-20  Yury Gribov  <y.gribov@samsung.com>
+
+	Backported from mainline
+	2014-05-30  Jakub Jelinek  <jakub@redhat.com>
+
+	* c-c++-common/asan/misalign-1.c: New test.
+	* c-c++-common/asan/misalign-2.c: New test.
+
+2014-10-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* c-c++-common/asan/instrument-with-calls-1.c: Add
+	-fno-sanitize=address -fsanitize=kernel-address to dg-options.
+	* c-c++-common/asan/instrument-with-calls-2.c: Likewise.
+
+	PR tree-optimization/63302
+	* gcc.c-torture/execute/pr63302.c: New test.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-09-01  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/61897
+	PR sanitizer/62140
+
+	* c-c++-common/asan/pr62140-1.c: New test.
+	* c-c++-common/asan/pr62140-2.c: New test.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-08-18  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/62089
+
+	* c-c++-common/asan/pr62089.c: New test.
+	* c-c++-common/asan/bitfield-1.c: New test.
+	* c-c++-common/asan/bitfield-2.c: New test.
+	* c-c++-common/asan/bitfield-3.c: New test.
+	* c-c++-common/asan/bitfield-4.c: New test.
+
+	Backport from mainline
+	2014-08-28  Yury Gribov  <y.gribov@samsung.com>
+
+	* c-c++-common/asan/pr62089.c: Fix test on 32-bit platforms.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-08-11  Yury Gribov  <y.gribov@samsung.com>
+
+	* c-c++-common/asan/inc.c: Update test.
+	* c-c++-common/asan/instrument-with-calls-2.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-1.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-2.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-3.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-4.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-5.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-6.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-7.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-8.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-9.c: Likewise.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-06-24  Max Ostapenko  <m.ostapenko@partner.samsung.com>
+
+	* c-c++-common/asan/no-redundant-instrumentation-9.c: New test.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-06-16  Yury Gribov  <y.gribov@samsung.com>
+
+	* c-c++-common/asan/instrument-with-calls-1.c: New test.
+	* c-c++-common/asan/instrument-with-calls-2.c: Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-1.c: Update
+	test patterns.
+	* c-c++-common/asan/no-redundant-instrumentation-2.c:
+	Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-4.c:
+	Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-5.c:
+	Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-6.c:
+	Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-7.c:
+	Likewise.
+	* c-c++-common/asan/no-redundant-instrumentation-8.c:
+	Likewise.
+
+	Backport from mainline
+	2014-06-18  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/61530
+
+	* c-c++-common/asan/pr61530.c: New test.
+
+	Backport from mainline
+	2014-06-18  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/61547
+
+	* c-c++-common/asan/strlen-overflow-1.c: New test.
+
+2014-10-16  Yury Gribov  <y.gribov@samsung.com>
+
+	Backport from mainline
+	2014-05-14  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/61100
+
+	* c-c++-common/asan/asan-interface-1.c: New test.
+	* lib/asan-dg.exp (asan_include_flags): New function.
+	(asan_init): Call asan_include_flags to obtain path
+	to sanitizer headers.
+
 2014-10-15  Vladimir Makarov  <vmakarov@redhat.com>
 
 	PR rtl-optimization/63448
