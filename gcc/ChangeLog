@@ -1,3 +1,23 @@
+2014-10-30  Release Manager
+
+	* GCC 4.9.2 released.
+
+2014-10-29  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/aarch64/aarch64.c (aarch64_madd_needs_nop): Restore
+	recog state after aarch64_prev_real_insn call.
+
+2014-10-27  Guozhi Wei  <carrot@google.com>
+
+	PR tree-optimization/63530
+	tree-vect-data-refs.c (vect_create_addr_base_for_vector_ref): Set
+	pointer alignment according to DR_MISALIGNMENT.
+
+2014-10-25  Yury Gribov  <y.gribov@samsung.com>
+
+	PR sanitizer/63638
+	* asan.c (enum asan_check_flags): Fixed ASAN_CHECK_LAST.
+
 2014-10-24  Markus Trippelsdorf  <markus@trippelsdorf.de>
 
 	PR bootstrap/63632
