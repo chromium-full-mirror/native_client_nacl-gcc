@@ -23,6 +23,7 @@ Boston, MA 02110-1301, USA.  */
 #include "config.h"
 #include "libiberty.h"
 #include "pex-common.h"
+#include "environ.h"
 
 #include <stdio.h>
 #include <signal.h>
@@ -76,7 +77,7 @@ __attribute__ ((mode (SI)));
 typedef __char_ptr32 *__char_ptr_char_ptr32
 __attribute__ ((mode (SI)));
 
-/* Return a 32 bit pointer to an array of 32 bit pointers 
+/* Return a 32 bit pointer to an array of 32 bit pointers
    given a 64 bit pointer to an array of 64 bit pointers.  */
 
 static __char_ptr_char_ptr32
@@ -388,8 +389,6 @@ pex_child_error (struct pex_obj *obj, const char *executable,
 }
 
 /* Execute a child.  */
-
-extern char **environ;
 
 #if defined(HAVE_SPAWNVE) && defined(HAVE_SPAWNVPE)
 /* Implementation of pex->exec_child using the Cygwin spawn operation.  */

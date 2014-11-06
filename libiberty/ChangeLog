@@ -1,3 +1,11 @@
+2014-11-05  Roland McGrath  <mcgrathr@google.com>
+
+	PR other/63758
+	* environ.h: New file.
+	* xmalloc.c: Include it.
+	(xmalloc_failed): Don't declare environ directly here.
+	* pex-unix.c: Likewise.
+
 2014-10-30  Release Manager
 
 	* GCC 4.9.2 released.
@@ -71,7 +79,7 @@
 	(d_ctor_dtor_name): Handle unified ctor/dtor.
 
 2013-11-22  Cary Coutant  <ccoutant@google.com>
-    
+
 	PR other/59195
 	* cp-demangle.c (struct d_info_checkpoint): New struct.
 	(struct d_print_info): Add current_template field.
