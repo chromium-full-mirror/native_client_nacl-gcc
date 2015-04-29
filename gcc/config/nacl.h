@@ -1,5 +1,5 @@
 /* Definitions for Native Client systems.
-   Copyright (C) 2013 Free Software Foundation, Inc.
+   Copyright (C) 2013-2015 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -73,14 +73,9 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define LONG_DOUBLE_TYPE_SIZE		DOUBLE_TYPE_SIZE
 #undef LIBGCC2_HAS_TF_MODE
 
-/* For now, -static is effectively the default.  But the driver
-   doesn't know that.  The gnu-user.h definition is:
-   "%{static:--start-group} %G %L %{static:--end-group}%{!static:%G}"
-
-   TODO(mcgrathr): When we have multilib for newlib (static-only) vs glibc
-   (dynamic by default, -static available), this will need to be defined so
-   that it uses the -static flavor for newlib and the gnu-user.h default
-   (i.e. switching on -static) for glibc.  */
-#undef LINK_GCC_C_SEQUENCE_SPEC
-#define LINK_GCC_C_SEQUENCE_SPEC \
-  "--start-group %G %L --end-group"
+/* For dynamic linking an ET_EXEC, we need to place the text segment
+   far enough above the normal 0x20000 default that there is enough
+   space for the untrusted ELF loader.  */
+#define NACL_LINK_SPEC \
+  "%{!static:%{!shared:%{!pie:-Ttext-segment=0x100000}}}" \
+  LINUX_TARGET_LINK_SPEC

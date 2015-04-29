@@ -1,5 +1,5 @@
 /* Definitions for ARM running Native Client
-   Copyright (C) 2012-2013 Free Software Foundation, Inc.
+   Copyright (C) 2012-2015 Free Software Foundation, Inc.
 
    This file is part of GCC.
 
@@ -76,7 +76,7 @@
 #define GNU_USER_DYNAMIC_LINKER "/lib/ld-nacl-arm.so.1"
 
 #undef  LINK_SPEC
-#define LINK_SPEC EABI_LINK_SPEC LINUX_TARGET_LINK_SPEC
+#define LINK_SPEC EABI_LINK_SPEC NACL_LINK_SPEC
 
 #undef  CC1_SPEC
 #define CC1_SPEC GNU_USER_TARGET_CC1_SPEC

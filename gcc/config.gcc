@@ -745,6 +745,12 @@ case ${target} in
 *-*-nacl*)
   gas=yes
   gnu_ld=yes
+  if test x$with_newlib != xyes; then
+    case ${enable_threads} in
+      "" | yes | posix) thread_file='posix' ;;
+    esac
+    tmake_file="t-slibgcc"
+  fi
   default_use_cxa_atexit=yes
   default_gnu_indirect_function=yes
   use_gcc_tgmath=no
